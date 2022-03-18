@@ -1,7 +1,17 @@
 #include "pch.h"
-#include <iostream>
+#include "WindowHandler.h"
 
 int main()
 {
-	std::cout << "hello world" << std::endl;
+	WindowHandler windowHandler{};
+	{
+		const WindowHandler::Info windowCreateInfo{};
+		windowHandler.Construct(windowCreateInfo);
+	}
+
+	bool quit = false;
+	while(!quit)
+	{
+		windowHandler.BeginFrame(quit);
+	}
 }

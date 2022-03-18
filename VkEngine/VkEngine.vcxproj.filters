@@ -21,7 +21,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowHandler.cpp">
+    <ClCompile Include="Source\WindowHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="Include\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowHandler.h">
+    <ClInclude Include="Include\WindowHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
