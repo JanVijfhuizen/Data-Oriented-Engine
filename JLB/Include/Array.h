@@ -13,13 +13,6 @@ namespace jlb
 	class Array
 	{
 	public:
-		Array() = default;
-		Array(Array& other) = delete;
-		Array(Array&& other) = delete;
-		Array& operator=(Array& other) = delete;
-		Array& operator=(Array&& other) = delete;
-		virtual ~Array() = default;
-
 		[[nodiscard]] virtual T& operator[](size_t index);
 		[[nodiscard]] size_t GetLength() const;
 
@@ -55,6 +48,14 @@ namespace jlb
 		void Swap(size_t a, size_t b);
 
 		/// <summary>
+		/// Copy the data from the source into this array.
+		/// </summary>
+		/// <param name="begin">Begin index.</param>
+		/// <param name="end">End index.</param>
+		/// <param name="src">Source data.</param>
+		void Copy(size_t begin, size_t end, T* src);
+
+		/// <summary>
 		/// Get a raw pointer to the managed memory.
 		/// </summary>
 		/// <returns>Raw pointer to the managed memory.</returns>
@@ -62,6 +63,8 @@ namespace jlb
 
 		[[nodiscard]] virtual Iterator<T> begin();
 		[[nodiscard]] virtual Iterator<T> end();
+
+		[[nodiscard]] operator bool() const;
 
 	private:
 		T* _memory = nullptr;
@@ -116,6 +119,12 @@ namespace jlb
 	}
 
 	template <typename T>
+	void Array<T>::Copy(const size_t begin, const size_t end, T* src)
+	{
+		memcpy(&_memory[begin], src, (end - begin) * sizeof(T));
+	}
+
+	template <typename T>
 	T* Array<T>::GetData()
 	{
 		return _memory;
@@ -139,5 +148,11 @@ namespace jlb
 		it.index = _length;
 		it.length = _length;
 		return it;
+	}
+
+	template <typename T>
+	Array<T>::operator bool() const
+	{
+		return _length > 0;
 	}
 }
