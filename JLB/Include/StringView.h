@@ -17,7 +17,7 @@ namespace jlb
 		/// Returns the pointer to the string literal.
 		/// </summary>
 		/// <returns>Pointer to the string literal.</returns>
-		const char* GetData() const;
+		[[nodiscard]] const char* GetData() const;
 
 		bool operator==(StringView& other);
 		bool operator==(const char* other);
