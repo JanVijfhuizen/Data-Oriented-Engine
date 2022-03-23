@@ -15,10 +15,9 @@ int main()
 
 	vk::App app{};
 	{
-		vk::AppInfo createInfo{};
-		createInfo.validationLayers.Allocate(tempAllocator, 1, "VK_LAYER_KHRONOS_validation");
-		app = vk::Bootstrap::CreateApp(tempAllocator, createInfo);
-		createInfo.validationLayers.Free(tempAllocator);
+		vk::AppInfo appInfo = vk::Bootstrap::CreateInfo(tempAllocator);
+		app = vk::Bootstrap::CreateApp(tempAllocator, appInfo);
+		appInfo.Free(tempAllocator);
 	}
 
 	bool quit = false;
@@ -28,4 +27,7 @@ int main()
 	}
 
 	vk::Bootstrap::DestroyApp(app);
+
+	assert(allocator.IsEmpty());
+	assert(tempAllocator.IsEmpty());
 }

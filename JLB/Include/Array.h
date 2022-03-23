@@ -106,7 +106,11 @@ namespace jlb
 	template <typename T>
 	void Array<T>::Free(LinearAllocator& allocator)
 	{
-		allocator.Free();
+		if (_memory)
+		{
+			allocator.Free();
+			_memory = nullptr;
+		}
 	}
 
 	template <typename T>

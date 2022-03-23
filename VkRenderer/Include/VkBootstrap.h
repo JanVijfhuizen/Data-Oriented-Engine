@@ -15,11 +15,14 @@ namespace vk
 		jlb::StringView name;
 		jlb::Array<jlb::StringView> validationLayers{};
 		jlb::Array<jlb::StringView> deviceExtensions{};
+
+		void Free(jlb::LinearAllocator& tempAllocator);
 	};
 
 	class Bootstrap final
 	{
 	public:
+		[[nodiscard]] static AppInfo CreateInfo(jlb::LinearAllocator& tempAllocator);
 		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info);
 		static void DestroyApp(const App& app);
 

@@ -48,6 +48,12 @@ namespace jlb
 		/// <returns></returns>
 		[[nodiscard]] size_t GetAvailableMemorySpace() const;
 
+		/// <summary>
+		/// Returns whether or not the allocator is in use.
+		/// </summary>
+		/// <returns>If the allocator is in use.</returns>
+		[[nodiscard]] bool IsEmpty() const;
+
 	private:
 		// Pointer to the big chunk of memory, from which everything is allocated.
 		size_t* _memory = nullptr;

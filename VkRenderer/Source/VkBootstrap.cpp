@@ -5,6 +5,19 @@
 
 namespace vk
 {
+	void AppInfo::Free(jlb::LinearAllocator& tempAllocator)
+	{
+		validationLayers.Free(tempAllocator);
+		deviceExtensions.Free(tempAllocator);
+	}
+
+	AppInfo Bootstrap::CreateInfo(jlb::LinearAllocator& tempAllocator)
+	{
+		AppInfo info{};
+		info.validationLayers.Allocate(tempAllocator, 1, "VK_LAYER_KHRONOS_validation");
+		return info;
+	}
+
 	App Bootstrap::CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info)
 	{
 		App app{};
@@ -52,6 +65,8 @@ namespace vk
 			// If the layer is not available.
 			assert(layerFound);
 		}
+
+		availableLayers.Free(tempAllocator);
 	}
 
 	void Bootstrap::CreateInstance(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app)
