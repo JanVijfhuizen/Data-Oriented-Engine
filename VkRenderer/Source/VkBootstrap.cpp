@@ -21,14 +21,20 @@ namespace vk
 	App Bootstrap::CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info)
 	{
 		App app{};
+
 		CheckValidationSupport(tempAllocator, info);
 		CreateInstance(tempAllocator, info, app);
 		CreateDebugger(app);
+
+		assert(info.windowHandler);
+		app.surface = info.windowHandler->CreateSurface(app.instance);
+
 		return app;
 	}
 
 	void Bootstrap::DestroyApp(const App& app)
 	{
+		vkDestroySurfaceKHR(app.instance, app.surface, nullptr);
 #ifdef _DEBUG
 		DestroyDebugUtilsMessengerEXT(app.instance, app.debugger, nullptr);
 #endif
@@ -122,7 +128,7 @@ namespace vk
 		return appInfo;
 	}
 
-	jlb::Array<jlb::StringView> Bootstrap::GetExtensions(jlb::LinearAllocator& tempAllocator, AppInfo& info)
+	jlb::Array<jlb::StringView> Bootstrap::GetExtensions(jlb::LinearAllocator& allocator, AppInfo& info)
 	{
 		// Disable debug extensions for release mode.
 		uint32_t debugExtensions = 0;
@@ -133,7 +139,7 @@ namespace vk
 		// Merge all extensions into one array.
 		const size_t size = info.deviceExtensions.GetLength() + debugExtensions;
 		jlb::Array<jlb::StringView> extensions{};
-		extensions.Allocate(tempAllocator, size);
+		extensions.Allocate(allocator, size);
 		extensions.Copy(0, info.deviceExtensions.GetLength(), info.deviceExtensions.GetData());
 
 #ifdef _DEBUG

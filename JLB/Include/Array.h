@@ -59,7 +59,7 @@ namespace jlb
 		/// Get a raw pointer to the managed memory.
 		/// </summary>
 		/// <returns>Raw pointer to the managed memory.</returns>
-		[[nodiscard]] T* GetData();
+		[[nodiscard]] T* GetData() const;
 
 		[[nodiscard]] virtual Iterator<T> begin();
 		[[nodiscard]] virtual Iterator<T> end();
@@ -129,7 +129,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	T* Array<T>::GetData()
+	T* Array<T>::GetData() const
 	{
 		return _memory;
 	}

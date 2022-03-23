@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "StringView.h"
+#include "VkBootstrap.h"
 
 /// <summary>
 /// Handles window creation by using the GLFW library.
 /// </summary>
-class WindowHandler final
+class WindowHandler final : public vk::IWindowHandler
 {
 public:
 	struct Info final
@@ -21,7 +22,12 @@ public:
 	/// </summary>
 	/// <param name="instance">Vulkan instance to create the surface for.</param>
 	/// <returns>Vulkan surface.</returns>
-	[[nodiscard]] VkSurfaceKHR CreateSurface(VkInstance instance);
+	[[nodiscard]] VkSurfaceKHR CreateSurface(VkInstance instance) override;
+	/// <summary>
+	/// Returns the extensions needed by this window to communicate to vulkan.
+	/// </summary>
+	/// <returns>Extensions needed to communicate with vulkan.</returns>
+	[[nodiscard]] jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::LinearAllocator& allocator);
 	/// <summary>
 	/// Starts a new frame.
 	/// </summary>

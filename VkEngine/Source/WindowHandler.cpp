@@ -24,12 +24,24 @@ void WindowHandler::Cleanup()
 	glfwTerminate();
 }
 
-VkSurfaceKHR WindowHandler::CreateSurface(VkInstance instance)
+VkSurfaceKHR WindowHandler::CreateSurface(const VkInstance instance)
 {
 	VkSurfaceKHR surface;
 	const auto result = glfwCreateWindowSurface(instance, _window, nullptr, &surface);
 	assert(!result);
 	return surface;
+}
+
+jlb::Array<jlb::StringView> WindowHandler::GetRequiredExtensions(jlb::LinearAllocator& allocator)
+{
+	uint32_t glfwExtensionCount = 0;
+	const auto buffer = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+	// Copy data from buffer into the array.
+	jlb::Array<jlb::StringView> extensions{};
+	extensions.Allocate(allocator, glfwExtensionCount);
+	memcpy(extensions.GetData(), buffer, sizeof(jlb::StringView) * glfwExtensionCount);
+	return extensions;
 }
 
 void WindowHandler::BeginFrame(bool& outQuit) const

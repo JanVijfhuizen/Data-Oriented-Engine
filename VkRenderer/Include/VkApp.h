@@ -6,6 +6,7 @@ namespace vk
 	{
 		VkDebugUtilsMessengerEXT debugger;
 		VkInstance instance;
+		VkSurfaceKHR surface;
 		VkPhysicalDevice physicalDevice;
 		VkDevice logicalDevice;
 		VkCommandPool commandPool;

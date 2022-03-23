@@ -10,11 +10,19 @@ namespace jlb
 
 namespace vk
 {
+	class IWindowHandler
+	{
+	public:
+		virtual VkSurfaceKHR CreateSurface(VkInstance instance) = 0;
+	};
+
 	struct AppInfo final
 	{
 		jlb::StringView name;
 		jlb::Array<jlb::StringView> validationLayers{};
 		jlb::Array<jlb::StringView> deviceExtensions{};
+
+		IWindowHandler* windowHandler = nullptr;
 
 		void Free(jlb::LinearAllocator& tempAllocator);
 	};
@@ -35,7 +43,7 @@ namespace vk
 			VkInstanceCreateInfo& instanceInfo);
 
 		[[nodiscard]] static VkApplicationInfo CreateApplicationInfo(AppInfo& info);
-		[[nodiscard]] static jlb::Array<jlb::StringView> GetExtensions(jlb::LinearAllocator& tempAllocator, AppInfo& info);
+		[[nodiscard]] static jlb::Array<jlb::StringView> GetExtensions(jlb::LinearAllocator& allocator, AppInfo& info);
 
 		static void CreateDebugger(App& app);
 		static VkResult CreateDebugUtilsMessengerEXT(
