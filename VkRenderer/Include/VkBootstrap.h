@@ -92,6 +92,7 @@ namespace vk
 		[[nodiscard]] static SupportDetails QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app, VkPhysicalDevice device);
 
 		static void CreateLogicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app);
+		static void CreateCommandPool(jlb::LinearAllocator& tempAllocator, App& app);
 
 		[[nodiscard]] static VkApplicationInfo CreateApplicationInfo(AppInfo& info);
 		[[nodiscard]] static jlb::Array<jlb::StringView> GetExtensions(jlb::LinearAllocator& allocator, AppInfo& info);

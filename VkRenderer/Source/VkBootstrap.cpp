@@ -65,12 +65,14 @@ namespace vk
 
 		SelectPhysicalDevice(tempAllocator, info, app);
 		CreateLogicalDevice(tempAllocator, info, app);
+		CreateCommandPool(tempAllocator, app);
 
 		return app;
 	}
 
 	void Bootstrap::DestroyApp(const App& app)
 	{
+		vkDestroyCommandPool(app.logicalDevice, app.commandPool, nullptr);
 		vkDestroyDevice(app.logicalDevice, nullptr);
 
 		vkDestroySurfaceKHR(app.instance, app.surface, nullptr);
@@ -411,6 +413,20 @@ namespace vk
 
 		familyIndexes.Free(tempAllocator);
 		queueCreateInfos.Free(tempAllocator);
+	}
+
+	void Bootstrap::CreateCommandPool(jlb::LinearAllocator& tempAllocator, App& app)
+	{
+		const auto families = GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
+
+		// Create a generic pool that will work with any render command, using the graphic command family.
+		VkCommandPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		poolInfo.queueFamilyIndex = families.graphics;
+		poolInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+		const auto result = vkCreateCommandPool(app.logicalDevice, &poolInfo, nullptr, &app.commandPool);
+		assert(!result);
 	}
 
 	VkApplicationInfo Bootstrap::CreateApplicationInfo(AppInfo& info)
