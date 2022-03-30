@@ -45,13 +45,11 @@ namespace jlb
 		/// <summary>
 		/// Returns the amount of free memory remaining.
 		/// </summary>
-		/// <returns></returns>
 		[[nodiscard]] size_t GetAvailableMemorySpace() const;
 
 		/// <summary>
 		/// Returns whether or not the allocator is in use.
 		/// </summary>
-		/// <returns>If the allocator is in use.</returns>
 		[[nodiscard]] bool IsEmpty() const;
 
 	private:

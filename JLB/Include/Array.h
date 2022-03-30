@@ -58,7 +58,6 @@ namespace jlb
 		/// <summary>
 		/// Get a raw pointer to the managed memory.
 		/// </summary>
-		/// <returns>Raw pointer to the managed memory.</returns>
 		[[nodiscard]] T* GetData() const;
 
 		[[nodiscard]] virtual Iterator<T> begin();

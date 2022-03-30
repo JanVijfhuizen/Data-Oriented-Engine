@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "Array.h"
 #include "StringView.h"
-#include "VkApp.h"
 
 namespace jlb 
 {
@@ -10,16 +9,40 @@ namespace jlb
 
 namespace vk
 {
+	class App;
+
+	/// <summary>
+	/// Interface for communicating with the Vulkan Bootstrap class.
+	/// </summary>
 	class IWindowHandler
 	{
 	public:
+		virtual ~IWindowHandler() = default;
+		/// <summary>
+		/// Create a vulkan surface to render to.
+		/// </summary>
+		/// <param name="instance">Vulkan application instance.</param>
 		[[nodiscard]] virtual VkSurfaceKHR CreateSurface(VkInstance instance) = 0;
+		/// <summary>
+		/// Gets the required vulkan extensions needed to render to this window.
+		/// </summary>
+		/// <param name="allocator">Allocator used to create the array.</param>
+		/// <returns>Allocated array with the required extensions.</returns>
 		[[nodiscard]] virtual jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::LinearAllocator& allocator) = 0;
+		/// <summary>
+		/// Returns the required extension count.
+		/// </summary>
 		[[nodiscard]] virtual size_t GetRequiredExtensionsCount() = 0;
 	};
 
+	/// <summary>
+	/// Information from which the Vulkan Bootstrap class can create a vulkan application.
+	/// </summary>
 	struct AppInfo final
 	{
+		/// <summary>
+		/// Contains GPU hardware information.
+		/// </summary>
 		struct PhysicalDeviceInfo final
 		{
 			VkPhysicalDevice device;
@@ -27,24 +50,46 @@ namespace vk
 			VkPhysicalDeviceFeatures features;
 		};
 
+		// Name of the application.
 		jlb::StringView name;
+		// Layers used to debug vulkan. Only enabled during debugging.
 		jlb::Array<jlb::StringView> validationLayers{};
+		// Required hardware extensions.
 		jlb::Array<jlb::StringView> deviceExtensions{};
-
+		// Class that manages the window.
 		IWindowHandler* windowHandler = nullptr;
-
+		// Returns whether or not the physical device can be used by the program.
 		bool(*isPhysicalDeviceValid)(PhysicalDeviceInfo& info) = nullptr;
+		// Returns how qualified the physical device is.
 		size_t(*getPhysicalDeviceRating)(PhysicalDeviceInfo& info) = nullptr;
+		// Returns the features needed to be enabled for the program to work.
 		VkPhysicalDeviceFeatures(*getPhysicalDeviceFeatures)() = nullptr;
 
 		void Free(jlb::LinearAllocator& tempAllocator);
 	};
 
+	/// <summary>
+	/// Class that simplifies creating a Vulkan application by abstracting the boilerplate code.
+	/// </summary>
 	class Bootstrap final
 	{
 	public:
-		[[nodiscard]] static AppInfo CreateInfo(jlb::LinearAllocator& tempAllocator);
+		/// <summary>
+		/// Create a default info struct that will be good enough for most Vulkan applications.<br>
+		/// For more advanced use, it is adviced to create one yourself.
+		/// </summary>
+		/// <returns>Info struct from which a Vulkan application can be created.</returns>
+		[[nodiscard]] static AppInfo CreateDefaultInfo(jlb::LinearAllocator& tempAllocator);
+		/// <summary>
+		/// Creates a new Vulkan application.
+		/// </summary>
+		/// <param name="info">Info struct from which to create the application.</param>
+		/// <returns>The created Vulkan application.</returns>
 		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info);
+		/// <summary>
+		/// Destroys a Vulkan application.
+		/// </summary>
+		/// <param name="app">Application to be destroyed.</param>
 		static void DestroyApp(const App& app);
 
 	private:

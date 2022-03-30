@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "VkBootstrap.h"
+#include "VkApp.h"
 #include "Array.h"
 #include <iostream>
 #include "Heap.h"

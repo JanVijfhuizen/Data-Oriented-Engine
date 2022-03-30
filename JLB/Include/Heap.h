@@ -30,14 +30,12 @@ namespace jlb
 		/// <param name="key">Used to sort the value. Leave empty to use the hasher.</param>
 		void Insert(T&& value, size_t key = SIZE_MAX);
 		/// <summary>
-		/// 
+		/// Get a copy of the top value in the heap.
 		/// </summary>
-		/// <returns></returns>
 		[[nodiscard]] T Peek();
 		/// <summary>
 		/// Returns and removes the top value of the Heap.
 		/// </summary>
-		/// <returns></returns>
 		T Pop();
 		/// <summary>
 		/// Sets the count to zero.
@@ -46,7 +44,6 @@ namespace jlb
 		/// <summary>
 		/// Gets the amount of values in the Heap.
 		/// </summary>
-		/// <returns>Amount of values in the Heap.</returns>
 		[[nodiscard]] size_t GetCount() const;
 
 	private:
