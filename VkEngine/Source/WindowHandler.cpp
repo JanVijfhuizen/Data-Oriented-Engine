@@ -44,6 +44,13 @@ jlb::Array<jlb::StringView> WindowHandler::GetRequiredExtensions(jlb::LinearAllo
 	return extensions;
 }
 
+size_t WindowHandler::GetRequiredExtensionsCount()
+{
+	uint32_t glfwExtensionCount = 0;
+	glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	return glfwExtensionCount;
+}
+
 void WindowHandler::BeginFrame(bool& outQuit) const
 {
 	// Check if the user pressed the close button.

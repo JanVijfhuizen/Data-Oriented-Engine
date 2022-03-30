@@ -21,12 +21,14 @@ namespace jlb
 		/// Inserts a value into the Heap.
 		/// </summary>
 		/// <param name="value">Value to be inserted.</param>
-		void Insert(T& value);
+		/// <param name="key">Used to sort the value. Leave empty to use the hasher.</param>
+		void Insert(T& value, size_t key = SIZE_MAX);
 		/// <summary>
 		/// Inserts a value into the Heap.
 		/// </summary>
 		/// <param name="value">Value to be inserted.</param>
-		void Insert(T&& value);
+		/// <param name="key">Used to sort the value. Leave empty to use the hasher.</param>
+		void Insert(T&& value, size_t key = SIZE_MAX);
 		/// <summary>
 		/// 
 		/// </summary>
@@ -50,7 +52,7 @@ namespace jlb
 	private:
 		size_t _count = 0;
 
-		void _Insert(T& value);
+		void _Insert(T& value, size_t key = SIZE_MAX);
 		void HeapifyBottomToTop(uint32_t index);
 		void HeapifyTopToBottom(uint32_t index);
 		void Swap(uint32_t a, uint32_t b);
@@ -67,26 +69,26 @@ namespace jlb
 	}
 
 	template <typename T>
-	void Heap<T>::Insert(T& value)
+	void Heap<T>::Insert(T& value, const size_t key)
 	{
-		_Insert(value);
+		_Insert(value, key);
 	}
 
 	template <typename T>
-	void Heap<T>::Insert(T&& value)
+	void Heap<T>::Insert(T&& value, const size_t key)
 	{
-		_Insert(value);
+		_Insert(value, key);
 	}
 
 	template <typename T>
-	void Heap<T>::_Insert(T& value)
+	void Heap<T>::_Insert(T& value, const size_t key)
 	{
 		_count++;
 		assert(_count < Array<KeyPair<T>>::GetLength());
 		const auto data = Array<KeyPair<T>>::GetData();
 
 		auto& keyPair = data[_count];
-		keyPair.key = hasher(value);
+		keyPair.key = key == SIZE_MAX ? hasher(value) : key;
 		keyPair.value = value;
 		HeapifyBottomToTop(_count);
 	}

@@ -27,7 +27,12 @@ public:
 	/// Returns the extensions needed by this window to communicate to vulkan.
 	/// </summary>
 	/// <returns>Extensions needed to communicate with vulkan.</returns>
-	[[nodiscard]] jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::LinearAllocator& allocator);
+	[[nodiscard]] jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::LinearAllocator& allocator) override;
+	/// <summary>
+	/// Returns the amount of vulkan extensions needed by this class.
+	/// </summary>
+	/// <returns>Amount of vulkan extensions needed by this class.</returns>
+	[[nodiscard]] size_t GetRequiredExtensionsCount() override;
 	/// <summary>
 	/// Starts a new frame.
 	/// </summary>

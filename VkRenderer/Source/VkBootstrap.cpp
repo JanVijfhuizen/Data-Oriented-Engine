@@ -2,6 +2,7 @@
 #include "VkBootstrap.h"
 #include "Array.h"
 #include <iostream>
+#include "Heap.h"
 
 namespace vk
 {
@@ -29,6 +30,8 @@ namespace vk
 		assert(info.windowHandler);
 		app.surface = info.windowHandler->CreateSurface(app.instance);
 
+		SelectPhysicalDevice(tempAllocator, info, app);
+
 		return app;
 	}
 
@@ -39,6 +42,38 @@ namespace vk
 		DestroyDebugUtilsMessengerEXT(app.instance, app.debugger, nullptr);
 #endif
 		vkDestroyInstance(app.instance, nullptr);
+	}
+
+	Bootstrap::QueueFamilies::operator bool() const
+	{
+		for (const auto& family : values)
+			if (family == SIZE_MAX)
+				return false;
+		return true;
+	}
+
+	Bootstrap::SupportDetails::operator bool() const
+	{
+		return formats && presentModes;
+	}
+
+	uint32_t Bootstrap::SupportDetails::GetRecommendedImageCount() const
+	{
+		// Always try to go for one larger than the minimum capability.
+		// More swapchain images mean less time waiting for a previous frame to render.
+		uint32_t imageCount = capabilities.minImageCount + 1;
+
+		const auto& maxImageCount = capabilities.maxImageCount;
+		if (maxImageCount > 0 && imageCount > maxImageCount)
+			imageCount = maxImageCount;
+
+		return imageCount;
+	}
+
+	void Bootstrap::SupportDetails::Free(jlb::LinearAllocator& tempAllocator)
+	{
+		formats.Free(tempAllocator);
+		presentModes.Free(tempAllocator);
 	}
 
 	void Bootstrap::CheckValidationSupport(jlb::LinearAllocator& tempAllocator, AppInfo& info)
@@ -111,6 +146,173 @@ namespace vk
 		instanceInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugInfo);
 	}
 
+	void Bootstrap::SelectPhysicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app)
+	{
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(app.instance, &deviceCount, nullptr);
+		assert(deviceCount);
+
+		jlb::Array<VkPhysicalDevice> devices{};
+		devices.Allocate(tempAllocator, deviceCount);
+		vkEnumeratePhysicalDevices(app.instance, &deviceCount, devices.GetData());
+
+		jlb::Heap<VkPhysicalDevice> candidates{};
+		candidates.Allocate(tempAllocator, deviceCount);
+
+		for (auto& device : devices)
+		{
+			VkPhysicalDeviceProperties deviceProperties;
+			VkPhysicalDeviceFeatures deviceFeatures;
+
+			vkGetPhysicalDeviceProperties(device, &deviceProperties);
+			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+			// If families are not all present, continue.
+			const auto families = GetQueueFamilies(tempAllocator, app.surface, device);
+			if (!families)
+				continue;
+
+			// If extensions are not supported, continue.
+			if (!CheckDeviceExtensionSupport(tempAllocator, device, info.deviceExtensions))
+				continue;
+
+			// Check swap chain support.
+			auto swapChainSupportStr = QuerySwapChainSupport(tempAllocator, app, device);
+			const bool swapChainSupport = static_cast<bool>(swapChainSupportStr);
+			swapChainSupportStr.Free(tempAllocator);
+			if (!swapChainSupport)
+				continue;
+
+			AppInfo::PhysicalDeviceInfo physicalDeviceInfo
+			{
+				device,
+				deviceProperties,
+				deviceFeatures
+			};
+
+			assert(info.isPhysicalDeviceValid);
+			assert(info.getPhysicalDeviceRating);
+
+			if (!info.isPhysicalDeviceValid(physicalDeviceInfo))
+				continue;
+
+			candidates.Insert(device, info.getPhysicalDeviceRating(physicalDeviceInfo));
+		}
+
+		assert(candidates.GetCount() > 0);
+		app.physicalDevice = candidates.Peek();
+
+		candidates.Free(tempAllocator);
+		devices.Free(tempAllocator);
+	}
+
+	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::LinearAllocator& tempAllocator, 
+		const VkSurfaceKHR surface, VkPhysicalDevice physicalDevice)
+	{
+		QueueFamilies families{};
+
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+
+		jlb::Array<VkQueueFamilyProperties> queueFamilies{};
+		queueFamilies.Allocate(tempAllocator, queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.GetData());
+
+		// Check for hardware capabilities.
+		uint32_t i = 0;
+		for (const auto& queueFamily : queueFamilies)
+		{
+			// If the graphics family is present.
+			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				families.graphics = i;
+
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
+
+			// Since this is a renderer made for games, we need to be able to render to the screen.
+			if (presentSupport)
+				families.present = i;
+
+			// If all families have been found.
+			if (families)
+				break;
+			i++;
+		}
+
+		queueFamilies.Free(tempAllocator);
+		return families;
+	}
+
+	bool Bootstrap::CheckDeviceExtensionSupport(jlb::LinearAllocator& tempAllocator, 
+		const VkPhysicalDevice device, jlb::Array<jlb::StringView>& extensions)
+	{
+		uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+		jlb::Array<VkExtensionProperties> availableExtensions{};
+		availableExtensions.Allocate(tempAllocator, extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.GetData());
+
+		bool found = false;
+		for (auto& availableExtension : availableExtensions)
+			if (strcmp(VK_KHR_SWAPCHAIN_EXTENSION_NAME, availableExtension.extensionName) == 0)
+			{
+				found = true;
+				break;
+			}
+
+		if(found)
+			for (const auto& extension : extensions)
+			{
+				found = false;
+				for (auto& availableExtension : availableExtensions)
+					if(strcmp(extension.GetData(), availableExtension.extensionName) == 0)
+					{
+						found = true;
+						break;
+					}
+
+				if (!found)
+					break;
+			}
+
+		availableExtensions.Free(tempAllocator);
+		return found;
+	}
+
+	Bootstrap::SupportDetails Bootstrap::QuerySwapChainSupport(
+		jlb::LinearAllocator& allocator, App& app, const VkPhysicalDevice device)
+	{
+		SupportDetails details{};
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, app.surface, &details.capabilities);
+
+		uint32_t formatCount;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, app.surface, &formatCount, nullptr);
+
+		// Get all supported swap chain formats, if any.
+		if (formatCount != 0)
+		{
+			auto& formats = details.formats;
+			formats.Allocate(allocator, formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(device, app.surface, &formatCount, formats.GetData());
+		}
+
+		uint32_t presentModeCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, app.surface, &presentModeCount, nullptr);
+
+		// Get all supported swap chain present modes, if any.
+		if (presentModeCount != 0)
+		{
+			auto& presentModes = details.presentModes;
+			presentModes.Allocate(allocator, presentModeCount);
+
+			vkGetPhysicalDeviceSurfacePresentModesKHR(device, app.surface,
+				&presentModeCount, presentModes.GetData());
+		}
+
+		return details;
+	}
+
 	VkApplicationInfo Bootstrap::CreateApplicationInfo(AppInfo& info)
 	{
 		const auto& name = info.name.GetData();
@@ -136,11 +338,18 @@ namespace vk
 		debugExtensions = 1;
 #endif
 
+		const size_t winExtensionsCount = info.windowHandler->GetRequiredExtensionsCount();
+		const size_t deviceExtensionsCount = info.deviceExtensions.GetLength();
+
 		// Merge all extensions into one array.
-		const size_t size = info.deviceExtensions.GetLength() + debugExtensions;
+		const size_t size = deviceExtensionsCount + winExtensionsCount + debugExtensions;
 		jlb::Array<jlb::StringView> extensions{};
 		extensions.Allocate(allocator, size);
-		extensions.Copy(0, info.deviceExtensions.GetLength(), info.deviceExtensions.GetData());
+		extensions.Copy(0, deviceExtensionsCount, info.deviceExtensions.GetData());
+
+		auto winExtensions = info.windowHandler->GetRequiredExtensions(allocator);
+		extensions.Copy(deviceExtensionsCount, deviceExtensionsCount + winExtensionsCount, winExtensions.GetData());
+		winExtensions.Free(allocator);
 
 #ifdef _DEBUG
 		extensions[extensions.GetLength() - 1] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
