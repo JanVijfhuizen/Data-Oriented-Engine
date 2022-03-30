@@ -15,27 +15,27 @@ namespace jlb
 		/// Add the value on top of the stack.
 		/// </summary>
 		/// <param name="value">Value to be added.</param>
+		/// <returns>Reference to the added value.</returns>
 		T& Push(T& value = {});
 		/// <summary>
 		/// Add the value on top of the stack.
 		/// </summary>
 		/// <param name="value">Value to be added.</param>
+		/// <returns>Reference to the added value.</returns>
 		T& Push(T&& value = {});
 		/// <summary>
 		/// Look at the top value of the stack.
 		/// </summary>
-		/// <returns>Top value of the stack.</returns>
+		/// <returns>Reference to the value of the stack.</returns>
 		[[nodiscard]] T& Peek();
 		/// <summary>
 		/// Get and remove the top value of the stack.
 		/// </summary>
-		/// <returns>Top value of the stack.</returns>
 		T Pop();
 
 		/// <summary>
 		/// Gets the amount of values in the vector.
 		/// </summary>
-		/// <returns>Amount of values in the vector.</returns>
 		[[nodiscard]] size_t GetCount() const;
 
 		Iterator<T> end() override;

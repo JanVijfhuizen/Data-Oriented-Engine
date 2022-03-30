@@ -19,15 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Renderer.h" />
     <ClInclude Include="Include\pch.h" />
+    <ClInclude Include="Include\VkApp.h" />
+    <ClInclude Include="Include\VkBootstrap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Renderer.cpp" />
+    <ClCompile Include="Source\VkBootstrap.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

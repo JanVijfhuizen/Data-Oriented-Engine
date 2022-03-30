@@ -29,7 +29,6 @@ namespace jlb
 	/// <summary>
 	/// Gets the value in the tuple at index I.
 	/// </summary>
-	/// <returns>Value at index I.</returns>
 	template<size_t I, typename Head, typename ...Tail>
 	[[nodiscard]] Head& Get(tupleImpl::TupleImpl<I, Head, Tail...>& tuple)
 	{

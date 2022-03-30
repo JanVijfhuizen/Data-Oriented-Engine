@@ -39,7 +39,6 @@ namespace jlb
 		/// <summary>
 		/// Gets the amount of values in the HashMap.
 		/// </summary>
-		/// <returns>Amount of values in the HashMap.</returns>
 		[[nodiscard]] size_t GetCount() const;
 
 	protected:

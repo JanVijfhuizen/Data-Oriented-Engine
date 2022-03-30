@@ -38,7 +38,6 @@ namespace jlb
 		/// <summary>
 		/// Gets the amount of values in the vector.
 		/// </summary>
-		/// <returns>Amount of values in the vector.</returns>
 		[[nodiscard]] size_t GetCount() const;
 		[[nodiscard]] Iterator<T> end() override;
 

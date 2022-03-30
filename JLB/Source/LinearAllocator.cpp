@@ -21,6 +21,7 @@ namespace jlb
 	{
 		// Assert if there still is enough free space.
 		size = ToChunkSize(size);
+
 		assert(size + _current + 1 < _size);
 
 		// Get pointer to the free memory that will be used for this allocation.
@@ -46,6 +47,11 @@ namespace jlb
 	size_t LinearAllocator::GetAvailableMemorySpace() const
 	{
 		return (_size - _current - 1) * sizeof(size_t);
+	}
+
+	bool LinearAllocator::IsEmpty() const
+	{
+		return _current == 0;
 	}
 
 	size_t LinearAllocator::ToChunkSize(const size_t size)
