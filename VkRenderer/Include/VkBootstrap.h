@@ -35,6 +35,7 @@ namespace vk
 
 		bool(*isPhysicalDeviceValid)(PhysicalDeviceInfo& info) = nullptr;
 		size_t(*getPhysicalDeviceRating)(PhysicalDeviceInfo& info) = nullptr;
+		VkPhysicalDeviceFeatures(*getPhysicalDeviceFeatures)() = nullptr;
 
 		void Free(jlb::LinearAllocator& tempAllocator);
 	};
@@ -89,6 +90,8 @@ namespace vk
 		[[nodiscard]] static QueueFamilies GetQueueFamilies(jlb::LinearAllocator& tempAllocator, VkSurfaceKHR surface, VkPhysicalDevice physicalDevice);
 		[[nodiscard]] static bool CheckDeviceExtensionSupport(jlb::LinearAllocator& tempAllocator, VkPhysicalDevice device, jlb::Array<jlb::StringView>& extensions);
 		[[nodiscard]] static SupportDetails QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app, VkPhysicalDevice device);
+
+		static void CreateLogicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app);
 
 		[[nodiscard]] static VkApplicationInfo CreateApplicationInfo(AppInfo& info);
 		[[nodiscard]] static jlb::Array<jlb::StringView> GetExtensions(jlb::LinearAllocator& allocator, AppInfo& info);

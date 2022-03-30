@@ -3,6 +3,8 @@
 #include "Array.h"
 #include <iostream>
 #include "Heap.h"
+#include "HashMap.h"
+#include "Vector.h"
 
 namespace vk
 {
@@ -16,6 +18,37 @@ namespace vk
 	{
 		AppInfo info{};
 		info.validationLayers.Allocate(tempAllocator, 1, "VK_LAYER_KHRONOS_validation");
+
+		info.isPhysicalDeviceValid = [](AppInfo::PhysicalDeviceInfo& info)
+		{
+			if (!info.features.samplerAnisotropy)
+				return false;
+			if (!info.features.geometryShader)
+				return false;
+			return true;
+		};
+		info.getPhysicalDeviceRating = [](AppInfo::PhysicalDeviceInfo& info)
+		{
+			size_t score = 0;
+			auto& properties = info.properties;
+
+			// Arbitrary increase in score, not sure what to look for to be honest.
+			if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+				score += 1000;
+			// Increase the score based on the maximum resolution supported.
+			score += properties.limits.maxImageDimension2D;
+
+			return score;
+		};
+		info.getPhysicalDeviceFeatures = []()
+		{
+			VkPhysicalDeviceFeatures deviceFeatures{};
+			deviceFeatures.samplerAnisotropy = VK_TRUE;
+			deviceFeatures.sampleRateShading = VK_TRUE;
+			deviceFeatures.geometryShader = VK_TRUE;
+			return deviceFeatures;
+		};
+
 		return info;
 	}
 
@@ -31,12 +64,15 @@ namespace vk
 		app.surface = info.windowHandler->CreateSurface(app.instance);
 
 		SelectPhysicalDevice(tempAllocator, info, app);
+		CreateLogicalDevice(tempAllocator, info, app);
 
 		return app;
 	}
 
 	void Bootstrap::DestroyApp(const App& app)
 	{
+		vkDestroyDevice(app.logicalDevice, nullptr);
+
 		vkDestroySurfaceKHR(app.instance, app.surface, nullptr);
 #ifdef _DEBUG
 		DestroyDebugUtilsMessengerEXT(app.instance, app.debugger, nullptr);
@@ -206,7 +242,7 @@ namespace vk
 		devices.Free(tempAllocator);
 	}
 
-	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::LinearAllocator& tempAllocator, 
+	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::LinearAllocator& tempAllocator,
 		const VkSurfaceKHR surface, VkPhysicalDevice physicalDevice)
 	{
 		QueueFamilies families{};
@@ -311,6 +347,70 @@ namespace vk
 		}
 
 		return details;
+	}
+
+	void Bootstrap::CreateLogicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app)
+	{
+		auto queueFamilies = GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
+
+		const size_t queueFamiliesCount = sizeof queueFamilies.values / sizeof(size_t);
+		jlb::Vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
+		queueCreateInfos.Allocate(tempAllocator, queueFamiliesCount);
+		jlb::HashMap<size_t> familyIndexes{};
+		familyIndexes.hasher = [](size_t& hashable) {return hashable; };
+		familyIndexes.Allocate(tempAllocator, queueFamiliesCount);
+		const float queuePriority = 1;
+
+		// Create a queue for each individual queue family.
+		// So if a single family handles both graphics and presentation, only create it once.
+		// Hence the hashmap.
+		for (auto family : queueFamilies.values)
+		{
+			if (familyIndexes.Contains(family))
+				continue;
+			familyIndexes.Insert(family);
+
+			VkDeviceQueueCreateInfo queueCreateInfo{};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = family;
+			queueCreateInfo.queueCount = 1;
+			queueCreateInfo.pQueuePriorities = &queuePriority;
+			queueCreateInfos.Add(queueCreateInfo);
+		}
+
+		assert(info.getPhysicalDeviceFeatures);
+		auto features = info.getPhysicalDeviceFeatures();
+
+		// Create interface to the selected GPU hardware.
+		VkDeviceCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.GetCount());
+		createInfo.pQueueCreateInfos = queueCreateInfos.GetData();
+		createInfo.pEnabledFeatures = &features;
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(info.deviceExtensions.GetLength());
+		createInfo.ppEnabledExtensionNames = reinterpret_cast<const char**>(info.deviceExtensions.GetData());
+
+		// Only enable debug layers when in debug mode.
+		createInfo.enabledLayerCount = 0;
+#ifdef _DEBUG
+		const auto& validationLayers = info.validationLayers;
+		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.GetLength());
+		createInfo.ppEnabledLayerNames = reinterpret_cast<const char**>(validationLayers.GetData());
+#endif
+
+		const auto result = vkCreateDevice(app.physicalDevice, &createInfo, nullptr, &app.logicalDevice);
+		assert(!result);
+
+		// Initialize the render queues.
+		uint32_t i = 0;
+		for (const auto& family : queueFamilies.values)
+		{
+			vkGetDeviceQueue(app.logicalDevice, family, 0, &app.queues.values[i]);
+			i++;
+		}
+
+		familyIndexes.Free(tempAllocator);
+		queueCreateInfos.Free(tempAllocator);
 	}
 
 	VkApplicationInfo Bootstrap::CreateApplicationInfo(AppInfo& info)
