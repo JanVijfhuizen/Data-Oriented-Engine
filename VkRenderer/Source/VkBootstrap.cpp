@@ -15,7 +15,7 @@ namespace vk
 		deviceExtensions.Free(tempAllocator);
 	}
 
-	AppInfo Bootstrap::CreateInfo(jlb::LinearAllocator& tempAllocator)
+	AppInfo Bootstrap::CreateDefaultInfo(jlb::LinearAllocator& tempAllocator)
 	{
 		AppInfo info{};
 		info.validationLayers.Allocate(tempAllocator, 1, "VK_LAYER_KHRONOS_validation");
@@ -83,6 +83,16 @@ namespace vk
 		vkDestroyInstance(app.instance, nullptr);
 	}
 
+	Bootstrap::SwapChainSupportDetails Bootstrap::QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app)
+	{
+		return QuerySwapChainSupport(allocator, app, app.physicalDevice);
+	}
+
+	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::LinearAllocator& tempAllocator, App& app)
+	{
+		return GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
+	}
+
 	Bootstrap::QueueFamilies::operator bool() const
 	{
 		for (const auto& family : values)
@@ -91,16 +101,16 @@ namespace vk
 		return true;
 	}
 
-	Bootstrap::SupportDetails::operator bool() const
+	Bootstrap::SwapChainSupportDetails::operator bool() const
 	{
 		return formats && presentModes;
 	}
 
-	uint32_t Bootstrap::SupportDetails::GetRecommendedImageCount() const
+	size_t Bootstrap::SwapChainSupportDetails::GetRecommendedImageCount() const
 	{
 		// Always try to go for one larger than the minimum capability.
 		// More swapchain images mean less time waiting for a previous frame to render.
-		uint32_t imageCount = capabilities.minImageCount + 1;
+		size_t imageCount = capabilities.minImageCount + 1;
 
 		const auto& maxImageCount = capabilities.maxImageCount;
 		if (maxImageCount > 0 && imageCount > maxImageCount)
@@ -109,7 +119,7 @@ namespace vk
 		return imageCount;
 	}
 
-	void Bootstrap::SupportDetails::Free(jlb::LinearAllocator& tempAllocator)
+	void Bootstrap::SwapChainSupportDetails::Free(jlb::LinearAllocator& tempAllocator)
 	{
 		formats.Free(tempAllocator);
 		presentModes.Free(tempAllocator);
@@ -319,10 +329,10 @@ namespace vk
 		return found;
 	}
 
-	Bootstrap::SupportDetails Bootstrap::QuerySwapChainSupport(
+	Bootstrap::SwapChainSupportDetails Bootstrap::QuerySwapChainSupport(
 		jlb::LinearAllocator& allocator, App& app, const VkPhysicalDevice device)
 	{
-		SupportDetails details{};
+		SwapChainSupportDetails details{};
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, app.surface, &details.capabilities);
 
 		uint32_t formatCount;

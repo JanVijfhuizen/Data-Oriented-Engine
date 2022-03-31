@@ -77,6 +77,11 @@ bool WindowHandler::QueryHasResized()
 	return resized;
 }
 
+glm::ivec2 WindowHandler::GetResolution()
+{
+	return _resolution;
+}
+
 void WindowHandler::FramebufferResizeCallback(GLFWwindow* window, const int width, const int height)
 {
 	auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));

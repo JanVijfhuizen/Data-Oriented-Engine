@@ -32,7 +32,7 @@ namespace jlb
 		/// <param name="allocator">Allocator from which to allocate.</param>
 		/// <param name="size">Size of the array.</param>
 		/// <param name="src">The data to copy into the array.</param>
-		virtual void Allocate(LinearAllocator& allocator, size_t size, T* src);
+		virtual void AllocateAndCopy(LinearAllocator& allocator, size_t size, T* src);
 
 		/// <summary>
 		/// Frees the array from the linear allocator.
@@ -94,7 +94,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	void Array<T>::Allocate(LinearAllocator& allocator, const size_t size, T* src)
+	void Array<T>::AllocateAndCopy(LinearAllocator& allocator, const size_t size, T* src)
 	{
 		_memory = allocator.New<T>(size);
 		_length = size;

@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\JlbMath.cpp" />
     <ClCompile Include="Source\LinearAllocator.cpp" />
     <ClCompile Include="Source\StringView.cpp" />
     <ClCompile Include="Source\UnitTest.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Include\Iterator.h" />
     <ClInclude Include="Include\KeyPair.h" />
     <ClInclude Include="Include\LinearAllocator.h" />
+    <ClInclude Include="Include\JlbMath.h" />
     <ClInclude Include="Include\Stack.h" />
     <ClInclude Include="Include\StringView.h" />
     <ClInclude Include="Include\Tuple.h" />

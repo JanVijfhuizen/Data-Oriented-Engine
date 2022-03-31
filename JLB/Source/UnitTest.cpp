@@ -116,7 +116,7 @@ namespace jlb
 				a.Allocate(allocator, 6 + rand() % 12);
 
 				Array<TestStruct> b{};
-				b.Allocate(allocator, a.GetLength(), a.GetData());
+				b.AllocateAndCopy(allocator, a.GetLength(), a.GetData());
 
 				allocator.Free();
 				allocator.Free();

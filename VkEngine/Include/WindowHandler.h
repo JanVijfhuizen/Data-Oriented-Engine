@@ -44,6 +44,12 @@ public:
 	/// <returns>True if the window has resized.</returns>
 	bool QueryHasResized();
 
+	/// <summary>
+	/// Returns the window resolution.
+	/// </summary>
+	/// <returns></returns>
+	[[nodiscard]] glm::ivec2 GetResolution() override;
+
 private:
 	GLFWwindow* _window = nullptr;
 	bool _resized = false;
