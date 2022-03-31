@@ -6,10 +6,11 @@
 #include "VkImageHandler.h"
 #include "VkSyncHandler.h"
 #include "VkCommandHandler.h"
+#include "VkFrameBufferHandler.h"
 
 namespace vk
 {
-	void SwapChain::Allocate(jlb::LinearAllocator& allocator, App& app, IWindowHandler& windowHandler)
+	void SwapChain::Allocate(jlb::LinearAllocator& allocator, App& app)
 	{
 		auto support = Bootstrap::QuerySwapChainSupport(allocator, app);
 		const uint32_t imageCount = support.GetRecommendedImageCount();
@@ -19,8 +20,6 @@ namespace vk
 
 		_images.Allocate(allocator, imageCount);
 		_frames.Allocate(allocator, SWAPCHAIN_MAX_FRAMES_IN_FLIGHT);
-
-		Recreate(allocator, app, windowHandler);
 	}
 
 	void SwapChain::Free(jlb::LinearAllocator& allocator, App& app)
@@ -46,6 +45,7 @@ namespace vk
 			if (image.fence)
 				vkWaitForFences(app.logicalDevice, 1, &image.fence, VK_TRUE, UINT64_MAX);
 			vkFreeCommandBuffers(app.logicalDevice, app.commandPool, 1, &image.cmdBuffer);
+			vkDestroyFramebuffer(app.logicalDevice, image.frameBuffer, nullptr);
 		}
 
 		for (auto& frame : _frames)
@@ -99,7 +99,7 @@ namespace vk
 		return actualExtent;
 	}
 
-	void SwapChain::Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler)
+	void SwapChain::Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler, const VkRenderPass renderPass)
 	{
 		auto support = Bootstrap::QuerySwapChainSupport(tempAllocator, app);
 		_extent = ChooseExtent(support.capabilities, windowHandler.GetResolution());
@@ -170,6 +170,16 @@ namespace vk
 			assert(!viewResult);
 
 			image.cmdBuffer = cmdBuffers[i];
+
+			auto frameBufferCreateInfo = FrameBufferHandler::CreateDefaultInfo();
+			frameBufferCreateInfo.renderPass = renderPass;
+			frameBufferCreateInfo.attachmentCount = 1;
+			frameBufferCreateInfo.pAttachments = &image.colorImageView;
+			frameBufferCreateInfo.width = _extent.width;
+			frameBufferCreateInfo.height = _extent.height;
+
+			const auto frameBufferResult = vkCreateFramebuffer(app.logicalDevice, &frameBufferCreateInfo, nullptr, &image.frameBuffer);
+			assert(!frameBufferResult);
 		}
 
 		for (auto& frame : _frames)

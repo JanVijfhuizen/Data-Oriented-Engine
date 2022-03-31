@@ -26,7 +26,8 @@ int main()
 	}
 
 	vk::SwapChain swapChain{};
-	swapChain.Allocate(allocator, app, windowHandler);
+	swapChain.Allocate(allocator, app);
+	//swapChain.Recreate(allocator, app, windowHandler);
 
 	bool quit = false;
 	while(!quit)

@@ -16,10 +16,10 @@ namespace vk
 	class SwapChain final
 	{
 	public:
-		void Allocate(jlb::LinearAllocator& allocator, App& app, IWindowHandler& windowHandler);
+		void Allocate(jlb::LinearAllocator& allocator, App& app);
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
-		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
+		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler, VkRenderPass renderPass);
 
 	private:
 		struct Image final
@@ -28,6 +28,7 @@ namespace vk
 			VkImageView colorImageView;
 			VkFence fence = VK_NULL_HANDLE;
 			VkCommandBuffer cmdBuffer;
+			VkFramebuffer frameBuffer;
 		};
 
 		struct Frame final
