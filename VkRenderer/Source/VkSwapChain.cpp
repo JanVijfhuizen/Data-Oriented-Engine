@@ -4,6 +4,7 @@
 #include "VkApp.h"
 #include "JlbMath.h"
 #include "VkImageHandler.h"
+#include "VkSyncHandler.h"
 
 namespace vk
 {
@@ -43,6 +44,13 @@ namespace vk
 				vkWaitForFences(app.logicalDevice, 1, &image.fence, VK_TRUE, UINT64_MAX);
 			image.fence = VK_NULL_HANDLE;
 			vkDestroyImageView(app.logicalDevice, image.colorImageView, nullptr);
+		}
+
+		for (auto& frame : _frames)
+		{
+			vkDestroySemaphore(app.logicalDevice, frame.imageAvailableSemaphore, nullptr);
+			vkDestroySemaphore(app.logicalDevice, frame.renderFinishedSemaphore, nullptr);
+			vkDestroyFence(app.logicalDevice, frame.inFlightFence, nullptr);
 		}
 
 		vkDestroySwapchainKHR(app.logicalDevice, _swapChain, nullptr);
@@ -153,6 +161,19 @@ namespace vk
 
 			const auto viewResult = vkCreateImageView(app.logicalDevice, &viewCreateInfo, nullptr, &image.colorImageView);
 			assert(!viewResult);
+		}
+
+		for (auto& frame : _frames)
+		{
+			auto semaphoreCreateInfo = SyncHandler::CreateSemaphoreDefaultInfo();
+			auto semaphoreResult = vkCreateSemaphore(app.logicalDevice, &semaphoreCreateInfo, nullptr, &frame.imageAvailableSemaphore);
+			assert(!semaphoreResult);
+			semaphoreResult = vkCreateSemaphore(app.logicalDevice, &semaphoreCreateInfo, nullptr, &frame.renderFinishedSemaphore);
+			assert(!semaphoreResult);
+
+			auto fenceCreateInfo = SyncHandler::CreateFenceDefaultInfo();
+			const auto fenceResult = vkCreateFence(app.logicalDevice, &fenceCreateInfo, nullptr, &frame.inFlightFence);
+			assert(!fenceResult);
 		}
 
 		vkImages.Free(tempAllocator);

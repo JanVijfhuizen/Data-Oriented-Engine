@@ -31,7 +31,9 @@ namespace vk
 
 		struct Frame final
 		{
-			
+			VkSemaphore imageAvailableSemaphore;
+			VkSemaphore renderFinishedSemaphore;
+			VkFence inFlightFence;
 		};
 
 		VkSurfaceFormatKHR _surfaceFormat;

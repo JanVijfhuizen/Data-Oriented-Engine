@@ -2,9 +2,10 @@
 
 namespace vk
 {
-	class FenceHandler final
+	class SyncHandler final
 	{
 	public:
-		[[nodiscard]] static VkFenceCreateInfo CreateDefaultInfo();
+		[[nodiscard]] static VkFenceCreateInfo CreateFenceDefaultInfo();
+		[[nodiscard]] static VkSemaphoreCreateInfo CreateSemaphoreDefaultInfo();
 	};
 }
