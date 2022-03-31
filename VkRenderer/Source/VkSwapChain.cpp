@@ -91,7 +91,6 @@ namespace vk
 	{
 		auto support = Bootstrap::QuerySwapChainSupport(tempAllocator, app);
 		_extent = ChooseExtent(support.capabilities, windowHandler.GetResolution());
-		support.Free(tempAllocator);
 
 		const auto families = Bootstrap::GetQueueFamilies(tempAllocator, app);
 
@@ -130,6 +129,7 @@ namespace vk
 		const auto result = vkCreateSwapchainKHR(app.logicalDevice, &createInfo, nullptr, &newSwapChain);
 		assert(!result);
 
+		support.Free(tempAllocator);
 		Cleanup(app);
 	}
 }

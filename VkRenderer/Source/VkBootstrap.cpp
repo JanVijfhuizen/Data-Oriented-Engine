@@ -53,9 +53,15 @@ namespace vk
 		return info;
 	}
 
-	App Bootstrap::CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info)
+	App Bootstrap::CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo info)
 	{
 		App app{};
+		
+		jlb::Array<jlb::StringView> deviceExtensions{};
+		deviceExtensions.Allocate(tempAllocator, info.deviceExtensions.GetLength() + 1);
+		deviceExtensions.Copy(0, info.deviceExtensions.GetLength(), info.deviceExtensions.GetData());
+		deviceExtensions[deviceExtensions.GetLength() - 1] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+		info.deviceExtensions = deviceExtensions;
 
 		CheckValidationSupport(tempAllocator, info);
 		CreateInstance(tempAllocator, info, app);
@@ -68,6 +74,7 @@ namespace vk
 		CreateLogicalDevice(tempAllocator, info, app);
 		CreateCommandPool(tempAllocator, app);
 
+		deviceExtensions.Free(tempAllocator);
 		return app;
 	}
 
@@ -302,28 +309,20 @@ namespace vk
 		availableExtensions.Allocate(tempAllocator, extensionCount);
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.GetData());
 
-		bool found = false;
-		for (auto& availableExtension : availableExtensions)
-			if (strcmp(VK_KHR_SWAPCHAIN_EXTENSION_NAME, availableExtension.extensionName) == 0)
-			{
-				found = true;
-				break;
-			}
-
-		if(found)
-			for (const auto& extension : extensions)
-			{
-				found = false;
-				for (auto& availableExtension : availableExtensions)
-					if(strcmp(extension.GetData(), availableExtension.extensionName) == 0)
-					{
-						found = true;
-						break;
-					}
-
-				if (!found)
+		bool found = true;
+		for (const auto& extension : extensions)
+		{
+			found = false;
+			for (auto& availableExtension : availableExtensions)
+				if(strcmp(extension.GetData(), availableExtension.extensionName) == 0)
+				{
+					found = true;
 					break;
-			}
+				}
+
+			if (!found)
+				break;
+		}
 
 		availableExtensions.Free(tempAllocator);
 		return found;
@@ -466,16 +465,14 @@ namespace vk
 #endif
 
 		const size_t winExtensionsCount = info.windowHandler->GetRequiredExtensionsCount();
-		const size_t deviceExtensionsCount = info.deviceExtensions.GetLength();
 
 		// Merge all extensions into one array.
-		const size_t size = deviceExtensionsCount + winExtensionsCount + debugExtensions;
+		const size_t size = winExtensionsCount + debugExtensions;
 		jlb::Array<jlb::StringView> extensions{};
 		extensions.Allocate(allocator, size);
-		extensions.Copy(0, deviceExtensionsCount, info.deviceExtensions.GetData());
 
 		auto winExtensions = info.windowHandler->GetRequiredExtensions(allocator);
-		extensions.Copy(deviceExtensionsCount, deviceExtensionsCount + winExtensionsCount, winExtensions.GetData());
+		extensions.Copy(0, winExtensionsCount, winExtensions.GetData());
 		winExtensions.Free(allocator);
 
 #ifdef _DEBUG
@@ -529,7 +526,7 @@ namespace vk
 		return info;
 	}
 
-	inline VkBool32 Bootstrap::DebugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+	VkBool32 Bootstrap::DebugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		const VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData)

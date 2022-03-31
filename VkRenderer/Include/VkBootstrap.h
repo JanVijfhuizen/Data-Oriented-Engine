@@ -126,7 +126,7 @@ namespace vk
 		/// </summary>
 		/// <param name="info">Info struct from which to create the application.</param>
 		/// <returns>The created Vulkan application.</returns>
-		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info);
+		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo info);
 		/// <summary>
 		/// Destroys a Vulkan application.
 		/// </summary>
