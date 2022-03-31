@@ -3,6 +3,7 @@
 #include "VkBootstrap.h"
 #include "VkApp.h"
 #include "JlbMath.h"
+#include "VkImageHandler.h"
 
 namespace vk
 {
@@ -34,13 +35,14 @@ namespace vk
 			return;
 
 		const auto result = vkDeviceWaitIdle(app.logicalDevice);
-		assert(result);
+		assert(!result);
 
 		for (auto& image : _images)
 		{
 			if (image.fence)
 				vkWaitForFences(app.logicalDevice, 1, &image.fence, VK_TRUE, UINT64_MAX);
 			image.fence = VK_NULL_HANDLE;
+			vkDestroyImageView(app.logicalDevice, image.colorImageView, nullptr);
 		}
 
 		vkDestroySwapchainKHR(app.logicalDevice, _swapChain, nullptr);
@@ -131,5 +133,28 @@ namespace vk
 
 		support.Free(tempAllocator);
 		Cleanup(app);
+
+		_swapChain = newSwapChain;
+
+		uint32_t length = _images.GetLength();
+		auto vkImages = jlb::Array<VkImage>{};
+
+		vkImages.Allocate(tempAllocator, length);
+		vkGetSwapchainImagesKHR(app.logicalDevice, _swapChain, &length, vkImages.GetData());
+
+		for (uint32_t i = 0; i < length; ++i)
+		{
+			auto& image = _images[i];
+			image.colorImage = vkImages[i];
+
+			auto viewCreateInfo = ImageHandler::CreateViewDefaultInfo();
+			viewCreateInfo.image = image.colorImage;
+			viewCreateInfo.format = _surfaceFormat.format;
+
+			const auto viewResult = vkCreateImageView(app.logicalDevice, &viewCreateInfo, nullptr, &image.colorImageView);
+			assert(!viewResult);
+		}
+
+		vkImages.Free(tempAllocator);
 	}
 }

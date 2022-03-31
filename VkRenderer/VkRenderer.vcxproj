@@ -24,6 +24,7 @@
     <ClInclude Include="Include\VkBootstrap.h" />
     <ClInclude Include="Include\VkSyncHandler.h" />
     <ClInclude Include="Include\VkSwapChain.h" />
+    <ClInclude Include="Include\VkImageHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\VkSyncHandler.cpp" />
@@ -33,6 +34,7 @@
     </ClCompile>
     <ClCompile Include="Source\VkBootstrap.cpp" />
     <ClCompile Include="Source\VkSwapChain.cpp" />
+    <ClCompile Include="Source\VkImageHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

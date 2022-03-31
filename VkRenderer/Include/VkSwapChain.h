@@ -24,6 +24,8 @@ namespace vk
 	private:
 		struct Image final
 		{
+			VkImage colorImage;
+			VkImageView colorImageView;
 			VkFence fence = VK_NULL_HANDLE;
 		};
 
