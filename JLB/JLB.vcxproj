@@ -158,6 +158,7 @@
     <ClInclude Include="Include\LinearAllocator.h" />
     <ClInclude Include="Include\JlbMath.h" />
     <ClInclude Include="Include\Stack.h" />
+    <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StringView.h" />
     <ClInclude Include="Include\Tuple.h" />
     <ClInclude Include="Include\UnitTest.h" />

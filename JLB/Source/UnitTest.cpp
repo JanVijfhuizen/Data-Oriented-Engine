@@ -10,6 +10,7 @@
 #include "HashMap.h"
 #include "Heap.h"
 #include "Tuple.h"
+#include "StackArray.h"
 
 namespace jlb
 {
@@ -348,6 +349,21 @@ namespace jlb
 			view = { array.GetData(), 4 };
 
 			ArrayView<float> v2 = view;
+		}
+
+		// Stack array.
+		{
+			StackArray<float, 4> array;
+
+			int i = 4;
+			for (auto array1 : array)
+			{
+				i--;
+			}
+
+			assert(i == 0);
+
+			ArrayView<float> v = array;
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace jlb
 	/// Simple struct that allows a chunk of memory to function as an array.
 	/// </summary>
 	template <typename T>
-	struct ArrayView final
+	struct ArrayView
 	{
 		T* data;
 		size_t length;
