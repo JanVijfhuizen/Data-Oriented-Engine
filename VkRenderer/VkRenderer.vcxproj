@@ -23,11 +23,14 @@
     <ClInclude Include="Include\VkApp.h" />
     <ClInclude Include="Include\VkBootstrap.h" />
     <ClInclude Include="Include\VkCommandHandler.h" />
+    <ClInclude Include="Include\VkRenderPassHandler.h" />
     <ClInclude Include="Include\VkSyncHandler.h" />
     <ClInclude Include="Include\VkSwapChain.h" />
     <ClInclude Include="Include\VkImageHandler.h" />
+    <ClInclude Include="Include\VkFrameBufferHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\VkRenderPassHandler.cpp" />
     <ClCompile Include="Source\VkCommandHandler.cpp" />
     <ClCompile Include="Source\VkSyncHandler.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -37,6 +40,7 @@
     <ClCompile Include="Source\VkBootstrap.cpp" />
     <ClCompile Include="Source\VkSwapChain.cpp" />
     <ClCompile Include="Source\VkImageHandler.cpp" />
+    <ClCompile Include="Source\VkFrameBufferHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

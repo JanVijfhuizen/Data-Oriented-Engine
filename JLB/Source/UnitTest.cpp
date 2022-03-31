@@ -337,5 +337,17 @@ namespace jlb
 			auto& enemy = enemies.Add();
 			Get<EnemyBehaviour::Transform>(enemy).rotation -= 5;
 		}
+
+		// ArrayView
+		{
+			LinearAllocator allocator{ 1024 };
+
+			Array<float> array{};
+			array.Allocate(allocator, 4);
+			ArrayView<float> view = array;
+			view = { array.GetData(), 4 };
+
+			ArrayView<float> v2 = view;
+		}
 	}
 }

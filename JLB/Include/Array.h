@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include "LinearAllocator.h"
-#include "Iterator.h"
+#include "ArrayView.h"
 #include <cstring>
 
 namespace jlb
@@ -64,6 +64,8 @@ namespace jlb
 		[[nodiscard]] virtual Iterator<T> end();
 
 		[[nodiscard]] operator bool() const;
+
+		[[nodiscard]]operator ArrayView<T>() const;
 
 	private:
 		T* _memory = nullptr;
@@ -157,5 +159,11 @@ namespace jlb
 	Array<T>::operator bool() const
 	{
 		return _length > 0;
+	}
+
+	template <typename T>
+	Array<T>::operator ArrayView<T>() const
+	{
+		return ArrayView<T>{_memory, _length};
 	}
 }
