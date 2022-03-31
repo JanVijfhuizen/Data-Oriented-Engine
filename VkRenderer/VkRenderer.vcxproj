@@ -22,11 +22,13 @@
     <ClInclude Include="Include\pch.h" />
     <ClInclude Include="Include\VkApp.h" />
     <ClInclude Include="Include\VkBootstrap.h" />
+    <ClInclude Include="Include\VkCommandHandler.h" />
     <ClInclude Include="Include\VkSyncHandler.h" />
     <ClInclude Include="Include\VkSwapChain.h" />
     <ClInclude Include="Include\VkImageHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\VkCommandHandler.cpp" />
     <ClCompile Include="Source\VkSyncHandler.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

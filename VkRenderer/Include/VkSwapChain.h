@@ -27,6 +27,7 @@ namespace vk
 			VkImage colorImage;
 			VkImageView colorImageView;
 			VkFence fence = VK_NULL_HANDLE;
+			VkCommandBuffer cmdBuffer;
 		};
 
 		struct Frame final

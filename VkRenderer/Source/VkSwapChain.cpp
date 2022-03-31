@@ -5,6 +5,7 @@
 #include "JlbMath.h"
 #include "VkImageHandler.h"
 #include "VkSyncHandler.h"
+#include "VkCommandHandler.h"
 
 namespace vk
 {
@@ -40,10 +41,11 @@ namespace vk
 
 		for (auto& image : _images)
 		{
-			if (image.fence)
-				vkWaitForFences(app.logicalDevice, 1, &image.fence, VK_TRUE, UINT64_MAX);
 			image.fence = VK_NULL_HANDLE;
 			vkDestroyImageView(app.logicalDevice, image.colorImageView, nullptr);
+			if (image.fence)
+				vkWaitForFences(app.logicalDevice, 1, &image.fence, VK_TRUE, UINT64_MAX);
+			vkFreeCommandBuffers(app.logicalDevice, app.commandPool, 1, &image.cmdBuffer);
 		}
 
 		for (auto& frame : _frames)
@@ -145,10 +147,15 @@ namespace vk
 		_swapChain = newSwapChain;
 
 		uint32_t length = _images.GetLength();
-		auto vkImages = jlb::Array<VkImage>{};
-
+		jlb::Array<VkImage> vkImages{};
 		vkImages.Allocate(tempAllocator, length);
 		vkGetSwapchainImagesKHR(app.logicalDevice, _swapChain, &length, vkImages.GetData());
+
+		const auto cmdBufferAllocInfo = CommandHandler::CreateBufferDefaultInfo(app);
+		jlb::Array<VkCommandBuffer> cmdBuffers{};
+		cmdBuffers.Allocate(tempAllocator, length);
+		const auto cmdResult = vkAllocateCommandBuffers(app.logicalDevice, &cmdBufferAllocInfo, cmdBuffers.GetData());
+		assert(!cmdResult);
 
 		for (uint32_t i = 0; i < length; ++i)
 		{
@@ -161,6 +168,8 @@ namespace vk
 
 			const auto viewResult = vkCreateImageView(app.logicalDevice, &viewCreateInfo, nullptr, &image.colorImageView);
 			assert(!viewResult);
+
+			image.cmdBuffer = cmdBuffers[i];
 		}
 
 		for (auto& frame : _frames)
@@ -176,6 +185,7 @@ namespace vk
 			assert(!fenceResult);
 		}
 
+		cmdBuffers.Free(tempAllocator);
 		vkImages.Free(tempAllocator);
 	}
 }
