@@ -19,7 +19,7 @@ namespace vk
 		void Allocate(jlb::LinearAllocator& allocator, App& app);
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
-		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler, VkRenderPass renderPass);
+		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
 
 	private:
 		struct Image final
@@ -43,6 +43,7 @@ namespace vk
 
 		VkExtent2D _extent;
 		VkSwapchainKHR _swapChain = VK_NULL_HANDLE;
+		VkRenderPass _renderPass;
 
 		jlb::Array<Image> _images{};
 		jlb::Array<Frame> _frames{};

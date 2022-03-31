@@ -19,11 +19,19 @@ namespace vk
 	VkAttachmentReference RenderPassHandler::CreateAttachmentReferenceDefaultInfo()
 	{
 		VkAttachmentReference colorAttachmentRef{};
+		colorAttachmentRef.attachment = 0;
 		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		return colorAttachmentRef;
 	}
 
-	VkSubpassDependency RenderPassHandler::CreateSubPassDependencyDefaultInfo()
+	VkSubpassDescription RenderPassHandler::CreateSubpassDescriptionDefaultInfo()
+	{
+		VkSubpassDescription subpass{};
+		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		return subpass;
+	}
+
+	VkSubpassDependency RenderPassHandler::CreateSubpassDependencyDefaultInfo()
 	{
 		VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -35,10 +43,19 @@ namespace vk
 		return dependency;
 	}
 
-	VkRenderPassCreateInfo RenderPassHandler::CreateDefaultInfo()
+	VkRenderPassCreateInfo RenderPassHandler::CreateDefaultInfo(
+		const jlb::ArrayView<VkAttachmentDescription> attachmentDescriptions,
+		const jlb::ArrayView<VkSubpassDescription> subpassDescriptions,
+		const jlb::ArrayView<VkSubpassDependency> subpassDependencies)
 	{
 		VkRenderPassCreateInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.attachmentCount = attachmentDescriptions.length;
+		renderPassInfo.pAttachments = attachmentDescriptions.data;
+		renderPassInfo.subpassCount = subpassDescriptions.length;
+		renderPassInfo.pSubpasses = subpassDescriptions.data;
+		renderPassInfo.dependencyCount = subpassDependencies.length;
+		renderPassInfo.pDependencies = subpassDependencies.data;
 		return renderPassInfo;
 	}
 }
