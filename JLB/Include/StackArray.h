@@ -10,9 +10,10 @@ namespace jlb
 	struct StackArray
 	{
 		// ReSharper disable once CppNonExplicitConvertingConstructor
-		StackArray(T& fillValue = {});
+		StackArray(const T& fillValue = {});
 		// ReSharper disable once CppNonExplicitConvertingConstructor
 		StackArray(T* src);
+		virtual ~StackArray() = default;
 
 		/// <summary>
 		/// Swaps values at the defined indexes.
@@ -35,14 +36,14 @@ namespace jlb
 		[[nodiscard]] virtual T& operator[](size_t index);
 		[[nodiscard]] Iterator<T> begin();
 		[[nodiscard]] Iterator<T> end();
-		[[nodiscard]] operator ArrayView<T>() const;
+		[[nodiscard]] operator ArrayView<T>();
 
 	private:
 		T _memory[S];
 	};
 
 	template <typename T, size_t S>
-	StackArray<T, S>::StackArray(T& fillValue)
+	StackArray<T, S>::StackArray(const T& fillValue)
 	{
 		for (int i = 0; i < S; ++i)
 			_memory[i] = fillValue;
@@ -102,7 +103,7 @@ namespace jlb
 	}
 
 	template <typename T, size_t S>
-	StackArray<T, S>::operator ArrayView<T>() const
+	StackArray<T, S>::operator ArrayView<T>()
 	{
 		return ArrayView<T>{_memory, S};
 	}

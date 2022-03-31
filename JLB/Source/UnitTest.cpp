@@ -349,6 +349,9 @@ namespace jlb
 			view = { array.GetData(), 4 };
 
 			ArrayView<float> v2 = view;
+
+			float f = 2;
+			ArrayView<float> v3 = f;
 		}
 
 		// Stack array.
