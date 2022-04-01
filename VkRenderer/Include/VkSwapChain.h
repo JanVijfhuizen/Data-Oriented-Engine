@@ -16,8 +16,14 @@ namespace vk
 	class SwapChain final
 	{
 	public:
+		VkClearValue clearColor = { 0, 0, 0, 1 };
+
 		void Allocate(jlb::LinearAllocator& allocator, App& app);
 		void Free(jlb::LinearAllocator& allocator, App& app);
+
+		void WaitForImage(App& app);
+		[[nodiscard]] VkCommandBuffer BeginRenderPass();
+		[[nodiscard]] VkResult EndRenderPassAndPresent(jlb::LinearAllocator& tempAllocator, App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
 
 		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
 
@@ -26,9 +32,9 @@ namespace vk
 		{
 			VkImage colorImage;
 			VkImageView colorImageView;
-			VkFence fence = VK_NULL_HANDLE;
 			VkCommandBuffer cmdBuffer;
 			VkFramebuffer frameBuffer;
+			VkFence inFlightFence = VK_NULL_HANDLE;
 		};
 
 		struct Frame final
@@ -44,6 +50,9 @@ namespace vk
 		VkExtent2D _extent;
 		VkSwapchainKHR _swapChain = VK_NULL_HANDLE;
 		VkRenderPass _renderPass;
+
+		uint32_t _imageIndex = 0;
+		uint8_t _frameIndex = 0;
 
 		jlb::Array<Image> _images{};
 		jlb::Array<Frame> _frames{};

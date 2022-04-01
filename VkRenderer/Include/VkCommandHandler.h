@@ -8,5 +8,7 @@ namespace vk
 	{
 	public:
 		[[nodiscard]] static VkCommandBufferAllocateInfo CreateBufferDefaultInfo(App& app);
+		[[nodiscard]] static VkCommandBufferBeginInfo CreateBufferBeginDefaultInfo();
+		[[nodiscard]] static VkSubmitInfo CreateSubmitDefaultInfo();
 	};
 }

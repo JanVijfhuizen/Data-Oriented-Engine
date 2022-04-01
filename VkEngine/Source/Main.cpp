@@ -33,6 +33,11 @@ int main()
 	while(!quit)
 	{
 		windowHandler.BeginFrame(quit);
+		swapChain.WaitForImage(app);
+		const auto cmdBuffer = swapChain.BeginRenderPass();
+		const auto presentResult = swapChain.EndRenderPassAndPresent(allocator, app);
+		if (presentResult)
+			swapChain.Recreate(allocator, app, windowHandler);
 	}
 
 	swapChain.Free(allocator, app);

@@ -58,4 +58,12 @@ namespace vk
 		renderPassInfo.pDependencies = subpassDependencies.data;
 		return renderPassInfo;
 	}
+
+	VkRenderPassBeginInfo RenderPassHandler::CreateBeginDefaultInfo()
+	{
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		return renderPassInfo;
+	}
 }

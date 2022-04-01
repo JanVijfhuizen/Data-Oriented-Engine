@@ -15,5 +15,7 @@ namespace vk
 			jlb::ArrayView<VkAttachmentDescription> attachmentDescriptions,
 			jlb::ArrayView<VkSubpassDescription> subpassDescriptions,
 			jlb::ArrayView<VkSubpassDependency> subpassDependencies);
+
+		[[nodiscard]] static VkRenderPassBeginInfo CreateBeginDefaultInfo();
 	};
 }

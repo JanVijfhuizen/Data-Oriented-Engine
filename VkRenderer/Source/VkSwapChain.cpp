@@ -31,6 +31,86 @@ namespace vk
 		_images.Free(allocator);
 	}
 
+	void SwapChain::WaitForImage(App& app)
+	{
+		auto& frame = _frames[_frameIndex];
+
+		vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
+		const auto result = vkAcquireNextImageKHR(app.logicalDevice,
+			_swapChain, UINT64_MAX, frame.imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
+		assert(!result);
+
+		auto& image = _images[_imageIndex];
+		if(image.inFlightFence)
+			vkWaitForFences(app.logicalDevice, 1, &image.inFlightFence, VK_TRUE, UINT64_MAX);
+		image.inFlightFence = frame.inFlightFence;
+	}
+
+	VkCommandBuffer SwapChain::BeginRenderPass()
+	{
+		auto& image = _images[_imageIndex];
+
+		// Begin render command.
+		auto cmd = CommandHandler::CreateBufferBeginDefaultInfo();
+		vkResetCommandBuffer(image.cmdBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
+		vkBeginCommandBuffer(image.cmdBuffer, &cmd);
+
+		// Begin render pass.
+		auto renderPassBeginInfo = RenderPassHandler::CreateBeginDefaultInfo();
+		renderPassBeginInfo.renderPass = _renderPass;
+		renderPassBeginInfo.framebuffer = image.frameBuffer;
+		renderPassBeginInfo.renderArea.extent = _extent;
+		renderPassBeginInfo.clearValueCount = 1;
+		renderPassBeginInfo.pClearValues = &clearColor;
+		
+		vkCmdBeginRenderPass(image.cmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		return image.cmdBuffer;
+	}
+
+	VkResult SwapChain::EndRenderPassAndPresent(jlb::LinearAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
+	{
+		auto& frame = _frames[_frameIndex];
+		auto& image = _images[_imageIndex];
+
+		vkCmdEndRenderPass(image.cmdBuffer);
+
+		auto result = vkEndCommandBuffer(image.cmdBuffer);
+		assert(!result);
+
+		jlb::Array<VkSemaphore> allWaitSemaphores{};
+		allWaitSemaphores.Allocate(tempAllocator, waitSemaphores.length + 1);
+		allWaitSemaphores.Copy(0, waitSemaphores.length, waitSemaphores.data);
+		allWaitSemaphores[waitSemaphores.length] = frame.imageAvailableSemaphore;
+
+		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		auto submitInfo = CommandHandler::CreateSubmitDefaultInfo();
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &image.cmdBuffer;
+		submitInfo.waitSemaphoreCount = allWaitSemaphores.GetLength();
+		submitInfo.pWaitSemaphores = allWaitSemaphores.GetData();
+		submitInfo.pWaitDstStageMask = &waitStage;
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = &frame.renderFinishedSemaphore;
+
+		vkResetFences(app.logicalDevice, 1, &frame.inFlightFence);
+		result = vkQueueSubmit(app.queues.graphics, 1, &submitInfo, frame.inFlightFence);
+		assert(!result);
+
+		allWaitSemaphores.Free(tempAllocator);
+
+		VkPresentInfoKHR presentInfo{};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.waitSemaphoreCount = 1;
+		presentInfo.pWaitSemaphores = &frame.renderFinishedSemaphore;
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = &_swapChain;
+		presentInfo.pImageIndices = &_imageIndex;
+
+		result = vkQueuePresentKHR(app.queues.present, &presentInfo);
+		_frameIndex = (_frameIndex + 1) % _frames.GetLength();
+		return result;
+	}
+
 	void SwapChain::Cleanup(App& app)
 	{
 		if (!_swapChain)
@@ -41,10 +121,10 @@ namespace vk
 
 		for (auto& image : _images)
 		{
-			image.fence = VK_NULL_HANDLE;
+			image.inFlightFence = VK_NULL_HANDLE;
 			vkDestroyImageView(app.logicalDevice, image.colorImageView, nullptr);
-			if (image.fence)
-				vkWaitForFences(app.logicalDevice, 1, &image.fence, VK_TRUE, UINT64_MAX);
+			if (image.inFlightFence)
+				vkWaitForFences(app.logicalDevice, 1, &image.inFlightFence, VK_TRUE, UINT64_MAX);
 			vkFreeCommandBuffers(app.logicalDevice, app.commandPool, 1, &image.cmdBuffer);
 			vkDestroyFramebuffer(app.logicalDevice, image.frameBuffer, nullptr);
 		}
@@ -153,7 +233,8 @@ namespace vk
 		vkImages.Allocate(tempAllocator, length);
 		vkGetSwapchainImagesKHR(app.logicalDevice, _swapChain, &length, vkImages.GetData());
 
-		const auto cmdBufferAllocInfo = CommandHandler::CreateBufferDefaultInfo(app);
+		auto cmdBufferAllocInfo = CommandHandler::CreateBufferDefaultInfo(app);
+		cmdBufferAllocInfo.commandBufferCount = length;
 		jlb::Array<VkCommandBuffer> cmdBuffers{};
 		cmdBuffers.Allocate(tempAllocator, length);
 		const auto cmdResult = vkAllocateCommandBuffers(app.logicalDevice, &cmdBufferAllocInfo, cmdBuffers.GetData());
