@@ -4,6 +4,7 @@
 #include "VkApp.h"
 #include "VkSwapChain.h"
 #include "ImguiImpl.h"
+#include "../Archetype.h"
 
 int main()
 {
