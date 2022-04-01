@@ -34,8 +34,8 @@ namespace jlb
 		[[nodiscard]] T* GetData() const;
 
 		[[nodiscard]] virtual T& operator[](size_t index);
-		[[nodiscard]] Iterator<T> begin();
-		[[nodiscard]] Iterator<T> end();
+		[[nodiscard]] virtual Iterator<T> begin();
+		[[nodiscard]] virtual Iterator<T> end();
 		[[nodiscard]] operator ArrayView<T>();
 
 	private:
