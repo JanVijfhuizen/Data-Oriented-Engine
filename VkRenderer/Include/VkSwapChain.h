@@ -11,20 +11,34 @@ namespace vk
 	struct App;
 	class IWindowHandler;
 
-	constexpr size_t SWAPCHAIN_MAX_FRAMES_IN_FLIGHT = 3;
+	constexpr size_t SWAPCHAIN_MAX_FRAMES_IN_FLIGHT = 4;
 
+	/// <summary>
+	/// Handles rendering to the screen.
+	/// </summary>
 	class SwapChain final
 	{
 	public:
+		// Window background color.
 		VkClearValue clearColor = { 0, 0, 0, 1 };
 
 		void Allocate(jlb::LinearAllocator& allocator, App& app);
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
-		void WaitForImage(App& app);
-		[[nodiscard]] VkCommandBuffer BeginRenderPass();
-		[[nodiscard]] VkResult EndRenderPassAndPresent(jlb::LinearAllocator& tempAllocator, App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
-
+		/// <summary>
+		/// Begins a new command and render pass.
+		/// </summary>
+		/// <returns>Command buffer used for the render pass.</returns>
+		[[nodiscard]] VkCommandBuffer BeginFrame(App& app);
+		/// <summary>
+		/// Ends the render pass and presents it to the screen.
+		/// </summary>
+		/// <param name="waitSemaphores">Additional semaphores to wait for.</param>
+		/// <returns>Present result.</returns>
+		[[nodiscard]] VkResult EndFrame(jlb::LinearAllocator& tempAllocator, App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
+		/// <summary>
+		/// Recreates the swap chain. Call this if EndFrame returns something else than VK_SUCCESS.
+		/// </summary>
 		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
 
 	private:
@@ -57,6 +71,7 @@ namespace vk
 		jlb::Array<Image> _images{};
 		jlb::Array<Frame> _frames{};
 
+		void WaitForImage(App& app);
 		void Cleanup(App& app);
 
 		// Choose color formatting for the swap chain images, like RGB(A).
