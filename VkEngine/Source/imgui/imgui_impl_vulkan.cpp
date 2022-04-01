@@ -1,3 +1,5 @@
+#include "precomp.h"
+
 // dear imgui: Renderer Backend for Vulkan
 // This needs to be used along with a Platform Backend (e.g. GLFW, SDL, Win32, custom..)
 
@@ -53,7 +55,7 @@
 //  2016-10-18: Vulkan: Add location decorators & change to use structs as in/out in glsl, update embedded spv (produced with glslangValidator -x). Null the released resources.
 //  2016-08-27: Vulkan: Fix Vulkan example for use when a depth buffer is active.
 
-#include "imgui_impl_vulkan.h"
+#include "backends/imgui_impl_vulkan.h"
 #include <stdio.h>
 
 // Reusable buffers used for rendering 1 current in-flight frame, for ImGui_ImplVulkan_RenderDrawData()

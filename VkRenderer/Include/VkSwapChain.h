@@ -40,6 +40,10 @@ namespace vk
 		/// Recreates the swap chain. Call this if EndFrame returns something else than VK_SUCCESS.
 		/// </summary>
 		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
+		/// <summary>
+		/// Returns the render pass used to draw to the screen.
+		/// </summary>
+		[[nodiscard]] VkRenderPass GetRenderPass() const;
 
 	private:
 		struct Image final

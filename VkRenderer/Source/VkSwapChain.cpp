@@ -305,4 +305,9 @@ namespace vk
 		cmdBuffers.Free(tempAllocator);
 		vkImages.Free(tempAllocator);
 	}
+
+	VkRenderPass SwapChain::GetRenderPass() const
+	{
+		return _renderPass;
+	}
 }
