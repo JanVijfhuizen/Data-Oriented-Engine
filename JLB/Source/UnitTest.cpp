@@ -10,6 +10,7 @@
 #include "HashMap.h"
 #include "Heap.h"
 #include "Tuple.h"
+#include "StackArray.h"
 
 namespace jlb
 {
@@ -116,7 +117,7 @@ namespace jlb
 				a.Allocate(allocator, 6 + rand() % 12);
 
 				Array<TestStruct> b{};
-				b.Allocate(allocator, a.GetLength(), a.GetData());
+				b.AllocateAndCopy(allocator, a.GetLength(), a.GetData());
 
 				allocator.Free();
 				allocator.Free();
@@ -336,6 +337,36 @@ namespace jlb
 			enemies.Allocate(allocator, 10);
 			auto& enemy = enemies.Add();
 			Get<EnemyBehaviour::Transform>(enemy).rotation -= 5;
+		}
+
+		// ArrayView
+		{
+			LinearAllocator allocator{ 1024 };
+
+			Array<float> array{};
+			array.Allocate(allocator, 4);
+			ArrayView<float> view = array;
+			view = { array.GetData(), 4 };
+
+			ArrayView<float> v2 = view;
+
+			float f = 2;
+			ArrayView<float> v3 = f;
+		}
+
+		// Stack array.
+		{
+			StackArray<float, 4> array;
+
+			int i = 4;
+			for (auto array1 : array)
+			{
+				i--;
+			}
+
+			assert(i == 0);
+
+			ArrayView<float> v = array;
 		}
 	}
 }

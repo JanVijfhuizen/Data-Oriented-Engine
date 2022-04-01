@@ -33,6 +33,10 @@ namespace vk
 		/// Returns the required extension count.
 		/// </summary>
 		[[nodiscard]] virtual size_t GetRequiredExtensionsCount() = 0;
+		/// <summary>
+		/// Returns the window resolution.
+		/// </summary>
+		[[nodiscard]] virtual glm::ivec2 GetResolution() = 0;
 	};
 
 	/// <summary>
@@ -75,24 +79,22 @@ namespace vk
 	{
 	public:
 		/// <summary>
-		/// Create a default info struct that will be good enough for most Vulkan applications.<br>
-		/// For more advanced use, it is adviced to create one yourself.
+		/// Contains swap chain support details for a Vulkan physical device.
 		/// </summary>
-		/// <returns>Info struct from which a Vulkan application can be created.</returns>
-		[[nodiscard]] static AppInfo CreateDefaultInfo(jlb::LinearAllocator& tempAllocator);
-		/// <summary>
-		/// Creates a new Vulkan application.
-		/// </summary>
-		/// <param name="info">Info struct from which to create the application.</param>
-		/// <returns>The created Vulkan application.</returns>
-		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo& info);
-		/// <summary>
-		/// Destroys a Vulkan application.
-		/// </summary>
-		/// <param name="app">Application to be destroyed.</param>
-		static void DestroyApp(const App& app);
+		struct SwapChainSupportDetails final
+		{
+			VkSurfaceCapabilitiesKHR capabilities{};
+			jlb::Array<VkSurfaceFormatKHR> formats{};
+			jlb::Array<VkPresentModeKHR> presentModes{};
 
-	private:
+			[[nodiscard]] explicit operator bool() const;
+			[[nodiscard]] size_t GetRecommendedImageCount() const;
+			void Free(jlb::LinearAllocator& tempAllocator);
+		};
+
+		/// <summary>
+		/// Contains the standard render queue families.
+		/// </summary>
 		struct QueueFamilies final
 		{
 			union
@@ -113,17 +115,35 @@ namespace vk
 			[[nodiscard]] operator bool() const;
 		};
 
-		struct SupportDetails final
-		{
-			VkSurfaceCapabilitiesKHR capabilities{};
-			jlb::Array<VkSurfaceFormatKHR> formats{};
-			jlb::Array<VkPresentModeKHR> presentModes{};
+		/// <summary>
+		/// Create a default info struct that will be good enough for most Vulkan applications.<br>
+		/// For more advanced use, it is adviced to create one yourself.
+		/// </summary>
+		/// <returns>Info struct from which a Vulkan application can be created.</returns>
+		[[nodiscard]] static AppInfo CreateDefaultInfo(jlb::LinearAllocator& tempAllocator);
+		/// <summary>
+		/// Creates a new Vulkan application.
+		/// </summary>
+		/// <param name="info">Info struct from which to create the application.</param>
+		/// <returns>The created Vulkan application.</returns>
+		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo info);
+		/// <summary>
+		/// Destroys a Vulkan application.
+		/// </summary>
+		/// <param name="app">Application to be destroyed.</param>
+		static void DestroyApp(const App& app);
 
-			[[nodiscard]] explicit operator bool() const;
-			[[nodiscard]] uint32_t GetRecommendedImageCount() const;
-			void Free(jlb::LinearAllocator& tempAllocator);
-		};
+		/// <summary>
+		/// Returns a struct containing information about the GPU hardware's swap chain support.
+		/// </summary>
+		/// <param name="app">Vulkan Application.</param>
+		[[nodiscard]] static SwapChainSupportDetails QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app);
+		/// <summary>
+		/// Returns the GPU's render queue families.
+		/// </summary>
+		[[nodiscard]] static QueueFamilies GetQueueFamilies(jlb::LinearAllocator& tempAllocator, App& app);
 
+	private:
 		static void CheckValidationSupport(jlb::LinearAllocator& tempAllocator, AppInfo& info);
 		static void CreateInstance(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app);
 		static void EnableValidationLayers(
@@ -134,7 +154,7 @@ namespace vk
 		static void SelectPhysicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app);
 		[[nodiscard]] static QueueFamilies GetQueueFamilies(jlb::LinearAllocator& tempAllocator, VkSurfaceKHR surface, VkPhysicalDevice physicalDevice);
 		[[nodiscard]] static bool CheckDeviceExtensionSupport(jlb::LinearAllocator& tempAllocator, VkPhysicalDevice device, jlb::Array<jlb::StringView>& extensions);
-		[[nodiscard]] static SupportDetails QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app, VkPhysicalDevice device);
+		[[nodiscard]] static SwapChainSupportDetails QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app, VkPhysicalDevice device);
 
 		static void CreateLogicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app);
 		static void CreateCommandPool(jlb::LinearAllocator& tempAllocator, App& app);
