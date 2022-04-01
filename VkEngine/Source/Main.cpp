@@ -1,14 +1,15 @@
-#include "pch.h"
+#include "precomp.h"
 #include "WindowHandler.h"
 #include "VkBootstrap.h"
 #include "VkApp.h"
 #include "VkSwapChain.h"
+#include "ImguiImpl.h"
 
 int main()
 {
-	WindowHandler windowHandler{};
+	vke::WindowHandler windowHandler{};
 	{
-		const WindowHandler::Info windowCreateInfo{};
+		const vke::WindowHandler::Info windowCreateInfo{};
 		windowHandler.Construct(windowCreateInfo);
 	}
 
@@ -26,18 +27,28 @@ int main()
 	}
 
 	vk::SwapChain swapChain{};
-	swapChain.Allocate(allocator, app);
-	swapChain.Recreate(allocator, app, windowHandler);
+	swapChain.Allocate(allocator, app, windowHandler);
+
+	vke::ImguiImpl imguiImpl{};
+	imguiImpl.Setup(app, swapChain, windowHandler);
 
 	bool quit = false;
 	while(!quit)
 	{
 		windowHandler.BeginFrame(quit);
 		const auto cmdBuffer = swapChain.BeginFrame(app);
+		imguiImpl.Beginframe();
+		ImGui::ShowDemoWindow();
+		imguiImpl.EndFrame(cmdBuffer);
 		const auto presentResult = swapChain.EndFrame(allocator, app);
 		if (presentResult)
 			swapChain.Recreate(allocator, app, windowHandler);
 	}
+
+	const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
+	assert(!idleResult);
+
+	imguiImpl.Cleanup(app);
 
 	swapChain.Free(allocator, app);
 	vk::Bootstrap::DestroyApp(app);
