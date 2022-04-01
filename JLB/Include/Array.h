@@ -13,6 +13,8 @@ namespace jlb
 	class Array
 	{
 	public:
+		virtual ~Array() = default;
+
 		[[nodiscard]] virtual T& operator[](size_t index);
 		[[nodiscard]] size_t GetLength() const;
 
