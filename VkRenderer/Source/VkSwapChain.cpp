@@ -46,8 +46,10 @@ namespace vk
 		image.inFlightFence = frame.inFlightFence;
 	}
 
-	VkCommandBuffer SwapChain::BeginRenderPass()
+	VkCommandBuffer SwapChain::BeginFrame(App& app)
 	{
+		WaitForImage(app);
+
 		auto& image = _images[_imageIndex];
 
 		// Begin render command.
@@ -67,7 +69,7 @@ namespace vk
 		return image.cmdBuffer;
 	}
 
-	VkResult SwapChain::EndRenderPassAndPresent(jlb::LinearAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
+	VkResult SwapChain::EndFrame(jlb::LinearAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
 	{
 		auto& frame = _frames[_frameIndex];
 		auto& image = _images[_imageIndex];

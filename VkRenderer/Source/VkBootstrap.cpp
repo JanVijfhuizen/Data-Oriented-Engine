@@ -6,6 +6,7 @@
 #include "Heap.h"
 #include "HashMap.h"
 #include "Vector.h"
+#include "StackVector.h"
 
 namespace vk
 {
@@ -366,8 +367,8 @@ namespace vk
 		auto queueFamilies = GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
 
 		const size_t queueFamiliesCount = sizeof queueFamilies.values / sizeof(size_t);
-		jlb::Vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
-		queueCreateInfos.Allocate(tempAllocator, queueFamiliesCount);
+		jlb::StackVector<VkDeviceQueueCreateInfo, queueFamiliesCount> queueCreateInfos{};
+
 		jlb::HashMap<size_t> familyIndexes{};
 		familyIndexes.hasher = [](size_t& hashable) {return hashable; };
 		familyIndexes.Allocate(tempAllocator, queueFamiliesCount);
@@ -422,7 +423,6 @@ namespace vk
 		}
 
 		familyIndexes.Free(tempAllocator);
-		queueCreateInfos.Free(tempAllocator);
 	}
 
 	void Bootstrap::CreateCommandPool(jlb::LinearAllocator& tempAllocator, App& app)

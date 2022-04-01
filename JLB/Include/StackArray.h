@@ -31,11 +31,11 @@ namespace jlb
 		/// <summary>
 		/// Get a raw pointer to the managed memory.
 		/// </summary>
-		[[nodiscard]] T* GetData() const;
+		[[nodiscard]] T* GetData();
 
 		[[nodiscard]] virtual T& operator[](size_t index);
-		[[nodiscard]] Iterator<T> begin();
-		[[nodiscard]] Iterator<T> end();
+		[[nodiscard]] virtual Iterator<T> begin();
+		[[nodiscard]] virtual Iterator<T> end();
 		[[nodiscard]] operator ArrayView<T>();
 
 	private:
@@ -71,7 +71,7 @@ namespace jlb
 	}
 
 	template <typename T, size_t S>
-	T* StackArray<T, S>::GetData() const
+	T* StackArray<T, S>::GetData()
 	{
 		return _memory;
 	}
