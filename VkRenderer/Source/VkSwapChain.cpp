@@ -11,7 +11,7 @@
 
 namespace vk
 {
-	void SwapChain::Allocate(jlb::LinearAllocator& allocator, App& app)
+	void SwapChain::Allocate(jlb::LinearAllocator& allocator, App& app, IWindowHandler& windowHandler)
 	{
 		auto support = Bootstrap::QuerySwapChainSupport(allocator, app);
 		const uint32_t imageCount = support.GetRecommendedImageCount();
@@ -21,6 +21,8 @@ namespace vk
 
 		_images.Allocate(allocator, imageCount);
 		_frames.Allocate(allocator, SWAPCHAIN_MAX_FRAMES_IN_FLIGHT);
+
+		Recreate(allocator, app, windowHandler);
 	}
 
 	void SwapChain::Free(jlb::LinearAllocator& allocator, App& app)

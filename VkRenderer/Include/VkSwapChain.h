@@ -22,7 +22,7 @@ namespace vk
 		// Window background color.
 		VkClearValue clearColor = { 0, 0, 0, 1 };
 
-		void Allocate(jlb::LinearAllocator& allocator, App& app);
+		void Allocate(jlb::LinearAllocator& allocator, App& app, IWindowHandler& windowHandler);
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
 		/// <summary>
