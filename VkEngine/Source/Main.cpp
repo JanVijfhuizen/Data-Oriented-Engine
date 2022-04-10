@@ -32,14 +32,16 @@ int main()
 	vke::ImguiImpl imguiImpl{};
 	imguiImpl.Setup(app, swapChain, windowHandler);
 
+	game::Start();
 	bool quit = false;
 	while(!quit)
 	{
 		windowHandler.BeginFrame(quit);
 		const auto cmdBuffer = swapChain.BeginFrame(app);
-		imguiImpl.Beginframe();
+		vke::ImguiImpl::Beginframe();
 		ImGui::ShowDemoWindow();
-		imguiImpl.EndFrame(cmdBuffer);
+		game::Update();
+		vke::ImguiImpl::EndFrame(cmdBuffer);
 		const auto presentResult = swapChain.EndFrame(allocator, app);
 		if (presentResult)
 			swapChain.Recreate(allocator, app, windowHandler);
