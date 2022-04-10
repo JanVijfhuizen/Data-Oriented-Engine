@@ -21,8 +21,10 @@ namespace vk
 					VkQueue graphics;
 					// Queue for presentation operations (rendering to the screen).
 					VkQueue present;
+					// Queue for transferring operations like image transfers.
+					VkQueue transfer;
 				};
-				VkQueue values[2];
+				VkQueue values[3];
 			};
 		};
 

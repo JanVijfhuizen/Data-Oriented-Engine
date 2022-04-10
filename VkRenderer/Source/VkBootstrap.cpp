@@ -283,6 +283,9 @@ namespace vk
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 				families.graphics = i;
 
+			if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT)
+				families.transfer = i;
+
 			VkBool32 presentSupport = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
 

@@ -103,10 +103,12 @@ namespace vk
 				{
 					size_t graphics;
 					size_t present;
+					size_t transfer;
 				};
 
-				size_t values[2]
+				size_t values[3]
 				{
+					SIZE_MAX,
 					SIZE_MAX,
 					SIZE_MAX
 				};
