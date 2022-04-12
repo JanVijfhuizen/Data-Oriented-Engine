@@ -7,7 +7,6 @@
 
 #ifdef _DEBUG
 #include "ImguiImpl.h"
-#include <iostream>
 #include <fstream>
 #include <string>
 #endif
@@ -15,34 +14,49 @@
 namespace vke
 {
 	const char* MEM_USAGE_PATH = "memUsage.txt";
+	constexpr size_t ENGINE_VERSION = 1;
 
-	void Engine::Run()
+	int Engine::Run()
 	{
-		size_t allocatorSize = 65536;
-		size_t tempAllocatorSize = 65536;
+		RuntimeData runtimeData{};
 
+		VersionData versionData;
+		const auto versionResult = LoadVersionData(versionData);
+		if(!versionResult)
 		{
-			std::ifstream memFile{};
-			memFile.open(MEM_USAGE_PATH, std::ios::in);
-			assert(memFile.is_open());
+			jlb::LinearAllocator allocator{ versionData.allocSpace };
+			jlb::LinearAllocator tempAllocator{ versionData.tempAllocSpace };
 
-			memFile.seekg(0, std::ios::end);
-			if(memFile.tellg())
-			{
-				memFile.seekg(0, 0);
+			runtimeData.allocator = &allocator;
+			runtimeData.tempAllocator = &tempAllocator;
 
-				std::string s;
-				std::getline(memFile, s);
-				allocatorSize = std::stoi(s);
-				std::getline(memFile, s);
-				tempAllocatorSize = std::stoi(s);
-			}
+			const int gameResult = RunGame(runtimeData, true);
+			if (gameResult)
+				return gameResult;
 
-			memFile.close();
+			SaveVersionData(runtimeData);
+			LoadVersionData(versionData);
 		}
 
-		jlb::LinearAllocator allocator{ 65536 };
-		jlb::LinearAllocator tempAllocator{ 65536 };
+		jlb::LinearAllocator allocator{ versionData.allocSpace };
+		jlb::LinearAllocator tempAllocator{ versionData.tempAllocSpace };
+		runtimeData.allocator = &allocator;
+		runtimeData.tempAllocator = &tempAllocator;
+
+		const int gameResult = RunGame(runtimeData, false);
+
+		assert(allocator.IsEmpty());
+		assert(tempAllocator.IsEmpty());
+
+		if(!gameResult)
+			SaveVersionData(runtimeData);
+		return gameResult;
+	}
+
+	int Engine::RunGame(RuntimeData& data, const bool allocRun)
+	{
+		auto& allocator = *data.allocator;
+		auto& tempAllocator = *data.tempAllocator;
 
 		WindowHandler windowHandler{};
 		{
@@ -91,6 +105,9 @@ namespace vke
 			const auto presentResult = swapChain.EndFrame(allocator, app);
 			if (presentResult)
 				swapChain.Recreate(allocator, app, windowHandler);
+
+			if (allocRun)
+				break;
 		}
 
 		const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
@@ -105,16 +122,61 @@ namespace vke
 		swapChain.Free(allocator, app);
 		vk::Bootstrap::DestroyApp(app);
 
-		assert(allocator.IsEmpty());
-		assert(tempAllocator.IsEmpty());
+		windowHandler.Cleanup();
+		return 0;
+	}
 
+	bool Engine::LoadVersionData(VersionData& outVersionData)
+	{
+		outVersionData = {};
+		outVersionData.buildVersion = ENGINE_VERSION;
+
+#ifdef _DEBUG
+		return false;
+#endif
+
+		std::ifstream memFile{};
+		memFile.open(MEM_USAGE_PATH, std::ios::in);
+		if (!memFile.is_open())
+			return false;
+
+		bool isValid = false;
+
+		// If the file is empty.
+		memFile.seekg(0, std::ios::end);
+		if (memFile.tellg())
 		{
-			std::ofstream memFIle{};
-			memFIle.open(MEM_USAGE_PATH, std::ios::out);
-			assert(memFIle.is_open());
-			memFIle << allocator.GetTotalRequestedSpace() << std::endl;
-			memFIle << tempAllocator.GetTotalRequestedSpace() << std::endl;
-			memFIle.close();
+			memFile.seekg(0, 0);
+
+			std::string s;
+			std::getline(memFile, s);
+			const size_t version = std::stoi(s);
+			
+			if (version == ENGINE_VERSION)
+			{
+				outVersionData.buildVersion = version;
+				std::getline(memFile, s);
+				outVersionData.allocSpace = std::stoi(s);
+				std::getline(memFile, s);
+				outVersionData.tempAllocSpace = std::stoi(s);
+				isValid = true;
+			}
 		}
+
+		memFile.close();
+		return isValid;
+	}
+
+	void Engine::SaveVersionData(RuntimeData& runtimeData)
+	{
+		std::ofstream memFIle{};
+		memFIle.open(MEM_USAGE_PATH, std::ios::out);
+		assert(memFIle.is_open());
+
+		memFIle << ENGINE_VERSION << std::endl;;
+		memFIle << runtimeData.allocator->GetTotalRequestedSpace() << std::endl;
+		memFIle << runtimeData.tempAllocator->GetTotalRequestedSpace() << std::endl;
+		
+		memFIle.close();
 	}
 }

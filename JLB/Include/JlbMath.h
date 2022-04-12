@@ -12,7 +12,7 @@ namespace jlb
 	};
 
 	template <typename T>
-	T Math::Max(T a, T b)
+	T Math::Max(const T a, const T b)
 	{
 		return a < b ? b : a;
 	}

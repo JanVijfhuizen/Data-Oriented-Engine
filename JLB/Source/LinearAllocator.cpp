@@ -58,7 +58,7 @@ namespace jlb
 
 	size_t LinearAllocator::GetTotalRequestedSpace() const
 	{
-		return _totalRequestedSpace * sizeof(size_t);
+		return (_totalRequestedSpace + 1) * sizeof(size_t);
 	}
 
 	size_t LinearAllocator::ToChunkSize(const size_t size)
