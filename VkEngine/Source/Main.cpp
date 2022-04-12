@@ -4,6 +4,8 @@
 #include "VkApp.h"
 #include "VkSwapChain.h"
 #include "ImguiImpl.h"
+#include "VkLinearAllocator.h"
+#include "VkBufferHandler.h"
 
 int main()
 {
@@ -32,6 +34,9 @@ int main()
 	vke::ImguiImpl imguiImpl{};
 	imguiImpl.Setup(app, swapChain, windowHandler);
 
+	vk::LinearAllocator vkAllocator{};
+	vkAllocator.Allocate(allocator, app);
+
 	game::Start();
 	bool quit = false;
 	while(!quit)
@@ -50,6 +55,7 @@ int main()
 	const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 	assert(!idleResult);
 
+	vkAllocator.Free(allocator, app);
 	imguiImpl.Cleanup(app);
 
 	swapChain.Free(allocator, app);
