@@ -39,6 +39,7 @@ namespace vk
 		auto& pool = _pools[poolId];
 		pool.alignment = alignment;
 		pool.size = size;
+		pool.remaining = size;
 
 		VkMemoryAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -105,5 +106,10 @@ namespace vk
 		auto& pool = _pools[poolId];
 		outTotalRequestedSpace = pool.size - pool.remaining;
 		outLargestAlignment = pool.largestAlignmentRequested;
+	}
+
+	size_t LinearAllocator::GetLength() const
+	{
+		return _pools.GetLength();
 	}
 }

@@ -30,16 +30,9 @@ namespace vke
 			const int gameResult = RunGame(versionData, true);
 			if (gameResult)
 				return gameResult;
-
-			SaveVersionData(versionData);
-			LoadVersionData(versionData);
 		}
 
-		const int gameResult = RunGame(versionData, false);
-
-		if(!gameResult)
-			SaveVersionData(versionData);
-		return gameResult;
+		return RunGame(versionData, false);
 	}
 
 	int Engine::RunGame(VersionData& versionData, bool allocRun)
@@ -74,6 +67,17 @@ namespace vke
 		vk::LinearAllocator vkAllocator{};
 		vkAllocator.Allocate(allocator, app);
 
+		{
+			VersionData::PoolInfo defaultPoolInfo{};
+			const bool load = versionData.poolInfos.size() > 0;
+
+			for (size_t i = 0; i < vkAllocator.GetLength(); ++i)
+			{
+				auto poolInfo = load ? versionData.poolInfos[i] : defaultPoolInfo;
+				vkAllocator.AllocatePool(app, poolInfo.size, poolInfo.alignment, i);
+			}
+		}
+
 		game::Start();
 		bool quit = false;
 		while (!quit)
@@ -102,6 +106,13 @@ namespace vke
 		const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 		assert(!idleResult);
 
+		versionData.poolInfos.clear();
+		for (size_t i = 0; i < vkAllocator.GetLength(); ++i)
+		{
+			versionData.poolInfos.push_back({});
+			auto& poolInfo = versionData.poolInfos[i];
+			vkAllocator.GetPoolInfo(i, poolInfo.size, poolInfo.alignment);
+		}
 		vkAllocator.Free(allocator, app);
 
 #ifdef _DEBUG
@@ -115,6 +126,8 @@ namespace vke
 
 		versionData.allocSpace = allocator.GetTotalRequestedSpace();
 		versionData.tempAllocSpace = tempAllocator.GetTotalRequestedSpace();
+
+		SaveVersionData(versionData);
 
 		assert(allocator.IsEmpty());
 		assert(tempAllocator.IsEmpty());
@@ -155,6 +168,15 @@ namespace vke
 				outVersionData.allocSpace = std::stoi(s);
 				std::getline(memFile, s);
 				outVersionData.tempAllocSpace = std::stoi(s);
+
+				while(std::getline(memFile, s))
+				{
+					outVersionData.poolInfos.push_back({});
+					auto& poolInfo = outVersionData.poolInfos[outVersionData.poolInfos.size() - 1];
+					poolInfo.size = std::stoi(s);
+					std::getline(memFile, s);
+					poolInfo.alignment = std::stoi(s);
+				}
 				isValid = true;
 			}
 		}
@@ -163,16 +185,22 @@ namespace vke
 		return isValid;
 	}
 
-	void Engine::SaveVersionData(VersionData& stats)
+	void Engine::SaveVersionData(VersionData& versionData)
 	{
-		std::ofstream memFIle{};
-		memFIle.open(VERSION_PATH, std::ios::out);
-		assert(memFIle.is_open());
+		std::ofstream memFile{};
+		memFile.open(VERSION_PATH, std::ios::out);
+		assert(memFile.is_open());
 
-		memFIle << ENGINE_VERSION << std::endl;;
-		memFIle << stats.allocSpace << std::endl;
-		memFIle << stats.tempAllocSpace << std::endl;
+		memFile << ENGINE_VERSION << std::endl;;
+		memFile << versionData.allocSpace << std::endl;
+		memFile << versionData.tempAllocSpace << std::endl;
+
+		for (auto& poolInfo : versionData.poolInfos)
+		{
+			memFile << poolInfo.size << std::endl;
+			memFile << poolInfo.alignment << std::endl;
+		}
 		
-		memFIle.close();
+		memFile.close();
 	}
 }

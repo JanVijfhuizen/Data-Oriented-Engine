@@ -33,6 +33,7 @@ namespace vk
 		[[nodiscard]] static VkDeviceSize CalculateBufferSize(VkDeviceSize size, VkDeviceSize alignment);
 
 		void GetPoolInfo(uint32_t poolId, VkDeviceSize& outTotalRequestedSpace, VkDeviceSize& outLargestAlignment);
+		[[nodiscard]] size_t GetLength() const;
 
 	private:
 		struct Pool final
