@@ -20,9 +20,9 @@ namespace vk
 		void Allocate(jlb::LinearAllocator& allocator, App& app);
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
-		// Define the alignment size for a pool.
-		void DefineAlignment(VkDeviceSize size, uint32_t poolId);
-		// Predefine the size of the allocated memory. Calls can be stacked.
+		// Updates a pool to conform to the largest requested alignment.
+		void RequestAlignment(VkDeviceSize size, uint32_t poolId);
+		// Add to the size of the memory that will be allocated, based on the largest requested alignment.
 		void Reserve(VkDeviceSize size, uint32_t poolId);
 		// Allocates the memory pools based on the total size of all the reserve calls.
 		void Compile(App& app);
@@ -36,10 +36,6 @@ namespace vk
 		// Calculates the buffer size depending on the minimum offset.
 		[[nodiscard]] static VkDeviceSize CalculateBufferSize(VkDeviceSize size, VkDeviceSize alignment);
 
-		[[nodiscard]] uint64_t GetMinUniformBufferOffsetAlignment() const;
-		[[nodiscard]] uint64_t GetMinStorageBufferOffsetAlignment() const;
-		[[nodiscard]] uint64_t GetMinTexelBufferOffsetAlignment() const;
-
 	private:
 		struct Pool final
 		{
@@ -52,8 +48,5 @@ namespace vk
 		};
 
 		jlb::Array<Pool> _pools{};
-		uint64_t _minUniformBufferOffsetAlignment;
-		uint64_t _minStorageBufferOffsetAlignment;
-		uint64_t _minTexelBufferOffsetAlignment;
 	};
 }

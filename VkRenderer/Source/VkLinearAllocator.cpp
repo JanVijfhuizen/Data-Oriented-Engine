@@ -9,12 +9,6 @@ namespace vk
 	{
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(app.physicalDevice, &memProperties);
-		VkPhysicalDeviceProperties properties;
-		vkGetPhysicalDeviceProperties(app.physicalDevice, &properties);
-
-		_minUniformBufferOffsetAlignment = properties.limits.minUniformBufferOffsetAlignment;
-		_minStorageBufferOffsetAlignment = properties.limits.minStorageBufferOffsetAlignment;
-		_minTexelBufferOffsetAlignment = properties.limits.minTexelBufferOffsetAlignment;
 
 		_pools.Allocate(allocator, memProperties.memoryTypeCount);
 
@@ -37,10 +31,10 @@ namespace vk
 		_pools.Free(allocator);
 	}
 
-	void LinearAllocator::DefineAlignment(const VkDeviceSize size, const uint32_t poolId)
+	void LinearAllocator::RequestAlignment(const VkDeviceSize size, const uint32_t poolId)
 	{
 		auto& pool = _pools[poolId];
-		pool.alignment = size;
+		pool.alignment = jlb::Math::Max(size, pool.alignment);
 	}
 
 	void LinearAllocator::Compile(App& app)
@@ -108,26 +102,12 @@ namespace vk
 	void LinearAllocator::Reserve(const VkDeviceSize size, const uint32_t poolId)
 	{
 		auto& pool = _pools[poolId];
+		assert(pool.size > 0);
 		pool.size += CalculateBufferSize(size, pool.alignment);
 	}
 
 	VkDeviceSize LinearAllocator::CalculateBufferSize(const VkDeviceSize size, const VkDeviceSize alignment)
 	{
 		return (size / alignment + (size % alignment > 0)) * alignment;
-	}
-
-	uint64_t LinearAllocator::GetMinUniformBufferOffsetAlignment() const
-	{
-		return _minUniformBufferOffsetAlignment;
-	}
-
-	uint64_t LinearAllocator::GetMinStorageBufferOffsetAlignment() const
-	{
-		return _minStorageBufferOffsetAlignment;
-	}
-
-	uint64_t LinearAllocator::GetMinTexelBufferOffsetAlignment() const
-	{
-		return _minTexelBufferOffsetAlignment;
 	}
 }

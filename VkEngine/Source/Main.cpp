@@ -37,27 +37,6 @@ int main()
 	vk::LinearAllocator vkAllocator{};
 	vkAllocator.Allocate(allocator, app);
 
-	// Testing.
-	VkBufferCreateInfo info = vk::BufferHandler::CreateBufferDefaultInfo(sizeof(size_t) * 35, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
-	VkBuffer buffer;
-	vkCreateBuffer(app.logicalDevice, &info, nullptr, &buffer);
-
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(app.logicalDevice, buffer, &memRequirements);
-	auto poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	vkAllocator.DefineAlignment(memRequirements.alignment, poolId);
-	vkAllocator.Reserve(sizeof(size_t) * 35, poolId);
-	vkAllocator.Reserve(sizeof(size_t) * 35, poolId);
-	vkAllocator.Compile(app);
-
-	auto block = vkAllocator.CreateBlock(sizeof(size_t) * 35, poolId);
-	auto block2 = vkAllocator.CreateBlock(sizeof(size_t) * 21, poolId);
-
-	vkBindBufferMemory(app.logicalDevice, buffer, block2.memory, block2.offset);
-
-	vkAllocator.FreeBlock(block2);
-	vkAllocator.FreeBlock(block);
-
 	game::Start();
 	bool quit = false;
 	while(!quit)
@@ -72,8 +51,6 @@ int main()
 		if (presentResult)
 			swapChain.Recreate(allocator, app, windowHandler);
 	}
-
-	vkDestroyBuffer(app.logicalDevice, buffer, nullptr);
 
 	const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 	assert(!idleResult);
