@@ -13,7 +13,7 @@
 
 namespace vke
 {
-	const char* MEM_USAGE_PATH = "memUsage.txt";
+	const char* VERSION_PATH = "version.txt";
 	constexpr size_t ENGINE_VERSION = 1;
 
 	int Engine::Run()
@@ -136,7 +136,7 @@ namespace vke
 #endif
 
 		std::ifstream memFile{};
-		memFile.open(MEM_USAGE_PATH, std::ios::in);
+		memFile.open(VERSION_PATH, std::ios::in);
 		if (!memFile.is_open())
 			return false;
 
@@ -170,7 +170,7 @@ namespace vke
 	void Engine::SaveVersionData(RuntimeData& runtimeData)
 	{
 		std::ofstream memFIle{};
-		memFIle.open(MEM_USAGE_PATH, std::ios::out);
+		memFIle.open(VERSION_PATH, std::ios::out);
 		assert(memFIle.is_open());
 
 		memFIle << ENGINE_VERSION << std::endl;;
