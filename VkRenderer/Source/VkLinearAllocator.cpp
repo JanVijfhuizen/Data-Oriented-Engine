@@ -31,29 +31,23 @@ namespace vk
 		_pools.Free(allocator);
 	}
 
-	void LinearAllocator::RequestAlignment(const VkDeviceSize size, const uint32_t poolId)
+	void LinearAllocator::AllocatePool(App& app, const VkDeviceSize size, const VkDeviceSize alignment, const uint32_t poolId)
 	{
+		if (size == 0)
+			return;
+
 		auto& pool = _pools[poolId];
-		pool.alignment = jlb::Math::Max(size, pool.alignment);
-	}
+		pool.alignment = alignment;
+		pool.size = size;
+		pool.remaining = size;
 
-	void LinearAllocator::Compile(App& app)
-	{
-		uint32_t i = 0;
-		for (auto& pool : _pools)
-		{
-			pool.remaining = pool.size;
-			if (pool.size == 0)
-				continue;
+		VkMemoryAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = pool.size;
+		allocInfo.memoryTypeIndex = poolId;
 
-			VkMemoryAllocateInfo allocInfo{};
-			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			allocInfo.allocationSize = pool.size;
-			allocInfo.memoryTypeIndex = i++;
-
-			const auto result = vkAllocateMemory(app.logicalDevice, &allocInfo, nullptr, &pool.memory);
-			assert(!result);
-		}
+		const auto result = vkAllocateMemory(app.logicalDevice, &allocInfo, nullptr, &pool.memory);
+		assert(!result);
 	}
 
 	MemBlock LinearAllocator::CreateBlock(const VkDeviceSize size, const uint32_t poolId)
@@ -63,6 +57,7 @@ namespace vk
 		const VkDeviceSize offset = pool.size - pool.remaining;
 		assert(alignedSize <= pool.remaining);
 		pool.remaining -= alignedSize;
+		pool.largestAlignmentRequested = jlb::Math::Max(pool.largestAlignmentRequested, alignedSize);
 
 		MemBlock block{};
 		block.memory = pool.memory;
@@ -99,15 +94,22 @@ namespace vk
 		return UINT32_MAX;
 	}
 
-	void LinearAllocator::Reserve(const VkDeviceSize size, const uint32_t poolId)
-	{
-		auto& pool = _pools[poolId];
-		assert(pool.size > 0);
-		pool.size += CalculateBufferSize(size, pool.alignment);
-	}
-
 	VkDeviceSize LinearAllocator::CalculateBufferSize(const VkDeviceSize size, const VkDeviceSize alignment)
 	{
 		return (size / alignment + (size % alignment > 0)) * alignment;
+	}
+
+	void LinearAllocator::GetPoolInfo(const uint32_t poolId, 
+		VkDeviceSize& outTotalRequestedSpace,
+		VkDeviceSize& outLargestAlignment)
+	{
+		auto& pool = _pools[poolId];
+		outTotalRequestedSpace = pool.size - pool.remaining;
+		outLargestAlignment = pool.largestAlignmentRequested;
+	}
+
+	size_t LinearAllocator::GetLength() const
+	{
+		return _pools.GetLength();
 	}
 }
