@@ -13,12 +13,6 @@ namespace vke
 		static int Run();
 
 	private:
-		struct RuntimeData final
-		{
-			jlb::LinearAllocator* allocator;
-			jlb::LinearAllocator* tempAllocator;
-		};
-
 		struct VersionData final
 		{
 			size_t buildVersion = SIZE_MAX;
@@ -26,9 +20,9 @@ namespace vke
 			size_t tempAllocSpace = 65536;
 		};
 
-		static int RunGame(RuntimeData& data, bool allocRun);
+		static int RunGame(VersionData& versionData, bool allocRun);
 
 		static bool LoadVersionData(VersionData& outVersionData);
-		static void SaveVersionData(RuntimeData& runtimeData);
+		static void SaveVersionData(VersionData& stats);
 	};
 }

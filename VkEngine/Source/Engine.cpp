@@ -4,59 +4,48 @@
 #include "VkLinearAllocator.h"
 #include "VkApp.h"
 #include "VkSwapChain.h"
+#include <fstream>
+#include <string>
 
 #ifdef _DEBUG
 #include "ImguiImpl.h"
-#include <fstream>
-#include <string>
 #endif
 
 namespace vke
 {
-	const char* VERSION_PATH = "version.txt";
+	const char* VERSION_PATH = 
+#ifdef _DEBUG
+	"version-debug.txt";
+#else
+	"version.txt";
+#endif
 	constexpr size_t ENGINE_VERSION = 1;
 
 	int Engine::Run()
 	{
-		RuntimeData runtimeData{};
-
 		VersionData versionData;
 		const auto versionResult = LoadVersionData(versionData);
 		if(!versionResult)
 		{
-			jlb::LinearAllocator allocator{ versionData.allocSpace };
-			jlb::LinearAllocator tempAllocator{ versionData.tempAllocSpace };
-
-			runtimeData.allocator = &allocator;
-			runtimeData.tempAllocator = &tempAllocator;
-
-			const int gameResult = RunGame(runtimeData, true);
+			const int gameResult = RunGame(versionData, true);
 			if (gameResult)
 				return gameResult;
 
-			SaveVersionData(runtimeData);
+			SaveVersionData(versionData);
 			LoadVersionData(versionData);
 		}
 
-		jlb::LinearAllocator allocator{ versionData.allocSpace };
-		jlb::LinearAllocator tempAllocator{ versionData.tempAllocSpace };
-		runtimeData.allocator = &allocator;
-		runtimeData.tempAllocator = &tempAllocator;
-
-		const int gameResult = RunGame(runtimeData, false);
-
-		assert(allocator.IsEmpty());
-		assert(tempAllocator.IsEmpty());
+		const int gameResult = RunGame(versionData, false);
 
 		if(!gameResult)
-			SaveVersionData(runtimeData);
+			SaveVersionData(versionData);
 		return gameResult;
 	}
 
-	int Engine::RunGame(RuntimeData& data, const bool allocRun)
+	int Engine::RunGame(VersionData& versionData, bool allocRun)
 	{
-		auto& allocator = *data.allocator;
-		auto& tempAllocator = *data.tempAllocator;
+		jlb::LinearAllocator allocator{ versionData.allocSpace };
+		jlb::LinearAllocator tempAllocator{ versionData.tempAllocSpace };
 
 		WindowHandler windowHandler{};
 		{
@@ -123,6 +112,13 @@ namespace vke
 		vk::Bootstrap::DestroyApp(app);
 
 		windowHandler.Cleanup();
+
+		versionData.allocSpace = allocator.GetTotalRequestedSpace();
+		versionData.tempAllocSpace = tempAllocator.GetTotalRequestedSpace();
+
+		assert(allocator.IsEmpty());
+		assert(tempAllocator.IsEmpty());
+
 		return 0;
 	}
 
@@ -167,15 +163,15 @@ namespace vke
 		return isValid;
 	}
 
-	void Engine::SaveVersionData(RuntimeData& runtimeData)
+	void Engine::SaveVersionData(VersionData& stats)
 	{
 		std::ofstream memFIle{};
 		memFIle.open(VERSION_PATH, std::ios::out);
 		assert(memFIle.is_open());
 
 		memFIle << ENGINE_VERSION << std::endl;;
-		memFIle << runtimeData.allocator->GetTotalRequestedSpace() << std::endl;
-		memFIle << runtimeData.tempAllocator->GetTotalRequestedSpace() << std::endl;
+		memFIle << stats.allocSpace << std::endl;
+		memFIle << stats.tempAllocSpace << std::endl;
 		
 		memFIle.close();
 	}
