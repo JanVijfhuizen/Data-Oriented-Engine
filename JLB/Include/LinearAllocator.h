@@ -52,6 +52,11 @@ namespace jlb
 		/// </summary>
 		[[nodiscard]] bool IsEmpty() const;
 
+		/// <summary>
+		/// Returns the total space used by this allocator during it's lifetime.
+		/// </summary>
+		[[nodiscard]] size_t GetTotalRequestedSpace() const;
+
 	private:
 		// Pointer to the big chunk of memory, from which everything is allocated.
 		size_t* _memory = nullptr;
@@ -59,6 +64,7 @@ namespace jlb
 		size_t _size = 0;
 		// The current memory index where new allocations will take place.
 		size_t _current = 0;
+		size_t _totalRequestedSpace = 0;
 
 		/// <summary>
 		/// Converts device size into chunk size.<br>

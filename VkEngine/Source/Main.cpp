@@ -5,7 +5,7 @@
 #include "VkSwapChain.h"
 #include "ImguiImpl.h"
 #include "VkLinearAllocator.h"
-#include "VkBufferHandler.h"
+#include <iostream>
 
 int main()
 {
@@ -51,7 +51,7 @@ int main()
 		if (presentResult)
 			swapChain.Recreate(allocator, app, windowHandler);
 	}
-
+		
 	const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 	assert(!idleResult);
 
@@ -63,4 +63,7 @@ int main()
 
 	assert(allocator.IsEmpty());
 	assert(tempAllocator.IsEmpty());
+
+	std::cout << "Constant memory used: " << allocator.GetTotalRequestedSpace() << std::endl;
+	std::cout << "Temporary memory used: " << tempAllocator.GetTotalRequestedSpace() << std::endl;
 }

@@ -1,6 +1,8 @@
-﻿#include "LinearAllocator.h"
+﻿
+#include "LinearAllocator.h"
 #include <malloc.h>
 #include <cassert>
+#include "JlbMath.h"
 
 namespace jlb
 {
@@ -21,7 +23,6 @@ namespace jlb
 	{
 		// Assert if there still is enough free space.
 		size = ToChunkSize(size);
-
 		assert(size + _current + 1 < _size);
 
 		// Get pointer to the free memory that will be used for this allocation.
@@ -33,6 +34,7 @@ namespace jlb
 		// Increment by one due to the extra size metadata.
 		++_current;
 
+		_totalRequestedSpace = Math::Max(_totalRequestedSpace, _current);
 		return current;
 	}
 
@@ -52,6 +54,11 @@ namespace jlb
 	bool LinearAllocator::IsEmpty() const
 	{
 		return _current == 0;
+	}
+
+	size_t LinearAllocator::GetTotalRequestedSpace() const
+	{
+		return _totalRequestedSpace * sizeof(size_t);
 	}
 
 	size_t LinearAllocator::ToChunkSize(const size_t size)
