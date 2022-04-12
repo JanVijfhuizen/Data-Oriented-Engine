@@ -1,28 +1,54 @@
 ﻿#include "precomp.h"
 #include "Engine.h"
 #include "WindowHandler.h"
-#include <iostream>
-
 #include "VkLinearAllocator.h"
 #include "VkApp.h"
 #include "VkSwapChain.h"
 
 #ifdef _DEBUG
 #include "ImguiImpl.h"
+#include <iostream>
+#include <fstream>
+#include <string>
 #endif
 
 namespace vke
 {
+	const char* MEM_USAGE_PATH = "memUsage.txt";
+
 	void Engine::Run()
 	{
+		size_t allocatorSize = 65536;
+		size_t tempAllocatorSize = 65536;
+
+		{
+			std::ifstream memFile{};
+			memFile.open(MEM_USAGE_PATH, std::ios::in);
+			assert(memFile.is_open());
+
+			memFile.seekg(0, std::ios::end);
+			if(memFile.tellg())
+			{
+				memFile.seekg(0, 0);
+
+				std::string s;
+				std::getline(memFile, s);
+				allocatorSize = std::stoi(s);
+				std::getline(memFile, s);
+				tempAllocatorSize = std::stoi(s);
+			}
+
+			memFile.close();
+		}
+
+		jlb::LinearAllocator allocator{ 65536 };
+		jlb::LinearAllocator tempAllocator{ 65536 };
+
 		WindowHandler windowHandler{};
 		{
 			const WindowHandler::Info windowCreateInfo{};
 			windowHandler.Construct(windowCreateInfo);
 		}
-
-		jlb::LinearAllocator allocator{ 65536 };
-		jlb::LinearAllocator tempAllocator{ 65536 };
 
 		vk::App app{};
 		{
@@ -82,7 +108,13 @@ namespace vke
 		assert(allocator.IsEmpty());
 		assert(tempAllocator.IsEmpty());
 
-		std::cout << "Constant memory used: " << allocator.GetTotalRequestedSpace() << std::endl;
-		std::cout << "Temporary memory used: " << tempAllocator.GetTotalRequestedSpace() << std::endl;
+		{
+			std::ofstream memFIle{};
+			memFIle.open(MEM_USAGE_PATH, std::ios::out);
+			assert(memFIle.is_open());
+			memFIle << allocator.GetTotalRequestedSpace() << std::endl;
+			memFIle << tempAllocator.GetTotalRequestedSpace() << std::endl;
+			memFIle.close();
+		}
 	}
 }
