@@ -10,6 +10,9 @@ namespace vke
 {
 	constexpr VkDeviceSize MEM_DEFAULT_SIZE = 65536;
 
+	/// <summary>
+	/// Data oriented engine that prioritizes efficient memory usage and good performance.
+	/// </summary>
 	class Engine final
 	{
 	public:

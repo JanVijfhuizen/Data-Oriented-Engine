@@ -1,9 +1,9 @@
 ﻿#include "precomp.h"
 #include "ImguiImpl.h"
-#include "VkApp.h"
+#include "VkRenderer/VkApp.h"
 #include "WindowHandler.h"
-#include "VkSwapChain.h"
-#include "VkCommandHandler.h"
+#include "VkRenderer/VkSwapChain.h"
+#include "VkRenderer/VkCommandHandler.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 

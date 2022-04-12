@@ -19,18 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\pch.h" />
-    <ClInclude Include="Include\VkLinearAllocator.h" />
-    <ClInclude Include="Include\VkApp.h" />
-    <ClInclude Include="Include\VkBootstrap.h" />
-    <ClInclude Include="Include\VkCommandHandler.h" />
-    <ClInclude Include="Include\VkMemBlock.h" />
-    <ClInclude Include="Include\VkRenderPassHandler.h" />
-    <ClInclude Include="Include\VkSyncHandler.h" />
-    <ClInclude Include="Include\VkSwapChain.h" />
-    <ClInclude Include="Include\VkImageHandler.h" />
-    <ClInclude Include="Include\VkFrameBufferHandler.h" />
-    <ClInclude Include="Include\VkBufferHandler.h" />
+    <ClInclude Include="Include\VkRenderer\pch.h" />
+    <ClInclude Include="Include\VkRenderer\VkLinearAllocator.h" />
+    <ClInclude Include="Include\VkRenderer\VkApp.h" />
+    <ClInclude Include="Include\VkRenderer\VkBootstrap.h" />
+    <ClInclude Include="Include\VkRenderer\VkCommandHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkMemBlock.h" />
+    <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkSyncHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkSwapChain.h" />
+    <ClInclude Include="Include\VkRenderer\VkImageHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkFrameBufferHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkBufferHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\VkLinearAllocator.cpp" />
@@ -153,7 +153,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include/;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include/VkRenderer;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -172,7 +172,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include/;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include/VkRenderer;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

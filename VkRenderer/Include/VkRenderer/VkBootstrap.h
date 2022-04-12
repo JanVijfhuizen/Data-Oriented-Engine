@@ -129,11 +129,12 @@ namespace vk
 		/// <param name="info">Info struct from which to create the application.</param>
 		/// <returns>The created Vulkan application.</returns>
 		[[nodiscard]] static App CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo info);
+		
 		/// <summary>
 		/// Destroys a Vulkan application.
 		/// </summary>
 		/// <param name="app">Application to be destroyed.</param>
-		static void DestroyApp(const App& app);
+		static void DestroyApp(App& app);
 
 		/// <summary>
 		/// Returns a struct containing information about the GPU hardware's swap chain support.

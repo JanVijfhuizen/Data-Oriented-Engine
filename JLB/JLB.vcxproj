@@ -149,6 +149,8 @@
     <ClCompile Include="Source\UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Archetype.h" />
+    <ClInclude Include="Include\EntitySystem.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
     <ClInclude Include="Include\HashMap.h" />

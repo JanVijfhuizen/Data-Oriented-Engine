@@ -3,5 +3,5 @@
 
 int main()
 {
-	vke::Engine::Run();
+	return vke::Engine::Run();
 }
