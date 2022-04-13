@@ -5,7 +5,6 @@
 #include <iostream>
 #include "Heap.h"
 #include "HashMap.h"
-#include "Vector.h"
 #include "StackVector.h"
 
 namespace vk
@@ -79,7 +78,7 @@ namespace vk
 		return app;
 	}
 
-	void Bootstrap::DestroyApp(const App& app)
+	void Bootstrap::DestroyApp(App& app)
 	{
 		vkDestroyCommandPool(app.logicalDevice, app.commandPool, nullptr);
 		vkDestroyDevice(app.logicalDevice, nullptr);

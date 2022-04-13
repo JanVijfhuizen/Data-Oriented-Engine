@@ -74,5 +74,11 @@
     <ClInclude Include="Include\StackVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Archetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EntitySystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

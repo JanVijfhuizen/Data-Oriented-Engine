@@ -15,40 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\pch.h">
+    <ClInclude Include="Include\VkRenderer\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkBootstrap.h">
+    <ClInclude Include="Include\VkRenderer\VkBootstrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkApp.h">
+    <ClInclude Include="Include\VkRenderer\VkApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkSwapChain.h">
+    <ClInclude Include="Include\VkRenderer\VkSwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkSyncHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkSyncHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkImageHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkImageHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkCommandHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkCommandHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkFrameBufferHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkFrameBufferHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderPassHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkLinearAllocator.h">
+    <ClInclude Include="Include\VkRenderer\VkLinearAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkMemBlock.h">
+    <ClInclude Include="Include\VkRenderer\VkMemBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkBufferHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkBufferHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

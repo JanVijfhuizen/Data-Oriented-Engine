@@ -1,10 +1,10 @@
 #pragma once
 #include "Vector.h"
 
-namespace vke
+namespace jlb
 {
 	template <typename Task>
-	class EntitySystem : public jlb::Vector<Task>
+	class EntitySystem : public Vector<Task>
 	{
 		
 	};

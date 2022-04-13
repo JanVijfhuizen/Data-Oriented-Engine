@@ -169,8 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Engine.h" />
-    <ClInclude Include="Include\Archetype.h" />
-    <ClInclude Include="Include\EntitySystem.h" />
     <ClInclude Include="Include\ImguiImpl.h" />
     <ClInclude Include="Include\precomp.h" />
     <ClInclude Include="Include\WindowHandler.h" />

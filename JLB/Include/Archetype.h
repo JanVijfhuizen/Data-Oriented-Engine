@@ -2,7 +2,7 @@
 #include "Vector.h"
 #include "Tuple.h"
 
-namespace vke
+namespace jlb
 {
 	template <typename ...Args>
 	class Archetype : public jlb::Vector<jlb::Tuple<Args...>>

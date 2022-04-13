@@ -31,7 +31,7 @@ namespace vk
 		[[nodiscard]] static uint32_t GetPoolId(App& app, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 		// Calculates the buffer size depending on the minimum offset.
 		[[nodiscard]] static VkDeviceSize CalculateBufferSize(VkDeviceSize size, VkDeviceSize alignment);
-
+		// Returns information about the given pool. Useful when determining how much space the program occupies.
 		void GetPoolInfo(uint32_t poolId, VkDeviceSize& outTotalRequestedSpace, VkDeviceSize& outLargestAlignment);
 		[[nodiscard]] size_t GetLength() const;
 

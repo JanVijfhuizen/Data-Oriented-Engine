@@ -1,11 +1,13 @@
 ﻿#include "precomp.h"
 #include "Engine.h"
 #include "WindowHandler.h"
-#include "VkLinearAllocator.h"
-#include "VkApp.h"
-#include "VkSwapChain.h"
+#include "VkRenderer/VkApp.h"
+#include "VkRenderer/VkLinearAllocator.h"
+#include "VkRenderer/VkSwapChain.h"
+#include "Game/EngineData.h"
 #include <fstream>
 #include <string>
+#include <chrono>
 
 #ifdef _DEBUG
 #include "ImguiImpl.h"
@@ -78,7 +80,17 @@ namespace vke
 			}
 		}
 
-		game::Start();
+		game::EngineOutData outData{};
+		outData.allocator = &allocator;
+		outData.tempAllocator = &tempAllocator;
+		outData.vkAllocator = &vkAllocator;
+		outData.app = &app;
+
+		using ms = std::chrono::duration<float, std::milli>;
+		auto oldTime = std::chrono::high_resolution_clock::now();
+
+		game::Start(outData);
+
 		bool quit = false;
 		while (!quit)
 		{
@@ -89,15 +101,25 @@ namespace vke
 			ImguiImpl::Beginframe();
 #endif
 
-			game::Update();
+			outData.swapChainCommandBuffer = cmdBuffer;
+			outData.swapChainRenderPass = swapChain.GetRenderPass();
+
+			auto newTime = std::chrono::high_resolution_clock::now();
+			outData.deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(newTime - oldTime).count() * 0.001f;
+			outData.time += outData.deltaTime;
+			oldTime = newTime;
+			auto inData = game::Update(outData);
 
 #ifdef _DEBUG
 			ImguiImpl::EndFrame(cmdBuffer);
 #endif
 
-			const auto presentResult = swapChain.EndFrame(allocator, app);
+			const auto presentResult = swapChain.EndFrame(allocator, app, inData.swapChainWaitSemaphores);
 			if (presentResult)
+			{
 				swapChain.Recreate(allocator, app, windowHandler);
+				game::OnRecreateSwapChainAssets(outData);
+			}
 
 			if (allocRun)
 				break;
@@ -105,6 +127,8 @@ namespace vke
 
 		const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 		assert(!idleResult);
+
+		game::Exit(outData);
 
 		versionData.poolInfos.clear();
 		for (size_t i = 0; i < vkAllocator.GetLength(); ++i)
