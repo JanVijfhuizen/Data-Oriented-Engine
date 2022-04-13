@@ -27,7 +27,7 @@ namespace game
 		// In milliseconds.
 		float time = 0;
 		// In milliseconds.
-		float deltaTime;
+		float deltaTime = 0;
 	};
 
 	struct EngineInData final

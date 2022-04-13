@@ -128,6 +128,8 @@ namespace vke
 		const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 		assert(!idleResult);
 
+		game::Exit(outData);
+
 		versionData.poolInfos.clear();
 		for (size_t i = 0; i < vkAllocator.GetLength(); ++i)
 		{

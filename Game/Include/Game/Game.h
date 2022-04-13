@@ -12,4 +12,5 @@ namespace game
 	extern "C" GAME_API void Start(EngineOutData outData);
 	extern "C" GAME_API EngineInData Update(EngineOutData outData);
 	extern "C" GAME_API void OnRecreateSwapChainAssets(EngineOutData outData);
+	extern "C" GAME_API void Exit(EngineOutData outData);
 }

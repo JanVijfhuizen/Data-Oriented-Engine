@@ -11,12 +11,16 @@ namespace game
 
 	EngineInData Update(const EngineOutData outData)
 	{
-		std::cout << outData.deltaTime << std::endl;
+		//std::cout << outData.deltaTime << std::endl;
 		return {};
 	}
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
 	{
 		
+	}
+
+	void Exit(EngineOutData outData)
+	{
 	}
 }
