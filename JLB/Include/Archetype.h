@@ -5,9 +5,9 @@
 namespace jlb
 {
 	template <typename ...Args>
-	class Archetype : public jlb::Vector<jlb::Tuple<Args...>>
+	class Archetype : public Vector<Tuple<Args...>>
 	{
 	public:
-		using Entity = jlb::Tuple<Args...>;
+		using Entity = Tuple<Args...>;
 	};
 }
