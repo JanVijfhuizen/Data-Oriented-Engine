@@ -115,7 +115,7 @@ namespace vke
 #endif
 
 			const auto presentResult = swapChain.EndFrame(allocator, app, inData.swapChainWaitSemaphores);
-			if (presentResult)
+			if (presentResult || allocRun)
 			{
 				swapChain.Recreate(allocator, app, windowHandler);
 				game::OnRecreateSwapChainAssets(outData);

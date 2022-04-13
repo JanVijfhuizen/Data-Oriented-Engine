@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Graphics/Vertex.h"
-#include "Components/Transform.h"
 
 namespace game
 {
@@ -12,10 +11,10 @@ namespace game
 		vertexData.binding = 0;
 		vertexData.stride = sizeof(Vertex);
 		vertexData.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-		auto& instanceData = bindingDescriptions[1];
-		instanceData.binding = 1;
-		instanceData.stride = sizeof(glm::mat4);
-		instanceData.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+		auto& modelData = bindingDescriptions[1];
+		modelData.binding = 1;
+		modelData.stride = sizeof(glm::mat4);
+		modelData.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 		return bindingDescriptions;
 	}
 
