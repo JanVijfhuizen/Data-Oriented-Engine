@@ -4,10 +4,25 @@
 
 namespace jlb
 {
-	template <typename ...Args>
-	class Archetype : public Vector<Tuple<Args...>>
+	template <typename ComponentTuple, typename ...Systems>
+	class Archetype;
+
+	template <typename ...Components, typename ...Systems>
+	class Archetype<Tuple<Components...>, Systems...> : public Vector<Tuple<Components...>>
 	{
 	public:
-		using Entity = Tuple<Args...>;
+		using Entity = Tuple<Components...>;
+
+		void Update(Systems&... systems);
+
+	protected:
+		virtual void OnUpdate(Entity& entity, Systems&... systems) = 0;
 	};
+
+	template <typename ... Components, typename ... Systems>
+	void Archetype<tupleImpl::TupleImpl<0, Components...>, Systems...>::Update(Systems&... systems)
+	{
+		for (auto& entity : *this)
+			OnUpdate(entity, systems...);
+	}
 }

@@ -11,10 +11,12 @@ namespace game
 {
 	class RenderSystem;
 
-	class PlayerArchetype final : public jlb::Archetype<Character, Collider, Controller, Renderer, ShadowCaster, Transform>
+	typedef jlb::Tuple<Character, Collider, Controller, Renderer, ShadowCaster, Transform> PlayerEntity;
+
+	class PlayerArchetype final : public jlb::Archetype<PlayerEntity, RenderSystem>
 	{
 	public:
-		enum Ind
+		enum Indices
 		{
 			Character,
 			Collider,
@@ -24,6 +26,7 @@ namespace game
 			Transform
 		};
 
-		void Update(RenderSystem& renderSystem);
+	protected:
+		void OnUpdate(Entity& entity, RenderSystem& renderSystem) override;
 	};
 }
