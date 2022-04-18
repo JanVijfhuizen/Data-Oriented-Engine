@@ -23,6 +23,7 @@ namespace game
 
 		VkCommandBuffer swapChainCommandBuffer;
 		VkRenderPass swapChainRenderPass;
+		glm::ivec2 resolution;
 
 		// In milliseconds.
 		float time = 0;

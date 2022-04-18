@@ -21,7 +21,7 @@ namespace game
 		// Update archetypes.
 		gameState.playerArchetype.Update(gameState.renderSystem);
 		// Update systems.
-		gameState.renderSystem.Update(*outData.app);
+		gameState.renderSystem.Update(outData);
 
 		auto& player = gameState.playerArchetype[0];
 		jlb::Get<PlayerArchetype::Transform>(player).position.x = sin(outData.time * 0.001f) * 4;
@@ -32,12 +32,13 @@ namespace game
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
 	{
-		
+		gameState.renderSystem.DestroySwapChainAssets(outData);
+		gameState.renderSystem.CreateSwapChainAssets(outData);
 	}
 
-	void Exit(EngineOutData outData)
+	void Exit(const EngineOutData outData)
 	{
-		gameState.renderSystem.Free(*outData.allocator);
+		gameState.renderSystem.Free(outData);
 		gameState.playerArchetype.Free(*outData.allocator);
 	}
 }

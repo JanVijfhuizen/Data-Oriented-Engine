@@ -44,6 +44,7 @@ namespace vk
 		/// Returns the render pass used to draw to the screen.
 		/// </summary>
 		[[nodiscard]] VkRenderPass GetRenderPass() const;
+		[[nodiscard]] glm::ivec2 GetResolution() const;
 
 	private:
 		struct Image final

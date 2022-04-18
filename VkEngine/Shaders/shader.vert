@@ -3,7 +3,9 @@
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inTexCoords;
-layout(location = 2) in mat4 model;
+layout(location = 2) in vec3 instancePosition;
+layout(location = 3) in float instanceRotation;
+layout(location = 4) in float instanceScale;
 
 layout(location = 0) out Data
 {
@@ -14,7 +16,7 @@ layout(location = 0) out Data
 void main() 
 {
     outData.fragTexCoord = inTexCoords;
-    outData.fragPos = vec3(model * vec4(inPosition, 1.0));
+    outData.fragPos = inPosition;
 
-    gl_Position = model * vec4(inPosition, 1);
+    gl_Position = vec4(inPosition, 1);
 }

@@ -13,14 +13,14 @@ namespace game
 		vertexData.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		auto& modelData = bindingDescriptions[1];
 		modelData.binding = 1;
-		modelData.stride = sizeof(glm::mat4);
+		modelData.stride = sizeof(Instance);
 		modelData.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 		return bindingDescriptions;
 	}
 
-	jlb::StackArray<VkVertexInputAttributeDescription, 6> Vertex::GetAttributeDescriptions()
+	jlb::StackArray<VkVertexInputAttributeDescription, 5> Vertex::GetAttributeDescriptions()
 	{
-		jlb::StackArray<VkVertexInputAttributeDescription, 6> attributeDescriptions{};
+		jlb::StackArray<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
 
 		auto& position = attributeDescriptions[0];
 		position.binding = 0;
@@ -36,27 +36,21 @@ namespace game
 
 		auto& row1 = attributeDescriptions[2];
 		row1.binding = 1;
-		row1.location = 0;
+		row1.location = 2;
 		row1.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row1.offset = 0;
+		row1.offset = offsetof(Instance, position);
 
 		auto& row2 = attributeDescriptions[3];
 		row2.binding = 1;
-		row2.location = 1;
+		row2.location = 3;
 		row2.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row2.offset = sizeof(glm::vec4);
+		row2.offset = offsetof(Instance, rotation);
 
 		auto& row3 = attributeDescriptions[4];
 		row3.binding = 1;
-		row3.location = 2;
+		row3.location = 4;
 		row3.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row3.offset = sizeof(glm::vec4) * 2;
-
-		auto& row4 = attributeDescriptions[5];
-		row4.binding = 1;
-		row4.location = 3;
-		row4.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row4.offset = sizeof(glm::vec4) * 3;
+		row3.offset = offsetof(Instance, scale);
 
 		return attributeDescriptions;
 	}

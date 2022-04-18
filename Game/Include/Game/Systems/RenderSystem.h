@@ -16,16 +16,27 @@ namespace game
 	{
 	public:
 		void Allocate(const EngineOutData& engineOutData, size_t size);
-		void Free(jlb::LinearAllocator& allocator) override;
+		void Free(const EngineOutData& engineOutData);
 
-		void Update(vk::App& app);
+		void Update(const EngineOutData& engineOutData);
 
 		[[nodiscard]] static RenderTask CreateDefaultTask(Renderer& renderer, Transform& transform);
+
+		void CreateSwapChainAssets(const EngineOutData& engineOutData);
+		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
 
 	private:
 		using EntitySystem<RenderTask>::Allocate;
 		using EntitySystem<RenderTask>::AllocateAndCopy;
+		using EntitySystem<RenderTask>::Free;
+
+		VkShaderModule _vertModule;
+		VkShaderModule _fragModule;
+
+		VkPipelineLayout _pipelineLayout;
+		VkPipeline _pipeline;
 
 		void LoadShader(const EngineOutData& engineOutData);
+		void UnloadShader(const EngineOutData& engineOutData) const;
 	};
 }

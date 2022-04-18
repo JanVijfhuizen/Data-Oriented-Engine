@@ -310,4 +310,9 @@ namespace vk
 	{
 		return _renderPass;
 	}
+
+	glm::ivec2 SwapChain::GetResolution() const
+	{
+		return {_extent.width, _extent.height};
+	}
 }
