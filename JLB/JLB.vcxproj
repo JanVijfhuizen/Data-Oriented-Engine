@@ -147,7 +147,6 @@
     <ClCompile Include="Source\JlbMath.cpp" />
     <ClCompile Include="Source\LinearAllocator.cpp" />
     <ClCompile Include="Source\StringView.cpp" />
-    <ClCompile Include="Source\UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Archetype.h" />
@@ -166,7 +165,6 @@
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />
     <ClInclude Include="Include\Tuple.h" />
-    <ClInclude Include="Include\UnitTest.h" />
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

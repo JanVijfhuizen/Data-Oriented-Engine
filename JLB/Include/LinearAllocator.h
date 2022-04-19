@@ -11,13 +11,8 @@ namespace jlb
 	class LinearAllocator final
 	{
 	public:
-		explicit LinearAllocator(size_t size);
-		~LinearAllocator();
-
-		LinearAllocator(LinearAllocator& other) = delete;
-		LinearAllocator(LinearAllocator&& other) = delete;
-		LinearAllocator& operator=(LinearAllocator& other) = delete;
-		LinearAllocator& operator=(LinearAllocator&& other) = delete;
+		void Allocate(size_t size);
+		void Free();
 
 		/// <summary>
 		/// Allocates a chunk of memory.
@@ -30,7 +25,7 @@ namespace jlb
 		/// Frees the last allocation.<br>
 		/// Does not call destructors.
 		/// </summary>
-		void Free();
+		void Pop();
 
 		/// <summary>
 		/// Wrapper method for Malloc. Immediately casts the allocated memory to one or multiple classes of type T.<br>

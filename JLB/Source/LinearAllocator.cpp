@@ -6,17 +6,18 @@
 
 namespace jlb
 {
-	LinearAllocator::LinearAllocator(const size_t size) :
-		// Immediately convert the size to chunk size.
-		_size(ToChunkSize(size))
+	void LinearAllocator::Allocate(const size_t size)
 	{
+		assert(!_memory);
+		_size = ToChunkSize(size);
 		// Allocate N size_t chunks.
 		_memory = reinterpret_cast<size_t*>(malloc(_size * sizeof(size_t)));
 	}
 
-	LinearAllocator::~LinearAllocator()
+	void LinearAllocator::Free()
 	{
 		free(_memory);
+		_memory = nullptr;
 	}
 
 	void* LinearAllocator::Malloc(size_t size)
@@ -38,7 +39,7 @@ namespace jlb
 		return current;
 	}
 
-	void LinearAllocator::Free()
+	void LinearAllocator::Pop()
 	{
 		// Assert if there is anything to free.
 		assert(_current > 0);

@@ -39,8 +39,12 @@ namespace vke
 
 	int Engine::RunGame(VersionData& versionData, bool allocRun)
 	{
-		jlb::LinearAllocator allocator{ versionData.allocSpace };
-		jlb::LinearAllocator tempAllocator{ versionData.tempAllocSpace };
+		jlb::LinearAllocator allocator{};
+		allocator.Allocate(versionData.allocSpace);
+		jlb::LinearAllocator tempAllocator{};
+		tempAllocator.Allocate(versionData.tempAllocSpace);
+		jlb::LinearAllocator setupAllocator{};
+		setupAllocator.Allocate(versionData.setupAllocSpace);
 
 		WindowHandler windowHandler{};
 		{
@@ -50,12 +54,10 @@ namespace vke
 
 		vk::App app{};
 		{
-			vk::AppInfo appInfo = vk::Bootstrap::CreateDefaultInfo(tempAllocator);
+			vk::AppInfo appInfo = vk::Bootstrap::CreateDefaultInfo(setupAllocator);
 			appInfo.windowHandler = &windowHandler;
-
-			app = vk::Bootstrap::CreateApp(tempAllocator, appInfo);
-
-			appInfo.Free(tempAllocator);
+			app = vk::Bootstrap::CreateApp(setupAllocator, appInfo);
+			appInfo.Free(setupAllocator);
 		}
 
 		vk::SwapChain swapChain{};
@@ -91,6 +93,7 @@ namespace vke
 		using ms = std::chrono::duration<float, std::milli>;
 		auto oldTime = std::chrono::high_resolution_clock::now();
 
+		setupAllocator.Free();
 		game::Start(outData);
 
 		bool quit = false;
@@ -153,13 +156,17 @@ namespace vke
 
 		windowHandler.Cleanup();
 
+		versionData.setupAllocSpace = setupAllocator.GetTotalRequestedSpace();
 		versionData.allocSpace = allocator.GetTotalRequestedSpace();
 		versionData.tempAllocSpace = tempAllocator.GetTotalRequestedSpace();
 
 		SaveVersionData(versionData);
 
-		assert(allocator.IsEmpty());
 		assert(tempAllocator.IsEmpty());
+		assert(allocator.IsEmpty());
+
+		tempAllocator.Free();
+		allocator.Free();
 
 		return 0;
 	}
@@ -221,6 +228,7 @@ namespace vke
 		assert(memFile.is_open());
 
 		memFile << ENGINE_VERSION << std::endl;;
+		memFile << versionData.setupAllocSpace << std::endl;
 		memFile << versionData.allocSpace << std::endl;
 		memFile << versionData.tempAllocSpace << std::endl;
 

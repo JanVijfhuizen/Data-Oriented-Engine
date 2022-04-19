@@ -28,6 +28,7 @@ namespace vke
 			};
 
 			size_t buildVersion = SIZE_MAX;
+			size_t setupAllocSpace = MEM_DEFAULT_SIZE;
 			size_t allocSpace = MEM_DEFAULT_SIZE;
 			size_t tempAllocSpace = MEM_DEFAULT_SIZE;
 			std::vector<PoolInfo> poolInfos{};

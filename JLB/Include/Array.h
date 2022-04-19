@@ -113,7 +113,7 @@ namespace jlb
 	{
 		if (_memory)
 		{
-			allocator.Free();
+			allocator.Pop();
 			_memory = nullptr;
 		}
 	}
