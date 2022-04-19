@@ -22,10 +22,16 @@ namespace vk
 		return beginInfo;
 	}
 
-	VkSubmitInfo CommandHandler::CreateSubmitDefaultInfo()
+	VkSubmitInfo CommandHandler::CreateSubmitDefaultInfo(const jlb::ArrayView<VkCommandBuffer> commandBuffers)
 	{
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = commandBuffers.length;
+		submitInfo.pCommandBuffers = commandBuffers.data;
+		submitInfo.waitSemaphoreCount = 0;
+		submitInfo.pWaitSemaphores = 0;
+		submitInfo.signalSemaphoreCount = 0;
+		submitInfo.pWaitDstStageMask = nullptr;
 		return submitInfo;
 	}
 }

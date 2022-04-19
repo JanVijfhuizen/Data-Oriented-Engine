@@ -34,6 +34,8 @@ namespace vk
 		// Returns information about the given pool. Useful when determining how much space the program occupies.
 		void GetPoolInfo(uint32_t poolId, VkDeviceSize& outTotalRequestedSpace, VkDeviceSize& outLargestAlignment);
 		[[nodiscard]] size_t GetLength() const;
+		// Returns whether or not all the blocks have been properly freed.
+		[[nodiscard]] bool IsEmpty();
 
 	private:
 		struct Pool final
@@ -46,6 +48,7 @@ namespace vk
 			VkDeviceSize alignment;
 
 			VkDeviceSize largestAlignmentRequested = 0;
+			VkDeviceSize largestSpaceOccupied = 0;
 		};
 
 		jlb::Array<Pool> _pools{};

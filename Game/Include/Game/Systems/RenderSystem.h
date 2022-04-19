@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "TaskSystem.h"
+#include "Graphics/Mesh.h"
 
 namespace game
 {
@@ -31,6 +32,7 @@ namespace game
 
 		VkShaderModule _vertModule;
 		VkShaderModule _fragModule;
+		Mesh _mesh;
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
@@ -39,6 +41,5 @@ namespace game
 		void UnloadShader(const EngineOutData& engineOutData) const;
 
 		void CreateMesh(const EngineOutData& engineOutData);
-		void DestroyMesh(const EngineOutData& engineOutData);
 	};
 }

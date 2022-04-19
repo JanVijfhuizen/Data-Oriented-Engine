@@ -20,7 +20,7 @@ namespace game
 	void RenderSystem::Free(const EngineOutData& engineOutData)
 	{
 		DestroySwapChainAssets(engineOutData);
-		DestroyMesh(engineOutData);
+		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
 		TaskSystem::Free(*engineOutData.allocator);
 	}
@@ -92,14 +92,7 @@ namespace game
 		indices[4] = 2;
 		indices[5] = 3;
 
-		VkBuffer vertBuffer;
-		VkBuffer indBuffer;
-		MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices, vertBuffer, indBuffer);
-	}
-
-	void RenderSystem::DestroyMesh(const EngineOutData& engineOutData)
-	{
-
+		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)

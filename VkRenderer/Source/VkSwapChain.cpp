@@ -87,9 +87,7 @@ namespace vk
 		allWaitSemaphores[waitSemaphores.length] = frame.imageAvailableSemaphore;
 
 		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		auto submitInfo = CommandHandler::CreateSubmitDefaultInfo();
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &image.cmdBuffer;
+		auto submitInfo = CommandHandler::CreateSubmitDefaultInfo(image.cmdBuffer);
 		submitInfo.waitSemaphoreCount = allWaitSemaphores.GetLength();
 		submitInfo.pWaitSemaphores = allWaitSemaphores.GetData();
 		submitInfo.pWaitDstStageMask = &waitStage;

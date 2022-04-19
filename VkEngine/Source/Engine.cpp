@@ -132,6 +132,7 @@ namespace vke
 		assert(!idleResult);
 
 		game::Exit(outData);
+		assert(vkAllocator.IsEmpty());
 
 		versionData.poolInfos.clear();
 		for (size_t i = 0; i < vkAllocator.GetLength(); ++i)
@@ -140,6 +141,7 @@ namespace vke
 			auto& poolInfo = versionData.poolInfos[i];
 			vkAllocator.GetPoolInfo(i, poolInfo.size, poolInfo.alignment);
 		}
+		
 		vkAllocator.Free(allocator, app);
 
 #ifdef _DEBUG
