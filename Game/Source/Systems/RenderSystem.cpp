@@ -8,9 +8,9 @@
 
 namespace game
 {
-	void RenderSystem::Allocate(const EngineOutData& engineOutData, const size_t size)
+	void RenderSystem::Allocate(const EngineOutData& engineOutData)
 	{
-		EntitySystem::Allocate(*engineOutData.allocator, size);
+		TaskSystem::Allocate(*engineOutData.allocator);
 		LoadShader(engineOutData);
 		CreateSwapChainAssets(engineOutData);
 	}
@@ -19,7 +19,7 @@ namespace game
 	{
 		DestroySwapChainAssets(engineOutData);
 		UnloadShader(engineOutData);
-		EntitySystem::Free(*engineOutData.allocator);
+		TaskSystem::Free(*engineOutData.allocator);
 	}
 
 	void RenderSystem::Update(const EngineOutData& engineOutData)

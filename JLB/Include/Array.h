@@ -90,6 +90,8 @@ namespace jlb
 	template <typename T>
 	void Array<T>::Allocate(LinearAllocator& allocator, const size_t size, const T& fillValue)
 	{
+		assert(!_memory);
+
 		_memory = allocator.New<T>(size);
 		_length = size;
 

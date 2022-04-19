@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "EntitySystem.h"
+#include "TaskSystem.h"
 
 namespace game
 {
@@ -12,10 +12,10 @@ namespace game
 		
 	};
 
-	class RenderSystem final : public jlb::EntitySystem<RenderTask>
+	class RenderSystem final : public jlb::TaskSystem<RenderTask>
 	{
 	public:
-		void Allocate(const EngineOutData& engineOutData, size_t size);
+		void Allocate(const EngineOutData& engineOutData);
 		void Free(const EngineOutData& engineOutData);
 
 		void Update(const EngineOutData& engineOutData);
@@ -26,9 +26,8 @@ namespace game
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
 
 	private:
-		using EntitySystem<RenderTask>::Allocate;
-		using EntitySystem<RenderTask>::AllocateAndCopy;
-		using EntitySystem<RenderTask>::Free;
+		using TaskSystem<RenderTask>::Allocate;
+		using TaskSystem<RenderTask>::Free;
 
 		VkShaderModule _vertModule;
 		VkShaderModule _fragModule;

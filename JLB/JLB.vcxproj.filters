@@ -80,7 +80,7 @@
     <ClInclude Include="Include\Archetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\EntitySystem.h">
+    <ClInclude Include="Include\TaskSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\FileLoader.h">

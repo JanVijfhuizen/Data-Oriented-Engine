@@ -26,6 +26,8 @@ namespace game
 			Transform
 		};
 
+		void DefineResourceUsage(RenderSystem& renderSystem) override;
+
 	protected:
 		void OnUpdate(Entity& entity, RenderSystem& renderSystem) override;
 	};

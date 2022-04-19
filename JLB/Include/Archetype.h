@@ -13,6 +13,7 @@ namespace jlb
 	public:
 		using Entity = Tuple<Components...>;
 
+		virtual void DefineResourceUsage(Systems&...) = 0;
 		void Update(Systems&... systems);
 
 	protected:

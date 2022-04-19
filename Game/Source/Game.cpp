@@ -9,8 +9,12 @@ namespace game
 		gameState = {};
 		// Set up archetypes.
 		gameState.playerArchetype.Allocate(*outData.allocator, 1);
+
+		// Define resource usage for systems.
+		gameState.playerArchetype.DefineResourceUsage(gameState.renderSystem);
+
 		// Set up systems.
-		gameState.renderSystem.Allocate(outData, 1);
+		gameState.renderSystem.Allocate(outData);
 
 		// Set up game world.
 		auto& player1 = gameState.playerArchetype.Add();
