@@ -10,7 +10,9 @@ namespace game
 
 	struct RenderTask final
 	{
-		
+		glm::vec2 position{};
+		float rotation = 0;
+		float scale = 1;
 	};
 
 	class RenderSystem final : public jlb::TaskSystem<RenderTask>
@@ -33,6 +35,8 @@ namespace game
 		VkShaderModule _vertModule;
 		VkShaderModule _fragModule;
 		Mesh _mesh;
+		VkBuffer _instanceBuffer;
+		vk::MemBlock _instanceMemBlock;
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
@@ -41,5 +45,7 @@ namespace game
 		void UnloadShader(const EngineOutData& engineOutData) const;
 
 		void CreateMesh(const EngineOutData& engineOutData);
+		void CreateInstanceArray(const EngineOutData& engineOutData);
+		void DestroyInstanceArray(const EngineOutData& engineOutData);
 	};
 }

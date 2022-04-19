@@ -6,6 +6,7 @@
 #include "Graphics/Vertex.h"
 #include "Graphics/PipelineHandler.h"
 #include "Graphics/MeshHandler.h"
+#include "Components/Transform.h"
 
 namespace game
 {
@@ -14,12 +15,14 @@ namespace game
 		TaskSystem::Allocate(*engineOutData.allocator);
 		LoadShader(engineOutData);
 		CreateMesh(engineOutData);
+		CreateInstanceArray(engineOutData);
 		CreateSwapChainAssets(engineOutData);
 	}
 
 	void RenderSystem::Free(const EngineOutData& engineOutData)
 	{
 		DestroySwapChainAssets(engineOutData);
+		DestroyInstanceArray(engineOutData);
 		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
 		TaskSystem::Free(*engineOutData.allocator);
@@ -40,6 +43,9 @@ namespace game
 	RenderTask RenderSystem::CreateDefaultTask(Renderer& renderer, Transform& transform)
 	{
 		RenderTask task{};
+		task.position = transform.position;
+		task.rotation = transform.rotation;
+		task.scale = transform.scale;
 		return task;
 	}
 
@@ -93,6 +99,40 @@ namespace game
 		indices[5] = 3;
 
 		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
+	}
+
+	void RenderSystem::CreateInstanceArray(const EngineOutData& engineOutData)
+	{
+		auto& app = *engineOutData.app;
+		auto& vkAllocator = *engineOutData.vkAllocator;
+
+		VkBufferCreateInfo vertBufferInfo{};
+		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		vertBufferInfo.size = sizeof(RenderTask) * GetLength();
+		vertBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		auto result = vkCreateBuffer(app.logicalDevice, &vertBufferInfo, nullptr, &_instanceBuffer);
+		assert(!result);
+
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(app.logicalDevice, _instanceBuffer, &memRequirements);
+
+		const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		_instanceMemBlock = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
+
+		result = vkBindBufferMemory(app.logicalDevice, _instanceBuffer, _instanceMemBlock.memory, _instanceMemBlock.offset);
+		assert(!result);
+	}
+
+	void RenderSystem::DestroyInstanceArray(const EngineOutData& engineOutData)
+	{
+		auto& app = *engineOutData.app;
+		auto& vkAllocator = *engineOutData.vkAllocator;
+
+		vkAllocator.FreeBlock(_instanceMemBlock);
+		vkDestroyBuffer(app.logicalDevice, _instanceBuffer, nullptr);
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
