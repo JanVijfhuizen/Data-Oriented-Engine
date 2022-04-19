@@ -5,6 +5,7 @@
 #include "VkRenderer/VkApp.h"
 #include "Graphics/Vertex.h"
 #include "Graphics/PipelineHandler.h"
+#include "Graphics/MeshHandler.h"
 
 namespace game
 {
@@ -12,12 +13,14 @@ namespace game
 	{
 		TaskSystem::Allocate(*engineOutData.allocator);
 		LoadShader(engineOutData);
+		CreateMesh(engineOutData);
 		CreateSwapChainAssets(engineOutData);
 	}
 
 	void RenderSystem::Free(const EngineOutData& engineOutData)
 	{
 		DestroySwapChainAssets(engineOutData);
+		DestroyMesh(engineOutData);
 		UnloadShader(engineOutData);
 		TaskSystem::Free(*engineOutData.allocator);
 	}
@@ -68,6 +71,35 @@ namespace game
 	{
 		vkDestroyShaderModule(engineOutData.app->logicalDevice, _vertModule, nullptr);
 		vkDestroyShaderModule(engineOutData.app->logicalDevice, _fragModule, nullptr);
+	}
+
+	void RenderSystem::CreateMesh(const EngineOutData& engineOutData)
+	{
+		jlb::StackArray<Vertex, 4> vertices{};
+		vertices[0].position = { -1, -1 };
+		vertices[1].position = { -1, 1 };
+		vertices[2].position = { 1, 1 };
+		vertices[3].position = { 1, -1 };
+		vertices[0].textureCoordinates = { 0, 0 };
+		vertices[1].textureCoordinates = { 0, 1 };
+		vertices[2].textureCoordinates = { 1, 1 };
+		vertices[3].textureCoordinates = { 1, 0 };
+		jlb::StackArray<Vertex::Index, 6> indices{};
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+		indices[3] = 1;
+		indices[4] = 2;
+		indices[5] = 3;
+
+		VkBuffer vertBuffer;
+		VkBuffer indBuffer;
+		MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices, vertBuffer, indBuffer);
+	}
+
+	void RenderSystem::DestroyMesh(const EngineOutData& engineOutData)
+	{
+
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)

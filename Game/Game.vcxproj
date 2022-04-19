@@ -168,6 +168,7 @@
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\GameState.h" />
+    <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />

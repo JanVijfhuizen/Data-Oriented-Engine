@@ -37,5 +37,8 @@ namespace game
 
 		void LoadShader(const EngineOutData& engineOutData);
 		void UnloadShader(const EngineOutData& engineOutData) const;
+
+		void CreateMesh(const EngineOutData& engineOutData);
+		void DestroyMesh(const EngineOutData& engineOutData);
 	};
 }
