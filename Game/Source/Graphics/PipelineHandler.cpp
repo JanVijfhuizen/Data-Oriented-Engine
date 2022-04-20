@@ -22,7 +22,7 @@ namespace game
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertexInputInfo.vertexBindingDescriptionCount = info.vertInputBindingDescriptions.length;
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(info.vertInputAttribDescriptions.length);
+		vertexInputInfo.vertexAttributeDescriptionCount = info.vertInputAttribDescriptions.length;
 		vertexInputInfo.pVertexBindingDescriptions = info.vertInputBindingDescriptions.data;
 		vertexInputInfo.pVertexAttributeDescriptions = info.vertInputAttribDescriptions.data;
 

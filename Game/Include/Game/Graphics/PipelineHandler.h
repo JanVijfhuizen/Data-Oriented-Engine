@@ -17,7 +17,7 @@ namespace game
 			jlb::ArrayView<VkVertexInputAttributeDescription> vertInputAttribDescriptions;
 			jlb::ArrayView<VkVertexInputBindingDescription> vertInputBindingDescriptions;
 			glm::ivec2 resolution;
-			bool shaderSamplingEnabled = true;
+			bool shaderSamplingEnabled = false;
 			VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
 			bool usePushConstant = false;
 			size_t pushConstantSize = 0;
