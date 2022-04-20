@@ -103,7 +103,7 @@ namespace game
 		indices[0] = 0;
 		indices[1] = 1;
 		indices[2] = 2;
-		indices[3] = 1;
+		indices[3] = 0;
 		indices[4] = 2;
 		indices[5] = 3;
 

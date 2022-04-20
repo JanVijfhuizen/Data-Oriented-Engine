@@ -75,7 +75,7 @@ namespace game
 
 		void* indStagingData;
 		vkMapMemory(app.logicalDevice, indStagingBlock.memory, indStagingBlock.offset, indStagingBlock.size, 0, &indStagingData);
-		memcpy(vertStagingData, static_cast<const void*>(vertices.data), indBufferInfo.size);
+		memcpy(indStagingData, static_cast<const void*>(indices.data), indBufferInfo.size);
 		vkUnmapMemory(app.logicalDevice, indStagingBlock.memory);
 
 		// Create output buffers.
