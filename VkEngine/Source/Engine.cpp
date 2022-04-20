@@ -89,6 +89,7 @@ namespace vke
 		outData.app = &app;
 		outData.resolution = swapChain.GetResolution();
 		outData.swapChainRenderPass = swapChain.GetRenderPass();
+		outData.swapChainImageCount = swapChain.GetLength();
 
 		using ms = std::chrono::duration<float, std::milli>;
 		auto oldTime = std::chrono::high_resolution_clock::now();
@@ -106,6 +107,7 @@ namespace vke
 			ImguiImpl::Beginframe();
 #endif
 			outData.swapChainCommandBuffer = cmdBuffer;
+			outData.swapChainImageIndex = swapChain.GetCurrentImageIndex();
 
 			auto newTime = std::chrono::high_resolution_clock::now();
 			outData.deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(newTime - oldTime).count() * 0.001f;

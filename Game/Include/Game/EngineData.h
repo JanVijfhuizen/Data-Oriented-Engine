@@ -24,6 +24,8 @@ namespace game
 		VkCommandBuffer swapChainCommandBuffer;
 		VkRenderPass swapChainRenderPass;
 		glm::ivec2 resolution;
+		uint8_t swapChainImageIndex;
+		uint8_t swapChainImageCount;
 
 		// In milliseconds.
 		float time = 0;

@@ -16,7 +16,7 @@ layout(location = 0) out Data
 void main() 
 {
     outData.fragTexCoord = inTexCoords;
-    outData.fragPos = inPosition;
+    outData.fragPos = inPosition + instancePosition;
 
-    gl_Position = vec4(inPosition, 1, 1);
+    gl_Position = vec4(inPosition + instancePosition, 1, 1);
 }

@@ -314,4 +314,14 @@ namespace vk
 	{
 		return {_extent.width, _extent.height};
 	}
+
+	uint8_t SwapChain::GetLength() const
+	{
+		return _images.GetLength();
+	}
+
+	uint8_t SwapChain::GetCurrentImageIndex() const
+	{
+		return _imageIndex;
+	}
 }

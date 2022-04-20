@@ -30,8 +30,9 @@ namespace game
 
 	void RenderSystem::Update(const EngineOutData& engineOutData)
 	{
+		const VkDeviceSize instanceOffset = _instanceMemBlock.offset + _instanceMemBlock.size / engineOutData.swapChainImageCount * engineOutData.swapChainImageIndex;
 		void* instanceData;
-		const auto result = vkMapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory, _instanceMemBlock.offset, _instanceMemBlock.size, 0, &instanceData);
+		const auto result = vkMapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory, instanceOffset, _instanceMemBlock.size, 0, &instanceData);
 		assert(!result);
 		memcpy(instanceData, static_cast<const void*>(GetData()), GetLength() * sizeof(RenderTask));
 		vkUnmapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory);
@@ -117,7 +118,7 @@ namespace game
 
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(RenderTask) * GetLength();
+		vertBufferInfo.size = sizeof(RenderTask) * GetLength() * engineOutData.swapChainImageCount;
 		vertBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
