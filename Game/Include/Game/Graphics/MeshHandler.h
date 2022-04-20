@@ -13,7 +13,6 @@ namespace game
 		template <typename Vertex, typename Index>
 		[[nodiscard]] static Mesh Create(const EngineOutData& engineOutData, 
 			jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
-
 		static void Destroy(const EngineOutData& engineOutData, Mesh& mesh);
 	};
 
@@ -149,6 +148,7 @@ namespace game
 		vkAllocator.FreeBlock(indStagingBlock);
 		vkAllocator.FreeBlock(vertStagingBlock);
 
+		mesh.indexCount = indices.length;
 		return mesh;
 	}
 }

@@ -29,8 +29,9 @@ namespace vk
 		submitInfo.commandBufferCount = commandBuffers.length;
 		submitInfo.pCommandBuffers = commandBuffers.data;
 		submitInfo.waitSemaphoreCount = 0;
-		submitInfo.pWaitSemaphores = 0;
+		submitInfo.pWaitSemaphores = nullptr;
 		submitInfo.signalSemaphoreCount = 0;
+		submitInfo.pSignalSemaphores = nullptr;
 		submitInfo.pWaitDstStageMask = nullptr;
 		return submitInfo;
 	}

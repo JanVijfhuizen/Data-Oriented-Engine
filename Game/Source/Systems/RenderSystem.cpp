@@ -30,22 +30,31 @@ namespace game
 
 	void RenderSystem::Update(const EngineOutData& engineOutData)
 	{
+		void* instanceData;
+		const auto result = vkMapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory, _instanceMemBlock.offset, _instanceMemBlock.size, 0, &instanceData);
+		assert(!result);
+		memcpy(instanceData, static_cast<const void*>(GetData()), GetLength() * sizeof(RenderTask));
+		vkUnmapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory);
+
+		jlb::StackArray<VkBuffer, 2> vertexBuffers{};
+		vertexBuffers[0] = _mesh.vertexBuffer;
+		vertexBuffers[1] = _instanceBuffer;
+		jlb::StackArray<VkDeviceSize, 2> offsets{};
+
 		vkCmdBindPipeline(engineOutData.swapChainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-
-		for (auto& task : *this)
-		{
-			// Do a render thing.
-		}
-
+		vkCmdBindVertexBuffers(engineOutData.swapChainCommandBuffer, 0, 2, vertexBuffers.GetData(), offsets.GetData());
+		vkCmdBindIndexBuffer(engineOutData.swapChainCommandBuffer, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+		vkCmdDrawIndexed(engineOutData.swapChainCommandBuffer, _mesh.indexCount, GetCount(), 0, 0, 0);
 		SetCount(0);
 	}
 
 	RenderTask RenderSystem::CreateDefaultTask(Renderer& renderer, Transform& transform)
 	{
 		RenderTask task{};
-		task.position = transform.position;
-		task.rotation = transform.rotation;
-		task.scale = transform.scale;
+		auto& vertexInstance = task.vertexInstance;
+		vertexInstance.position = transform.position;
+		vertexInstance.rotation = transform.rotation;
+		vertexInstance.scale = transform.scale;
 		return task;
 	}
 

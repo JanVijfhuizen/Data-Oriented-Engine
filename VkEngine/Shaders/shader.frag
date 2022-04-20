@@ -4,7 +4,7 @@
 layout(location = 0) in Data
 {
     vec2 fragTexCoord;
-    vec3 fragPos;
+    vec2 fragPos;
 } inData;
 
 layout(location = 0) out vec4 outColor;

@@ -5,11 +5,11 @@ namespace game
 {
 	struct Vertex final
 	{
-		typedef uint8_t Index;
+		typedef uint16_t Index;
 
 		struct Instance final
 		{
-			glm::vec3 position;
+			glm::vec2 position;
 			float rotation;
 			float scale;
 		};

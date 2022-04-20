@@ -34,23 +34,23 @@ namespace game
 		texCoords.format = VK_FORMAT_R32G32_SFLOAT;
 		texCoords.offset = offsetof(Vertex, textureCoordinates);
 
-		auto& row1 = attributeDescriptions[2];
-		row1.binding = 1;
-		row1.location = 2;
-		row1.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row1.offset = offsetof(Instance, position);
+		auto& instancePosition = attributeDescriptions[2];
+		instancePosition.binding = 1;
+		instancePosition.location = 2;
+		instancePosition.format = VK_FORMAT_R32G32_SFLOAT;
+		instancePosition.offset = offsetof(Instance, position);
 
-		auto& row2 = attributeDescriptions[3];
-		row2.binding = 1;
-		row2.location = 3;
-		row2.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row2.offset = offsetof(Instance, rotation);
+		auto& instanceRotation = attributeDescriptions[3];
+		instanceRotation.binding = 1;
+		instanceRotation.location = 3;
+		instanceRotation.format = VK_FORMAT_R32_SFLOAT;
+		instanceRotation.offset = offsetof(Instance, rotation);
 
-		auto& row3 = attributeDescriptions[4];
-		row3.binding = 1;
-		row3.location = 4;
-		row3.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		row3.offset = offsetof(Instance, scale);
+		auto& instanceScale = attributeDescriptions[4];
+		instanceScale.binding = 1;
+		instanceScale.location = 4;
+		instanceScale.format = VK_FORMAT_R32_SFLOAT;
+		instanceScale.offset = offsetof(Instance, scale);
 
 		return attributeDescriptions;
 	}

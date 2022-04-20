@@ -37,8 +37,9 @@ namespace vk
 	{
 		auto& frame = _frames[_frameIndex];
 
-		vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
-		const auto result = vkAcquireNextImageKHR(app.logicalDevice,
+		auto result = vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
+		assert(!result);
+		result = vkAcquireNextImageKHR(app.logicalDevice,
 			_swapChain, UINT64_MAX, frame.imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
 		assert(!result);
 
@@ -93,7 +94,7 @@ namespace vk
 		submitInfo.pWaitDstStageMask = &waitStage;
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = &frame.renderFinishedSemaphore;
-
+;
 		vkResetFences(app.logicalDevice, 1, &frame.inFlightFence);
 		result = vkQueueSubmit(app.queues.graphics, 1, &submitInfo, frame.inFlightFence);
 		assert(!result);

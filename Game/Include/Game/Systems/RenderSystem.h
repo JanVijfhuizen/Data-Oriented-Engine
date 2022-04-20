@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "TaskSystem.h"
 #include "Graphics/Mesh.h"
+#include "Graphics/Vertex.h"
 
 namespace game
 {
@@ -10,9 +11,7 @@ namespace game
 
 	struct RenderTask final
 	{
-		glm::vec2 position{};
-		float rotation = 0;
-		float scale = 1;
+		Vertex::Instance vertexInstance{};
 	};
 
 	class RenderSystem final : public jlb::TaskSystem<RenderTask>

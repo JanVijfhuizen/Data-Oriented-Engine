@@ -105,7 +105,6 @@ namespace vke
 #ifdef _DEBUG
 			ImguiImpl::Beginframe();
 #endif
-
 			outData.swapChainCommandBuffer = cmdBuffer;
 
 			auto newTime = std::chrono::high_resolution_clock::now();

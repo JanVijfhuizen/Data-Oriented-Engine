@@ -9,5 +9,6 @@ namespace game
 		VkBuffer indexBuffer;
 		vk::MemBlock vertexMemBlock;
 		vk::MemBlock indexMemBlock;
+		size_t indexCount;
 	};
 }
