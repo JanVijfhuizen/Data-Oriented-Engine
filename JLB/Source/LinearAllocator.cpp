@@ -54,8 +54,9 @@ namespace jlb
 		
 		// Adjusts the size of the previous allocation.
 		_current -= blockSize;
-		blockSize = size;
+		blockSize = 0;
 		_current += size;
+		_memory[_current - 1] = size;
 
 		_totalRequestedSpace = Math::Max(_totalRequestedSpace, _current);
 	}
