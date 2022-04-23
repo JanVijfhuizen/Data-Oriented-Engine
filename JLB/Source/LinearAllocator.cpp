@@ -16,11 +16,12 @@ namespace jlb
 
 	void LinearAllocator::Free()
 	{
+		_allocId--;
 		free(_memory);
 		_memory = nullptr;
 	}
 
-	void* LinearAllocator::Malloc(size_t size)
+	void* LinearAllocator::Malloc(size_t size, size_t& outAllocId)
 	{
 		// Assert if there still is enough free space.
 		size = ToChunkSize(size);
@@ -36,11 +37,16 @@ namespace jlb
 		++_current;
 
 		_totalRequestedSpace = Math::Max(_totalRequestedSpace, _current);
+		outAllocId = _allocId++;
 		return current;
 	}
 
-	void LinearAllocator::Pop()
+	void LinearAllocator::MFree(const size_t allocId)
 	{
+		// Check if the correct block is being freed (the newest allocated block, that is).
+		assert(allocId == _allocId - 1);
+		--_allocId;
+
 		// Assert if there is anything to free.
 		assert(_current > 0);
 		// Move N places back, based on the amount of memory allocated during the last Malloc.

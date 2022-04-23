@@ -3,6 +3,7 @@
 #include "LinearAllocator.h"
 #include "ArrayView.h"
 #include <cstring>
+#include <stdint.h>
 
 namespace jlb
 {
@@ -13,8 +14,6 @@ namespace jlb
 	class Array
 	{
 	public:
-		virtual ~Array() = default;
-
 		[[nodiscard]] virtual T& operator[](size_t index);
 		[[nodiscard]] size_t GetLength() const;
 
@@ -67,11 +66,12 @@ namespace jlb
 
 		[[nodiscard]] operator bool() const;
 
-		[[nodiscard]]operator ArrayView<T>() const;
+		[[nodiscard]] operator ArrayView<T>() const;
 
 	private:
 		T* _memory = nullptr;
 		size_t _length = 0;
+		size_t _allocId = SIZE_MAX;
 	};
 
 	template <typename T>
@@ -92,7 +92,7 @@ namespace jlb
 	{
 		assert(!_memory);
 
-		_memory = allocator.New<T>(size);
+		_memory = allocator.New<T>(size, _allocId);
 		_length = size;
 
 		for (size_t i = 0; i < size; ++i)
@@ -102,7 +102,7 @@ namespace jlb
 	template <typename T>
 	void Array<T>::AllocateAndCopy(LinearAllocator& allocator, const size_t size, T* src)
 	{
-		_memory = allocator.New<T>(size);
+		_memory = allocator.New<T>(size, _allocId);
 		_length = size;
 
 		memcpy(_memory, src, size * sizeof(T));
@@ -113,7 +113,7 @@ namespace jlb
 	{
 		if (_memory)
 		{
-			allocator.Pop();
+			allocator.MFree(_allocId);
 			_memory = nullptr;
 		}
 	}
