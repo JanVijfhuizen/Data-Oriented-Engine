@@ -49,6 +49,7 @@ namespace vk
 
 			VkDeviceSize largestAlignmentRequested = 0;
 			VkDeviceSize largestSpaceOccupied = 0;
+			size_t allocId = 0;
 		};
 
 		jlb::Array<Pool> _pools{};

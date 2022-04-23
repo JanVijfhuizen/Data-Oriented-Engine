@@ -12,5 +12,6 @@ namespace vk
 		VkDeviceSize alignedSize;
 		VkDeviceSize offset;
 		uint32_t poolId;
+		size_t allocId;
 	};
 }

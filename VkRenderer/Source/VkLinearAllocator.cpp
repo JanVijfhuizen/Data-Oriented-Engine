@@ -68,6 +68,7 @@ namespace vk
 		block.alignedSize = alignedSize;
 		block.offset = offset;
 		block.poolId = poolId;
+		block.allocId = pool.allocId++;
 
 		return block;
 	}
@@ -75,6 +76,8 @@ namespace vk
 	void LinearAllocator::FreeBlock(MemBlock& block)
 	{
 		auto& pool = _pools[block.poolId];
+		assert(block.allocId == pool.allocId - 1);
+		--pool.allocId;
 		pool.remaining += block.alignedSize;
 	}
 
