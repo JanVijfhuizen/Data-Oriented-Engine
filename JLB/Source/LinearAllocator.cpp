@@ -41,6 +41,25 @@ namespace jlb
 		return current;
 	}
 
+	void LinearAllocator::MResize(size_t size, const size_t allocId)
+	{
+		assert(_current > 0);
+		assert(allocId == _allocId - 1);
+
+		auto& blockSize = _memory[_current - 1];
+
+		// Assert if there still is enough free space.
+		size = ToChunkSize(size);
+		assert(size + _current - blockSize + 1 < _size);
+		
+		// Adjusts the size of the previous allocation.
+		_current -= blockSize;
+		blockSize = size;
+		_current += size;
+
+		_totalRequestedSpace = Math::Max(_totalRequestedSpace, _current);
+	}
+
 	void LinearAllocator::MFree(const size_t allocId)
 	{
 		// Check if the correct block is being freed (the newest allocated block, that is).

@@ -36,6 +36,11 @@ namespace jlb
 		virtual void AllocateAndCopy(LinearAllocator& allocator, size_t size, T* src);
 
 		/// <summary>
+		/// Resizes the array, provided this was the latest allocation.
+		/// </summary>
+		virtual void Resize(LinearAllocator& allocator, size_t size);
+
+		/// <summary>
 		/// Frees the array from the linear allocator.
 		/// </summary>
 		/// <param name="allocator">Allocator to free it from.</param>
@@ -106,6 +111,13 @@ namespace jlb
 		_length = size;
 
 		memcpy(_memory, src, size * sizeof(T));
+	}
+
+	template <typename T>
+	void Array<T>::Resize(LinearAllocator& allocator, size_t size)
+	{
+		allocator.MResize(size * sizeof(T), _allocId);
+		_length = size;
 	}
 
 	template <typename T>

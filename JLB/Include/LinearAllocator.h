@@ -23,10 +23,16 @@ namespace jlb
 		/// <returns>Pointer to the allocated memory.</returns>
 		[[nodiscard]] void* Malloc(size_t size, size_t& outAllocId);
 		/// <summary>
+		/// Resizes the size of the previously allocated memory block.
+		/// </summary>
+		/// <param name="size">Increased size.</param>
+		/// <param name="allocId">The allocation's id.</param>
+		void MResize(size_t size, size_t allocId);
+		/// <summary>
 		/// Frees the last allocation.<br>
 		/// Does not call destructors.
 		/// </summary>
-		/// <param name="allocId">The allocation's id. Required when freeing space, to make sure things are de-allocated in the correct order.</param>
+		/// <param name="allocId">The allocation's id.</param>
 		void MFree(size_t allocId);
 
 		/// <summary>
