@@ -42,7 +42,6 @@ namespace game
 		vkUnmapMemory(logicalDevice, memBlock.memory);
 
 		VkDeviceSize offset = 0;
-
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
 		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
 			0, 1, &_descriptorSets[engineOutData.swapChainImageIndex], 0, nullptr);
@@ -131,7 +130,7 @@ namespace game
 		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(RenderTask) * GetLength() * engineOutData.swapChainImageCount;
+		vertBufferInfo.size = sizeof(RenderTask) * GetLength();
 		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -159,9 +158,9 @@ namespace game
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		bindings[0].size = sizeof(RenderTask) * GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
+
 		LayoutHandler::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = bindings;
-
 		_descriptorLayout = LayoutHandler::Create(engineOutData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
@@ -192,24 +191,23 @@ namespace game
 		assert(!result);
 
 		layouts.Free(tempAllocator);
-		return;
 
 		// Bind descriptor sets to the instance data.
 		for (size_t i = 0; i < swapChainImageCount; ++i)
 		{
 			VkDescriptorBufferInfo info{};
 			info.buffer = _instanceBuffers[i];
-			info.range = sizeof(RenderTask) * GetLength();
 			info.offset = 0;
+			info.range = sizeof(RenderTask) * GetLength();
 
 			VkWriteDescriptorSet write;
 			write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			write.dstSet = _descriptorSets[i];
 			write.dstBinding = 0;
-			write.dstArrayElement = 0;
-			write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			write.dstSet = _descriptorSets[i];
 			write.descriptorCount = 1;
+			write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 			write.pBufferInfo = &info;
+			write.dstArrayElement = 0;
 
 			vkUpdateDescriptorSets(logicalDevice, 1, &write, 0, nullptr);
 		}
