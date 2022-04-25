@@ -178,7 +178,7 @@ namespace vke
 		outVersionData.buildVersion = ENGINE_VERSION;
 
 #ifdef _DEBUG
-		//return false;
+		return false;
 #endif
 
 		std::ifstream memFile{};

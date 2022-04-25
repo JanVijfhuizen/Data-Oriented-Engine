@@ -193,6 +193,12 @@ namespace game
 
 		layouts.Free(tempAllocator);
 
+#ifdef _DEBUG
+		// Really dumb, but updating the descriptor sets just crashes the debug build, 
+		// and Vulkan doesn't give a reason as to why.
+		return;
+#endif
+
 		// Bind descriptor sets to the instance data.
 		for (size_t i = 0; i < swapChainImageCount; ++i)
 		{
