@@ -29,15 +29,22 @@ namespace vke
 		const auto versionResult = LoadVersionData(versionData);
 		if(!versionResult)
 		{
-			const int gameResult = RunGame(versionData, true);
+			for (uint32_t phase = 0; phase != static_cast<uint32_t>(Phase::Running) - 1; phase++)
+			{
+				const int result = RunGame(versionData, static_cast<Phase>(phase));
+				if (result)
+					return result;
+			}
+
+			const int gameResult = RunGame(versionData, Phase::VkPoolAlignmentCheck);
 			if (gameResult)
 				return gameResult;
 		}
 
-		return RunGame(versionData, false);
+		return RunGame(versionData, Phase::Running);
 	}
 
-	int Engine::RunGame(VersionData& versionData, bool allocRun)
+	int Engine::RunGame(VersionData& versionData, Phase phase)
 	{
 		jlb::LinearAllocator allocator{};
 		allocator.Allocate(versionData.allocSpace);
@@ -120,7 +127,7 @@ namespace vke
 #endif
 
 			const auto presentResult = swapChain.EndFrame(allocator, app, inData.swapChainWaitSemaphores);
-			if (presentResult || allocRun)
+			if (presentResult || phase != Phase::Running)
 			{
 				swapChain.Recreate(allocator, app, windowHandler);
 				outData.resolution = swapChain.GetResolution();
@@ -128,7 +135,7 @@ namespace vke
 				game::OnRecreateSwapChainAssets(outData);
 			}
 
-			if (allocRun)
+			if (phase != Phase::Running)
 				break;
 		}
 

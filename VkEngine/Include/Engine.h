@@ -34,7 +34,14 @@ namespace vke
 			std::vector<PoolInfo> poolInfos{};
 		};
 
-		static int RunGame(VersionData& versionData, bool allocRun);
+		enum class Phase
+		{
+			VkPoolAlignmentCheck,
+			GeneralMemoryCheck,
+			Running
+		};
+
+		static int RunGame(VersionData& versionData, Phase phase);
 
 		static bool LoadVersionData(VersionData& outVersionData);
 		static void SaveVersionData(VersionData& versionData);
