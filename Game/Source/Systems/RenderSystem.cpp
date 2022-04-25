@@ -34,19 +34,22 @@ namespace game
 		auto& cmd = engineOutData.swapChainCommandBuffer;
 
 		auto& logicalDevice = engineOutData.app->logicalDevice;
-		const VkDeviceSize instanceOffset = _instanceMemBlock.offset + _instanceMemBlock.size / engineOutData.swapChainImageCount * engineOutData.swapChainImageIndex;
+		auto& memBlock = _instanceMemBlocks[engineOutData.swapChainImageIndex];
 		void* instanceData;
-		const auto result = vkMapMemory(logicalDevice, _instanceMemBlock.memory, instanceOffset, _instanceMemBlock.size, 0, &instanceData);
+		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
 		assert(!result);
 		memcpy(instanceData, static_cast<const void*>(GetData()), sizeof(RenderTask) * GetLength());
-		vkUnmapMemory(logicalDevice, _instanceMemBlock.memory);
+		vkUnmapMemory(logicalDevice, memBlock.memory);
 
 		VkDeviceSize offset = 0;
 
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+			0, 1, &_descriptorSets[engineOutData.swapChainImageIndex], 0, nullptr);
 		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
 		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 		vkCmdDrawIndexed(cmd, _mesh.indexCount, GetCount(), 0, 0, 0);
+
 		SetCount(0);
 	}
 
@@ -118,8 +121,12 @@ namespace game
 	void RenderSystem::CreateShaderAssets(const EngineOutData& engineOutData)
 	{
 		auto& app = *engineOutData.app;
+		auto& allocator = *engineOutData.allocator;
+		auto& tempAllocator = *engineOutData.tempAllocator;
 		auto& vkAllocator = *engineOutData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
+
+		const size_t swapChainImageCount = engineOutData.swapChainImageCount;
 
 		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
@@ -128,18 +135,24 @@ namespace game
 		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &_instanceBuffer);
-		assert(!result);
+		_instanceBuffers.Allocate(allocator, swapChainImageCount);
+		_instanceMemBlocks.Allocate(allocator, swapChainImageCount);
 
-		VkMemoryRequirements memRequirements;
-		vkGetBufferMemoryRequirements(logicalDevice, _instanceBuffer, &memRequirements);
+		for (size_t i = 0; i < swapChainImageCount; ++i)
+		{
+			auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &_instanceBuffers[i]);
+			assert(!result);
 
-		const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		_instanceMemBlock = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
+			VkMemoryRequirements memRequirements;
+			vkGetBufferMemoryRequirements(logicalDevice, _instanceBuffers[0], &memRequirements);
 
-		result = vkBindBufferMemory(logicalDevice, _instanceBuffer, _instanceMemBlock.memory, _instanceMemBlock.offset);
-		assert(!result);
+			const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.CreateBlock(vertBufferInfo.size * engineOutData.swapChainImageCount, poolId);
+
+			result = vkBindBufferMemory(logicalDevice, _instanceBuffers[i], memBlock.memory, memBlock.offset);
+			assert(!result);
+		}
 
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 1> bindings{};
@@ -154,38 +167,73 @@ namespace game
 		// Create descriptor pool.
 		VkDescriptorPoolSize poolSize{};
 		poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		poolSize.descriptorCount = 1;
+		poolSize.descriptorCount = swapChainImageCount;
 		VkDescriptorPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		poolInfo.poolSizeCount = 1;
 		poolInfo.pPoolSizes = &poolSize;
-		poolInfo.maxSets = 1;
+		poolInfo.maxSets = swapChainImageCount;
 
-		result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &_descriptorPool);
+		auto result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &_descriptorPool);
 		assert(!result);
 
+		jlb::Array<VkDescriptorSetLayout> layouts{};
+		layouts.Allocate(tempAllocator, swapChainImageCount, _descriptorLayout);
+
 		// Create descriptor set.
+		_descriptorSets.Allocate(allocator, swapChainImageCount);
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		allocInfo.descriptorPool = _descriptorPool;
-		allocInfo.descriptorSetCount = 1;
-		allocInfo.pSetLayouts = &_descriptorLayout;
+		allocInfo.descriptorSetCount = swapChainImageCount;
+		allocInfo.pSetLayouts = layouts.GetData();
 
-		result = vkAllocateDescriptorSets(logicalDevice, &allocInfo, &_descriptorSet);
+		result = vkAllocateDescriptorSets(logicalDevice, &allocInfo, _descriptorSets.GetData());
 		assert(!result);
+
+		layouts.Free(tempAllocator);
+		return;
+
+		// Bind descriptor sets to the instance data.
+		for (size_t i = 0; i < swapChainImageCount; ++i)
+		{
+			VkDescriptorBufferInfo info{};
+			info.buffer = _instanceBuffers[i];
+			info.range = sizeof(RenderTask) * GetLength();
+			info.offset = 0;
+
+			VkWriteDescriptorSet write;
+			write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			write.dstSet = _descriptorSets[i];
+			write.dstBinding = 0;
+			write.dstArrayElement = 0;
+			write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			write.descriptorCount = 1;
+			write.pBufferInfo = &info;
+
+			vkUpdateDescriptorSets(logicalDevice, 1, &write, 0, nullptr);
+		}
 	}
 
 	void RenderSystem::DestroyShaderAssets(const EngineOutData& engineOutData)
 	{
 		auto& app = *engineOutData.app;
 		auto& logicalDevice = app.logicalDevice;
+		auto& allocator = *engineOutData.allocator;
 		auto& vkAllocator = *engineOutData.vkAllocator;
 
 		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
+		_descriptorSets.Free(*engineOutData.allocator);
 
-		vkAllocator.FreeBlock(_instanceMemBlock);
-		vkDestroyBuffer(logicalDevice, _instanceBuffer, nullptr);
+		for (int32_t i = engineOutData.swapChainImageCount - 1; i >= 0; --i)
+		{
+			vkDestroyBuffer(logicalDevice, _instanceBuffers[i], nullptr);
+			vkAllocator.FreeBlock(_instanceMemBlocks[i]);
+		}
+
+		_instanceMemBlocks.Free(allocator);
+		_instanceBuffers.Free(allocator);
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
@@ -205,7 +253,7 @@ namespace game
 		pipelineInfo.resolution = engineOutData.resolution;
 		pipelineInfo.modules = modules;
 		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
-		//pipelineInfo.layouts = _descriptorLayout;
+		pipelineInfo.layouts = _descriptorLayout;
 
 		PipelineHandler::Create(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
 	}

@@ -35,9 +35,9 @@ namespace game
 		Mesh _mesh;
 		VkDescriptorPool _descriptorPool;
 		VkDescriptorSetLayout _descriptorLayout;
-		VkDescriptorSet _descriptorSet;
-		VkBuffer _instanceBuffer;
-		vk::MemBlock _instanceMemBlock;
+		jlb::Array<VkDescriptorSet> _descriptorSets{};
+		jlb::Array<VkBuffer> _instanceBuffers{};
+		jlb::Array<vk::MemBlock> _instanceMemBlocks{};
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;

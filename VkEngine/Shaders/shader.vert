@@ -4,6 +4,18 @@
 layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec2 inTexCoords;
 
+struct InstanceData
+{
+	vec2 position;
+    float rotation;
+    float scale;
+};
+
+layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
+{
+	InstanceData instances[];
+} instanceBuffer;
+
 layout(location = 0) out Data
 {
     vec2 fragTexCoord;
@@ -15,5 +27,5 @@ void main()
     outData.fragTexCoord = inTexCoords;
     outData.fragPos = inPosition;
 
-    gl_Position = vec4(inPosition, 1, 1);
+    gl_Position = vec4(inPosition + instanceBuffer.instances[gl_InstanceIndex].position, 1, 1);
 }
