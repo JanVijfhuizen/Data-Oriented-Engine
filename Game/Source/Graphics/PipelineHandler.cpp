@@ -5,7 +5,7 @@
 
 namespace game
 {
-	void PipelineHandler::CreatePipeline(const EngineOutData& engineOutData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline)
+	void PipelineHandler::Create(const EngineOutData& engineOutData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline)
 	{
 		jlb::Array<VkPipelineShaderStageCreateInfo> modules{};
 		modules.Allocate(*engineOutData.tempAllocator, info.modules.length);

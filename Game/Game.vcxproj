@@ -171,6 +171,7 @@
     <ClInclude Include="Include\Game\Graphics\Mesh.h" />
     <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
+    <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Systems\RenderSystem.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\Graphics\MeshHandler.cpp" />
     <ClCompile Include="Source\Graphics\PipelineHandler.cpp" />
+    <ClCompile Include="Source\Graphics\LayoutHandler.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -7,6 +7,7 @@
 #include "Graphics/PipelineHandler.h"
 #include "Graphics/MeshHandler.h"
 #include "Components/Transform.h"
+#include "Graphics/LayoutHandler.h"
 
 namespace game
 {
@@ -15,14 +16,14 @@ namespace game
 		TaskSystem::Allocate(*engineOutData.allocator);
 		LoadShader(engineOutData);
 		CreateMesh(engineOutData);
-		CreateInstanceArray(engineOutData);
+		CreateBuffers(engineOutData);
 		CreateSwapChainAssets(engineOutData);
 	}
 
 	void RenderSystem::Free(const EngineOutData& engineOutData)
 	{
 		DestroySwapChainAssets(engineOutData);
-		DestroyInstanceArray(engineOutData);
+		DestroyBuffers(engineOutData);
 		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
 		TaskSystem::Free(*engineOutData.allocator);
@@ -30,22 +31,20 @@ namespace game
 
 	void RenderSystem::Update(const EngineOutData& engineOutData)
 	{
-		const VkDeviceSize instanceOffset = _instanceMemBlock.offset + _instanceMemBlock.size / engineOutData.swapChainImageCount * engineOutData.swapChainImageIndex;
-		void* instanceData;
-		const auto result = vkMapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory, instanceOffset, _instanceMemBlock.size, 0, &instanceData);
-		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(GetData()), GetLength() * sizeof(RenderTask));
-		vkUnmapMemory(engineOutData.app->logicalDevice, _instanceMemBlock.memory);
+		auto& cmd = engineOutData.swapChainCommandBuffer;
+
+		UpdateUboArray(engineOutData, sizeof(RenderTask) * GetLength(), GetData(), _instanceMemBlock);
+		UpdateUboArray(engineOutData, sizeof(LayoutData), &_layoutData, _layoutDataMemBlock);
 
 		jlb::StackArray<VkBuffer, 2> vertexBuffers{};
 		vertexBuffers[0] = _mesh.vertexBuffer;
 		vertexBuffers[1] = _instanceBuffer;
 		jlb::StackArray<VkDeviceSize, 2> offsets{};
 
-		vkCmdBindPipeline(engineOutData.swapChainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-		vkCmdBindVertexBuffers(engineOutData.swapChainCommandBuffer, 0, 2, vertexBuffers.GetData(), offsets.GetData());
-		vkCmdBindIndexBuffer(engineOutData.swapChainCommandBuffer, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-		vkCmdDrawIndexed(engineOutData.swapChainCommandBuffer, _mesh.indexCount, GetCount(), 0, 0, 0);
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+		vkCmdBindVertexBuffers(cmd, 0, 2, vertexBuffers.GetData(), offsets.GetData());
+		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+		vkCmdDrawIndexed(cmd, _mesh.indexCount, GetCount(), 0, 0, 0);
 		SetCount(0);
 	}
 
@@ -59,10 +58,18 @@ namespace game
 		return task;
 	}
 
+	void RenderSystem::SetCameraTransform(Transform& transform)
+	{
+		_layoutData.cameraTransform = transform;
+	}
+
 	void RenderSystem::LoadShader(const EngineOutData& engineOutData)
 	{
-		auto vert = jlb::FileLoader::Read(*engineOutData.tempAllocator, "Shaders/vert.spv");
-		auto frag = jlb::FileLoader::Read(*engineOutData.tempAllocator, "Shaders/frag.spv");
+		auto& logicalDevice = engineOutData.app->logicalDevice;
+		auto& tempAllocator = *engineOutData.tempAllocator;
+
+		auto vert = jlb::FileLoader::Read(tempAllocator, "Shaders/vert.spv");
+		auto frag = jlb::FileLoader::Read(tempAllocator, "Shaders/frag.spv");
 
 		VkShaderModuleCreateInfo vertCreateInfo{};
 		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -74,13 +81,13 @@ namespace game
 		fragCreateInfo.codeSize = frag.GetLength();
 		fragCreateInfo.pCode = reinterpret_cast<const uint32_t*>(frag.GetData());
 
-		auto result = vkCreateShaderModule(engineOutData.app->logicalDevice, &vertCreateInfo, nullptr, &_vertModule);
+		auto result = vkCreateShaderModule(logicalDevice, &vertCreateInfo, nullptr, &_vertModule);
 		assert(!result);
-		result = vkCreateShaderModule(engineOutData.app->logicalDevice, &fragCreateInfo, nullptr, &_fragModule);
+		result = vkCreateShaderModule(logicalDevice, &fragCreateInfo, nullptr, &_fragModule);
 		assert(!result);
 
-		frag.Free(*engineOutData.tempAllocator);
-		vert.Free(*engineOutData.tempAllocator);
+		frag.Free(tempAllocator);
+		vert.Free(tempAllocator);
 	}
 
 	void RenderSystem::UnloadShader(const EngineOutData& engineOutData) const
@@ -111,38 +118,59 @@ namespace game
 		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
 	}
 
-	void RenderSystem::CreateInstanceArray(const EngineOutData& engineOutData)
+	void RenderSystem::CreateBuffers(const EngineOutData& engineOutData)
+	{
+		CreateUboArray(engineOutData, sizeof(RenderTask) * GetLength(), _instanceMemBlock, _instanceBuffer);
+		CreateUboArray(engineOutData, sizeof(LayoutData), _layoutDataMemBlock, _layoutDataBuffer);
+	}
+
+	void RenderSystem::DestroyBuffers(const EngineOutData& engineOutData)
 	{
 		auto& app = *engineOutData.app;
 		auto& vkAllocator = *engineOutData.vkAllocator;
+
+		vkAllocator.FreeBlock(_layoutDataMemBlock);
+		vkDestroyBuffer(app.logicalDevice, _layoutDataBuffer, nullptr);
+		vkAllocator.FreeBlock(_instanceMemBlock);
+		vkDestroyBuffer(app.logicalDevice, _instanceBuffer, nullptr);
+	}
+
+	void RenderSystem::CreateUboArray(const EngineOutData& engineOutData, const size_t size, vk::MemBlock& outMemBlock, VkBuffer& outBuffer)
+	{
+		auto& app = *engineOutData.app;
+		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& logicalDevice = app.logicalDevice;
 
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(RenderTask) * GetLength() * engineOutData.swapChainImageCount;
+		vertBufferInfo.size = size * engineOutData.swapChainImageCount;
 		vertBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		auto result = vkCreateBuffer(app.logicalDevice, &vertBufferInfo, nullptr, &_instanceBuffer);
+		auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &outBuffer);
 		assert(!result);
 
 		VkMemoryRequirements memRequirements;
-		vkGetBufferMemoryRequirements(app.logicalDevice, _instanceBuffer, &memRequirements);
+		vkGetBufferMemoryRequirements(logicalDevice, outBuffer, &memRequirements);
 
 		const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		_instanceMemBlock = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
+		outMemBlock = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
 
-		result = vkBindBufferMemory(app.logicalDevice, _instanceBuffer, _instanceMemBlock.memory, _instanceMemBlock.offset);
+		result = vkBindBufferMemory(logicalDevice, outBuffer, outMemBlock.memory, outMemBlock.offset);
 		assert(!result);
 	}
 
-	void RenderSystem::DestroyInstanceArray(const EngineOutData& engineOutData)
+	void RenderSystem::UpdateUboArray(const EngineOutData& engineOutData, const size_t size, void* inData,
+		vk::MemBlock& memBlock)
 	{
-		auto& app = *engineOutData.app;
-		auto& vkAllocator = *engineOutData.vkAllocator;
-
-		vkAllocator.FreeBlock(_instanceMemBlock);
-		vkDestroyBuffer(app.logicalDevice, _instanceBuffer, nullptr);
+		auto& logicalDevice = engineOutData.app->logicalDevice;
+		const VkDeviceSize instanceOffset = memBlock.offset + memBlock.size / engineOutData.swapChainImageCount * engineOutData.swapChainImageIndex;
+		void* instanceData;
+		const auto result = vkMapMemory(logicalDevice, memBlock.memory, instanceOffset, memBlock.size, 0, &instanceData);
+		assert(!result);
+		memcpy(instanceData, static_cast<const void*>(inData), size);
+		vkUnmapMemory(logicalDevice, memBlock.memory);
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
@@ -153,19 +181,31 @@ namespace game
 		modules[1].module = _fragModule;
 		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
+		jlb::StackArray<LayoutHandler::Info::Binding, 1> bindings{};
+		bindings[0].size = sizeof(Transform);
+		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
+		LayoutHandler::Info descriptorLayoutInfo{};
+		descriptorLayoutInfo.bindings = bindings;
+
+		_descriptorLayout = LayoutHandler::Create(engineOutData, descriptorLayoutInfo);
+
 		PipelineHandler::Info pipelineInfo{};
 		pipelineInfo.vertInputAttribDescriptions = Vertex::GetAttributeDescriptions();
 		pipelineInfo.vertInputBindingDescriptions = Vertex::GetBindingDescriptions();
 		pipelineInfo.resolution = engineOutData.resolution;
 		pipelineInfo.modules = modules;
 		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
+		//pipelineInfo.layouts = _descriptorLayout;
 
-		PipelineHandler::CreatePipeline(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
+		PipelineHandler::Create(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
 	void RenderSystem::DestroySwapChainAssets(const EngineOutData& engineOutData) const
 	{
-		vkDestroyPipeline(engineOutData.app->logicalDevice, _pipeline, nullptr);
-		vkDestroyPipelineLayout(engineOutData.app->logicalDevice, _pipelineLayout, nullptr);
+		auto& logicalDevice = engineOutData.app->logicalDevice;
+
+		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
+		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
 	}
 }

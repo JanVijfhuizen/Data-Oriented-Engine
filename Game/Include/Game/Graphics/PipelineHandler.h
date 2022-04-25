@@ -30,6 +30,6 @@ namespace game
 			int32_t basePipelineIndex = -1;
 		};
 
-		static void CreatePipeline(const EngineOutData& engineOutData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline);
+		static void Create(const EngineOutData& engineOutData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline);
 	};
 }
