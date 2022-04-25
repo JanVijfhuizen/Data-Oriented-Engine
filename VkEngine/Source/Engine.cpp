@@ -178,7 +178,7 @@ namespace vke
 		outVersionData.buildVersion = ENGINE_VERSION;
 
 #ifdef _DEBUG
-		return false;
+		//return false;
 #endif
 
 		std::ifstream memFile{};
@@ -201,6 +201,8 @@ namespace vke
 			if (version == ENGINE_VERSION)
 			{
 				outVersionData.buildVersion = version;
+				std::getline(memFile, s);
+				outVersionData.setupAllocSpace = std::stoi(s);
 				std::getline(memFile, s);
 				outVersionData.allocSpace = std::stoi(s);
 				std::getline(memFile, s);
