@@ -16,14 +16,14 @@ namespace game
 		TaskSystem::Allocate(*engineOutData.allocator);
 		LoadShader(engineOutData);
 		CreateMesh(engineOutData);
-		CreateBuffers(engineOutData);
+		CreateShaderAssets(engineOutData);
 		CreateSwapChainAssets(engineOutData);
 	}
 
 	void RenderSystem::Free(const EngineOutData& engineOutData)
 	{
 		DestroySwapChainAssets(engineOutData);
-		DestroyBuffers(engineOutData);
+		DestroyShaderAssets(engineOutData);
 		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
 		TaskSystem::Free(*engineOutData.allocator);
@@ -115,12 +115,13 @@ namespace game
 		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
 	}
 
-	void RenderSystem::CreateBuffers(const EngineOutData& engineOutData)
+	void RenderSystem::CreateShaderAssets(const EngineOutData& engineOutData)
 	{
 		auto& app = *engineOutData.app;
 		auto& vkAllocator = *engineOutData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
 
+		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		vertBufferInfo.size = sizeof(RenderTask) * GetLength() * engineOutData.swapChainImageCount;
@@ -139,15 +140,52 @@ namespace game
 
 		result = vkBindBufferMemory(logicalDevice, _instanceBuffer, _instanceMemBlock.memory, _instanceMemBlock.offset);
 		assert(!result);
+
+		// Create descriptor layout.
+		jlb::StackArray<LayoutHandler::Info::Binding, 1> bindings{};
+		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		bindings[0].size = sizeof(RenderTask) * GetLength();
+		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
+		LayoutHandler::Info descriptorLayoutInfo{};
+		descriptorLayoutInfo.bindings = bindings;
+
+		_descriptorLayout = LayoutHandler::Create(engineOutData, descriptorLayoutInfo);
+
+		// Create descriptor pool.
+		VkDescriptorPoolSize poolSize{};
+		poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		poolSize.descriptorCount = 1;
+		VkDescriptorPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		poolInfo.poolSizeCount = 1;
+		poolInfo.pPoolSizes = &poolSize;
+		poolInfo.maxSets = 1;
+
+		result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &_descriptorPool);
+		assert(!result);
+
+		// Create descriptor set.
+		VkDescriptorSetAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = _descriptorPool;
+		allocInfo.descriptorSetCount = 1;
+		allocInfo.pSetLayouts = &_descriptorLayout;
+
+		result = vkAllocateDescriptorSets(logicalDevice, &allocInfo, &_descriptorSet);
+		assert(!result);
 	}
 
-	void RenderSystem::DestroyBuffers(const EngineOutData& engineOutData)
+	void RenderSystem::DestroyShaderAssets(const EngineOutData& engineOutData)
 	{
 		auto& app = *engineOutData.app;
+		auto& logicalDevice = app.logicalDevice;
 		auto& vkAllocator = *engineOutData.vkAllocator;
 
+		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
+		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
+
 		vkAllocator.FreeBlock(_instanceMemBlock);
-		vkDestroyBuffer(app.logicalDevice, _instanceBuffer, nullptr);
+		vkDestroyBuffer(logicalDevice, _instanceBuffer, nullptr);
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
@@ -157,15 +195,6 @@ namespace game
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
 		modules[1].module = _fragModule;
 		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-		jlb::StackArray<LayoutHandler::Info::Binding, 1> bindings{};
-		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(RenderTask) * GetLength();
-		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
-		LayoutHandler::Info descriptorLayoutInfo{};
-		descriptorLayoutInfo.bindings = bindings;
-
-		_descriptorLayout = LayoutHandler::Create(engineOutData, descriptorLayoutInfo);
 
 		auto vertAttributes = Vertex::GetAttributeDescriptions();
 		auto vertBindings = Vertex::GetBindingDescriptions();
@@ -187,6 +216,5 @@ namespace game
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
 	}
 }
