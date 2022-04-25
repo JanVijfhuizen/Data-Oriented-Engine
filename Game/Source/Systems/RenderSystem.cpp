@@ -189,9 +189,12 @@ namespace game
 
 		_descriptorLayout = LayoutHandler::Create(engineOutData, descriptorLayoutInfo);
 
+		auto vertAttributes = Vertex::GetAttributeDescriptions();
+		auto vertBindings = Vertex::GetBindingDescriptions();
+
 		PipelineHandler::Info pipelineInfo{};
-		pipelineInfo.vertInputAttribDescriptions = Vertex::GetAttributeDescriptions();
-		pipelineInfo.vertInputBindingDescriptions = Vertex::GetBindingDescriptions();
+		pipelineInfo.vertInputAttribDescriptions = vertAttributes;
+		pipelineInfo.vertInputBindingDescriptions = vertBindings;
 		pipelineInfo.resolution = engineOutData.resolution;
 		pipelineInfo.modules = modules;
 		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
