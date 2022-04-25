@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "TaskSystem.h"
 #include "Graphics/Mesh.h"
-#include "Graphics/Vertex.h"
 #include "Components/Transform.h"
 
 namespace game
@@ -11,7 +10,7 @@ namespace game
 
 	struct RenderTask final
 	{
-		Vertex::Instance vertexInstance{};
+		Transform transform{};
 	};
 
 	class RenderSystem final : public jlb::TaskSystem<RenderTask>
@@ -24,17 +23,10 @@ namespace game
 
 		[[nodiscard]] static RenderTask CreateDefaultTask(Renderer& renderer, Transform& transform);
 
-		void SetCameraTransform(Transform& transform);
-
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
 
 	private:
-		struct LayoutData final
-		{
-			Transform cameraTransform{};
-		} _layoutData{};
-
 		using TaskSystem<RenderTask>::Allocate;
 		using TaskSystem<RenderTask>::Free;
 
@@ -43,8 +35,6 @@ namespace game
 		Mesh _mesh;
 		VkBuffer _instanceBuffer;
 		vk::MemBlock _instanceMemBlock;
-		VkBuffer _layoutDataBuffer;
-		vk::MemBlock _layoutDataMemBlock;
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
@@ -56,8 +46,5 @@ namespace game
 		void CreateMesh(const EngineOutData& engineOutData);
 		void CreateBuffers(const EngineOutData& engineOutData);
 		void DestroyBuffers(const EngineOutData& engineOutData);
-
-		static void CreateUboArray(const EngineOutData& engineOutData, size_t size, vk::MemBlock& outMemBlock, VkBuffer& outBuffer);
-		static void UpdateUboArray(const EngineOutData& engineOutData, size_t size, void* inData, vk::MemBlock& memBlock);
 	};
 }

@@ -33,16 +33,18 @@ namespace game
 	{
 		auto& cmd = engineOutData.swapChainCommandBuffer;
 
-		UpdateUboArray(engineOutData, sizeof(RenderTask) * GetLength(), GetData(), _instanceMemBlock);
-		UpdateUboArray(engineOutData, sizeof(LayoutData), &_layoutData, _layoutDataMemBlock);
+		auto& logicalDevice = engineOutData.app->logicalDevice;
+		const VkDeviceSize instanceOffset = _instanceMemBlock.offset + _instanceMemBlock.size / engineOutData.swapChainImageCount * engineOutData.swapChainImageIndex;
+		void* instanceData;
+		const auto result = vkMapMemory(logicalDevice, _instanceMemBlock.memory, instanceOffset, _instanceMemBlock.size, 0, &instanceData);
+		assert(!result);
+		memcpy(instanceData, static_cast<const void*>(GetData()), sizeof(RenderTask) * GetLength());
+		vkUnmapMemory(logicalDevice, _instanceMemBlock.memory);
 
-		jlb::StackArray<VkBuffer, 2> vertexBuffers{};
-		vertexBuffers[0] = _mesh.vertexBuffer;
-		vertexBuffers[1] = _instanceBuffer;
-		jlb::StackArray<VkDeviceSize, 2> offsets{};
+		VkDeviceSize offset = 0;
 
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-		vkCmdBindVertexBuffers(cmd, 0, 2, vertexBuffers.GetData(), offsets.GetData());
+		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
 		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 		vkCmdDrawIndexed(cmd, _mesh.indexCount, GetCount(), 0, 0, 0);
 		SetCount(0);
@@ -51,16 +53,11 @@ namespace game
 	RenderTask RenderSystem::CreateDefaultTask(Renderer& renderer, Transform& transform)
 	{
 		RenderTask task{};
-		auto& vertexInstance = task.vertexInstance;
-		vertexInstance.position = transform.position;
-		vertexInstance.rotation = transform.rotation;
-		vertexInstance.scale = transform.scale;
+		auto& taskTransform = task.transform;
+		taskTransform.position = transform.position;
+		taskTransform.rotation = transform.rotation;
+		taskTransform.scale = transform.scale;
 		return task;
-	}
-
-	void RenderSystem::SetCameraTransform(Transform& transform)
-	{
-		_layoutData.cameraTransform = transform;
 	}
 
 	void RenderSystem::LoadShader(const EngineOutData& engineOutData)
@@ -120,8 +117,28 @@ namespace game
 
 	void RenderSystem::CreateBuffers(const EngineOutData& engineOutData)
 	{
-		CreateUboArray(engineOutData, sizeof(RenderTask) * GetLength(), _instanceMemBlock, _instanceBuffer);
-		CreateUboArray(engineOutData, sizeof(LayoutData), _layoutDataMemBlock, _layoutDataBuffer);
+		auto& app = *engineOutData.app;
+		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& logicalDevice = app.logicalDevice;
+
+		VkBufferCreateInfo vertBufferInfo{};
+		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		vertBufferInfo.size = sizeof(RenderTask) * GetLength() * engineOutData.swapChainImageCount;
+		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &_instanceBuffer);
+		assert(!result);
+
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(logicalDevice, _instanceBuffer, &memRequirements);
+
+		const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		_instanceMemBlock = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
+
+		result = vkBindBufferMemory(logicalDevice, _instanceBuffer, _instanceMemBlock.memory, _instanceMemBlock.offset);
+		assert(!result);
 	}
 
 	void RenderSystem::DestroyBuffers(const EngineOutData& engineOutData)
@@ -129,48 +146,8 @@ namespace game
 		auto& app = *engineOutData.app;
 		auto& vkAllocator = *engineOutData.vkAllocator;
 
-		vkAllocator.FreeBlock(_layoutDataMemBlock);
-		vkDestroyBuffer(app.logicalDevice, _layoutDataBuffer, nullptr);
 		vkAllocator.FreeBlock(_instanceMemBlock);
 		vkDestroyBuffer(app.logicalDevice, _instanceBuffer, nullptr);
-	}
-
-	void RenderSystem::CreateUboArray(const EngineOutData& engineOutData, const size_t size, vk::MemBlock& outMemBlock, VkBuffer& outBuffer)
-	{
-		auto& app = *engineOutData.app;
-		auto& vkAllocator = *engineOutData.vkAllocator;
-		auto& logicalDevice = app.logicalDevice;
-
-		VkBufferCreateInfo vertBufferInfo{};
-		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = size * engineOutData.swapChainImageCount;
-		vertBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &outBuffer);
-		assert(!result);
-
-		VkMemoryRequirements memRequirements;
-		vkGetBufferMemoryRequirements(logicalDevice, outBuffer, &memRequirements);
-
-		const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		outMemBlock = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
-
-		result = vkBindBufferMemory(logicalDevice, outBuffer, outMemBlock.memory, outMemBlock.offset);
-		assert(!result);
-	}
-
-	void RenderSystem::UpdateUboArray(const EngineOutData& engineOutData, const size_t size, void* inData,
-		vk::MemBlock& memBlock)
-	{
-		auto& logicalDevice = engineOutData.app->logicalDevice;
-		const VkDeviceSize instanceOffset = memBlock.offset + memBlock.size / engineOutData.swapChainImageCount * engineOutData.swapChainImageIndex;
-		void* instanceData;
-		const auto result = vkMapMemory(logicalDevice, memBlock.memory, instanceOffset, memBlock.size, 0, &instanceData);
-		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(inData), size);
-		vkUnmapMemory(logicalDevice, memBlock.memory);
 	}
 
 	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
@@ -182,7 +159,8 @@ namespace game
 		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 		jlb::StackArray<LayoutHandler::Info::Binding, 1> bindings{};
-		bindings[0].size = sizeof(Transform);
+		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		bindings[0].size = sizeof(RenderTask) * GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		LayoutHandler::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = bindings;
