@@ -103,11 +103,11 @@ namespace jlb
 	template <typename T>
 	T& Vector<T>::_Add(T& value, LinearAllocator* allocator)
 	{
-		const bool outOfMemory = _count + 1 >= Array<T>::GetLength();
+		const bool outOfMemory = _count + 1 > Array<T>::GetLength();
 		if (allocator && outOfMemory)
 			Array<T>::Resize(*allocator, _count + 1);
 		else
-			assert(outOfMemory);
+			assert(!outOfMemory);
 		return Array<T>::operator[](_count++) = value;
 	}
 }

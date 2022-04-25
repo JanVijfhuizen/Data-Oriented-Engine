@@ -11,7 +11,7 @@ struct InstanceData
     float scale;
 };
 
-layout(set = 0, binding = 0) readonly buffer InstanceBuffer
+layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
 {
 	InstanceData instances[];
 } instanceBuffer;

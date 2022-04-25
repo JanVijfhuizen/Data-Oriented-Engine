@@ -139,17 +139,18 @@ namespace game
 
 		for (size_t i = 0; i < swapChainImageCount; ++i)
 		{
-			auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &_instanceBuffers[i]);
+			auto& buffer = _instanceBuffers[i];
+			auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &buffer);
 			assert(!result);
 
 			VkMemoryRequirements memRequirements;
-			vkGetBufferMemoryRequirements(logicalDevice, _instanceBuffers[0], &memRequirements);
+			vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
 
 			const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.CreateBlock(vertBufferInfo.size * engineOutData.swapChainImageCount, poolId);
+			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.CreateBlock(vertBufferInfo.size, poolId);
 
-			result = vkBindBufferMemory(logicalDevice, _instanceBuffers[i], memBlock.memory, memBlock.offset);
+			result = vkBindBufferMemory(logicalDevice, buffer, memBlock.memory, memBlock.offset);
 			assert(!result);
 		}
 

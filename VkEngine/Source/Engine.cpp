@@ -208,6 +208,9 @@ namespace vke
 
 				while(std::getline(memFile, s))
 				{
+					if (s.empty())
+						break;
+
 					outVersionData.poolInfos.push_back({});
 					auto& poolInfo = outVersionData.poolInfos[outVersionData.poolInfos.size() - 1];
 					poolInfo.size = std::stoi(s);
