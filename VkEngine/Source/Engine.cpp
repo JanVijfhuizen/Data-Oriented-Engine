@@ -96,7 +96,7 @@ namespace vke
 			for (size_t i = 0; i < vkAllocator.GetLength(); ++i)
 			{
 				auto poolInfo = load ? versionData.poolInfos[i] : defaultPoolInfo;
-				vkAllocator.AllocatePool(app, poolInfo.size, poolInfo.alignment, i);
+				vkAllocator.DefinePool(poolInfo.size, poolInfo.alignment, i);
 			}
 		}
 

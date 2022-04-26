@@ -21,9 +21,10 @@ namespace vk
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
 		// Updates a pool to conform to the largest requested alignment.
-		void AllocatePool(App& app, VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
+		void DefinePool(VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
 		// Returns a block from the allocated memory.
-		[[nodiscard]] MemBlock CreateBlock(VkDeviceSize size, uint32_t poolId);
+		// If this is the first time allocating from this pool, it allocates the memory for the pool.
+		[[nodiscard]] MemBlock CreateBlock(App& app, VkDeviceSize size, uint32_t poolId);
 		// Frees a block from the allocated memory. This is a linear allocator, so it assumes it is the last allocated block.
 		void FreeBlock(MemBlock& block);
 

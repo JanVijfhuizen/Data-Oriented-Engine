@@ -31,7 +31,7 @@ namespace vk
 		_pools.Free(allocator);
 	}
 
-	void LinearAllocator::AllocatePool(App& app, const VkDeviceSize size, const VkDeviceSize alignment, const uint32_t poolId)
+	void LinearAllocator::DefinePool(const VkDeviceSize size, const VkDeviceSize alignment, const uint32_t poolId)
 	{
 		if (size == 0)
 			return;
@@ -40,19 +40,23 @@ namespace vk
 		pool.alignment = alignment;
 		pool.size = size;
 		pool.remaining = size;
-
-		VkMemoryAllocateInfo allocInfo{};
-		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocInfo.allocationSize = pool.size;
-		allocInfo.memoryTypeIndex = poolId;
-
-		const auto result = vkAllocateMemory(app.logicalDevice, &allocInfo, nullptr, &pool.memory);
-		assert(!result);
 	}
 
-	MemBlock LinearAllocator::CreateBlock(const VkDeviceSize size, const uint32_t poolId)
+	MemBlock LinearAllocator::CreateBlock(App& app, const VkDeviceSize size, const uint32_t poolId)
 	{
 		auto& pool = _pools[poolId];
+
+		if(!pool.memory)
+		{
+			VkMemoryAllocateInfo allocInfo{};
+			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			allocInfo.allocationSize = pool.size;
+			allocInfo.memoryTypeIndex = poolId;
+
+			const auto result = vkAllocateMemory(app.logicalDevice, &allocInfo, nullptr, &pool.memory);
+			assert(!result);
+		}
+
 		const VkDeviceSize alignedSize = CalculateBufferSize(size, pool.alignment);
 		const VkDeviceSize offset = pool.size - pool.remaining;
 		assert(alignedSize <= pool.remaining);

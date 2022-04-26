@@ -38,7 +38,7 @@ namespace game
 
 		const auto stagingPoolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits, 
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		auto stagingMemBlock = vkAllocator.CreateBlock(bufferInfo.size, stagingPoolId);
+		auto stagingMemBlock = vkAllocator.CreateBlock(app, bufferInfo.size, stagingPoolId);
 
 		result = vkBindBufferMemory(logicalDevice, stagingBuffer, stagingMemBlock.memory, stagingMemBlock.offset);
 		assert(!result);
@@ -62,7 +62,7 @@ namespace game
 		vkGetImageMemoryRequirements(logicalDevice, image, &memRequirements);
 		const auto poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		const auto memBlock = vkAllocator.CreateBlock(bufferInfo.size, poolId);
+		const auto memBlock = vkAllocator.CreateBlock(app, bufferInfo.size, poolId);
 
 		result = vkBindImageMemory(logicalDevice, image, memBlock.memory, memBlock.offset);
 		assert(!result);
