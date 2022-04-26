@@ -31,8 +31,8 @@ namespace vke
 			/// </summary>
 			struct VkPoolInfo final
 			{
-				VkDeviceSize size = MEM_DEFAULT_SIZE;
-				VkDeviceSize alignment = 256;
+				VkDeviceSize size = VK_MEM_DEFAULT_SIZE;
+				VkDeviceSize alignment = VK_MEM_DEFAULT_ALIGNMENT;
 			};
 
 			size_t buildVersion = SIZE_MAX;
