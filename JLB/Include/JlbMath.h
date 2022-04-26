@@ -2,11 +2,16 @@
 
 namespace jlb
 {
+	/// <summary>
+	/// Basic math class that contains some useful mathematical functions.
+	/// </summary>
 	class Math final
 	{
 	public:
+		// Clamp a value between a minimum and a maximum number.
 		[[nodiscard]] static float Clamp(float clampable, float min, float max);
 
+		// Returns the highest of the two values.
 		template <typename T>
 		[[nodiscard]] static T Max(T a, T b);
 	};

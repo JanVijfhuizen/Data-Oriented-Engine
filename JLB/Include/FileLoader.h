@@ -5,6 +5,9 @@ namespace jlb
 {
 	class StringView;
 
+	/// <summary>
+	/// Simple class that is able to load and read files.
+	/// </summary>
 	class FileLoader final
 	{
 	public:

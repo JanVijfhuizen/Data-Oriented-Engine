@@ -80,6 +80,8 @@ namespace vke
 		// Set up IMGUI.
 		ImguiImpl imguiImpl{};
 		imguiImpl.Setup(app, swapChain, windowHandler);
+		size_t FPSMA[50]{};
+		size_t FPSIndex = 0;
 #endif
 
 		// Set up the Vulkan pool allocator.
@@ -142,6 +144,20 @@ namespace vke
 			auto inData = game::Update(outData);
 
 #ifdef _DEBUG
+			FPSMA[FPSIndex] = static_cast<size_t>(1000.f / outData.deltaTime);
+			size_t FPSMALength = sizeof FPSMA / sizeof(size_t);
+			FPSIndex = (FPSIndex + 1) % FPSMALength;
+			size_t FPSMACombined = 0;
+
+			for (size_t i = 0; i < FPSMALength; ++i)
+				FPSMACombined += FPSMA[i];
+			FPSMACombined /= FPSMALength;
+
+			ImGui::Begin("Debug Info", 0, ImGuiWindowFlags_AlwaysAutoResize);
+			std::string fpsText = "FPS:" + std::to_string(FPSMACombined);
+			ImGui::Text("%s", fpsText.c_str());
+			ImGui::End();
+
 			ImguiImpl::EndFrame(cmdBuffer);
 #endif
 
