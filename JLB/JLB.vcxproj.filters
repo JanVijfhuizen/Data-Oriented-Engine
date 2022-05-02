@@ -80,5 +80,8 @@
     <ClInclude Include="Include\FileLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\IndexSequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
