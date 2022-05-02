@@ -4,34 +4,44 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// Entity Component Archetype. Used to define a type of entity and the components that it uses.
-	/// </summary>
-	/// <typeparam name="ComponentTuple">The components used by the entity.</typeparam>
-	/// <typeparam name="...Systems">The systems used by the entity.</typeparam>
-	template <typename ComponentTuple, typename ...Systems>
-	class Archetype;
-
-	template <typename ...Components, typename ...Systems>
-	class Archetype<Tuple<Components...>, Systems...> : public Vector<Tuple<Components...>>
+	template <typename Info, typename ...Components>
+	class Archetype : public Vector<Tuple<Components...>>
 	{
 	public:
 		using Entity = Tuple<Components...>;
 
 		// Define the resources required from the systems.
-		virtual void DefineResourceUsage(Systems&...) = 0;
+		virtual void DefineResourceUsage(Info& info) = 0;
 		// Updates all entities in this archetype.
-		void Update(Systems&... systems);
+		void Update(Info& info);
 
 	protected:
 		// Update a single entity.
-		virtual void OnUpdate(Entity& entity, Systems&... systems) = 0;
+		virtual void OnUpdate(Info& info, Components&...) = 0;
+
+	private:
+		struct ProxyInfo final
+		{
+			void(Archetype<Info, Components...>::* func)(Info& info, Components&...);
+			Info* info;
+			Archetype<Info, Components...>* obj;
+		};
+
+		static void ProxyOnUpdate(ProxyInfo& info, Components&... components)
+		{
+			(info.obj->*info.func)(*info.info, components...);
+		}
 	};
 
-	template <typename ... Components, typename ... Systems>
-	void Archetype<tupleImpl::TupleImpl<0, Components...>, Systems...>::Update(Systems&... systems)
+	template <typename Info, typename ... Components>
+	void Archetype<Info, Components...>::Update(Info& info)
 	{
+		ProxyInfo proxyInfo{};
+		proxyInfo.func = &Archetype<Info, Components...>::OnUpdate;
+		proxyInfo.info = &info;
+		proxyInfo.obj = this;
+
 		for (auto& entity : *this)
-			OnUpdate(entity, systems...);
+			jlb::Apply(ProxyOnUpdate, entity, proxyInfo);
 	}
 }

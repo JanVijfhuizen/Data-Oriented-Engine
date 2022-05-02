@@ -11,7 +11,9 @@ namespace game
 		gameState.playerArchetype.Allocate(*outData.allocator, 2);
 
 		// Define resource usage for systems.
-		gameState.playerArchetype.DefineResourceUsage(gameState.renderSystem);
+		PlayerArchetypeInfo playerArchetypeInfo{};
+		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
+		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
 
 		// Set up systems.
 		gameState.renderSystem.Allocate(outData);
@@ -24,12 +26,11 @@ namespace game
 	EngineInData Update(const EngineOutData outData)
 	{
 		// Update archetypes.
-		gameState.playerArchetype.Update(gameState.renderSystem);
+		PlayerArchetypeInfo playerArchetypeInfo{};
+		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
+		gameState.playerArchetype.Update(playerArchetypeInfo);
 		// Update systems.
 		gameState.renderSystem.Update(outData);
-
-		auto& player = gameState.playerArchetype[1];
-		jlb::Get<PlayerArchetype::Transform>(player).position.x = sin(outData.time * 0.001f) * 4;
 
 		EngineInData inData{};
 		return inData;

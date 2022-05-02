@@ -55,9 +55,6 @@ namespace jlb
 	/// <summary>
 	/// Calls the given function and forwards the tuple values to that function.
 	/// </summary>
-	/// <typeparam name="Ret">Return value.</typeparam>
-	/// <typeparam name="...Args">Tuple values.</typeparam>
-	/// <typeparam name="In">Additional parameter.</typeparam>
 	/// <param name="func">Function to pass.</param>
 	/// <param name="in">Additional parameter value.</param>
 	/// <returns>Func output.</returns>

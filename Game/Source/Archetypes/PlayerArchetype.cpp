@@ -2,16 +2,15 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/RenderSystem.h"
 
-void game::PlayerArchetype::DefineResourceUsage(RenderSystem& renderSystem)
+void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeInfo& info)
 {
-	renderSystem.IncreaseRequestedLength(GetLength());
+	info.renderSystem->IncreaseRequestedLength(GetLength());
 }
 
-void game::PlayerArchetype::OnUpdate(Entity& entity, RenderSystem& renderSystem)
+void game::PlayerArchetype::OnUpdate(PlayerArchetypeInfo& info, 
+	Character&, Collider&, Controller&, Renderer& renderer,
+	ShadowCaster&, Transform& transform)
 {
-	auto& renderer = jlb::Get<Renderer>(entity);
-	auto& transform = jlb::Get<Transform>(entity);
-
 	auto task = RenderSystem::CreateDefaultTask(renderer, transform);
-	renderSystem.Add(task);
+	info.renderSystem->Add(task);
 }
