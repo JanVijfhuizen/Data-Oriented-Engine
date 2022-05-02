@@ -42,16 +42,28 @@ namespace jlb
 	/// <typeparam name="...Ts">Types to be held.</typeparam>
 	template <typename ...Ts>
 	using Tuple = tupleImpl::TupleImpl<0, Ts...>;
-	
-	template<typename Ret, typename ...Args, size_t ...I>
-	auto ApplyImpl(Ret(*func)(Args&...), IndexSequence<I...>, Tuple<Args...>& tuple)
+
+	namespace tupleImpl
 	{
-		return func(Get<I>(tuple)...);
+		template<typename Ret, typename In, typename ...Args, size_t ...I>
+		auto ApplyImpl(Ret(*func)(In&, Args&...), In& in, IndexSequence<I...>, Tuple<Args...>& tuple)
+		{
+			return func(in, Get<I>(tuple)...);
+		}
 	}
 
-	template<typename Ret, typename ...Args>
-	auto Apply(Ret(*func)(Args&...), Tuple<Args...>& tuple)
+	/// <summary>
+	/// Calls the given function and forwards the tuple values to that function.
+	/// </summary>
+	/// <typeparam name="Ret">Return value.</typeparam>
+	/// <typeparam name="...Args">Tuple values.</typeparam>
+	/// <typeparam name="In">Additional parameter.</typeparam>
+	/// <param name="func">Function to pass.</param>
+	/// <param name="in">Additional parameter value.</param>
+	/// <returns>Func output.</returns>
+	template<typename Ret, typename In, typename ...Args>
+	auto Apply(Ret(*func)(In&, Args&...), Tuple<Args...>& tuple, In& in)
 	{
-		return ApplyImpl(func, typename MakeIndexes<Args...>::Type(), tuple);
+		return tupleImpl::ApplyImpl(func, in, typename MakeIndexes<Args...>::Type(), tuple);
 	}
 }
