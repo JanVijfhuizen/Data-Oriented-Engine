@@ -4,6 +4,9 @@
 
 namespace jlb
 {
+	/// <summary>
+	/// Class used to store and specify a type of entities.
+	/// </summary>
 	template <typename Info, typename ...Components>
 	class Archetype : public Vector<Tuple<Components...>>
 	{
@@ -27,10 +30,7 @@ namespace jlb
 			Archetype<Info, Components...>* obj;
 		};
 
-		static void ProxyOnUpdate(ProxyInfo& info, Components&... components)
-		{
-			(info.obj->*info.func)(*info.info, components...);
-		}
+		static void ProxyOnUpdate(ProxyInfo& info, Components&... components);
 	};
 
 	template <typename Info, typename ... Components>
@@ -43,5 +43,11 @@ namespace jlb
 
 		for (auto& entity : *this)
 			jlb::Apply(ProxyOnUpdate, entity, proxyInfo);
+	}
+
+	template <typename Info, typename ... Components>
+	void Archetype<Info, Components...>::ProxyOnUpdate(ProxyInfo& info, Components&... components)
+	{
+		(info.obj->*info.func)(*info.info, components...);
 	}
 }

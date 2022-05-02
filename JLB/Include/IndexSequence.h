@@ -25,6 +25,10 @@ namespace jlb
         };
     }
 
+    /// <summary>
+    /// Creates a linear sequence of numbers, based on the amount of arguments passed.<br>
+    /// If N arguments are passed, it will generate a IndexSequence from 0 to N - 1.
+    /// </summary>
     template<typename ...Types>
     struct MakeIndexes : indexImpl::MakeIndexesImpl<0, IndexSequence<>, Types...>
     {
