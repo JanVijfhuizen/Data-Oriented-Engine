@@ -5,6 +5,7 @@ namespace jlb
 {
 	/// <summary>
 	/// Simple struct that allows a chunk of memory to function as an array.
+	/// Most data structures can be converted into an array view, including singular objects.
 	/// </summary>
 	template <typename T>
 	struct ArrayView

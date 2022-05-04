@@ -31,8 +31,10 @@
     <ClInclude Include="Include\VkRenderer\VkImageHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkFrameBufferHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkBufferHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkSamplerHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\VkSamplerHandler.cpp" />
     <ClCompile Include="Source\VkLinearAllocator.cpp" />
     <ClCompile Include="Source\VkRenderPassHandler.cpp" />
     <ClCompile Include="Source\VkCommandHandler.cpp" />

@@ -11,26 +11,29 @@ namespace jlb
 	class LinearAllocator final
 	{
 	public:
-		explicit LinearAllocator(size_t size);
-		~LinearAllocator();
-
-		LinearAllocator(LinearAllocator& other) = delete;
-		LinearAllocator(LinearAllocator&& other) = delete;
-		LinearAllocator& operator=(LinearAllocator& other) = delete;
-		LinearAllocator& operator=(LinearAllocator&& other) = delete;
+		void Allocate(size_t size);
+		void Free();
 
 		/// <summary>
 		/// Allocates a chunk of memory.
 		/// </summary>
 		/// <param name="size">The size of the to be allocated memory.<br> 
+		/// <param name="outAllocId">The allocation's id. Required when freeing space, to make sure things are de-allocated in the correct order.</param>
 		/// Take note that the allocation takes up an extra sizeof(size_t) amount of space.</param>
 		/// <returns>Pointer to the allocated memory.</returns>
-		[[nodiscard]] void* Malloc(size_t size);
+		[[nodiscard]] void* Malloc(size_t size, size_t& outAllocId);
+		/// <summary>
+		/// Resizes the size of the previously allocated memory block.
+		/// </summary>
+		/// <param name="size">Increased size.</param>
+		/// <param name="allocId">The allocation's id.</param>
+		void MResize(size_t size, size_t allocId);
 		/// <summary>
 		/// Frees the last allocation.<br>
 		/// Does not call destructors.
 		/// </summary>
-		void Free();
+		/// <param name="allocId">The allocation's id.</param>
+		void MFree(size_t allocId);
 
 		/// <summary>
 		/// Wrapper method for Malloc. Immediately casts the allocated memory to one or multiple classes of type T.<br>
@@ -38,9 +41,10 @@ namespace jlb
 		/// </summary>
 		/// <typeparam name="T">Type of classes to be allocated.</typeparam>
 		/// <param name="count">Amount of classes to be allocated.</param>
+		/// <param name="outAllocId">The allocation's id. Required when freeing space, to make sure things are de-allocated in the correct order.</param>
 		/// <returns>Pointer to the allocated memory.</returns>
 		template <typename T>
-		[[nodiscard]] T* New(size_t count = 1);
+		[[nodiscard]] T* New(size_t count, size_t& outAllocId);
 
 		/// <summary>
 		/// Returns the amount of free memory remaining.
@@ -65,6 +69,7 @@ namespace jlb
 		// The current memory index where new allocations will take place.
 		size_t _current = 0;
 		size_t _totalRequestedSpace = 0;
+		size_t _allocId = 0;
 
 		/// <summary>
 		/// Converts device size into chunk size.<br>
@@ -77,8 +82,8 @@ namespace jlb
 	};
 
 	template <typename T>
-	T* LinearAllocator::New(const size_t count)
+	T* LinearAllocator::New(const size_t count, size_t& outAllocId)
 	{
-		return reinterpret_cast<T*>(Malloc(sizeof(T) * count));
+		return reinterpret_cast<T*>(Malloc(sizeof(T) * count, outAllocId));
 	}
 }

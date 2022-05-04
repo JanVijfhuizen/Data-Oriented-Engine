@@ -143,16 +143,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\FileLoader.cpp" />
     <ClCompile Include="Source\JlbMath.cpp" />
     <ClCompile Include="Source\LinearAllocator.cpp" />
     <ClCompile Include="Source\StringView.cpp" />
-    <ClCompile Include="Source\UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Archetype.h" />
-    <ClInclude Include="Include\EntitySystem.h" />
+    <ClInclude Include="Include\IndexSequence.h" />
+    <ClInclude Include="Include\TaskSystem.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
+    <ClInclude Include="Include\FileLoader.h" />
     <ClInclude Include="Include\HashMap.h" />
     <ClInclude Include="Include\Heap.h" />
     <ClInclude Include="Include\Iterator.h" />
@@ -164,7 +166,6 @@
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />
     <ClInclude Include="Include\Tuple.h" />
-    <ClInclude Include="Include\UnitTest.h" />
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

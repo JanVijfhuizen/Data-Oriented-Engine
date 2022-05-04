@@ -128,8 +128,8 @@ namespace vk
 
 	void Bootstrap::SwapChainSupportDetails::Free(jlb::LinearAllocator& tempAllocator)
 	{
-		formats.Free(tempAllocator);
 		presentModes.Free(tempAllocator);
+		formats.Free(tempAllocator);
 	}
 
 	void Bootstrap::CheckValidationSupport(jlb::LinearAllocator& tempAllocator, AppInfo& info)

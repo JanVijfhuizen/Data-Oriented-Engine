@@ -8,23 +8,29 @@ namespace game
 	{
 		gameState = {};
 		// Set up archetypes.
-		gameState.playerArchetype.Allocate(*outData.allocator, 1);
+		gameState.playerArchetype.Allocate(*outData.allocator, 2);
+
+		// Define resource usage for systems.
+		PlayerArchetypeInfo playerArchetypeInfo{};
+		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
+		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
+
 		// Set up systems.
-		gameState.renderSystem.Allocate(*outData.allocator, 1);
+		gameState.renderSystem.Allocate(outData);
 
 		// Set up game world.
 		auto& player1 = gameState.playerArchetype.Add();
+		auto& player2 = gameState.playerArchetype.Add();
 	}
 
 	EngineInData Update(const EngineOutData outData)
 	{
 		// Update archetypes.
-		gameState.playerArchetype.Update(gameState.renderSystem);
+		PlayerArchetypeInfo playerArchetypeInfo{};
+		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
+		gameState.playerArchetype.Update(playerArchetypeInfo);
 		// Update systems.
-		gameState.renderSystem.Update(*outData.app);
-
-		auto& player = gameState.playerArchetype[0];
-		jlb::Get<PlayerArchetype::Transform>(player).position.x = sin(outData.time * 0.001f) * 4;
+		gameState.renderSystem.Update(outData);
 
 		EngineInData inData{};
 		return inData;
@@ -32,12 +38,13 @@ namespace game
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
 	{
-		
+		gameState.renderSystem.DestroySwapChainAssets(outData);
+		gameState.renderSystem.CreateSwapChainAssets(outData);
 	}
 
-	void Exit(EngineOutData outData)
+	void Exit(const EngineOutData outData)
 	{
-		gameState.renderSystem.Free(*outData.allocator);
+		gameState.renderSystem.Free(outData);
 		gameState.playerArchetype.Free(*outData.allocator);
 	}
 }

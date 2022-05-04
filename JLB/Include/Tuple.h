@@ -1,4 +1,5 @@
 #pragma once
+#include "IndexSequence.h"
 
 namespace jlb
 {
@@ -41,4 +42,25 @@ namespace jlb
 	/// <typeparam name="...Ts">Types to be held.</typeparam>
 	template <typename ...Ts>
 	using Tuple = tupleImpl::TupleImpl<0, Ts...>;
+
+	namespace tupleImpl
+	{
+		template<typename Ret, typename In, typename ...Args, size_t ...I>
+		auto ApplyImpl(Ret(*func)(In&, Args&...), In& in, IndexSequence<I...>, Tuple<Args...>& tuple)
+		{
+			return func(in, Get<I>(tuple)...);
+		}
+	}
+
+	/// <summary>
+	/// Calls the given function and forwards the tuple values to that function.
+	/// </summary>
+	/// <param name="func">Function to pass.</param>
+	/// <param name="in">Additional parameter value.</param>
+	/// <returns>Func output.</returns>
+	template<typename Ret, typename In, typename ...Args>
+	auto Apply(Ret(*func)(In&, Args&...), Tuple<Args...>& tuple, In& in)
+	{
+		return tupleImpl::ApplyImpl(func, in, typename MakeIndexes<Args...>::Type(), tuple);
+	}
 }

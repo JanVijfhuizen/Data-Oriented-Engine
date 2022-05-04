@@ -6,20 +6,22 @@
 
 namespace jlb
 {
-	LinearAllocator::LinearAllocator(const size_t size) :
-		// Immediately convert the size to chunk size.
-		_size(ToChunkSize(size))
+	void LinearAllocator::Allocate(const size_t size)
 	{
+		assert(!_memory);
+		_size = ToChunkSize(size);
 		// Allocate N size_t chunks.
 		_memory = reinterpret_cast<size_t*>(malloc(_size * sizeof(size_t)));
 	}
 
-	LinearAllocator::~LinearAllocator()
+	void LinearAllocator::Free()
 	{
+		_allocId--;
 		free(_memory);
+		_memory = nullptr;
 	}
 
-	void* LinearAllocator::Malloc(size_t size)
+	void* LinearAllocator::Malloc(size_t size, size_t& outAllocId)
 	{
 		// Assert if there still is enough free space.
 		size = ToChunkSize(size);
@@ -35,11 +37,36 @@ namespace jlb
 		++_current;
 
 		_totalRequestedSpace = Math::Max(_totalRequestedSpace, _current);
+		outAllocId = _allocId++;
 		return current;
 	}
 
-	void LinearAllocator::Free()
+	void LinearAllocator::MResize(size_t size, const size_t allocId)
 	{
+		assert(_current > 0);
+		assert(allocId == _allocId - 1);
+
+		auto& blockSize = _memory[_current - 1];
+
+		// Assert if there still is enough free space.
+		size = ToChunkSize(size);
+		assert(size + _current - blockSize + 1 < _size);
+		
+		// Adjusts the size of the previous allocation.
+		_current -= blockSize;
+		blockSize = 0;
+		_current += size;
+		_memory[_current - 1] = size;
+
+		_totalRequestedSpace = Math::Max(_totalRequestedSpace, _current);
+	}
+
+	void LinearAllocator::MFree(const size_t allocId)
+	{
+		// Check if the correct block is being freed (the newest allocated block, that is).
+		assert(allocId == _allocId - 1);
+		--_allocId;
+
 		// Assert if there is anything to free.
 		assert(_current > 0);
 		// Move N places back, based on the amount of memory allocated during the last Malloc.

@@ -1,13 +1,29 @@
 #pragma once
 #include "Vector.h"
-#include "Tuple.h"
 
 namespace jlb
 {
-	template <typename ...Args>
-	class Archetype : public Vector<Tuple<Args...>>
+	/// <summary>
+	/// Class used to store and specify a type of entities.
+	/// </summary>
+	template <typename Entity, typename Info>
+	class Archetype : public Vector<Entity>
 	{
 	public:
-		using Entity = Tuple<Args...>;
+		// Define the resources required from the systems.
+		virtual void DefineResourceUsage(Info& info) = 0;
+		// Updates all entities in this archetype.
+		void Update(Info& info);
+
+	protected:
+		// Update a single entity.
+		virtual void OnUpdate(Entity& entity, Info& info) = 0;
 	};
+
+	template <typename Entity, typename Info>
+	void Archetype<Entity, Info>::Update(Info& info)
+	{
+		for (auto& entity : *this)
+			OnUpdate(entity, info);
+	}
 }

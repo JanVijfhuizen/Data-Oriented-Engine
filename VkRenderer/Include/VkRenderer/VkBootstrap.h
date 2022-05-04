@@ -9,7 +9,7 @@ namespace jlb
 
 namespace vk
 {
-	class App;
+	struct App;
 
 	/// <summary>
 	/// Interface for communicating with the Vulkan Bootstrap class.

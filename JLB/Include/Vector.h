@@ -16,15 +16,19 @@ namespace jlb
 		/// Cannot exceed the capacity of the managed memory.
 		/// </summary>
 		/// <param name="value">The value to be added to the vector.</param>
+		/// <param name="allocator">Add an allocator if you want to be able to dynamically increase the size of the vector.<br>
+		/// Only works if the vector was the newest allocation.</param>
 		/// <returns>The added value inside the vector.</returns>
-		T& Add(T& value);
+		T& Add(T& value, LinearAllocator* allocator = nullptr);
 		/// <summary>
 		/// Place a value in the front of the vector and increase it's size by one.<br>
 		/// Cannot exceed the capacity of the managed memory.
 		/// </summary>
 		/// <param name="value">The value to be added to the vector.</param>
+		/// <param name="allocator">Add an allocator if you want to be able to dynamically increase the size of the vector.<br>
+		/// Only works if the vector was the newest allocation.</param>
 		/// <returns>The added value inside the vector.</returns>
-		T& Add(T&& value = {});
+		T& Add(T&& value = {}, LinearAllocator* allocator = nullptr);
 		/// <summary>
 		/// Remove the value at a certain index.
 		/// </summary>
@@ -34,7 +38,9 @@ namespace jlb
 		/// Set the count of the vector. Cannot exceed the capacity of the managed memory.
 		/// </summary>
 		/// <param name="count"></param>
-		void SetCount(size_t count);
+		/// <param name="allocator">Add an allocator if you want to be able to dynamically increase the size of the vector.<br>
+		/// Only works if the vector was the newest allocation.</param>
+		void SetCount(size_t count, LinearAllocator* allocator = nullptr);
 		/// <summary>
 		/// Gets the amount of values in the vector.
 		/// </summary>
@@ -44,20 +50,20 @@ namespace jlb
 	private:
 		// The amount of values in this vector.
 		size_t _count = 0;
+
+		T& _Add(T& value, LinearAllocator* allocator = nullptr);
 	};
 
 	template <typename T>
-	T& Vector<T>::Add(T& value)
+	T& Vector<T>::Add(T& value, LinearAllocator* allocator)
 	{
-		assert(_count + 1 <= Array<T>::GetLength());
-		return Array<T>::operator[](_count++) = value;
+		return _Add(value, allocator);
 	}
 
 	template <typename T>
-	T& Vector<T>::Add(T&& value)
+	T& Vector<T>::Add(T&& value, LinearAllocator* allocator)
 	{
-		assert(_count + 1 <= Array<T>::GetLength());
-		return Array<T>::operator[](_count++) = value;
+		return _Add(value, allocator);
 	}
 
 	template <typename T>
@@ -68,9 +74,13 @@ namespace jlb
 	}
 
 	template <typename T>
-	void Vector<T>::SetCount(const size_t count)
+	void Vector<T>::SetCount(const size_t count, LinearAllocator* allocator)
 	{
-		assert(count <= Array<T>::GetLength());
+		const bool outOfMemory = count > Array<T>::GetLength();
+		if (allocator && outOfMemory)
+			Array<T>::Resize(*allocator, count);
+		else
+			assert(count <= Array<T>::GetLength());
 		_count = count;
 	}
 
@@ -88,5 +98,16 @@ namespace jlb
 		it.index = _count;
 		it.length = Array<T>::GetLength();
 		return it;
+	}
+
+	template <typename T>
+	T& Vector<T>::_Add(T& value, LinearAllocator* allocator)
+	{
+		const bool outOfMemory = _count + 1 > Array<T>::GetLength();
+		if (allocator && outOfMemory)
+			Array<T>::Resize(*allocator, _count + 1);
+		else
+			assert(!outOfMemory);
+		return Array<T>::operator[](_count++) = value;
 	}
 }

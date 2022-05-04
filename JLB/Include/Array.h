@@ -3,6 +3,7 @@
 #include "LinearAllocator.h"
 #include "ArrayView.h"
 #include <cstring>
+#include <stdint.h>
 
 namespace jlb
 {
@@ -13,8 +14,6 @@ namespace jlb
 	class Array
 	{
 	public:
-		virtual ~Array() = default;
-
 		[[nodiscard]] virtual T& operator[](size_t index);
 		[[nodiscard]] size_t GetLength() const;
 
@@ -35,6 +34,11 @@ namespace jlb
 		/// <param name="size">Size of the array.</param>
 		/// <param name="src">The data to copy into the array.</param>
 		virtual void AllocateAndCopy(LinearAllocator& allocator, size_t size, T* src);
+
+		/// <summary>
+		/// Resizes the array, provided this was the latest allocation.
+		/// </summary>
+		virtual void Resize(LinearAllocator& allocator, size_t size);
 
 		/// <summary>
 		/// Frees the array from the linear allocator.
@@ -67,11 +71,12 @@ namespace jlb
 
 		[[nodiscard]] operator bool() const;
 
-		[[nodiscard]]operator ArrayView<T>() const;
+		[[nodiscard]] operator ArrayView<T>() const;
 
 	private:
 		T* _memory = nullptr;
 		size_t _length = 0;
+		size_t _allocId = SIZE_MAX;
 	};
 
 	template <typename T>
@@ -90,7 +95,9 @@ namespace jlb
 	template <typename T>
 	void Array<T>::Allocate(LinearAllocator& allocator, const size_t size, const T& fillValue)
 	{
-		_memory = allocator.New<T>(size);
+		assert(!_memory);
+
+		_memory = allocator.New<T>(size, _allocId);
 		_length = size;
 
 		for (size_t i = 0; i < size; ++i)
@@ -100,10 +107,17 @@ namespace jlb
 	template <typename T>
 	void Array<T>::AllocateAndCopy(LinearAllocator& allocator, const size_t size, T* src)
 	{
-		_memory = allocator.New<T>(size);
+		_memory = allocator.New<T>(size, _allocId);
 		_length = size;
 
 		memcpy(_memory, src, size * sizeof(T));
+	}
+
+	template <typename T>
+	void Array<T>::Resize(LinearAllocator& allocator, size_t size)
+	{
+		allocator.MResize(size * sizeof(T), _allocId);
+		_length = size;
 	}
 
 	template <typename T>
@@ -111,7 +125,7 @@ namespace jlb
 	{
 		if (_memory)
 		{
-			allocator.Free();
+			allocator.MFree(_allocId);
 			_memory = nullptr;
 		}
 	}

@@ -21,11 +21,12 @@ namespace vk
 		void Free(jlb::LinearAllocator& allocator, App& app);
 
 		// Updates a pool to conform to the largest requested alignment.
-		void AllocatePool(App& app, VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
+		void DefinePool(VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
 		// Returns a block from the allocated memory.
-		[[nodiscard]] MemBlock CreateBlock(VkDeviceSize size, uint32_t poolId);
+		// If this is the first time allocating from this pool, it allocates the memory for the pool.
+		[[nodiscard]] MemBlock CreateBlock(App& app, VkDeviceSize size, VkDeviceSize alignmentRequirement, uint32_t poolId);
 		// Frees a block from the allocated memory. This is a linear allocator, so it assumes it is the last allocated block.
-		void FreeBlock(MemBlock& block);
+		void FreeBlock(const MemBlock& block);
 
 		// Get the ID of a pool that supports a certain memory type.
 		[[nodiscard]] static uint32_t GetPoolId(App& app, uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -34,6 +35,8 @@ namespace vk
 		// Returns information about the given pool. Useful when determining how much space the program occupies.
 		void GetPoolInfo(uint32_t poolId, VkDeviceSize& outTotalRequestedSpace, VkDeviceSize& outLargestAlignment);
 		[[nodiscard]] size_t GetLength() const;
+		// Returns whether or not all the blocks have been properly freed.
+		[[nodiscard]] bool IsEmpty();
 
 	private:
 		struct Pool final
@@ -46,6 +49,8 @@ namespace vk
 			VkDeviceSize alignment;
 
 			VkDeviceSize largestAlignmentRequested = 0;
+			VkDeviceSize largestSpaceOccupied = 0;
+			size_t allocId = 0;
 		};
 
 		jlb::Array<Pool> _pools{};

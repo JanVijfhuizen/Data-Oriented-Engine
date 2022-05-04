@@ -44,6 +44,18 @@ namespace vk
 		/// Returns the render pass used to draw to the screen.
 		/// </summary>
 		[[nodiscard]] VkRenderPass GetRenderPass() const;
+		/// <summary>
+		/// Returns the swap chain image resolution.
+		/// </summary>
+		[[nodiscard]] glm::ivec2 GetResolution() const;
+		/// <summary>
+		/// Returns the amount of images in the swap chain.
+		/// </summary>
+		[[nodiscard]] uint8_t GetLength() const;
+		/// <summary>
+		/// Returns the index of the current image which will be written to.
+		/// </summary>
+		[[nodiscard]] uint8_t GetCurrentImageIndex() const;
 
 	private:
 		struct Image final

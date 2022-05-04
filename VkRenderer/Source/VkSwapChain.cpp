@@ -37,8 +37,9 @@ namespace vk
 	{
 		auto& frame = _frames[_frameIndex];
 
-		vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
-		const auto result = vkAcquireNextImageKHR(app.logicalDevice,
+		auto result = vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
+		assert(!result);
+		result = vkAcquireNextImageKHR(app.logicalDevice,
 			_swapChain, UINT64_MAX, frame.imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
 		assert(!result);
 
@@ -87,15 +88,13 @@ namespace vk
 		allWaitSemaphores[waitSemaphores.length] = frame.imageAvailableSemaphore;
 
 		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		auto submitInfo = CommandHandler::CreateSubmitDefaultInfo();
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &image.cmdBuffer;
+		auto submitInfo = CommandHandler::CreateSubmitDefaultInfo(image.cmdBuffer);
 		submitInfo.waitSemaphoreCount = allWaitSemaphores.GetLength();
 		submitInfo.pWaitSemaphores = allWaitSemaphores.GetData();
 		submitInfo.pWaitDstStageMask = &waitStage;
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = &frame.renderFinishedSemaphore;
-
+;
 		vkResetFences(app.logicalDevice, 1, &frame.inFlightFence);
 		result = vkQueueSubmit(app.queues.graphics, 1, &submitInfo, frame.inFlightFence);
 		assert(!result);
@@ -268,10 +267,7 @@ namespace vk
 			auto& image = _images[i];
 			image.colorImage = vkImages[i];
 
-			auto viewCreateInfo = ImageHandler::CreateViewDefaultInfo();
-			viewCreateInfo.image = image.colorImage;
-			viewCreateInfo.format = _surfaceFormat.format;
-
+			auto viewCreateInfo = ImageHandler::CreateViewDefaultInfo(image.colorImage, _surfaceFormat.format);
 			const auto viewResult = vkCreateImageView(app.logicalDevice, &viewCreateInfo, nullptr, &image.colorImageView);
 			assert(!viewResult);
 
@@ -309,5 +305,20 @@ namespace vk
 	VkRenderPass SwapChain::GetRenderPass() const
 	{
 		return _renderPass;
+	}
+
+	glm::ivec2 SwapChain::GetResolution() const
+	{
+		return {_extent.width, _extent.height};
+	}
+
+	uint8_t SwapChain::GetLength() const
+	{
+		return _images.GetLength();
+	}
+
+	uint8_t SwapChain::GetCurrentImageIndex() const
+	{
+		return _imageIndex;
 	}
 }
