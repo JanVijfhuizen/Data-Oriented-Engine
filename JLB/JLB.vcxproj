@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\StackAllocator.cpp" />
     <ClCompile Include="Source\FileLoader.cpp" />
     <ClCompile Include="Source\JlbMath.cpp" />
     <ClCompile Include="Source\LinearAllocator.cpp" />
@@ -151,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="Include\Archetype.h" />
     <ClInclude Include="Include\IndexSequence.h" />
+    <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\TaskSystem.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
