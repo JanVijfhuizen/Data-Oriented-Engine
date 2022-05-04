@@ -11,6 +11,7 @@
 #include "Graphics/TextureHandler.h"
 #include "VkRenderer/VkImageHandler.h"
 #include "VkRenderer/VkSamplerHandler.h"
+#include "Components/Renderer.h"
 
 namespace game
 {
@@ -64,6 +65,7 @@ namespace game
 		taskTransform.position = transform.position;
 		taskTransform.rotation = transform.rotation;
 		taskTransform.scale = transform.scale;
+		task.subTexture = renderer.subTexture;
 		return task;
 	}
 

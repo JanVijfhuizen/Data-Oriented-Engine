@@ -6,9 +6,13 @@ layout(location = 1) in vec2 inTexCoords;
 
 struct InstanceData
 {
+    // Transform.
 	vec2 position;
     float rotation;
     float scale;
+    // Texture sub coordinates.
+    vec2 texLTop;
+    vec2 texRBot;
 };
 
 layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
@@ -22,10 +26,14 @@ layout(location = 0) out Data
     vec2 fragPos;
 } outData;
 
+void HandleInstance(in InstanceData instance)
+{
+    outData.fragTexCoord = instance.texLTop + (instance.texRBot - instance.texLTop) * inTexCoords;
+    outData.fragPos = inPosition;
+    gl_Position = vec4(inPosition + instance.position, 1, 1);
+}
+
 void main() 
 {
-    outData.fragTexCoord = inTexCoords;
-    outData.fragPos = inPosition;
-
-    gl_Position = vec4(inPosition + instanceBuffer.instances[gl_InstanceIndex].position, 1, 1);
+    HandleInstance(instanceBuffer.instances[gl_InstanceIndex]);
 }

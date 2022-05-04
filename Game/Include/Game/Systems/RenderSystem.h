@@ -3,6 +3,7 @@
 #include "Graphics/Mesh.h"
 #include "Components/Transform.h"
 #include "Graphics/Texture.h"
+#include "Graphics/SubTexture.h"
 
 namespace game
 {
@@ -12,6 +13,7 @@ namespace game
 	struct RenderTask final
 	{
 		Transform transform{};
+		SubTexture subTexture{};
 	};
 
 	class RenderSystem final : public jlb::TaskSystem<RenderTask>
