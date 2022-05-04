@@ -34,6 +34,8 @@ namespace game
 		VkShaderModule _vertModule;
 		VkShaderModule _fragModule;
 		Texture _textureAtlas;
+		VkImageView _atlasImageView;
+		VkSampler _atlasSampler;
 		Mesh _mesh;
 		VkDescriptorPool _descriptorPool;
 		VkDescriptorSetLayout _descriptorLayout;
@@ -46,6 +48,8 @@ namespace game
 
 		void LoadShader(const EngineOutData& engineOutData);
 		void UnloadShader(const EngineOutData& engineOutData) const;
+		void LoadTextureAtlas(const EngineOutData& engineOutData);
+		void UnloadTextureAtlas(const EngineOutData& engineOutData);
 
 		void CreateMesh(const EngineOutData& engineOutData);
 		void CreateShaderAssets(const EngineOutData& engineOutData);

@@ -9,13 +9,15 @@
 #include "Components/Transform.h"
 #include "Graphics/LayoutHandler.h"
 #include "Graphics/TextureHandler.h"
+#include "VkRenderer/VkImageHandler.h"
+#include "VkRenderer/VkSamplerHandler.h"
 
 namespace game
 {
 	void RenderSystem::Allocate(const EngineOutData& engineOutData)
 	{
 		TaskSystem::Allocate(*engineOutData.allocator);
-		_textureAtlas = TextureHandler::LoadTexture(engineOutData, "Textures/Atlas.png");
+		LoadTextureAtlas(engineOutData);
 		LoadShader(engineOutData);
 		CreateMesh(engineOutData);
 		CreateShaderAssets(engineOutData);
@@ -28,7 +30,7 @@ namespace game
 		DestroyShaderAssets(engineOutData);
 		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
-		TextureHandler::FreeTexture(engineOutData, _textureAtlas);
+		UnloadTextureAtlas(engineOutData);
 		TaskSystem::Free(*engineOutData.allocator);
 	}
 
@@ -98,6 +100,29 @@ namespace game
 		vkDestroyShaderModule(engineOutData.app->logicalDevice, _fragModule, nullptr);
 	}
 
+	void RenderSystem::LoadTextureAtlas(const EngineOutData& engineOutData)
+	{
+		auto& app = *engineOutData.app;
+		auto& logicalDevice = app.logicalDevice;
+
+		_textureAtlas = TextureHandler::LoadTexture(engineOutData, "Textures/Atlas.png");
+		const auto viewCreateInfo = vk::ImageHandler::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
+		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_atlasImageView);
+		assert(!result);
+		const auto samplerCreateInfo = vk::SamplerHandler::CreateDefaultInfo(app);
+		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_atlasSampler);
+		assert(!result);
+	}
+
+	void RenderSystem::UnloadTextureAtlas(const EngineOutData& engineOutData)
+	{
+		auto& logicalDevice = engineOutData.app->logicalDevice;
+
+		vkDestroySampler(logicalDevice, _atlasSampler, nullptr);
+		vkDestroyImageView(logicalDevice, _atlasImageView, nullptr);
+		TextureHandler::FreeTexture(engineOutData, _textureAtlas);
+	}
+
 	void RenderSystem::CreateMesh(const EngineOutData& engineOutData)
 	{
 		jlb::StackArray<Vertex, 4> vertices{};
@@ -158,10 +183,12 @@ namespace game
 		}
 
 		// Create descriptor layout.
-		jlb::StackArray<LayoutHandler::Info::Binding, 1> bindings{};
+		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		bindings[0].size = sizeof(RenderTask) * GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
+		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 		LayoutHandler::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = bindings;
@@ -205,21 +232,39 @@ namespace game
 		// Bind descriptor sets to the instance data.
 		for (size_t i = 0; i < swapChainImageCount; ++i)
 		{
-			VkDescriptorBufferInfo info{};
-			info.buffer = _instanceBuffers[i];
-			info.offset = 0;
-			info.range = sizeof(RenderTask) * GetLength();
+			jlb::StackArray<VkWriteDescriptorSet, 2> writes{};
 
-			VkWriteDescriptorSet write;
-			write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			write.dstBinding = 0;
-			write.dstSet = _descriptorSets[i];
-			write.descriptorCount = 1;
-			write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-			write.pBufferInfo = &info;
-			write.dstArrayElement = 0;
+			// Bind instance buffer.
+			VkDescriptorBufferInfo instanceInfo{};
+			instanceInfo.buffer = _instanceBuffers[i];
+			instanceInfo.offset = 0;
+			instanceInfo.range = sizeof(RenderTask) * GetLength();
 
-			vkUpdateDescriptorSets(logicalDevice, 1, &write, 0, nullptr);
+			auto& instanceWrite = writes[0];
+			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			instanceWrite.dstBinding = 0;
+			instanceWrite.dstSet = _descriptorSets[i];
+			instanceWrite.descriptorCount = 1;
+			instanceWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			instanceWrite.pBufferInfo = &instanceInfo;
+			instanceWrite.dstArrayElement = 0;
+
+			// Bind texture atlas.
+			VkDescriptorImageInfo  atlasInfo{};
+			atlasInfo.imageLayout = TextureHandler::GetImageLayout();
+			atlasInfo.imageView = _atlasImageView;
+			atlasInfo.sampler = _atlasSampler;
+
+			auto& textureAtlasWrite = writes[1];
+			textureAtlasWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			textureAtlasWrite.dstBinding = 1;
+			textureAtlasWrite.dstSet = _descriptorSets[i];
+			textureAtlasWrite.descriptorCount = 1;
+			textureAtlasWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			textureAtlasWrite.pImageInfo = &atlasInfo;
+			textureAtlasWrite.dstArrayElement = 0;
+
+			vkUpdateDescriptorSets(logicalDevice, writes.GetLength(), writes.GetData(), 0, nullptr);
 		}
 	}
 

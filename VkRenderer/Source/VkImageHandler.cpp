@@ -24,13 +24,12 @@ namespace vk
 		return createInfo;
 	}
 
-	VkImageViewCreateInfo ImageHandler::CreateViewDefaultInfo()
+	VkImageViewCreateInfo ImageHandler::CreateViewDefaultInfo(const VkImage image, const VkFormat format)
 	{
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 
 		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
 
 		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -42,6 +41,9 @@ namespace vk
 		createInfo.subresourceRange.levelCount = 1;
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
+
+		createInfo.image = image;
+		createInfo.format = format;
 
 		return createInfo;
 	}

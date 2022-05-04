@@ -11,6 +11,16 @@
 
 namespace game
 {
+	VkFormat TextureHandler::GetTextureFormat()
+	{
+		return VK_FORMAT_R8G8B8A8_SRGB;
+	}
+
+	VkImageLayout TextureHandler::GetImageLayout()
+	{
+		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	}
+
 	Texture TextureHandler::LoadTexture(const EngineOutData& engineOutData, const jlb::StringView path)
 	{
 		auto& app = *engineOutData.app;

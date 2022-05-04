@@ -9,7 +9,7 @@ namespace vk
 	{
 	public:
 		[[nodiscard]] static VkImageCreateInfo CreateDefaultInfo(glm::ivec2 resolution, VkImageUsageFlags usage);
-		[[nodiscard]] static VkImageViewCreateInfo CreateViewDefaultInfo();
+		[[nodiscard]] static VkImageViewCreateInfo CreateViewDefaultInfo(VkImage image, VkFormat format = VK_FORMAT_R8G8B8A8_SRGB);
 
 		static void CopyBufferToImage(VkBuffer buffer, VkImage image, VkCommandBuffer cmdBuffer, glm::ivec2 resolution);
 		static void TransitionLayout(VkImage image, VkCommandBuffer cmdBuffer, VkImageLayout oldLayout,

@@ -267,10 +267,7 @@ namespace vk
 			auto& image = _images[i];
 			image.colorImage = vkImages[i];
 
-			auto viewCreateInfo = ImageHandler::CreateViewDefaultInfo();
-			viewCreateInfo.image = image.colorImage;
-			viewCreateInfo.format = _surfaceFormat.format;
-
+			auto viewCreateInfo = ImageHandler::CreateViewDefaultInfo(image.colorImage, _surfaceFormat.format);
 			const auto viewResult = vkCreateImageView(app.logicalDevice, &viewCreateInfo, nullptr, &image.colorImageView);
 			assert(!viewResult);
 
