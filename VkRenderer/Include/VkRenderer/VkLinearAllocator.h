@@ -14,7 +14,7 @@ namespace vk
 	/// <summary>
 	/// Linear allocator for allocations made with Vulkan. This includes GPU allocations.
 	/// </summary>
-	class StackAllocator final
+	class LinearAllocator final
 	{
 	public:
 		void Allocate(jlb::StackAllocator& allocator, App& app);

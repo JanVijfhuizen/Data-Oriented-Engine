@@ -1,41 +1,35 @@
 ﻿#include "pch.h"
-#include "Systems/RenderSystem.h"
-#include "FileLoader.h"
-#include "StringView.h"
-#include "VkRenderer/VkApp.h"
-#include "Graphics/Vertex.h"
-#include "Graphics/PipelineHandler.h"
+#include "Graphics/BaseRenderSystem.h"
 #include "Graphics/MeshHandler.h"
-#include "Components/Transform.h"
-#include "Graphics/LayoutHandler.h"
+#include "Graphics/PipelineHandler.h"
+#include "FileLoader.h"
 #include "Graphics/TextureHandler.h"
 #include "VkRenderer/VkImageHandler.h"
 #include "VkRenderer/VkSamplerHandler.h"
-#include "Components/Renderer.h"
+#include "Graphics/LayoutHandler.h"
+#include "StackArray.h"
 
 namespace game
 {
-	void RenderSystem::Allocate(const EngineOutData& engineOutData)
+	void BaseRenderSystem::Allocate(EngineOutData& engineOutData, CreateInfo& info)
 	{
-		TaskSystem::Allocate(*engineOutData.allocator);
-		LoadTextureAtlas(engineOutData);
-		LoadShader(engineOutData);
-		CreateMesh(engineOutData);
-		CreateShaderAssets(engineOutData);
-		CreateSwapChainAssets(engineOutData);
+		LoadTextureAtlas(engineOutData, info.texturePath);
+		LoadShader(engineOutData, info.shaderVertPath, info.shaderFragPath);
+		_mesh = CreateMesh(engineOutData);
+		CreateShaderAssets(engineOutData, info.instanceSize, info.instanceCount);
+		CreateSwapChainAssets(engineOutData, info);
 	}
 
-	void RenderSystem::Free(const EngineOutData& engineOutData)
+	void BaseRenderSystem::Free(EngineOutData& engineOutData)
 	{
 		DestroySwapChainAssets(engineOutData);
 		DestroyShaderAssets(engineOutData);
 		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
 		UnloadTextureAtlas(engineOutData);
-		TaskSystem::Free(*engineOutData.allocator);
 	}
 
-	void RenderSystem::Update(const EngineOutData& engineOutData)
+	void BaseRenderSystem::Update(EngineOutData& engineOutData, void* instanceSrc, const size_t instanceSize, const size_t instanceCount)
 	{
 		auto& cmd = engineOutData.swapChainCommandBuffer;
 
@@ -44,7 +38,7 @@ namespace game
 		void* instanceData;
 		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
 		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(GetData()), sizeof(RenderTask) * GetLength());
+		memcpy(instanceSrc, instanceData, instanceSize * instanceCount);
 		vkUnmapMemory(logicalDevice, memBlock.memory);
 
 		VkDeviceSize offset = 0;
@@ -53,29 +47,43 @@ namespace game
 			0, 1, &_descriptorSets[engineOutData.swapChainImageIndex], 0, nullptr);
 		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
 		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-		vkCmdDrawIndexed(cmd, _mesh.indexCount, GetCount(), 0, 0, 0);
-
-		SetCount(0);
+		vkCmdDrawIndexed(cmd, _mesh.indexCount, instanceCount, 0, 0, 0);
 	}
 
-	RenderTask RenderSystem::CreateDefaultTask(Renderer& renderer, Transform& transform)
+	void BaseRenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData, CreateInfo& info)
 	{
-		RenderTask task{};
-		auto& taskTransform = task.transform;
-		taskTransform.position = transform.position;
-		taskTransform.rotation = transform.rotation;
-		taskTransform.scale = transform.scale;
-		task.subTexture = renderer.subTexture;
-		return task;
+		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
+		modules[0].module = _vertModule;
+		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
+		modules[1].module = _fragModule;
+		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		PipelineHandler::Info pipelineInfo{};
+		pipelineInfo.vertInputAttribDescriptions = info.vertInputAttribDescriptions;
+		pipelineInfo.vertInputBindingDescriptions = info.vertInputBindingDescriptions;
+		pipelineInfo.resolution = engineOutData.resolution;
+		pipelineInfo.modules = modules;
+		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
+		pipelineInfo.layouts = _descriptorLayout;
+
+		PipelineHandler::Create(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
-	void RenderSystem::LoadShader(const EngineOutData& engineOutData)
+	void BaseRenderSystem::DestroySwapChainAssets(const EngineOutData& engineOutData) const
+	{
+		auto& logicalDevice = engineOutData.app->logicalDevice;
+
+		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
+		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
+	}
+
+	void BaseRenderSystem::LoadShader(const EngineOutData& engineOutData, const jlb::StringView vertPath, const jlb::StringView fragPath)
 	{
 		auto& logicalDevice = engineOutData.app->logicalDevice;
 		auto& tempAllocator = *engineOutData.tempAllocator;
 
-		auto vert = jlb::FileLoader::Read(tempAllocator, "Shaders/vert.spv");
-		auto frag = jlb::FileLoader::Read(tempAllocator, "Shaders/frag.spv");
+		auto vert = jlb::FileLoader::Read(tempAllocator, vertPath);
+		auto frag = jlb::FileLoader::Read(tempAllocator, fragPath);
 
 		VkShaderModuleCreateInfo vertCreateInfo{};
 		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -96,18 +104,18 @@ namespace game
 		vert.Free(tempAllocator);
 	}
 
-	void RenderSystem::UnloadShader(const EngineOutData& engineOutData) const
+	void BaseRenderSystem::UnloadShader(const EngineOutData& engineOutData) const
 	{
 		vkDestroyShaderModule(engineOutData.app->logicalDevice, _vertModule, nullptr);
 		vkDestroyShaderModule(engineOutData.app->logicalDevice, _fragModule, nullptr);
 	}
 
-	void RenderSystem::LoadTextureAtlas(const EngineOutData& engineOutData)
+	void BaseRenderSystem::LoadTextureAtlas(const EngineOutData& engineOutData, const jlb::StringView path)
 	{
 		auto& app = *engineOutData.app;
 		auto& logicalDevice = app.logicalDevice;
 
-		_textureAtlas = TextureHandler::LoadTexture(engineOutData, "Textures/Atlas.png");
+		_textureAtlas = TextureHandler::LoadTexture(engineOutData, path);
 		const auto viewCreateInfo = vk::ImageHandler::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
 		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_atlasImageView);
 		assert(!result);
@@ -116,7 +124,7 @@ namespace game
 		assert(!result);
 	}
 
-	void RenderSystem::UnloadTextureAtlas(const EngineOutData& engineOutData)
+	void BaseRenderSystem::UnloadTextureAtlas(const EngineOutData& engineOutData)
 	{
 		auto& logicalDevice = engineOutData.app->logicalDevice;
 
@@ -125,29 +133,7 @@ namespace game
 		TextureHandler::FreeTexture(engineOutData, _textureAtlas);
 	}
 
-	void RenderSystem::CreateMesh(const EngineOutData& engineOutData)
-	{
-		jlb::StackArray<Vertex, 4> vertices{};
-		vertices[0].position = { -1, -1 };
-		vertices[1].position = { -1, 1 };
-		vertices[2].position = { 1, 1 };
-		vertices[3].position = { 1, -1 };
-		vertices[0].textureCoordinates = { 0, 0 };
-		vertices[1].textureCoordinates = { 0, 1 };
-		vertices[2].textureCoordinates = { 1, 1 };
-		vertices[3].textureCoordinates = { 1, 0 };
-		jlb::StackArray<Vertex::Index, 6> indices{};
-		indices[0] = 0;
-		indices[1] = 1;
-		indices[2] = 2;
-		indices[3] = 0;
-		indices[4] = 2;
-		indices[5] = 3;
-
-		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
-	}
-
-	void RenderSystem::CreateShaderAssets(const EngineOutData& engineOutData)
+	void BaseRenderSystem::CreateShaderAssets(const EngineOutData& engineOutData, const size_t instanceSize, const size_t instanceCount)
 	{
 		auto& app = *engineOutData.app;
 		auto& allocator = *engineOutData.allocator;
@@ -160,7 +146,7 @@ namespace game
 		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(RenderTask) * GetLength();
+		vertBufferInfo.size = instanceSize * instanceCount;
 		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -187,7 +173,7 @@ namespace game
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(RenderTask) * GetLength();
+		bindings[0].size = instanceSize * instanceCount;
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -240,7 +226,7 @@ namespace game
 			VkDescriptorBufferInfo instanceInfo{};
 			instanceInfo.buffer = _instanceBuffers[i];
 			instanceInfo.offset = 0;
-			instanceInfo.range = sizeof(RenderTask) * GetLength();
+			instanceInfo.range = instanceSize * instanceCount;
 
 			auto& instanceWrite = writes[0];
 			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -270,7 +256,7 @@ namespace game
 		}
 	}
 
-	void RenderSystem::DestroyShaderAssets(const EngineOutData& engineOutData)
+	void BaseRenderSystem::DestroyShaderAssets(const EngineOutData& engineOutData)
 	{
 		auto& app = *engineOutData.app;
 		auto& logicalDevice = app.logicalDevice;
@@ -289,35 +275,5 @@ namespace game
 
 		_instanceMemBlocks.Free(allocator);
 		_instanceBuffers.Free(allocator);
-	}
-
-	void RenderSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
-	{
-		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
-		modules[0].module = _vertModule;
-		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
-		modules[1].module = _fragModule;
-		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-		auto vertAttributes = Vertex::GetAttributeDescriptions();
-		auto vertBindings = Vertex::GetBindingDescriptions();
-
-		PipelineHandler::Info pipelineInfo{};
-		pipelineInfo.vertInputAttribDescriptions = vertAttributes;
-		pipelineInfo.vertInputBindingDescriptions = vertBindings;
-		pipelineInfo.resolution = engineOutData.resolution;
-		pipelineInfo.modules = modules;
-		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
-		pipelineInfo.layouts = _descriptorLayout;
-
-		PipelineHandler::Create(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
-	}
-
-	void RenderSystem::DestroySwapChainAssets(const EngineOutData& engineOutData) const
-	{
-		auto& logicalDevice = engineOutData.app->logicalDevice;
-
-		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
-		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
 	}
 }

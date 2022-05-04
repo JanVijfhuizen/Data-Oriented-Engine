@@ -85,7 +85,7 @@ namespace vke
 #endif
 
 		// Set up the Vulkan pool allocator.
-		vk::StackAllocator vkAllocator{};
+		vk::LinearAllocator vkAllocator{};
 		vkAllocator.Allocate(allocator, app);
 
 		{
