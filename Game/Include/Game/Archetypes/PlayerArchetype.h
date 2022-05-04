@@ -11,17 +11,26 @@ namespace game
 {
 	class RenderSystem;
 
+	struct Player
+	{
+		Controller controller;
+		Collider collider;
+		Character character;
+		Renderer renderer;
+		ShadowCaster shadowCaster;
+		Transform transform;
+	};
+
 	struct PlayerArchetypeInfo final
 	{
 		RenderSystem* renderSystem;
 	};
 
-	class PlayerArchetype final : public jlb::Archetype<PlayerArchetypeInfo, Character, Collider, Controller, Renderer, ShadowCaster, Transform>
+	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeInfo>
 	{
 	public:
 		void DefineResourceUsage(PlayerArchetypeInfo& info) override;
 	protected:
-		void OnUpdate(PlayerArchetypeInfo& info, Character&, Collider&, Controller&, Renderer&, ShadowCaster&,
-			Transform&) override;
+		void OnUpdate(Player& entity, PlayerArchetypeInfo& info) override;
 	};
 }

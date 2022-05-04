@@ -7,10 +7,8 @@ void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeInfo& info)
 	info.renderSystem->IncreaseRequestedLength(GetLength());
 }
 
-void game::PlayerArchetype::OnUpdate(PlayerArchetypeInfo& info, 
-	Character&, Collider&, Controller&, Renderer& renderer,
-	ShadowCaster&, Transform& transform)
+void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 {
-	auto task = RenderSystem::CreateDefaultTask(renderer, transform);
+	auto task = RenderSystem::CreateDefaultTask(entity.renderer, entity.transform);
 	info.renderSystem->Add(task);
 }
