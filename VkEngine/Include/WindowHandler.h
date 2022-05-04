@@ -14,6 +14,7 @@ namespace vke
 		{
 			glm::ivec2 resolution{ 800, 600 };
 			jlb::StringView name = "My Window";
+			bool allowResizing = false;
 		};
 
 		void Construct(const Info& info);

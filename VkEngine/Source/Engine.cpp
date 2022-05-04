@@ -156,6 +156,10 @@ namespace vke
 			ImGui::Begin("Debug Info", 0, ImGuiWindowFlags_AlwaysAutoResize);
 			std::string fpsText = "FPS:" + std::to_string(FPSMACombined);
 			ImGui::Text("%s", fpsText.c_str());
+			std::string depthText = "Depth:" + std::to_string(allocator.GetDepth());
+			std::string tempDepthText = "Temp Depth:" + std::to_string(tempAllocator.GetDepth());
+			ImGui::Text("%s", depthText.c_str());
+			ImGui::Text("%s", tempDepthText.c_str());
 			ImGui::End();
 
 			ImguiImpl::EndFrame(cmdBuffer);
@@ -163,7 +167,7 @@ namespace vke
 
 			// Submit for presentation to the screen.
 			const auto presentResult = swapChain.EndFrame(allocator, app, inData.swapChainWaitSemaphores);
-			// Recreate the swapchian if the swapchain is inadequate/outdated, or if we're in a testrun.
+			// Recreate the swapchain if the swapchain is inadequate/outdated, or if we're in a testrun.
 			if (presentResult || phase != Phase::Main)
 			{
 				swapChain.Recreate(allocator, app, windowHandler);
