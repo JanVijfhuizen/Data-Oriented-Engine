@@ -29,7 +29,7 @@ namespace vke
 		/// Returns the extensions needed by this window to communicate to vulkan.
 		/// </summary>
 		/// <returns>Extensions needed to communicate with vulkan.</returns>
-		[[nodiscard]] jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::LinearAllocator& allocator) override;
+		[[nodiscard]] jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::StackAllocator& allocator) override;
 		/// <summary>
 		/// Returns the amount of vulkan extensions needed by this class.
 		/// </summary>

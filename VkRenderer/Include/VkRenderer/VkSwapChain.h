@@ -3,7 +3,7 @@
 
 namespace jlb 
 {
-	class LinearAllocator;
+	class StackAllocator;
 }
 
 namespace vk
@@ -22,8 +22,8 @@ namespace vk
 		// Window background color.
 		VkClearValue clearColor = { 0, 0, 0, 1 };
 
-		void Allocate(jlb::LinearAllocator& allocator, App& app, IWindowHandler& windowHandler);
-		void Free(jlb::LinearAllocator& allocator, App& app);
+		void Allocate(jlb::StackAllocator& allocator, App& app, IWindowHandler& windowHandler);
+		void Free(jlb::StackAllocator& allocator, App& app);
 
 		/// <summary>
 		/// Begins a new command and render pass.
@@ -35,11 +35,11 @@ namespace vk
 		/// </summary>
 		/// <param name="waitSemaphores">Additional semaphores to wait for.</param>
 		/// <returns>Present result.</returns>
-		[[nodiscard]] VkResult EndFrame(jlb::LinearAllocator& tempAllocator, App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
+		[[nodiscard]] VkResult EndFrame(jlb::StackAllocator& tempAllocator, App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
 		/// <summary>
 		/// Recreates the swap chain. Call this if EndFrame returns something else than VK_SUCCESS.
 		/// </summary>
-		void Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
+		void Recreate(jlb::StackAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
 		/// <summary>
 		/// Returns the render pass used to draw to the screen.
 		/// </summary>

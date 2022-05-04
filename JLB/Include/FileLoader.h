@@ -11,6 +11,6 @@ namespace jlb
 	class FileLoader final
 	{
 	public:
-		static Array<char> Read(LinearAllocator& allocator, StringView path);
+		static Array<char> Read(StackAllocator& allocator, StringView path);
 	};
 }

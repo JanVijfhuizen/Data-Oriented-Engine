@@ -3,7 +3,7 @@
 
 namespace jlb
 {
-	class LinearAllocator;
+	class StackAllocator;
 }
 
 namespace vke
@@ -36,14 +36,6 @@ namespace vke
 			};
 
 			size_t buildVersion = SIZE_MAX;
-			// Space required during initialization.
-			// Only used for temporary data that can be deleted after initialization.
-			size_t setupAllocSpace = MEM_DEFAULT_SIZE;
-			// Space required during initialization/runtime.
-			size_t allocSpace = MEM_DEFAULT_SIZE;
-			// Space required during runtime for temporary allocations.
-			size_t tempAllocSpace = MEM_DEFAULT_SIZE;
-			// Memory requirements per Vulkan pool. Amount of pools and size often varies for different hardware.
 			std::vector<VkPoolInfo> poolInfos{};
 		};
 

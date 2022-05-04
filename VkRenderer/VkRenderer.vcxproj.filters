@@ -42,7 +42,7 @@
     <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkLinearAllocator.h">
+    <ClInclude Include="Include\VkRenderer\VkStackAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\VkRenderer\VkMemBlock.h">
@@ -80,7 +80,7 @@
     <ClCompile Include="Source\VkRenderPassHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkLinearAllocator.cpp">
+    <ClCompile Include="Source\VkStackAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\VkBufferHandler.cpp">

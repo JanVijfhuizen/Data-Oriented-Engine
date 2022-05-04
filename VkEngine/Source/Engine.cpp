@@ -49,12 +49,12 @@ namespace vke
 	int Engine::RunGame(VersionData& versionData, Phase phase)
 	{
 		// Set up the allocators.
-		jlb::LinearAllocator allocator{};
-		allocator.Allocate(versionData.allocSpace);
-		jlb::LinearAllocator tempAllocator{};
-		tempAllocator.Allocate(versionData.tempAllocSpace);
-		jlb::LinearAllocator setupAllocator{};
-		setupAllocator.Allocate(versionData.setupAllocSpace);
+		jlb::StackAllocator allocator{};
+		allocator.Allocate();
+		jlb::StackAllocator tempAllocator{};
+		tempAllocator.Allocate();
+		jlb::StackAllocator setupAllocator{};
+		setupAllocator.Allocate();
 
 		// Set up the window handler.
 		WindowHandler windowHandler{};
@@ -85,7 +85,7 @@ namespace vke
 #endif
 
 		// Set up the Vulkan pool allocator.
-		vk::LinearAllocator vkAllocator{};
+		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(allocator, app);
 
 		{
@@ -212,11 +212,6 @@ namespace vke
 		// Destroy the window.
 		windowHandler.Cleanup();
 
-		// Further update the version data.
-		versionData.setupAllocSpace = setupAllocator.GetTotalRequestedSpace();
-		versionData.allocSpace = allocator.GetTotalRequestedSpace();
-		versionData.tempAllocSpace = tempAllocator.GetTotalRequestedSpace();
-
 		// Store the version data.
 		SaveVersionData(versionData);
 
@@ -266,12 +261,6 @@ namespace vke
 			{
 				// Load memory requirements.
 				outVersionData.buildVersion = version;
-				std::getline(memFile, s);
-				outVersionData.setupAllocSpace = std::stoi(s);
-				std::getline(memFile, s);
-				outVersionData.allocSpace = std::stoi(s);
-				std::getline(memFile, s);
-				outVersionData.tempAllocSpace = std::stoi(s);
 
 				// Load Vulkan memory pools requirements.
 				while(std::getline(memFile, s))
@@ -300,10 +289,7 @@ namespace vke
 		assert(memFile.is_open());
 
 		// Store memory requirements and engine version.
-		memFile << ENGINE_VERSION << std::endl;;
-		memFile << versionData.setupAllocSpace << std::endl;
-		memFile << versionData.allocSpace << std::endl;
-		memFile << versionData.tempAllocSpace << std::endl;
+		memFile << ENGINE_VERSION << std::endl;
 
 		// Store Vulkan memory pool requirements.
 		for (auto& poolInfo : versionData.poolInfos)

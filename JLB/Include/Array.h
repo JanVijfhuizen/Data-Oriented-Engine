@@ -1,9 +1,9 @@
 #pragma once
 #include <cassert>
-#include "LinearAllocator.h"
+#include "StackAllocator.h"
 #include "ArrayView.h"
 #include <cstring>
-#include <stdint.h>
+#include <cstdint>
 
 namespace jlb
 {
@@ -24,7 +24,7 @@ namespace jlb
 		/// <param name="allocator">Allocator from which to allocate.</param>
 		/// <param name="size">Size of the array.</param>
 		/// <param name="fillValue">The array will be initialized with this value.</param>
-		virtual void Allocate(LinearAllocator& allocator, size_t size, const T& fillValue = {});
+		virtual void Allocate(StackAllocator& allocator, size_t size, const T& fillValue = {});
 
 		/// <summary>
 		/// Allocates a chunk of memory to be managed.<br>
@@ -33,18 +33,13 @@ namespace jlb
 		/// <param name="allocator">Allocator from which to allocate.</param>
 		/// <param name="size">Size of the array.</param>
 		/// <param name="src">The data to copy into the array.</param>
-		virtual void AllocateAndCopy(LinearAllocator& allocator, size_t size, T* src);
-
-		/// <summary>
-		/// Resizes the array, provided this was the latest allocation.
-		/// </summary>
-		virtual void Resize(LinearAllocator& allocator, size_t size);
+		virtual void AllocateAndCopy(StackAllocator& allocator, size_t size, T* src);
 
 		/// <summary>
 		/// Frees the array from the linear allocator.
 		/// </summary>
 		/// <param name="allocator">Allocator to free it from.</param>
-		virtual void Free(LinearAllocator& allocator);
+		virtual void Free(StackAllocator& allocator);
 
 		/// <summary>
 		/// Swaps values at the defined indexes.
@@ -74,16 +69,15 @@ namespace jlb
 		[[nodiscard]] operator ArrayView<T>() const;
 
 	private:
-		T* _memory = nullptr;
+		StackAllocator::Allocation<T> _allocation{};
 		size_t _length = 0;
-		size_t _allocId = SIZE_MAX;
 	};
 
 	template <typename T>
 	T& Array<T>::operator[](const size_t index)
 	{
 		assert(index < _length);
-		return _memory[index];
+		return _allocation.ptr[index];
 	}
 
 	template <typename T>
@@ -93,69 +87,61 @@ namespace jlb
 	}
 
 	template <typename T>
-	void Array<T>::Allocate(LinearAllocator& allocator, const size_t size, const T& fillValue)
+	void Array<T>::Allocate(StackAllocator& allocator, const size_t size, const T& fillValue)
 	{
-		assert(!_memory);
+		assert(!_allocation);
 
-		_memory = allocator.New<T>(size, _allocId);
+		_allocation = allocator.New<T>(size);
 		_length = size;
 
 		for (size_t i = 0; i < size; ++i)
-			_memory[i] = fillValue;
+			_allocation.ptr[i] = fillValue;
 	}
 
 	template <typename T>
-	void Array<T>::AllocateAndCopy(LinearAllocator& allocator, const size_t size, T* src)
+	void Array<T>::AllocateAndCopy(StackAllocator& allocator, const size_t size, T* src)
 	{
-		_memory = allocator.New<T>(size, _allocId);
+		_allocation = allocator.New<T>(size);
 		_length = size;
 
-		memcpy(_memory, src, size * sizeof(T));
+		memcpy(_allocation.ptr, src, size * sizeof(T));
 	}
 
 	template <typename T>
-	void Array<T>::Resize(LinearAllocator& allocator, size_t size)
+	void Array<T>::Free(StackAllocator& allocator)
 	{
-		allocator.MResize(size * sizeof(T), _allocId);
-		_length = size;
-	}
-
-	template <typename T>
-	void Array<T>::Free(LinearAllocator& allocator)
-	{
-		if (_memory)
-		{
-			allocator.MFree(_allocId);
-			_memory = nullptr;
-		}
+		if (!_allocation)
+			return;
+		allocator.MFree(_allocation);
+		_allocation = {};
 	}
 
 	template <typename T>
 	void Array<T>::Swap(const size_t a, const size_t b)
 	{
 		assert(a < _length&& b < _length);
-		const T temp = _memory[a];
-		_memory[a] = _memory[b];
-		_memory[b] = temp;
+		const T temp = _allocation.ptr[a];
+		_allocation.ptr[a] = _allocation.ptr[b];
+		_allocation.ptr[b] = temp;
 	}
 
 	template <typename T>
 	void Array<T>::Copy(const size_t begin, const size_t end, T* src)
 	{
-		memcpy(&_memory[begin], src, (end - begin) * sizeof(T));
+		memcpy(&_allocation.ptr[begin], src, (end - begin) * sizeof(T));
 	}
 
 	template <typename T>
 	T* Array<T>::GetData() const
 	{
-		return _memory;
+		return _allocation.ptr;
 	}
 
 	template <typename T>
 	Iterator<T> Array<T>::begin()
 	{
 		Iterator<T> it;
-		it.memory = _memory;
+		it.memory = _allocation.ptr;
 		it.index = 0;
 		it.length = _length;
 		return it;
@@ -165,7 +151,7 @@ namespace jlb
 	Iterator<T> Array<T>::end()
 	{
 		Iterator<T> it;
-		it.memory = _memory;
+		it.memory = _allocation.ptr;
 		it.index = _length;
 		it.length = _length;
 		return it;
@@ -180,6 +166,6 @@ namespace jlb
 	template <typename T>
 	Array<T>::operator ArrayView<T>() const
 	{
-		return ArrayView<T>{_memory, _length};
+		return ArrayView<T>{_allocation.ptr, _length};
 	}
 }
