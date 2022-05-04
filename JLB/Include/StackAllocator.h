@@ -20,7 +20,7 @@ namespace jlb
 		};
 
 		void Allocate(const CreateInfo& info = {});
-		void Free() const;
+		void Free();
 
 		[[nodiscard]] Allocation<void> Malloc(size_t size);
 		template <typename T>
@@ -47,7 +47,7 @@ namespace jlb
 		assert(_id == allocation.id + 1);
 
 		const size_t size = _data[_current - 1];
-		_current -= size + 1;
+		_current -= size;
 		_id--;
 	}
 

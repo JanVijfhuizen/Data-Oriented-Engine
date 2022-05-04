@@ -11,10 +11,14 @@ namespace jlb
 		_size = ToChunkSize(info.pageSize);
 	}
 
-	void StackAllocator::Free() const
+	void StackAllocator::Free()
 	{
-		if(_next)
+		if (_next)
+		{
 			_next->Free();
+			delete _next;
+			_next = nullptr;
+		}
 		delete[] _data;
 	}
 
@@ -28,7 +32,7 @@ namespace jlb
 			{
 				_next = new StackAllocator;
 				CreateInfo createInfo{};
-				createInfo.pageSize = Math::Max(chunkSize + 1, _size);
+				createInfo.pageSize = Math::Max(size + 1, _size * sizeof(size_t));
 				_next->Allocate(createInfo);
 			}
 
