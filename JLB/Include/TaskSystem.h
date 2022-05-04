@@ -14,7 +14,7 @@ namespace jlb
 		// Increase the size that the system will be allocated with.
 		// Call this before actually allocating it.
 		void IncreaseRequestedLength(size_t size);
-		virtual void Allocate(LinearAllocator& allocator);
+		virtual void Allocate(StackAllocator& allocator);
 
 	private:
 		using Vector<Task>::Allocate;
@@ -30,7 +30,7 @@ namespace jlb
 	}
 
 	template <typename Task>
-	void TaskSystem<Task>::Allocate(LinearAllocator& allocator)
+	void TaskSystem<Task>::Allocate(StackAllocator& allocator)
 	{
 		Vector<Task>::Allocate(allocator, _requestedLength);
 	}

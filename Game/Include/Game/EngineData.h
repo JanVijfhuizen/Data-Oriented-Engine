@@ -3,13 +3,13 @@
 
 namespace jlb
 {
-	class LinearAllocator;
+	class StackAllocator;
 }
 
 namespace vk
 {
 	struct App;
-	class LinearAllocator;
+	class StackAllocator;
 }
 
 namespace game
@@ -36,11 +36,11 @@ namespace game
 	struct EngineOutData final
 	{
 		// Used for mostly permanent allocations.
-		jlb::LinearAllocator* allocator;
+		jlb::StackAllocator* allocator;
 		// Used for temporary allocations.
-		jlb::LinearAllocator* tempAllocator;
+		jlb::StackAllocator* tempAllocator;
 		// Used for Vulkan allocations.
-		vk::LinearAllocator* vkAllocator;
+		vk::StackAllocator* vkAllocator;
 		// App containing all relevant Vulkan data.
 		vk::App* app;
 

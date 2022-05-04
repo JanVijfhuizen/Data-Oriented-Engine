@@ -11,7 +11,7 @@
 
 namespace vk
 {
-	void SwapChain::Allocate(jlb::LinearAllocator& allocator, App& app, IWindowHandler& windowHandler)
+	void SwapChain::Allocate(jlb::StackAllocator& allocator, App& app, IWindowHandler& windowHandler)
 	{
 		auto support = Bootstrap::QuerySwapChainSupport(allocator, app);
 		const uint32_t imageCount = support.GetRecommendedImageCount();
@@ -25,7 +25,7 @@ namespace vk
 		Recreate(allocator, app, windowHandler);
 	}
 
-	void SwapChain::Free(jlb::LinearAllocator& allocator, App& app)
+	void SwapChain::Free(jlb::StackAllocator& allocator, App& app)
 	{
 		Cleanup(app);
 
@@ -72,7 +72,7 @@ namespace vk
 		return image.cmdBuffer;
 	}
 
-	VkResult SwapChain::EndFrame(jlb::LinearAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
+	VkResult SwapChain::EndFrame(jlb::StackAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
 	{
 		auto& frame = _frames[_frameIndex];
 		auto& image = _images[_imageIndex];
@@ -184,7 +184,7 @@ namespace vk
 		return actualExtent;
 	}
 
-	void SwapChain::Recreate(jlb::LinearAllocator& tempAllocator, App& app, IWindowHandler& windowHandler)
+	void SwapChain::Recreate(jlb::StackAllocator& tempAllocator, App& app, IWindowHandler& windowHandler)
 	{
 		auto support = Bootstrap::QuerySwapChainSupport(tempAllocator, app);
 		_extent = ChooseExtent(support.capabilities, windowHandler.GetResolution());

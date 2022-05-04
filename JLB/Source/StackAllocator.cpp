@@ -48,6 +48,18 @@ namespace jlb
 		return allocation;
 	}
 
+	bool StackAllocator::IsEmpty() const
+	{
+		return _current == 0;
+	}
+
+	size_t StackAllocator::GetDepth() const
+	{
+		if (_next)
+			return _next->GetDepth() + 1;
+		return 0;
+	}
+
 	size_t StackAllocator::ToChunkSize(size_t size)
 	{
 		return size / sizeof(size_t) + (size % sizeof(size_t) > 0);

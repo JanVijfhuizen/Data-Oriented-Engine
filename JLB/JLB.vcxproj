@@ -146,7 +146,6 @@
     <ClCompile Include="Source\StackAllocator.cpp" />
     <ClCompile Include="Source\FileLoader.cpp" />
     <ClCompile Include="Source\JlbMath.cpp" />
-    <ClCompile Include="Source\LinearAllocator.cpp" />
     <ClCompile Include="Source\StringView.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,7 +160,6 @@
     <ClInclude Include="Include\Heap.h" />
     <ClInclude Include="Include\Iterator.h" />
     <ClInclude Include="Include\KeyPair.h" />
-    <ClInclude Include="Include\LinearAllocator.h" />
     <ClInclude Include="Include\JlbMath.h" />
     <ClInclude Include="Include\Stack.h" />
     <ClInclude Include="Include\StackArray.h" />

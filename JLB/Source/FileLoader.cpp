@@ -5,7 +5,7 @@
 
 namespace jlb
 {
-	Array<char> FileLoader::Read(LinearAllocator& allocator, const StringView path)
+	Array<char> FileLoader::Read(StackAllocator& allocator, const StringView path)
 	{
 		std::ifstream file(path, std::ios::ate | std::ios::binary);
 		assert(file.is_open());

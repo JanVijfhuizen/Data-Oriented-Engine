@@ -9,13 +9,13 @@
 
 namespace vk
 {
-	void AppInfo::Free(jlb::LinearAllocator& tempAllocator)
+	void AppInfo::Free(jlb::StackAllocator& tempAllocator)
 	{
 		validationLayers.Free(tempAllocator);
 		deviceExtensions.Free(tempAllocator);
 	}
 
-	AppInfo Bootstrap::CreateDefaultInfo(jlb::LinearAllocator& tempAllocator)
+	AppInfo Bootstrap::CreateDefaultInfo(jlb::StackAllocator& tempAllocator)
 	{
 		AppInfo info{};
 		info.validationLayers.Allocate(tempAllocator, 1, "VK_LAYER_KHRONOS_validation");
@@ -53,7 +53,7 @@ namespace vk
 		return info;
 	}
 
-	App Bootstrap::CreateApp(jlb::LinearAllocator& tempAllocator, AppInfo info)
+	App Bootstrap::CreateApp(jlb::StackAllocator& tempAllocator, AppInfo info)
 	{
 		App app{};
 		
@@ -90,12 +90,12 @@ namespace vk
 		vkDestroyInstance(app.instance, nullptr);
 	}
 
-	Bootstrap::SwapChainSupportDetails Bootstrap::QuerySwapChainSupport(jlb::LinearAllocator& allocator, App& app)
+	Bootstrap::SwapChainSupportDetails Bootstrap::QuerySwapChainSupport(jlb::StackAllocator& allocator, App& app)
 	{
 		return QuerySwapChainSupport(allocator, app, app.physicalDevice);
 	}
 
-	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::LinearAllocator& tempAllocator, App& app)
+	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::StackAllocator& tempAllocator, App& app)
 	{
 		return GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
 	}
@@ -126,13 +126,13 @@ namespace vk
 		return imageCount;
 	}
 
-	void Bootstrap::SwapChainSupportDetails::Free(jlb::LinearAllocator& tempAllocator)
+	void Bootstrap::SwapChainSupportDetails::Free(jlb::StackAllocator& tempAllocator)
 	{
 		presentModes.Free(tempAllocator);
 		formats.Free(tempAllocator);
 	}
 
-	void Bootstrap::CheckValidationSupport(jlb::LinearAllocator& tempAllocator, AppInfo& info)
+	void Bootstrap::CheckValidationSupport(jlb::StackAllocator& tempAllocator, AppInfo& info)
 	{
 #ifdef NDEBUG
 		return;
@@ -166,7 +166,7 @@ namespace vk
 		availableLayers.Free(tempAllocator);
 	}
 
-	void Bootstrap::CreateInstance(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app)
+	void Bootstrap::CreateInstance(jlb::StackAllocator& tempAllocator, AppInfo& info, App& app)
 	{
 		const auto appInfo = CreateApplicationInfo(info);
 		auto extensions = GetExtensions(tempAllocator, info);
@@ -202,7 +202,7 @@ namespace vk
 		instanceInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugInfo);
 	}
 
-	void Bootstrap::SelectPhysicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app)
+	void Bootstrap::SelectPhysicalDevice(jlb::StackAllocator& tempAllocator, AppInfo& info, App& app)
 	{
 		uint32_t deviceCount = 0;
 		vkEnumeratePhysicalDevices(app.instance, &deviceCount, nullptr);
@@ -262,7 +262,7 @@ namespace vk
 		devices.Free(tempAllocator);
 	}
 
-	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::LinearAllocator& tempAllocator,
+	Bootstrap::QueueFamilies Bootstrap::GetQueueFamilies(jlb::StackAllocator& tempAllocator,
 		const VkSurfaceKHR surface, VkPhysicalDevice physicalDevice)
 	{
 		QueueFamilies families{};
@@ -302,7 +302,7 @@ namespace vk
 		return families;
 	}
 
-	bool Bootstrap::CheckDeviceExtensionSupport(jlb::LinearAllocator& tempAllocator, 
+	bool Bootstrap::CheckDeviceExtensionSupport(jlb::StackAllocator& tempAllocator, 
 		const VkPhysicalDevice device, jlb::Array<jlb::StringView>& extensions)
 	{
 		uint32_t extensionCount;
@@ -332,7 +332,7 @@ namespace vk
 	}
 
 	Bootstrap::SwapChainSupportDetails Bootstrap::QuerySwapChainSupport(
-		jlb::LinearAllocator& allocator, App& app, const VkPhysicalDevice device)
+		jlb::StackAllocator& allocator, App& app, const VkPhysicalDevice device)
 	{
 		SwapChainSupportDetails details{};
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, app.surface, &details.capabilities);
@@ -364,7 +364,7 @@ namespace vk
 		return details;
 	}
 
-	void Bootstrap::CreateLogicalDevice(jlb::LinearAllocator& tempAllocator, AppInfo& info, App& app)
+	void Bootstrap::CreateLogicalDevice(jlb::StackAllocator& tempAllocator, AppInfo& info, App& app)
 	{
 		auto queueFamilies = GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
 
@@ -427,7 +427,7 @@ namespace vk
 		familyIndexes.Free(tempAllocator);
 	}
 
-	void Bootstrap::CreateCommandPool(jlb::LinearAllocator& tempAllocator, App& app)
+	void Bootstrap::CreateCommandPool(jlb::StackAllocator& tempAllocator, App& app)
 	{
 		const auto families = GetQueueFamilies(tempAllocator, app.surface, app.physicalDevice);
 
@@ -458,7 +458,7 @@ namespace vk
 		return appInfo;
 	}
 
-	jlb::Array<jlb::StringView> Bootstrap::GetExtensions(jlb::LinearAllocator& allocator, AppInfo& info)
+	jlb::Array<jlb::StringView> Bootstrap::GetExtensions(jlb::StackAllocator& allocator, AppInfo& info)
 	{
 		// Disable debug extensions for release mode.
 		uint32_t debugExtensions = 0;

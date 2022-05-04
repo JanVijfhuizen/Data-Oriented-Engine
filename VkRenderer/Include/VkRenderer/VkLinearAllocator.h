@@ -4,7 +4,7 @@
 
 namespace jlb 
 {
-	class LinearAllocator;
+	class StackAllocator;
 }
 
 namespace vk
@@ -14,11 +14,11 @@ namespace vk
 	/// <summary>
 	/// Linear allocator for allocations made with Vulkan. This includes GPU allocations.
 	/// </summary>
-	class LinearAllocator final
+	class StackAllocator final
 	{
 	public:
-		void Allocate(jlb::LinearAllocator& allocator, App& app);
-		void Free(jlb::LinearAllocator& allocator, App& app);
+		void Allocate(jlb::StackAllocator& allocator, App& app);
+		void Free(jlb::StackAllocator& allocator, App& app);
 
 		// Updates a pool to conform to the largest requested alignment.
 		void DefinePool(VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);

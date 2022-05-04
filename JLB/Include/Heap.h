@@ -15,7 +15,7 @@ namespace jlb
 		// Function used to get a hash value from a value, which is used to sort values.
 		size_t(*hasher)(T& value);
 
-		void Allocate(LinearAllocator& allocator, size_t size, const KeyPair<T>& fillValue = {}) override;
+		void Allocate(StackAllocator& allocator, size_t size, const KeyPair<T>& fillValue = {}) override;
 
 		/// <summary>
 		/// Inserts a value into the Heap.
@@ -60,7 +60,7 @@ namespace jlb
 	};
 
 	template <typename T>
-	void Heap<T>::Allocate(LinearAllocator& allocator, const size_t size, const KeyPair<T>& fillValue)
+	void Heap<T>::Allocate(StackAllocator& allocator, const size_t size, const KeyPair<T>& fillValue)
 	{
 		Array<KeyPair<T>>::Allocate(allocator, size + 1, fillValue);
 	}

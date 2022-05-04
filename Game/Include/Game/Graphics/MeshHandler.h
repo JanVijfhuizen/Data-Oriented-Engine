@@ -55,10 +55,10 @@ namespace game
 		vkGetBufferMemoryRequirements(app.logicalDevice, indStagingBuffer, &indStagingMemRequirements);
 
 		// Define and allocate memory.
-		const uint32_t vertStagingBufferPoolId = vk::LinearAllocator::GetPoolId(app, vertStagingMemRequirements.memoryTypeBits, 
+		const uint32_t vertStagingBufferPoolId = vk::StackAllocator::GetPoolId(app, vertStagingMemRequirements.memoryTypeBits, 
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		auto vertStagingBlock = vkAllocator.CreateBlock(app, vertBufferInfo.size, vertStagingMemRequirements.alignment, vertStagingBufferPoolId);
-		const uint32_t indStagingBufferPoolId = vk::LinearAllocator::GetPoolId(app, indStagingMemRequirements.memoryTypeBits,
+		const uint32_t indStagingBufferPoolId = vk::StackAllocator::GetPoolId(app, indStagingMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		auto indStagingBlock = vkAllocator.CreateBlock(app, indBufferInfo.size, indStagingMemRequirements.alignment, indStagingBufferPoolId);
 
@@ -92,10 +92,10 @@ namespace game
 		VkMemoryRequirements indMemRequirements;
 		vkGetBufferMemoryRequirements(app.logicalDevice, mesh.indexBuffer, &indMemRequirements);
 
-		const uint32_t vertBufferPoolId = vk::LinearAllocator::GetPoolId(app, vertMemRequirements.memoryTypeBits,
+		const uint32_t vertBufferPoolId = vk::StackAllocator::GetPoolId(app, vertMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		mesh.vertexMemBlock = vkAllocator.CreateBlock(app, vertBufferInfo.size, vertMemRequirements.alignment, vertBufferPoolId);
-		const uint32_t indBufferPoolId = vk::LinearAllocator::GetPoolId(app, indMemRequirements.memoryTypeBits,
+		const uint32_t indBufferPoolId = vk::StackAllocator::GetPoolId(app, indMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		mesh.indexMemBlock = vkAllocator.CreateBlock(app, indBufferInfo.size, indMemRequirements.alignment, indBufferPoolId);
 

@@ -34,7 +34,7 @@ namespace vke
 		return surface;
 	}
 
-	jlb::Array<jlb::StringView> WindowHandler::GetRequiredExtensions(jlb::LinearAllocator& allocator)
+	jlb::Array<jlb::StringView> WindowHandler::GetRequiredExtensions(jlb::StackAllocator& allocator)
 	{
 		uint32_t glfwExtensionCount = 0;
 		const auto buffer = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
