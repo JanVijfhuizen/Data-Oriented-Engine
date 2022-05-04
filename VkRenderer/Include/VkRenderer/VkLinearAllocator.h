@@ -24,9 +24,9 @@ namespace vk
 		void DefinePool(VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
 		// Returns a block from the allocated memory.
 		// If this is the first time allocating from this pool, it allocates the memory for the pool.
-		[[nodiscard]] MemBlock CreateBlock(App& app, VkDeviceSize size, uint32_t poolId);
+		[[nodiscard]] MemBlock CreateBlock(App& app, VkDeviceSize size, VkDeviceSize alignmentRequirement, uint32_t poolId);
 		// Frees a block from the allocated memory. This is a linear allocator, so it assumes it is the last allocated block.
-		void FreeBlock(MemBlock& block);
+		void FreeBlock(const MemBlock& block);
 
 		// Get the ID of a pool that supports a certain memory type.
 		[[nodiscard]] static uint32_t GetPoolId(App& app, uint32_t typeFilter, VkMemoryPropertyFlags properties);

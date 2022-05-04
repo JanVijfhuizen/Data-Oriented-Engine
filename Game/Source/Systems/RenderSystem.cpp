@@ -8,12 +8,14 @@
 #include "Graphics/MeshHandler.h"
 #include "Components/Transform.h"
 #include "Graphics/LayoutHandler.h"
+#include "Graphics/TextureHandler.h"
 
 namespace game
 {
 	void RenderSystem::Allocate(const EngineOutData& engineOutData)
 	{
 		TaskSystem::Allocate(*engineOutData.allocator);
+		_textureAtlas = TextureHandler::LoadTexture(engineOutData, "Textures/Atlas.png");
 		LoadShader(engineOutData);
 		CreateMesh(engineOutData);
 		CreateShaderAssets(engineOutData);
@@ -26,6 +28,7 @@ namespace game
 		DestroyShaderAssets(engineOutData);
 		MeshHandler::Destroy(engineOutData, _mesh);
 		UnloadShader(engineOutData);
+		TextureHandler::FreeTexture(engineOutData, _textureAtlas);
 		TaskSystem::Free(*engineOutData.allocator);
 	}
 
@@ -148,7 +151,7 @@ namespace game
 
 			const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.CreateBlock(app, vertBufferInfo.size, poolId);
+			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.CreateBlock(app, vertBufferInfo.size, memRequirements.alignment, poolId);
 
 			result = vkBindBufferMemory(logicalDevice, buffer, memBlock.memory, memBlock.offset);
 			assert(!result);

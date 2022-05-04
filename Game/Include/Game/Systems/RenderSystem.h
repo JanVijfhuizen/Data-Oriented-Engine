@@ -2,6 +2,7 @@
 #include "TaskSystem.h"
 #include "Graphics/Mesh.h"
 #include "Components/Transform.h"
+#include "Graphics/Texture.h"
 
 namespace game
 {
@@ -32,6 +33,7 @@ namespace game
 
 		VkShaderModule _vertModule;
 		VkShaderModule _fragModule;
+		Texture _textureAtlas;
 		Mesh _mesh;
 		VkDescriptorPool _descriptorPool;
 		VkDescriptorSetLayout _descriptorLayout;

@@ -42,7 +42,7 @@ namespace vk
 		pool.remaining = size;
 	}
 
-	MemBlock LinearAllocator::CreateBlock(App& app, const VkDeviceSize size, const uint32_t poolId)
+	MemBlock LinearAllocator::CreateBlock(App& app, const VkDeviceSize size, const VkDeviceSize alignmentRequirement, const uint32_t poolId)
 	{
 		auto& pool = _pools[poolId];
 
@@ -63,7 +63,7 @@ namespace vk
 		pool.remaining -= alignedSize;
 
 		// Debugging purposes.
-		pool.largestAlignmentRequested = jlb::Math::Max(pool.largestAlignmentRequested, alignedSize);
+		pool.largestAlignmentRequested = jlb::Math::Max(pool.largestAlignmentRequested, alignmentRequirement);
 		pool.largestSpaceOccupied = jlb::Math::Max(pool.largestSpaceOccupied, pool.size - pool.remaining);
 
 		MemBlock block{};
@@ -77,7 +77,7 @@ namespace vk
 		return block;
 	}
 
-	void LinearAllocator::FreeBlock(MemBlock& block)
+	void LinearAllocator::FreeBlock(const MemBlock& block)
 	{
 		auto& pool = _pools[block.poolId];
 		assert(block.allocId == pool.allocId - 1);
