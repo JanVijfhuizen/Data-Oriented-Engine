@@ -9,7 +9,15 @@ void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeInfo& info)
 
 void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 {
-	entity.renderer.subTexture.rightBot = { 0.5, 1 };
-	auto task = RenderSystem::CreateDefaultTask(entity.renderer, entity.transform);
+	auto& transform = entity.transform;
+	auto& renderer = entity.renderer;
+
+	// Temp.
+	renderer.subTexture.rightBot = { 0.5, 1 };
+
+	RenderTask task{};
+	auto& taskTransform = task.transform;
+	taskTransform = transform;
+	task.subTexture = renderer.subTexture;
 	info.renderSystem->Add(task);
 }

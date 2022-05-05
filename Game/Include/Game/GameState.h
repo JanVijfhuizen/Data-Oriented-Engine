@@ -2,6 +2,7 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/RenderSystem.h"
 #include "Systems/UISystem.h"
+#include "Graphics/RenderTask.h"
 
 namespace game
 {
@@ -11,7 +12,7 @@ namespace game
 		PlayerArchetype playerArchetype{};
 
 		// Systems.
-		RenderSystem renderSystem{};
+		RenderSystem<RenderTask> renderSystem{};
 		UISystem uiSystem{};
 	} gameState;
 }

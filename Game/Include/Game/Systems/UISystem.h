@@ -2,11 +2,10 @@
 #include "TaskSystem.h"
 #include "StringView.h"
 #include "RenderSystem.h"
+#include "Components/Transform.h"
 
 namespace game
 {
-	class RenderSystem;
-
 	struct UITask
 	{
 		jlb::StringView text;
@@ -25,8 +24,14 @@ namespace game
 	private:
 		using TaskSystem<UITask>::Allocate;
 
+		struct InternalRenderTask
+		{
+			Transform transform{};
+			SubTexture subTexture{};
+		};
+
 		const size_t _charSize = 6;
 		const size_t _renderSizeUsage = 1000;
-		RenderSystem _renderSystem{};
+		RenderSystem<InternalRenderTask> _renderSystem{};
 	};
 }

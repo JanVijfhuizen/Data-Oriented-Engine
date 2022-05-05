@@ -6,7 +6,7 @@ namespace game
 {
 	void UISystem::Allocate(const EngineOutData& engineOutData)
 	{
-		RenderSystem::CreateInfo createInfo{};
+		RenderSystem<InternalRenderTask>::CreateInfo createInfo{};
 		createInfo.vertPath = "Shaders/ui-vert.spv";
 		createInfo.fragPath = "Shaders/ui-frag.spv";
 		createInfo.atlasTexturePath = "Textures/ui-atlas.png";
@@ -24,7 +24,7 @@ namespace game
 	void UISystem::Update(const EngineOutData& engineOutData)
 	{
 		const auto& texture = _renderSystem.GetTexture();
-		RenderTask renderTask{};
+		InternalRenderTask renderTask{};
 		Transform transform{};
 		transform.scale = .02f;
 
