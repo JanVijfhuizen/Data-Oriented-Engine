@@ -135,6 +135,19 @@ namespace game
 		return sub;
 	}
 
+	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, const size_t index)
+	{
+		return GenerateSubTexture(texture, chunkSize, 
+			IndexToCoordinates(texture, chunkSize, index), 
+			IndexToCoordinates(texture, chunkSize, index + 1));
+	}
+
+	glm::ivec2 TextureHandler::IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
+	{
+		const glm::ivec2 resolution = texture.resolution / glm::ivec2{chunkSize, chunkSize};
+		return { resolution.x % index, resolution.y / index };
+	}
+
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)
 	{
 		vkDestroyImage(engineOutData.app->logicalDevice, texture.image, nullptr);

@@ -20,7 +20,7 @@ namespace game
 #endif
 #ifndef VK_MEM_DEFAULT_SIZE
 // During the initial engine test runs, this will be used as the default memory size for the Vulkan memory pools.
-#define VK_MEM_DEFAULT_SIZE 65536  // NOLINT(cppcoreguidelines-macro-usage)
+#define VK_MEM_DEFAULT_SIZE 262144  // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 #ifndef VK_MEM_DEFAULT_ALIGNMENT
 // During the initial engine test runs, this will be used as the default memory alignment for Vulkan memory pools.

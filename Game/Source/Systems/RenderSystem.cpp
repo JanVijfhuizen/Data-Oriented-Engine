@@ -320,4 +320,9 @@ namespace game
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
 	}
+
+	const Texture& RenderSystem::GetTexture() const
+	{
+		return _textureAtlas;
+	}
 }

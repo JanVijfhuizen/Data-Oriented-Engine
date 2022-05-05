@@ -197,8 +197,8 @@ namespace vke
 		{
 			versionData.poolInfos.push_back({});
 			auto& poolInfo = versionData.poolInfos[i];
-			VkDeviceSize tempSize;
-			vkAllocator.GetPoolInfo(i, phase == Phase::VkPoolAlignmentCheck ? tempSize : poolInfo.size, poolInfo.alignment);
+			VkDeviceSize tempSize{};
+			vkAllocator.GetPoolInfo(i, phase == Phase::GeneralMemoryCheck ? poolInfo.size : tempSize, poolInfo.alignment);
 		}
 
 		// Delete the Vulkan mmeory pools.

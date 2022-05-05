@@ -11,6 +11,8 @@ namespace jlb
 	class Vector : public Array<T>
 	{
 	public:
+		void Free(StackAllocator& allocator) override;
+
 		/// <summary>
 		/// Place a value in the front of the vector and increase it's size by one.<br>
 		/// Cannot exceed the capacity of the managed memory.
@@ -47,6 +49,13 @@ namespace jlb
 
 		T& _Add(T& value);
 	};
+
+	template <typename T>
+	void Vector<T>::Free(StackAllocator& allocator)
+	{
+		Array<T>::Free(allocator);
+		_count = 0;
+	}
 
 	template <typename T>
 	T& Vector<T>::Add(T& value)

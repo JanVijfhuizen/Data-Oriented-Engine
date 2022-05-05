@@ -18,12 +18,12 @@ namespace game
 		SubTexture subTexture{};
 	};
 
-	class RenderSystem final : public jlb::TaskSystem<RenderTask>
+	class RenderSystem : public jlb::TaskSystem<RenderTask>
 	{
 	public:
 		struct CreateInfo final
 		{
-			jlb::StringView atlasTexturePath = "Textures/Atlas.png";
+			jlb::StringView atlasTexturePath = "Textures/atlas.png";
 			jlb::StringView vertPath = "Shaders/vert.spv";
 			jlb::StringView fragPath = "Shaders/frag.spv";
 		};
@@ -37,6 +37,8 @@ namespace game
 
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
+		
+		[[nodiscard]] const Texture& GetTexture() const;
 
 	private:
 		using TaskSystem<RenderTask>::Allocate;
