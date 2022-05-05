@@ -172,6 +172,7 @@
     <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
     <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
+    <ClInclude Include="Include\Game\Graphics\RenderConventions.h" />
     <ClInclude Include="Include\Game\Graphics\RenderTask.h" />
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />

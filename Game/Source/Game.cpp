@@ -30,7 +30,7 @@ namespace game
 		// Update archetypes.
 		PlayerArchetypeInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
-		//gameState.playerArchetype.Update(playerArchetypeInfo);
+		gameState.playerArchetype.Update(playerArchetypeInfo);
 
 		static float f = 0;
 		f += outData.deltaTime * .003f;

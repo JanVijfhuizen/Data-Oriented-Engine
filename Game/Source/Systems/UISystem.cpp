@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Systems/UISystem.h"
 #include "Graphics/TextureHandler.h"
+#include "Graphics/RenderConventions.h"
 
 namespace game
 {
@@ -26,7 +27,7 @@ namespace game
 		const auto& texture = _renderSystem.GetTexture();
 		InternalRenderTask renderTask{};
 		Transform transform{};
-		transform.scale = .02f;
+		transform.scale = RenderConventions::TEXT_SIZE;
 
 		for (auto& task : *this)
 		{

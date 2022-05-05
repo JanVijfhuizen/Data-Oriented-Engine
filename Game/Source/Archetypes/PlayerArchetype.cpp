@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/RenderSystem.h"
+#include "Graphics/RenderConventions.h"
 
 void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeInfo& info)
 {
@@ -18,6 +19,7 @@ void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 	RenderTask task{};
 	auto& taskTransform = task.transform;
 	taskTransform = transform;
+	taskTransform.scale *= RenderConventions::ENTITY_SIZE;
 	task.subTexture = renderer.subTexture;
 	info.renderSystem->Add(task);
 }

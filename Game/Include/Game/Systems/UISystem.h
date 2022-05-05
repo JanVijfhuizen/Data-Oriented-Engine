@@ -8,9 +8,8 @@ namespace game
 {
 	struct UITask
 	{
-		jlb::StringView text;
+		jlb::StringView text{};
 		glm::vec2 leftTop;
-		glm::vec2 rightBot;
 		float spacingPct = .2f;
 	};
 

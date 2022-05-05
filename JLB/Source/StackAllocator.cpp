@@ -32,7 +32,7 @@ namespace jlb
 			{
 				_next = new StackAllocator;
 				CreateInfo createInfo{};
-				createInfo.pageSize = Math::Max(size + 1, _size * sizeof(size_t));
+				createInfo.pageSize = Math::Max(size + sizeof(size_t), _size * sizeof(size_t));
 				_next->Allocate(createInfo);
 			}
 
@@ -60,7 +60,7 @@ namespace jlb
 		return 0;
 	}
 
-	size_t StackAllocator::ToChunkSize(size_t size)
+	size_t StackAllocator::ToChunkSize(const size_t size)
 	{
 		return size / sizeof(size_t) + (size % sizeof(size_t) > 0);
 	}
