@@ -12,11 +12,14 @@ namespace game
 		// Define resource usage for systems.
 		PlayerArchetypeInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
+		playerArchetypeInfo.animationSystem = &gameState.animationSystem;
 		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
+
 		// Temp.
 		gameState.uiSystem.IncreaseRequestedLength(2);
 
 		// Set up systems.
+		gameState.animationSystem.Allocate(*outData.allocator);
 		gameState.renderSystem.Allocate(outData);
 		gameState.uiSystem.Allocate(outData);
 
@@ -30,6 +33,7 @@ namespace game
 		// Update archetypes.
 		PlayerArchetypeInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
+		playerArchetypeInfo.animationSystem = &gameState.animationSystem;
 		gameState.playerArchetype.Update(playerArchetypeInfo);
 
 		static float f = 0;
@@ -39,9 +43,11 @@ namespace game
 		UITask task{};
 		task.text = "general kenobi";
 		task.spacingPct = abs(sin(f));
+		task.leftTop.y = .5;
 		gameState.uiSystem.Add(task);
 
 		// Update systems.
+		gameState.animationSystem.Update(outData);
 		gameState.renderSystem.Update(outData);
 		gameState.uiSystem.Update(outData);
 
@@ -59,6 +65,8 @@ namespace game
 	{
 		gameState.uiSystem.Free(outData);
 		gameState.renderSystem.Free(outData);
+		gameState.animationSystem.Free(*outData.allocator);
+
 		gameState.playerArchetype.Free(*outData.allocator);
 	}
 }

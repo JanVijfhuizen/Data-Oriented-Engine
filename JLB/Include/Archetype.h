@@ -18,6 +18,9 @@ namespace jlb
 	protected:
 		// Update a single entity.
 		virtual void OnUpdate(Entity& entity, Info& info) = 0;
+
+	private:
+		using Vector<Entity>::AllocateAndCopy;
 	};
 
 	template <typename Entity, typename Info>

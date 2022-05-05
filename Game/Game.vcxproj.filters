@@ -90,6 +90,15 @@
     <ClInclude Include="Include\Game\Graphics\RenderConventions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Game\Graphics\Animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Game\Systems\AnimationSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Game\Components\Animator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\dllmain.cpp">
@@ -120,6 +129,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\UISystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AnimationSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

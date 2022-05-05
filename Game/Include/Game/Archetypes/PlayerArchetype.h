@@ -8,29 +8,40 @@
 #include "Components/Transform.h"
 #include "Systems/RenderSystem.h"
 #include "Graphics/RenderTask.h"
+#include "Graphics/Animation.h"
+#include "Components/Animator.h"
 
 namespace game
 {
+	class AnimationSystem;
+
 	struct Player
 	{
-		Controller controller;
-		Collider collider;
-		Character character;
-		Renderer renderer;
-		ShadowCaster shadowCaster;
-		Transform transform;
+		Animator animator{};
+		Controller controller{};
+		Collider collider{};
+		Character character{};
+		Renderer renderer{};
+		ShadowCaster shadowCaster{};
+		Transform transform{};
 	};
 
 	struct PlayerArchetypeInfo final
 	{
 		RenderSystem<RenderTask>* renderSystem;
+		AnimationSystem* animationSystem;
 	};
 
 	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeInfo>
 	{
 	public:
+		void Allocate(jlb::StackAllocator& allocator, size_t size, const Player& fillValue = {}) override;
+		void Free(jlb::StackAllocator& allocator) override;
 		void DefineResourceUsage(PlayerArchetypeInfo& info) override;
-	protected:
+
+	private:
+		Animation _testAnim{};
+
 		void OnUpdate(Player& entity, PlayerArchetypeInfo& info) override;
 	};
 }
