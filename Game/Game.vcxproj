@@ -172,6 +172,8 @@
     <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
     <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
+    <ClInclude Include="Include\Game\Graphics\RenderConventions.h" />
+    <ClInclude Include="Include\Game\Graphics\RenderTask.h" />
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
@@ -196,7 +198,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Systems\RenderSystem.cpp" />
     <ClCompile Include="Source\Graphics\Vertex.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

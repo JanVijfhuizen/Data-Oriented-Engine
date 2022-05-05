@@ -7,10 +7,6 @@
 #include <chrono>
 #include "VkRenderer/VkStackAllocator.h"
 
-#ifdef _DEBUG
-#include "ImguiImpl.h"
-#endif
-
 namespace vke
 {
 	// Path for the version data used for checking/storing memory requirements.
@@ -24,11 +20,6 @@ namespace vke
 	constexpr size_t ENGINE_VERSION = 1;
 
 	int Engine::Run()
-	{
-		return RunGame();
-	}
-
-	int Engine::RunGame()
 	{
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};

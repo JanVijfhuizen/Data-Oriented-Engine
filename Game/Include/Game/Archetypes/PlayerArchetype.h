@@ -6,11 +6,11 @@
 #include "Components/Renderer.h"
 #include "Components/ShadowCaster.h"
 #include "Components/Transform.h"
+#include "Systems/RenderSystem.h"
+#include "Graphics/RenderTask.h"
 
 namespace game
 {
-	class RenderSystem;
-
 	struct Player
 	{
 		Controller controller;
@@ -23,7 +23,7 @@ namespace game
 
 	struct PlayerArchetypeInfo final
 	{
-		RenderSystem* renderSystem;
+		RenderSystem<RenderTask>* renderSystem;
 	};
 
 	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeInfo>

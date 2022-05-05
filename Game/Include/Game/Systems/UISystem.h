@@ -2,17 +2,15 @@
 #include "TaskSystem.h"
 #include "StringView.h"
 #include "RenderSystem.h"
+#include "Components/Transform.h"
 
 namespace game
 {
-	class RenderSystem;
-
 	struct UITask
 	{
-		jlb::StringView text;
+		jlb::StringView text{};
 		glm::vec2 leftTop;
-		glm::vec2 rightBot;
-		bool autoResize = false;
+		float spacingPct = .2f;
 	};
 
 	class UISystem final : public jlb::TaskSystem<UITask>
@@ -25,8 +23,13 @@ namespace game
 	private:
 		using TaskSystem<UITask>::Allocate;
 
-		const size_t _charSize = 6;
+		struct InternalRenderTask
+		{
+			Transform transform{};
+			SubTexture subTexture{};
+		};
+
 		const size_t _renderSizeUsage = 1000;
-		RenderSystem _renderSystem{};
+		RenderSystem<InternalRenderTask> _renderSystem{};
 	};
 }

@@ -4,6 +4,8 @@
 layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec2 inTexCoords;
 
+#include "utils.glsl"
+
 struct InstanceData
 {
     // Transform.
@@ -20,6 +22,11 @@ layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
 	InstanceData instances[];
 } instanceBuffer;
 
+layout(push_constant) uniform PushConstants
+{
+    vec2 resolution;
+} pushConstants;
+
 layout(location = 0) out Data
 {
     vec2 fragTexCoord;
@@ -30,7 +37,11 @@ void HandleInstance(in InstanceData instance)
 {
     outData.fragTexCoord = instance.texLTop + (instance.texRBot - instance.texLTop) * inTexCoords;
     outData.fragPos = inPosition;
-    gl_Position = vec4(inPosition + instance.position, 1, 1);
+
+    float aspectFix = pushConstants.resolution.y / pushConstants.resolution.x;
+    vec4 pos = vec4(inPosition * instance.scale + Rotate(instance.position, instance.rotation), 1, 1);
+    pos.x *= aspectFix;
+    gl_Position = pos;
 }
 
 void main() 

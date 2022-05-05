@@ -14,7 +14,7 @@ namespace game
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
 		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
 		// Temp.
-		gameState.uiSystem.IncreaseRequestedLength(1);
+		gameState.uiSystem.IncreaseRequestedLength(2);
 
 		// Set up systems.
 		gameState.renderSystem.Allocate(outData);
@@ -30,11 +30,15 @@ namespace game
 		// Update archetypes.
 		PlayerArchetypeInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
-		//gameState.playerArchetype.Update(playerArchetypeInfo);
+		gameState.playerArchetype.Update(playerArchetypeInfo);
+
+		static float f = 0;
+		f += outData.deltaTime * .003f;
 
 		// Temp.
 		UITask task{};
-		task.text = "hey";
+		task.text = "general kenobi";
+		task.spacingPct = abs(sin(f));
 		gameState.uiSystem.Add(task);
 
 		// Update systems.
