@@ -157,7 +157,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Game\Graphics\BaseRenderSystem.h" />
     <ClInclude Include="Include\Game\Components\Character.h" />
     <ClInclude Include="Include\Game\Components\Collider.h" />
     <ClInclude Include="Include\Game\Components\Controller.h" />
@@ -182,7 +181,6 @@
     <ClInclude Include="Include\Game\Graphics\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Graphics\BaseRenderSystem.cpp" />
     <ClCompile Include="Source\Graphics\TextureHandler.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />
