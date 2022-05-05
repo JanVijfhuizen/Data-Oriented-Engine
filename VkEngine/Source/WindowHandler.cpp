@@ -8,6 +8,7 @@ namespace vke
 		// Initialize GLFW for Vulkan.
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, info.allowResizing ? GLFW_TRUE : GLFW_FALSE);
 
 		// Create window.
 		const auto& resolution = info.resolution;

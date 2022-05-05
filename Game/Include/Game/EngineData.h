@@ -9,7 +9,7 @@ namespace jlb
 namespace vk
 {
 	struct App;
-	class StackAllocator;
+	class LinearAllocator;
 }
 
 namespace game
@@ -40,7 +40,7 @@ namespace game
 		// Used for temporary allocations.
 		jlb::StackAllocator* tempAllocator;
 		// Used for Vulkan allocations.
-		vk::StackAllocator* vkAllocator;
+		vk::LinearAllocator* vkAllocator;
 		// App containing all relevant Vulkan data.
 		vk::App* app;
 
