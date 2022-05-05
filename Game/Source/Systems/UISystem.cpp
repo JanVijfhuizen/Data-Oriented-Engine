@@ -26,7 +26,7 @@ namespace game
 		const auto& texture = _renderSystem.GetTexture();
 		RenderTask renderTask{};
 		Transform transform{};
-		transform.scale = .2f;
+		transform.scale = .02f;
 
 		for (auto& task : *this)
 		{
@@ -41,7 +41,7 @@ namespace game
 				const int index = static_cast<int>(c -'a');
 
 				// temp.
-				transform.position = origin + glm::vec2(.3f * i, 0);
+				transform.position = origin + glm::vec2((transform.scale * (1.f + task.spacingPct)) * i, 0);
 				renderTask.transform = transform;
 				renderTask.subTexture = TextureHandler::GenerateSubTexture(texture, _charSize, index);
 				_renderSystem.Add(renderTask);

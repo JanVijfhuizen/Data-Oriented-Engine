@@ -44,6 +44,11 @@ namespace game
 		using TaskSystem<RenderTask>::Allocate;
 		using TaskSystem<RenderTask>::Free;
 
+		struct PushConstant final
+		{
+			glm::vec2 resolution;
+		};
+
 		VkShaderModule _vertModule;
 		VkShaderModule _fragModule;
 		Texture _textureAtlas;

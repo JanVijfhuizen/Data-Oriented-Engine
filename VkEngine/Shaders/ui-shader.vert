@@ -20,6 +20,11 @@ layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
     InstanceData instances[];
 } instanceBuffer;
 
+layout(push_constant) uniform PushConstants
+{
+    vec2 resolution;
+} pushConstants;
+
 layout(location = 0) out Data
 {
     vec2 fragTexCoord;
@@ -30,7 +35,11 @@ void HandleInstance(in InstanceData instance)
 {
     outData.fragTexCoord = instance.texLTop + (instance.texRBot - instance.texLTop) * inTexCoords;
     outData.fragPos = inPosition;
-    gl_Position = vec4(inPosition * instance.scale + instance.position, 1, 1);
+
+    float aspectFix = pushConstants.resolution.x / pushConstants.resolution.y;
+    vec4 pos = vec4(inPosition * instance.scale + instance.position, 1, 1);
+    pos.x *= aspectFix;
+    gl_Position = pos;
 }
 
 void main() 

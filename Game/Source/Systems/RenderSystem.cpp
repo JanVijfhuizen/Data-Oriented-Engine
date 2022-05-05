@@ -53,6 +53,11 @@ namespace game
 			0, 1, &_descriptorSets[engineOutData.swapChainImageIndex], 0, nullptr);
 		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
 		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+		PushConstant pushConstant{};
+		pushConstant.resolution = engineOutData.resolution;
+
+		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
 		vkCmdDrawIndexed(cmd, _mesh.indexCount, GetCount(), 0, 0, 0);
 
 		SetCount(0);
@@ -309,6 +314,8 @@ namespace game
 		pipelineInfo.modules = modules;
 		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
 		pipelineInfo.layouts = _descriptorLayout;
+		pipelineInfo.pushConstantSize = sizeof(PushConstant);
+		pipelineInfo.usePushConstant = true;
 
 		PipelineHandler::Create(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
 	}

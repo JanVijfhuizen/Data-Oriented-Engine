@@ -12,7 +12,7 @@ namespace game
 		jlb::StringView text;
 		glm::vec2 leftTop;
 		glm::vec2 rightBot;
-		bool autoResize = false;
+		float spacingPct = .2f;
 	};
 
 	class UISystem final : public jlb::TaskSystem<UITask>
