@@ -6,7 +6,6 @@ namespace game
 {
 	void Start(const EngineOutData outData)
 	{
-		gameState = {};
 		// Set up archetypes.
 		gameState.playerArchetype.Allocate(*outData.allocator, 2);
 
@@ -14,9 +13,12 @@ namespace game
 		PlayerArchetypeInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
 		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
+		// Temp.
+		gameState.uiSystem.IncreaseRequestedLength(1);
 
 		// Set up systems.
 		gameState.renderSystem.Allocate(outData);
+		gameState.uiSystem.Allocate(outData);
 
 		// Set up game world.
 		auto& player1 = gameState.playerArchetype.Add();
@@ -28,9 +30,16 @@ namespace game
 		// Update archetypes.
 		PlayerArchetypeInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
-		gameState.playerArchetype.Update(playerArchetypeInfo);
+		//gameState.playerArchetype.Update(playerArchetypeInfo);
+
+		// Temp.
+		UITask task{};
+		task.text = "hey";
+		gameState.uiSystem.Add(task);
+
 		// Update systems.
 		gameState.renderSystem.Update(outData);
+		gameState.uiSystem.Update(outData);
 
 		EngineInData inData{};
 		return inData;
@@ -44,6 +53,7 @@ namespace game
 
 	void Exit(const EngineOutData outData)
 	{
+		gameState.uiSystem.Free(outData);
 		gameState.renderSystem.Free(outData);
 		gameState.playerArchetype.Free(*outData.allocator);
 	}

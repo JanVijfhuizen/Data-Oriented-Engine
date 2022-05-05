@@ -4,7 +4,7 @@
 #include "stb_image.h"
 #include "StringView.h"
 #include "VkRenderer/VkApp.h"
-#include "VkRenderer/VkLinearAllocator.h"
+#include "VkRenderer/VkStackAllocator.h"
 #include "VkRenderer/VkCommandHandler.h"
 #include "VkRenderer/VkSyncHandler.h"
 #include "VkRenderer/VkImageHandler.h"
@@ -46,9 +46,9 @@ namespace game
 		VkMemoryRequirements memRequirements;
 		vkGetBufferMemoryRequirements(logicalDevice, stagingBuffer, &memRequirements);
 
-		const auto stagingPoolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits, 
+		const auto stagingPoolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		const auto stagingMemBlock = vkAllocator.CreateBlock(app, bufferInfo.size, memRequirements.alignment, stagingPoolId);
+		const auto stagingMemBlock = vkAllocator.AllocateBlock(app, bufferInfo.size, memRequirements.alignment, stagingPoolId);
 
 		result = vkBindBufferMemory(logicalDevice, stagingBuffer, stagingMemBlock.memory, stagingMemBlock.offset);
 		assert(!result);
@@ -70,9 +70,9 @@ namespace game
 		assert(!result);
 
 		vkGetImageMemoryRequirements(logicalDevice, image, &memRequirements);
-		const auto poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
+		const auto poolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		const auto memBlock = vkAllocator.CreateBlock(app, bufferInfo.size, memRequirements.alignment, poolId);
+		const auto memBlock = vkAllocator.AllocateBlock(app, bufferInfo.size, memRequirements.alignment, poolId);
 
 		result = vkBindImageMemory(logicalDevice, image, memBlock.memory, memBlock.offset);
 		assert(!result);
@@ -133,6 +133,19 @@ namespace game
 		sub.rightBot.x = xMul * rBot.x;
 		sub.rightBot.y = yMul * rBot.y;
 		return sub;
+	}
+
+	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, const size_t index)
+	{
+		return GenerateSubTexture(texture, chunkSize, 
+			IndexToCoordinates(texture, chunkSize, index), 
+			IndexToCoordinates(texture, chunkSize, index + 1));
+	}
+
+	glm::ivec2 TextureHandler::IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
+	{
+		const glm::ivec2 resolution = texture.resolution / glm::ivec2{chunkSize, chunkSize};
+		return { resolution.x % index, resolution.y / index };
 	}
 
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)

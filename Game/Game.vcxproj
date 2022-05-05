@@ -175,12 +175,14 @@
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
+    <ClInclude Include="Include\Game\Systems\UISystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Systems\RenderSystem.h" />
     <ClInclude Include="Include\Game\Graphics\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\UISystem.cpp" />
     <ClCompile Include="Source\Graphics\TextureHandler.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />

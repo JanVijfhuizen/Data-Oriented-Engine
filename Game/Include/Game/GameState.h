@@ -1,15 +1,17 @@
 #pragma once
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/RenderSystem.h"
+#include "Systems/UISystem.h"
 
 namespace game
 {
 	struct GameState final
 	{
 		// Archetypes.
-		PlayerArchetype playerArchetype;
+		PlayerArchetype playerArchetype{};
 
 		// Systems.
-		RenderSystem renderSystem;
+		RenderSystem renderSystem{};
+		UISystem uiSystem{};
 	} gameState;
 }
