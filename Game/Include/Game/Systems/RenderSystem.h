@@ -13,6 +13,7 @@
 #include "VkRenderer/VkImageHandler.h"
 #include "VkRenderer/VkSamplerHandler.h"
 #include "Graphics/LayoutHandler.h"
+#include "Graphics/RenderConventions.h"
 
 namespace game
 {
@@ -34,7 +35,9 @@ namespace game
 
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
-		
+
+		// Aligns the coordinates to the pixelart.
+		[[nodiscard]] glm::vec2 AlignPixelCoordinates(glm::vec2 vec) const;
 		[[nodiscard]] const Texture& GetTexture() const;
 
 	private:
@@ -154,6 +157,12 @@ namespace game
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
+	}
+
+	template <typename Task>
+	glm::vec2 RenderSystem<Task>::AlignPixelCoordinates(const glm::vec2 vec) const
+	{
+		return { vec.x - fmod(vec.x, RenderConventions::PIXEL_SIZE),  vec.y - fmod(vec.y, RenderConventions::PIXEL_SIZE) };
 	}
 
 	template <typename Task>

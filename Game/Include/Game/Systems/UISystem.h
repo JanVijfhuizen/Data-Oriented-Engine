@@ -29,7 +29,6 @@ namespace game
 			SubTexture subTexture{};
 		};
 
-		const size_t _charSize = 6;
 		const size_t _renderSizeUsage = 1000;
 		RenderSystem<InternalRenderTask> _renderSystem{};
 	};

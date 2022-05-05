@@ -41,10 +41,10 @@ namespace game
 				const char c = strLit[i];
 				const int index = static_cast<int>(c -'a');
 
-				// temp.
-				transform.position = origin + glm::vec2((transform.scale * (1.f + task.spacingPct)) * i, 0);
+				transform.position = origin + glm::vec2(transform.scale * (1.f + task.spacingPct) * i, 0);
+				transform.position = _renderSystem.AlignPixelCoordinates(transform.position);
 				renderTask.transform = transform;
-				renderTask.subTexture = TextureHandler::GenerateSubTexture(texture, _charSize, index);
+				renderTask.subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::TEXT_PIXEL_SIZE, index);
 				_renderSystem.Add(renderTask);
 			}
 		}
