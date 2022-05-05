@@ -19,19 +19,19 @@ namespace jlb
 		/// </summary>
 		/// <param name="value">The value to be added to the vector.</param>
 		/// <returns>The added value inside the vector.</returns>
-		T& Add(T& value);
+		virtual T& Add(T& value);
 		/// <summary>
 		/// Place a value in the front of the vector and increase it's size by one.<br>
 		/// Cannot exceed the capacity of the managed memory.
 		/// </summary>
 		/// <param name="value">The value to be added to the vector.</param>
 		/// <returns>The added value inside the vector.</returns>
-		T& Add(T&& value = {});
+		virtual T& Add(T&& value = {});
 		/// <summary>
 		/// Remove the value at a certain index.
 		/// </summary>
 		/// <param name="index">Index where the value will be removed.</param>
-		void RemoveAt(size_t index);
+		virtual void RemoveAt(size_t index);
 		/// <summary>
 		/// Set the count of the vector. Cannot exceed the capacity of the managed memory.
 		/// </summary>
