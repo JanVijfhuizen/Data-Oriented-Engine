@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\VkRenderer\pch.h" />
-    <ClInclude Include="Include\VkRenderer\VkLinearAllocator.h" />
     <ClInclude Include="Include\VkRenderer\VkApp.h" />
     <ClInclude Include="Include\VkRenderer\VkBootstrap.h" />
     <ClInclude Include="Include\VkRenderer\VkCommandHandler.h" />
@@ -37,7 +36,6 @@
   <ItemGroup>
     <ClCompile Include="Source\VkStackAllocator.cpp" />
     <ClCompile Include="Source\VkSamplerHandler.cpp" />
-    <ClCompile Include="Source\VkLinearAllocator.cpp" />
     <ClCompile Include="Source\VkRenderPassHandler.cpp" />
     <ClCompile Include="Source\VkCommandHandler.cpp" />
     <ClCompile Include="Source\VkSyncHandler.cpp" />

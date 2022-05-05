@@ -83,6 +83,9 @@ namespace jlb
 		allocation.id = alloc.id;
 		allocation.ptr = reinterpret_cast<T*>(alloc.ptr);
 		allocation.src = alloc.src;
+
+		for (size_t i = 0; i < count; ++i)
+			allocation.ptr[i] = T();
 		return allocation;
 	}
 }

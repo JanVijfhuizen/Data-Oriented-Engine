@@ -98,7 +98,7 @@ namespace vk
 		}
 		assert(current);
 
-		assert(current->allocId == memBlock.allocId - 1);
+		assert(memBlock.allocId == current->allocId - 1);
 		--current->allocId;
 		current->remaining += memBlock.alignedSize;
 	}

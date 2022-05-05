@@ -176,9 +176,9 @@ namespace game
 			VkMemoryRequirements memRequirements;
 			vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
 
-			const uint32_t poolId = vk::LinearAllocator::GetPoolId(app, memRequirements.memoryTypeBits,
+			const uint32_t poolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.CreateBlock(app, vertBufferInfo.size, memRequirements.alignment, poolId);
+			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.AllocateBlock(app, vertBufferInfo.size, memRequirements.alignment, poolId);
 
 			result = vkBindBufferMemory(logicalDevice, buffer, memBlock.memory, memBlock.offset);
 			assert(!result);

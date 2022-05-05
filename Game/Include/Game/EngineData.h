@@ -9,24 +9,11 @@ namespace jlb
 namespace vk
 {
 	struct App;
-	class LinearAllocator;
+	class StackAllocator;
 }
 
 namespace game
 {
-#ifndef MEM_DEFAULT_SIZE
-	// During the initial engine test runs, this will be used as the default memory size for the linear allocators.
-#define MEM_DEFAULT_SIZE 65536  // NOLINT(cppcoreguidelines-macro-usage)
-#endif
-#ifndef VK_MEM_DEFAULT_SIZE
-// During the initial engine test runs, this will be used as the default memory size for the Vulkan memory pools.
-#define VK_MEM_DEFAULT_SIZE 262144  // NOLINT(cppcoreguidelines-macro-usage)
-#endif
-#ifndef VK_MEM_DEFAULT_ALIGNMENT
-// During the initial engine test runs, this will be used as the default memory alignment for Vulkan memory pools.
-#define VK_MEM_DEFAULT_ALIGNMENT 1024  // NOLINT(cppcoreguidelines-macro-usage)
-#endif
-
 	/// <summary>
 	/// Data passed from the engine to the game framework.<br>
 	/// One very important thing to note is that the allocators REQUIRE you to be very stable with memory allocations.<br>
@@ -40,7 +27,7 @@ namespace game
 		// Used for temporary allocations.
 		jlb::StackAllocator* tempAllocator;
 		// Used for Vulkan allocations.
-		vk::LinearAllocator* vkAllocator;
+		vk::StackAllocator* vkAllocator;
 		// App containing all relevant Vulkan data.
 		vk::App* app;
 

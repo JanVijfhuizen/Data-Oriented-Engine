@@ -1,5 +1,5 @@
 #pragma once
-#include "VkRenderer/VkLinearAllocator.h"
+#include "VkRenderer/VkStackAllocator.h"
 #include "VkRenderer/VkCommandHandler.h"
 #include "VkRenderer/VkSyncHandler.h"
 #include "Mesh.h"
@@ -55,12 +55,12 @@ namespace game
 		vkGetBufferMemoryRequirements(app.logicalDevice, indStagingBuffer, &indStagingMemRequirements);
 
 		// Define and allocate memory.
-		const uint32_t vertStagingBufferPoolId = vk::LinearAllocator::GetPoolId(app, vertStagingMemRequirements.memoryTypeBits, 
+		const uint32_t vertStagingBufferPoolId = vkAllocator.GetPoolId(app, vertStagingMemRequirements.memoryTypeBits, 
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		auto vertStagingBlock = vkAllocator.CreateBlock(app, vertBufferInfo.size, vertStagingMemRequirements.alignment, vertStagingBufferPoolId);
-		const uint32_t indStagingBufferPoolId = vk::LinearAllocator::GetPoolId(app, indStagingMemRequirements.memoryTypeBits,
+		auto vertStagingBlock = vkAllocator.AllocateBlock(app, vertBufferInfo.size, vertStagingMemRequirements.alignment, vertStagingBufferPoolId);
+		const uint32_t indStagingBufferPoolId = vkAllocator.GetPoolId(app, indStagingMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		auto indStagingBlock = vkAllocator.CreateBlock(app, indBufferInfo.size, indStagingMemRequirements.alignment, indStagingBufferPoolId);
+		auto indStagingBlock = vkAllocator.AllocateBlock(app, indBufferInfo.size, indStagingMemRequirements.alignment, indStagingBufferPoolId);
 
 		result = vkBindBufferMemory(app.logicalDevice, vertStagingBuffer, vertStagingBlock.memory, vertStagingBlock.offset);
 		assert(!result);
@@ -92,12 +92,12 @@ namespace game
 		VkMemoryRequirements indMemRequirements;
 		vkGetBufferMemoryRequirements(app.logicalDevice, mesh.indexBuffer, &indMemRequirements);
 
-		const uint32_t vertBufferPoolId = vk::LinearAllocator::GetPoolId(app, vertMemRequirements.memoryTypeBits,
+		const uint32_t vertBufferPoolId = vkAllocator.GetPoolId(app, vertMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		mesh.vertexMemBlock = vkAllocator.CreateBlock(app, vertBufferInfo.size, vertMemRequirements.alignment, vertBufferPoolId);
-		const uint32_t indBufferPoolId = vk::LinearAllocator::GetPoolId(app, indMemRequirements.memoryTypeBits,
+		mesh.vertexMemBlock = vkAllocator.AllocateBlock(app, vertBufferInfo.size, vertMemRequirements.alignment, vertBufferPoolId);
+		const uint32_t indBufferPoolId = vkAllocator.GetPoolId(app, indMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		mesh.indexMemBlock = vkAllocator.CreateBlock(app, indBufferInfo.size, indMemRequirements.alignment, indBufferPoolId);
+		mesh.indexMemBlock = vkAllocator.AllocateBlock(app, indBufferInfo.size, indMemRequirements.alignment, indBufferPoolId);
 
 		result = vkBindBufferMemory(app.logicalDevice, mesh.vertexBuffer, mesh.vertexMemBlock.memory, mesh.vertexMemBlock.offset);
 		assert(!result);
