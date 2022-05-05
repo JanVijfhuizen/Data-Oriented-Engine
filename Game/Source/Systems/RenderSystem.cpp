@@ -15,11 +15,11 @@
 
 namespace game
 {
-	void RenderSystem::Allocate(const EngineOutData& engineOutData)
+	void RenderSystem::Allocate(const EngineOutData& engineOutData, const CreateInfo& createInfo)
 	{
 		TaskSystem::Allocate(*engineOutData.allocator);
-		LoadTextureAtlas(engineOutData);
-		LoadShader(engineOutData);
+		LoadTextureAtlas(engineOutData, createInfo);
+		LoadShader(engineOutData, createInfo);
 		CreateMesh(engineOutData);
 		CreateShaderAssets(engineOutData);
 		CreateSwapChainAssets(engineOutData);
@@ -69,13 +69,13 @@ namespace game
 		return task;
 	}
 
-	void RenderSystem::LoadShader(const EngineOutData& engineOutData)
+	void RenderSystem::LoadShader(const EngineOutData& engineOutData, const CreateInfo& createInfo)
 	{
 		auto& logicalDevice = engineOutData.app->logicalDevice;
 		auto& tempAllocator = *engineOutData.tempAllocator;
 
-		auto vert = jlb::FileLoader::Read(tempAllocator, "Shaders/vert.spv");
-		auto frag = jlb::FileLoader::Read(tempAllocator, "Shaders/frag.spv");
+		auto vert = jlb::FileLoader::Read(tempAllocator, createInfo.vertPath);
+		auto frag = jlb::FileLoader::Read(tempAllocator, createInfo.fragPath);
 
 		VkShaderModuleCreateInfo vertCreateInfo{};
 		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -102,12 +102,12 @@ namespace game
 		vkDestroyShaderModule(engineOutData.app->logicalDevice, _fragModule, nullptr);
 	}
 
-	void RenderSystem::LoadTextureAtlas(const EngineOutData& engineOutData)
+	void RenderSystem::LoadTextureAtlas(const EngineOutData& engineOutData, const CreateInfo& createInfo)
 	{
 		auto& app = *engineOutData.app;
 		auto& logicalDevice = app.logicalDevice;
 
-		_textureAtlas = TextureHandler::LoadTexture(engineOutData, "Textures/Atlas.png");
+		_textureAtlas = TextureHandler::LoadTexture(engineOutData, createInfo.atlasTexturePath);
 		const auto viewCreateInfo = vk::ImageHandler::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
 		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_atlasImageView);
 		assert(!result);
