@@ -26,6 +26,7 @@
     <ClInclude Include="Include\VkRenderer\VkCommandHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkMemBlock.h" />
     <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkStackAllocator.h" />
     <ClInclude Include="Include\VkRenderer\VkSyncHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkSwapChain.h" />
     <ClInclude Include="Include\VkRenderer\VkImageHandler.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="Include\VkRenderer\VkSamplerHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\VkStackAllocator.cpp" />
     <ClCompile Include="Source\VkSamplerHandler.cpp" />
     <ClCompile Include="Source\VkLinearAllocator.cpp" />
     <ClCompile Include="Source\VkRenderPassHandler.cpp" />
