@@ -38,10 +38,10 @@ namespace game
 			for (size_t i = 0; i < s; ++i)
 			{
 				const char c = strLit[i];
-				const int index = static_cast<int>(c -'a') + 1;
+				const int index = static_cast<int>(c -'a');
 
 				// temp.
-				transform.position = origin + glm::vec2(.1f, 0);
+				transform.position = origin + glm::vec2(.3f * i, 0);
 				renderTask.transform = transform;
 				renderTask.subTexture = TextureHandler::GenerateSubTexture(texture, _charSize, index);
 				_renderSystem.Add(renderTask);

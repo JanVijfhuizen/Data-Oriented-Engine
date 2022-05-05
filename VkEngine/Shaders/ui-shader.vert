@@ -7,7 +7,7 @@ layout(location = 1) in vec2 inTexCoords;
 struct InstanceData
 {
     // Transform.
-	vec2 position;
+    vec2 position;
     float rotation;
     float scale;
     // Texture sub coordinates.
@@ -17,7 +17,7 @@ struct InstanceData
 
 layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
 {
-	InstanceData instances[];
+    InstanceData instances[];
 } instanceBuffer;
 
 layout(location = 0) out Data
@@ -30,7 +30,7 @@ void HandleInstance(in InstanceData instance)
 {
     outData.fragTexCoord = instance.texLTop + (instance.texRBot - instance.texLTop) * inTexCoords;
     outData.fragPos = inPosition;
-    gl_Position = vec4(inPosition + instance.position, 1, 1);
+    gl_Position = vec4(inPosition * instance.scale + instance.position, 1, 1);
 }
 
 void main() 

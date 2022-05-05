@@ -137,15 +137,14 @@ namespace game
 
 	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, const size_t index)
 	{
-		return GenerateSubTexture(texture, chunkSize, 
-			IndexToCoordinates(texture, chunkSize, index), 
-			IndexToCoordinates(texture, chunkSize, index + 1));
+		const glm::ivec2 lTop = IndexToCoordinates(texture, chunkSize, index);
+		return GenerateSubTexture(texture, chunkSize, lTop, lTop + glm::ivec2{1, 1});
 	}
 
 	glm::ivec2 TextureHandler::IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
 	{
 		const glm::ivec2 resolution = texture.resolution / glm::ivec2{chunkSize, chunkSize};
-		return { resolution.x % index, resolution.y / index };
+		return { index % resolution.x, index / resolution.x };
 	}
 
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)

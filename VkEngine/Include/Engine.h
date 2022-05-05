@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <vector>
 
 namespace jlb
 {
@@ -19,8 +18,5 @@ namespace vke
 		/// </summary>
 		/// <returns>0 if successful, otherwise returns a Vulkan error.</returns>
 		static int Run();
-
-	private:
-		static int RunGame();
 	};
 }
