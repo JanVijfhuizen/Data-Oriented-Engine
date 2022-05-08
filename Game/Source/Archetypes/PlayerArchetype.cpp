@@ -26,8 +26,8 @@ void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeInfo& info)
 void game::PlayerArchetype::Start(PlayerArchetypeInfo& info)
 {
 	const auto& texture = info.renderSystem->GetTexture();
-	_testAnim.frames[0].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_PIXEL_SIZE, 0);
-	_testAnim.frames[1].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_PIXEL_SIZE, 1);
+	_testAnim.frames[0].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, 0);
+	_testAnim.frames[1].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, 1);
 }
 
 void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
@@ -48,7 +48,7 @@ void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 	RenderTask task{};
 	auto& taskTransform = task.transform;
 	taskTransform = transform;
-	taskTransform.scale *= RenderConventions::ENTITY_SIZE;
+	taskTransform.scale = glm::vec2(RenderConventions::ENTITY_SIZE);
 	//taskTransform.position = info.renderSystem->AlignPixelCoordinates(taskTransform.position);
 	task.subTexture = renderer.subTexture;
 	info.renderSystem->Add(task);

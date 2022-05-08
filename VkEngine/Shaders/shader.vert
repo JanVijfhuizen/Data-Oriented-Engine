@@ -4,17 +4,12 @@
 layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec2 inTexCoords;
 
-#include "utils.glsl"
+#include "utils.shader"
 
 struct InstanceData
 {
-    // Transform.
-	vec2 position;
-    float rotation;
-    float scale;
-    // Texture sub coordinates.
-    vec2 texLTop;
-    vec2 texRBot;
+    Transform transform;
+    SubTexture subTexture;
 };
 
 layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
@@ -25,6 +20,7 @@ layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
 layout(push_constant) uniform PushConstants
 {
     vec2 resolution;
+    float pixelSize;
 } pushConstants;
 
 layout(location = 0) out Data
@@ -35,13 +31,10 @@ layout(location = 0) out Data
 
 void HandleInstance(in InstanceData instance)
 {
-    outData.fragTexCoord = instance.texLTop + (instance.texRBot - instance.texLTop) * inTexCoords;
+    outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
 
-    float aspectFix = pushConstants.resolution.y / pushConstants.resolution.x;
-    vec4 pos = vec4(inPosition * instance.scale + Rotate(instance.position, instance.rotation), 1, 1);
-    pos.x *= aspectFix;
-    gl_Position = pos;
+    gl_Position = CalculatePosition(instance.transform, inPosition, pushConstants.resolution, pushConstants.pixelSize);
 }
 
 void main() 
