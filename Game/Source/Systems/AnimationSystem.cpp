@@ -13,6 +13,9 @@ namespace game
 
 			for (auto& task : *this)
 			{
+				assert(task.animator);
+				assert(task.renderer);
+
 				auto& animator = *task.animator;
 				if (!animator.animation)
 					continue;

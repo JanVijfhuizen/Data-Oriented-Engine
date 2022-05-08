@@ -147,18 +147,14 @@ namespace game
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	SubTexture TextureHandler::GenerateSubSubTexture(const Texture& texture, const SubTexture& subTexture, 
-		const size_t chunkSize, const glm::ivec2 lTop, const glm::ivec2 rBot)
+	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const glm::ivec2 lTop, const glm::ivec2 rBot)
 	{
-		const float xMul = static_cast<float>(chunkSize * 2) / texture.resolution.x;
-		const float yMul = static_cast<float>(chunkSize * 2) / texture.resolution.y;
-
-		SubTexture subSubTexture = subTexture;
-		subSubTexture.leftTop.x += xMul * lTop.x;
-		subSubTexture.leftTop.y += yMul * lTop.y;
-		subSubTexture.rightBot.x += xMul * rBot.x;
-		subSubTexture.rightBot.y += yMul * rBot.y;
-		return subSubTexture;
+		SubTexture subTexture{};
+		subTexture.leftTop.x = texture.resolution.x * lTop.x;
+		subTexture.leftTop.y = texture.resolution.y * lTop.y;
+		subTexture.rightBot.x = texture.resolution.x * rBot.x;
+		subTexture.rightBot.y = texture.resolution.y * rBot.y;
+		return subTexture;
 	}
 
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)
