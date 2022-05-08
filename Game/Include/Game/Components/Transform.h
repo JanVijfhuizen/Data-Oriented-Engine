@@ -2,10 +2,10 @@
 
 namespace game
 {
-	struct alignas(32) Transform final
+	struct Transform final
 	{
 		glm::vec2 position{};
-		glm::vec2 scale{16};
 		float rotation{};
+		float scale{ 1 };
 	};
 }

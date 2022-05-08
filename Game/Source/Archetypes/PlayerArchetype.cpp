@@ -43,12 +43,12 @@ void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 	static float f = 0;
 	f += 0.0002f;
 
-	transform.position.y = -.5f + cos(f) * .25f;
+	transform.position.y = -96 + cos(f) * 32;
 
 	RenderTask task{};
 	auto& taskTransform = task.transform;
 	taskTransform = transform;
-	taskTransform.scale = glm::vec2(RenderConventions::ENTITY_SIZE);
+	taskTransform.scale = RenderConventions::ENTITY_SIZE;
 	//taskTransform.position = info.renderSystem->AlignPixelCoordinates(taskTransform.position);
 	task.subTexture = renderer.subTexture;
 	info.renderSystem->Add(task);

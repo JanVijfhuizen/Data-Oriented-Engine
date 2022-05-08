@@ -27,7 +27,7 @@ namespace game
 		const auto& texture = _renderSystem.GetTexture();
 		InternalRenderTask renderTask{};
 		Transform transform{};
-		transform.scale = glm::vec2(RenderConventions::TEXT_SIZE);
+		transform.scale = RenderConventions::TEXT_SIZE;
 
 		for (auto& task : *this)
 		{
@@ -41,7 +41,7 @@ namespace game
 				const char c = strLit[i];
 				const int index = static_cast<int>(c -'a');
 
-				transform.position = origin + glm::vec2(transform.scale.x * (1.f + task.spacingPct) * i, 0);
+				transform.position = origin + glm::vec2(transform.scale * (1.f + task.spacingPct) * i, 0);
 				//transform.position = _renderSystem.AlignPixelCoordinates(transform.position);
 				renderTask.transform = transform;
 				renderTask.subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::TEXT_SIZE, index);
