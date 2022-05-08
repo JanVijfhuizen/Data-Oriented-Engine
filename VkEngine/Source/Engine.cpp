@@ -80,7 +80,6 @@ namespace vke
 			windowHandler.BeginFrame(quit);
 			const auto cmdBuffer = swapChain.BeginFrame(app);
 
-
 			// Update swap chain information.
 			outData.swapChainCommandBuffer = cmdBuffer;
 			outData.swapChainImageIndex = swapChain.GetCurrentImageIndex();

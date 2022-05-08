@@ -49,7 +49,6 @@ void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 	auto& taskTransform = task.transform;
 	taskTransform = transform;
 	taskTransform.scale = RenderConventions::ENTITY_SIZE;
-	//taskTransform.position = info.renderSystem->AlignPixelCoordinates(taskTransform.position);
 	task.subTexture = renderer.subTexture;
 	info.renderSystem->Add(task);
 }

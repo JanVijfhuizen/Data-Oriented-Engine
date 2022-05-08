@@ -3,12 +3,18 @@
 
 namespace vke
 {
+	void GLFWKeyCallback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
+	{
+		game::OnKeyInput(key, action);
+	}
+
 	void WindowHandler::Construct(const Info& info)
 	{
 		// Initialize GLFW for Vulkan.
-		glfwInit();
+		const int result = glfwInit();
+		assert(result);
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, info.allowResizing ? GLFW_TRUE : GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, info.allowResizing);
 
 		// Create window.
 		const auto& resolution = info.resolution;
@@ -19,6 +25,9 @@ namespace vke
 		// Set callback for resize.
 		glfwSetFramebufferSizeCallback(_window, FramebufferResizeCallback);
 		_resolution = info.resolution;
+
+		// Set input callback.
+		glfwSetKeyCallback(_window, GLFWKeyCallback);
 	}
 
 	void WindowHandler::Cleanup() const
@@ -56,13 +65,13 @@ namespace vke
 
 	void WindowHandler::BeginFrame(bool& outQuit) const
 	{
+		// Check for events.
+		glfwPollEvents();
+
 		// Check if the user pressed the close button.
 		outQuit = glfwWindowShouldClose(_window);
 		if (outQuit)
 			return;
-
-		// Check for events.
-		glfwPollEvents();
 
 		int32_t width = 0, height = 0;
 		glfwGetFramebufferSize(_window, &width, &height);

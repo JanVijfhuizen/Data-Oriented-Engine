@@ -1,9 +1,15 @@
 #include "pch.h"
 #include "Game.h"
 #include "GameState.h"
+#include <iostream>
 
 namespace game
 {
+	void OnKeyInput(const int key, const int action)
+	{
+		
+	}
+
 	void Start(const EngineOutData outData)
 	{
 		// Set up archetypes.
