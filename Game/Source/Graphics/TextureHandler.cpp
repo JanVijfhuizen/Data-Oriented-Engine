@@ -147,6 +147,20 @@ namespace game
 		return { index % resolution.x, index / resolution.x };
 	}
 
+	SubTexture TextureHandler::GenerateSubSubTexture(const Texture& texture, const SubTexture& subTexture, 
+		const size_t chunkSize, const glm::ivec2 lTop, const glm::ivec2 rBot)
+	{
+		const float xMul = static_cast<float>(chunkSize * 2) / texture.resolution.x;
+		const float yMul = static_cast<float>(chunkSize * 2) / texture.resolution.y;
+
+		SubTexture subSubTexture = subTexture;
+		subSubTexture.leftTop.x += xMul * lTop.x;
+		subSubTexture.leftTop.y += yMul * lTop.y;
+		subSubTexture.rightBot.x += xMul * rBot.x;
+		subSubTexture.rightBot.y += yMul * rBot.y;
+		return subSubTexture;
+	}
+
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)
 	{
 		vkDestroyImage(engineOutData.app->logicalDevice, texture.image, nullptr);

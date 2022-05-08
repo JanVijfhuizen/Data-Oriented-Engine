@@ -38,10 +38,12 @@ namespace game
 		void Allocate(jlb::StackAllocator& allocator, size_t size, const Player& fillValue = {}) override;
 		void Free(jlb::StackAllocator& allocator) override;
 		void DefineResourceUsage(PlayerArchetypeInfo& info) override;
+		void Start(PlayerArchetypeInfo& info) override;
 
 	private:
 		Animation _testAnim{};
 
 		void OnUpdate(Player& entity, PlayerArchetypeInfo& info) override;
+	
 	};
 }

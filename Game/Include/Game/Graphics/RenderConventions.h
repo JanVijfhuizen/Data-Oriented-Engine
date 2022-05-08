@@ -4,7 +4,7 @@ namespace game
 {
 	struct RenderConventions final
 	{
-		constexpr static size_t ENTITY_PIXEL_SIZE = 32;
+		constexpr static size_t ENTITY_PIXEL_SIZE = 16;
 		constexpr static size_t TEXT_PIXEL_SIZE = 6;
 
 		constexpr static float PIXEL_SIZE = 0.008;

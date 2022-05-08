@@ -7,11 +7,8 @@
 void game::PlayerArchetype::Allocate(jlb::StackAllocator& allocator, const size_t size, const Player& fillValue)
 {
 	Archetype<Player, PlayerArchetypeInfo>::Allocate(allocator, size, fillValue);
-
 	_testAnim.frames.Allocate(allocator, 2);
-	_testAnim.frames[0].subTexture.rightBot = { 0.5, 1 };
-	_testAnim.frames[1].subTexture.leftTop = { 0.5, 0 };
-	_testAnim.frames[1].subTexture.rightBot = { 1, 1 };
+	
 }
 
 void game::PlayerArchetype::Free(jlb::StackAllocator& allocator)
@@ -24,6 +21,13 @@ void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeInfo& info)
 {
 	info.renderSystem->IncreaseRequestedLength(GetLength());
 	info.animationSystem->IncreaseRequestedLength(GetLength());
+}
+
+void game::PlayerArchetype::Start(PlayerArchetypeInfo& info)
+{
+	const auto& texture = info.renderSystem->GetTexture();
+	_testAnim.frames[0].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_PIXEL_SIZE, 0);
+	_testAnim.frames[1].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_PIXEL_SIZE, 1);
 }
 
 void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
@@ -45,7 +49,7 @@ void game::PlayerArchetype::OnUpdate(Player& entity, PlayerArchetypeInfo& info)
 	auto& taskTransform = task.transform;
 	taskTransform = transform;
 	taskTransform.scale *= RenderConventions::ENTITY_SIZE;
-	taskTransform.position = info.renderSystem->AlignPixelCoordinates(taskTransform.position);
+	//taskTransform.position = info.renderSystem->AlignPixelCoordinates(taskTransform.position);
 	task.subTexture = renderer.subTexture;
 	info.renderSystem->Add(task);
 }

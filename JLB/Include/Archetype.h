@@ -12,6 +12,8 @@ namespace jlb
 	public:
 		// Define the resources required from the systems.
 		virtual void DefineResourceUsage(Info& info) = 0;
+		// Start creating prototypes now that all the required resources have been set up.
+		virtual void Start(Info& info) = 0;
 		// Updates all entities in this archetype.
 		void Update(Info& info);
 

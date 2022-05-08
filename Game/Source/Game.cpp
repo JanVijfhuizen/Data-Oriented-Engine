@@ -23,6 +23,9 @@ namespace game
 		gameState.renderSystem.Allocate(outData);
 		gameState.uiSystem.Allocate(outData);
 
+		// Start the game.
+		gameState.playerArchetype.Start(playerArchetypeInfo);
+
 		// Set up game world.
 		auto& player1 = gameState.playerArchetype.Add();
 		auto& player2 = gameState.playerArchetype.Add();
