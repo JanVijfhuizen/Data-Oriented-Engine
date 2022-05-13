@@ -7,7 +7,7 @@ namespace game
 {
 	void OnKeyInput(const int key, const int action)
 	{
-		
+		PlayerArchetype::OnKeyInput(key, action, gameState.playerArchetype);
 	}
 
 	void Start(const EngineOutData outData)

@@ -4,8 +4,6 @@
 
 namespace game
 {
-	struct Texture;
-
 	struct SkeletonTask final
 	{
 		Skeleton* skeleton = nullptr;
@@ -14,6 +12,6 @@ namespace game
 	class SkeletonSystem final : public jlb::TaskSystem<SkeletonTask>
 	{
 	public:
-		[[nodiscard]] Skeleton GenerateSkeleton(jlb::StackAllocator& allocator, const Texture& texture, Skeleton::Type type) const;
+		[[nodiscard]] static Skeleton GenerateSkeleton(jlb::StackAllocator& allocator, const SubTexture& subTexture, Skeleton::Type type);
 	};
 }

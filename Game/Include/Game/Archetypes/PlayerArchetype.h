@@ -35,15 +35,17 @@ namespace game
 	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeInfo>
 	{
 	public:
+		static void OnKeyInput(int key, int action, PlayerArchetype& instance);
+
 		void Allocate(jlb::StackAllocator& allocator, size_t size, const Player& fillValue = {}) override;
 		void Free(jlb::StackAllocator& allocator) override;
 		void DefineResourceUsage(PlayerArchetypeInfo& info) override;
 		void Start(PlayerArchetypeInfo& info) override;
 
 	private:
+		Controller _playerController{};
 		Animation _testAnim{};
 
 		void OnUpdate(Player& entity, PlayerArchetypeInfo& info) override;
-	
 	};
 }

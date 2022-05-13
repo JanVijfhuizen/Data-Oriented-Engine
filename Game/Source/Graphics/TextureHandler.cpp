@@ -147,13 +147,12 @@ namespace game
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const glm::ivec2 lTop, const glm::ivec2 rBot)
+	SubTexture TextureHandler::GenerateOffsettedSubTexture(const SubTexture& subTexture,
+		const glm::ivec2 lTop, const glm::ivec2 rBot)
 	{
-		SubTexture subTexture{};
-		subTexture.leftTop.x = texture.resolution.x * lTop.x;
-		subTexture.leftTop.y = texture.resolution.y * lTop.y;
-		subTexture.rightBot.x = texture.resolution.x * rBot.x;
-		subTexture.rightBot.y = texture.resolution.y * rBot.y;
+		SubTexture offsettedSubTexture{};
+		offsettedSubTexture.leftTop = subTexture.leftTop + glm::vec2(lTop);
+		offsettedSubTexture.rightBot = subTexture.rightBot + glm::vec2(rBot);
 		return subTexture;
 	}
 

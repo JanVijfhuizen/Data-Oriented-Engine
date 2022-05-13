@@ -5,7 +5,7 @@
 namespace game
 {
 	Skeleton SkeletonSystem::GenerateSkeleton(jlb::StackAllocator& allocator, 
-		const Texture& texture, const Skeleton::Type type) const
+		const SubTexture& subTexture, const Skeleton::Type type)
 	{
 		Skeleton skeleton{};
 		auto& bones = skeleton.bones;
@@ -14,17 +14,17 @@ namespace game
 		case Skeleton::Type::human:
 			bones.Allocate(allocator, 6);
 			// Head.
-			bones[0] = TextureHandler::GenerateSubTexture(texture, glm::ivec2(0, 0), glm::ivec2(15, 5));
+			bones[0] = TextureHandler::GenerateOffsettedSubTexture(subTexture, glm::ivec2(0, 0), glm::ivec2(15, 5));
 			// Body.
-			bones[1] = TextureHandler::GenerateSubTexture(texture, glm::ivec2(4, 6), glm::ivec2(11, 10));
+			bones[1] = TextureHandler::GenerateOffsettedSubTexture(subTexture, glm::ivec2(4, 6), glm::ivec2(11, 10));
 			// L Arm.
-			bones[2] = TextureHandler::GenerateSubTexture(texture, glm::ivec2(0, 6), glm::ivec2(3, 15));
+			bones[2] = TextureHandler::GenerateOffsettedSubTexture(subTexture, glm::ivec2(0, 6), glm::ivec2(3, 15));
 			// R Arm.
-			bones[3] = TextureHandler::GenerateSubTexture(texture, glm::ivec2(12, 6), glm::ivec2(15, 15));
+			bones[3] = TextureHandler::GenerateOffsettedSubTexture(subTexture, glm::ivec2(12, 6), glm::ivec2(15, 15));
 			// L Leg.
-			bones[4] = TextureHandler::GenerateSubTexture(texture, glm::ivec2(4, 11), glm::ivec2(7, 15));
+			bones[4] = TextureHandler::GenerateOffsettedSubTexture(subTexture, glm::ivec2(4, 11), glm::ivec2(7, 15));
 			// R leg.
-			bones[5] = TextureHandler::GenerateSubTexture(texture, glm::ivec2(8, 11), glm::ivec2(11, 15));
+			bones[5] = TextureHandler::GenerateOffsettedSubTexture(subTexture, glm::ivec2(8, 11), glm::ivec2(11, 15));
 			break;
 		default: 
 			break; 

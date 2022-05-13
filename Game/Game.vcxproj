@@ -187,8 +187,10 @@
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Systems\RenderSystem.h" />
     <ClInclude Include="Include\Game\Graphics\Vertex.h" />
+    <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Handlers\InputHandler.cpp" />
     <ClCompile Include="Source\Systems\SkeletonSystem.cpp" />
     <ClCompile Include="Source\Systems\AnimationSystem.cpp" />
     <ClCompile Include="Source\Systems\UISystem.cpp" />
