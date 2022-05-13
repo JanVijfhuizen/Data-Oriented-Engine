@@ -10,9 +10,9 @@ namespace game
 		PlayerArchetype::OnKeyInput(key, action, gameState.playerArchetype);
 	}
 
-	void OnMouseInput(int key, int action)
+	void OnMouseInput(const int key, const int action)
 	{
-
+		CursorArchetype::OnMouseKeyInput(key, action, gameState.cursorArchetype);
 	}
 
 	void Start(const EngineOutData outData)

@@ -9,5 +9,6 @@ namespace game
 		Animation* animation = nullptr;
 		uint32_t index;
 		uint32_t rDelay = 0;
+		bool loop = true;
 	};
 }
