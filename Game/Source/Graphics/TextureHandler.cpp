@@ -147,15 +147,6 @@ namespace game
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	SubTexture TextureHandler::GenerateOffsettedSubTexture(const SubTexture& subTexture,
-		const glm::ivec2 lTop, const glm::ivec2 rBot)
-	{
-		SubTexture offsettedSubTexture{};
-		offsettedSubTexture.leftTop = subTexture.leftTop + glm::vec2(lTop);
-		offsettedSubTexture.rightBot = subTexture.rightBot + glm::vec2(rBot);
-		return subTexture;
-	}
-
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)
 	{
 		vkDestroyImage(engineOutData.app->logicalDevice, texture.image, nullptr);

@@ -99,12 +99,6 @@
     <ClInclude Include="Include\Game\Components\Animator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Systems\SkeletonSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Game\Graphics\Skeleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Game\Handlers\InputHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -143,10 +137,10 @@
     <ClCompile Include="Source\Systems\AnimationSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Systems\SkeletonSystem.cpp">
+    <ClCompile Include="Source\Handlers\InputHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Handlers\InputHandler.cpp">
+    <ClCompile Include="Source\Graphics\SubTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

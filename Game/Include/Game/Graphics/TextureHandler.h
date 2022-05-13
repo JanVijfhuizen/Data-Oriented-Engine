@@ -18,7 +18,6 @@ namespace game
 		[[nodiscard]] static SubTexture GenerateSubTexture(const Texture& texture, size_t chunkSize, glm::ivec2 lTop, glm::ivec2 rBot);
 		[[nodiscard]] static SubTexture GenerateSubTexture(const Texture& texture, size_t chunkSize, size_t index);
 		[[nodiscard]] static glm::ivec2 IndexToCoordinates(const Texture& texture, size_t chunkSize, size_t index);
-		[[nodiscard]] static SubTexture GenerateOffsettedSubTexture(const SubTexture& subTexture, glm::ivec2 lTop, glm::ivec2 rBot);
 		static void FreeTexture(const EngineOutData& engineOutData, Texture& texture);
 	};
 }
