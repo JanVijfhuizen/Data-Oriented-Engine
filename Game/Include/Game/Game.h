@@ -10,6 +10,7 @@
 namespace game
 {
 	extern "C" GAME_API void OnKeyInput(int key, int action);
+	extern "C" GAME_API void OnMouseInput(int key, int action);
 	extern "C" GAME_API void Start(EngineOutData outData);
 	extern GAME_API EngineInData Update(EngineOutData outData);
 	extern "C" GAME_API void OnRecreateSwapChainAssets(EngineOutData outData);

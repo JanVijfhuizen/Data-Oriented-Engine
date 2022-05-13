@@ -90,6 +90,16 @@ namespace vke
 			outData.time += outData.deltaTime;
 			oldTime = newTime;
 
+			{
+				double x;
+				double y;
+				glfwGetCursorPos(windowHandler.GetGLFWWIndow(), &x, &y);
+				x /= outData.resolution.x;
+				y /= outData.resolution.y;
+				outData.mousePos.x = x;
+				outData.mousePos.y = y;
+			}
+
 			// Update the game.
 			auto inData = game::Update(outData);
 

@@ -20,16 +20,21 @@ namespace game
 				if (!animator.animation)
 					continue;
 
-				++animator.rDelay;
-
 				auto& animation = animator.animation;
-				auto& frame = animation->frames[animator.index];
+				auto& frames = animation->frames;
+				auto& frame = frames[animator.index];
+
 				task.renderer->subTexture = frame.subTexture;
+
+				if (!animator.loop && animator.index == frames.GetLength() - 1)
+					continue;
+
+				++animator.rDelay;
 
 				if (animator.rDelay > frame.delay)
 				{
 					animator.rDelay = 0;
-					animator.index = (animator.index + 1) % animation->frames.GetLength();
+					animator.index = (animator.index + 1) % frames.GetLength();
 				}
 			}
 		}

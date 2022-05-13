@@ -6,7 +6,7 @@
 
 namespace game
 {
-	struct UITask
+	struct UITask final
 	{
 		jlb::StringView text{};
 		glm::vec2 leftTop;

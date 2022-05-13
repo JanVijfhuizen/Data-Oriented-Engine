@@ -3,9 +3,28 @@
 
 namespace vke
 {
+	int GLFWwindowMouseState;
+
 	void GLFWKeyCallback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
 	{
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS && GLFWwindowMouseState == GLFW_CURSOR_DISABLED)
+		{
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			glfwSetCursorPos(window, 0, 0);
+			GLFWwindowMouseState = GLFW_CURSOR_NORMAL;
+		}
 		game::OnKeyInput(key, action);
+	}
+
+	void GLFWMouseKeyCallback(GLFWwindow* window, const int button, const int action, const int mods)
+	{
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && GLFWwindowMouseState == GLFW_CURSOR_NORMAL)
+		{
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetCursorPos(window, 0, 0);
+			GLFWwindowMouseState = GLFW_CURSOR_DISABLED;
+		}
+		game::OnMouseInput(button, action);
 	}
 
 	void WindowHandler::Construct(const Info& info)
@@ -28,6 +47,9 @@ namespace vke
 
 		// Set input callback.
 		glfwSetKeyCallback(_window, GLFWKeyCallback);
+		glfwSetMouseButtonCallback(_window, GLFWMouseKeyCallback);
+		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		GLFWwindowMouseState = GLFW_CURSOR_DISABLED;
 	}
 
 	void WindowHandler::Cleanup() const
