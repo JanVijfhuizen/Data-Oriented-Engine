@@ -31,7 +31,7 @@ namespace vk
 			while(current)
 			{
 				if(current->memory != VK_NULL_HANDLE)
-					vkFreeMemory(app.logicalDevice, pool.memory, nullptr);
+					vkFreeMemory(app.logicalDevice, current->memory, nullptr);
 				current = current->next;
 			}	
 		}

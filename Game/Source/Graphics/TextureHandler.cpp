@@ -48,7 +48,7 @@ namespace game
 
 		const auto stagingPoolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		const auto stagingMemBlock = vkAllocator.AllocateBlock(app, bufferInfo.size, memRequirements.alignment, stagingPoolId);
+		const auto stagingMemBlock = vkAllocator.AllocateBlock(app, memRequirements.size, memRequirements.alignment, stagingPoolId);
 
 		result = vkBindBufferMemory(logicalDevice, stagingBuffer, stagingMemBlock.memory, stagingMemBlock.offset);
 		assert(!result);
@@ -72,7 +72,7 @@ namespace game
 		vkGetImageMemoryRequirements(logicalDevice, image, &memRequirements);
 		const auto poolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		const auto memBlock = vkAllocator.AllocateBlock(app, bufferInfo.size, memRequirements.alignment, poolId);
+		const auto memBlock = vkAllocator.AllocateBlock(app, memRequirements.size, memRequirements.alignment, poolId);
 
 		result = vkBindImageMemory(logicalDevice, image, memBlock.memory, memBlock.offset);
 		assert(!result);
@@ -147,18 +147,13 @@ namespace game
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	SubTexture TextureHandler::GenerateSubSubTexture(const Texture& texture, const SubTexture& subTexture, 
-		const size_t chunkSize, const glm::ivec2 lTop, const glm::ivec2 rBot)
+	SubTexture TextureHandler::GenerateOffsettedSubTexture(const SubTexture& subTexture,
+		const glm::ivec2 lTop, const glm::ivec2 rBot)
 	{
-		const float xMul = static_cast<float>(chunkSize * 2) / texture.resolution.x;
-		const float yMul = static_cast<float>(chunkSize * 2) / texture.resolution.y;
-
-		SubTexture subSubTexture = subTexture;
-		subSubTexture.leftTop.x += xMul * lTop.x;
-		subSubTexture.leftTop.y += yMul * lTop.y;
-		subSubTexture.rightBot.x += xMul * rBot.x;
-		subSubTexture.rightBot.y += yMul * rBot.y;
-		return subSubTexture;
+		SubTexture offsettedSubTexture{};
+		offsettedSubTexture.leftTop = subTexture.leftTop + glm::vec2(lTop);
+		offsettedSubTexture.rightBot = subTexture.rightBot + glm::vec2(rBot);
+		return subTexture;
 	}
 
 	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)

@@ -7,8 +7,8 @@ namespace game
 {
 	struct AnimationTask final
 	{
-		Renderer* renderer;
-		Animator* animator;
+		Renderer* renderer = nullptr;
+		Animator* animator = nullptr;
 	};
 
 	class AnimationSystem final : public jlb::TaskSystem<AnimationTask>

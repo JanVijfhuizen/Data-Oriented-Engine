@@ -13,7 +13,6 @@
 #include "VkRenderer/VkImageHandler.h"
 #include "VkRenderer/VkSamplerHandler.h"
 #include "Graphics/LayoutHandler.h"
-#include "Graphics/RenderConventions.h"
 
 namespace game
 {
@@ -36,8 +35,6 @@ namespace game
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
 
-		// Aligns the coordinates to the pixelart.
-		[[nodiscard]] glm::vec2 AlignPixelCoordinates(glm::vec2 vec) const;
 		[[nodiscard]] const Texture& GetTexture() const;
 
 	private:
@@ -47,6 +44,7 @@ namespace game
 		struct PushConstant final
 		{
 			glm::vec2 resolution;
+			float pixelSize = 0.008;
 		};
 
 		VkShaderModule _vertModule;
@@ -157,12 +155,6 @@ namespace game
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
-	}
-
-	template <typename Task>
-	glm::vec2 RenderSystem<Task>::AlignPixelCoordinates(const glm::vec2 vec) const
-	{
-		return { vec.x - fmod(vec.x, RenderConventions::PIXEL_SIZE),  vec.y - fmod(vec.y, RenderConventions::PIXEL_SIZE) };
 	}
 
 	template <typename Task>
@@ -286,7 +278,7 @@ namespace game
 
 			const uint32_t poolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.AllocateBlock(app, vertBufferInfo.size, memRequirements.alignment, poolId);
+			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.AllocateBlock(app, memRequirements.size, memRequirements.alignment, poolId);
 
 			result = vkBindBufferMemory(logicalDevice, buffer, memBlock.memory, memBlock.offset);
 			assert(!result);
@@ -332,12 +324,6 @@ namespace game
 		assert(!result);
 
 		layouts.Free(tempAllocator);
-
-#ifdef _DEBUG
-		// Really dumb, but updating the descriptor sets just crashes the debug build, 
-		// and Vulkan doesn't give a reason as to why.
-		return;
-#endif
 
 		// Bind descriptor sets to the instance data.
 		for (size_t i = 0; i < swapChainImageCount; ++i)

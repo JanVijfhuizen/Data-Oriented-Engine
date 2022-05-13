@@ -176,18 +176,23 @@
     <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
     <ClInclude Include="Include\Game\Graphics\RenderConventions.h" />
     <ClInclude Include="Include\Game\Graphics\RenderTask.h" />
+    <ClInclude Include="Include\Game\Graphics\Skeleton.h" />
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
+    <ClInclude Include="Include\Game\Systems\SkeletonSystem.h" />
     <ClInclude Include="Include\Game\Systems\UISystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Systems\RenderSystem.h" />
     <ClInclude Include="Include\Game\Graphics\Vertex.h" />
+    <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\AnimationSystem.cpp" />
+    <ClCompile Include="Source\Handlers\InputHandler.cpp" />
+    <ClCompile Include="Source\Systems\SkeletonSystem.cpp" />
+    <ClCompile Include="Source\Systems\AnimationSystem.cpp" />
     <ClCompile Include="Source\Systems\UISystem.cpp" />
     <ClCompile Include="Source\Graphics\TextureHandler.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
