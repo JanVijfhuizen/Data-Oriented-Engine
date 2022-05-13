@@ -5,16 +5,14 @@ namespace game
 {
 	SubTexture SubTexture::operator+(const SubTexture& a) const
 	{
-		SubTexture b{};
-		b += *this;
+		SubTexture b = *this;
 		b += a;
 		return b;
 	}
 
 	SubTexture SubTexture::operator-(const SubTexture& a) const
 	{
-		SubTexture b{};
-		b += *this;
+		SubTexture b = *this;
 		b -= a;
 		return b;
 	}

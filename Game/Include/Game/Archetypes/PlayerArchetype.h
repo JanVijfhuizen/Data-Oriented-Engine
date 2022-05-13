@@ -26,26 +26,34 @@ namespace game
 		Transform transform{};
 	};
 
-	struct PlayerArchetypeInfo final
+	struct PlayerArchetypeCreateInfo final
 	{
 		RenderSystem<RenderTask>* renderSystem;
 		AnimationSystem* animationSystem;
 	};
 
-	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeInfo>
+	struct PlayerArchetypeUpdateInfo final
+	{
+		RenderSystem<RenderTask>* renderSystem;
+		AnimationSystem* animationSystem;
+		glm::vec2 mousePosition;
+	};
+
+	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeCreateInfo, PlayerArchetypeUpdateInfo>
 	{
 	public:
 		static void OnKeyInput(int key, int action, PlayerArchetype& instance);
 
 		void Allocate(jlb::StackAllocator& allocator, size_t size, const Player& fillValue = {}) override;
 		void Free(jlb::StackAllocator& allocator) override;
-		void DefineResourceUsage(PlayerArchetypeInfo& info) override;
-		void Start(PlayerArchetypeInfo& info) override;
+		void DefineResourceUsage(PlayerArchetypeCreateInfo& info) override;
+		void Start(PlayerArchetypeCreateInfo& info) override;
 
 	private:
 		Controller _playerController{};
 		Animation _testAnim{};
 
-		void OnUpdate(Player& entity, PlayerArchetypeInfo& info) override;
+		void OnPreEntityUpdate(PlayerArchetypeUpdateInfo& info) override;
+		void OnEntityUpdate(Player& entity, PlayerArchetypeUpdateInfo& info) override;
 	};
 }

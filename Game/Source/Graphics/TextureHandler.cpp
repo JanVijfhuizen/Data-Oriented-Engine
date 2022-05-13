@@ -122,7 +122,8 @@ namespace game
 		return texture;
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, const glm::ivec2 lTop, const glm::ivec2 rBot)
+	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
+		const glm::ivec2 lTop, const glm::ivec2 rBot)
 	{
 		const float xMul = static_cast<float>(chunkSize) / texture.resolution.x;
 		const float yMul = static_cast<float>(chunkSize) / texture.resolution.y;
@@ -135,7 +136,8 @@ namespace game
 		return sub;
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, const size_t index)
+	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
+		const size_t index)
 	{
 		const glm::ivec2 lTop = IndexToCoordinates(texture, chunkSize, index);
 		return GenerateSubTexture(texture, chunkSize, lTop, lTop + glm::ivec2{1, 1});

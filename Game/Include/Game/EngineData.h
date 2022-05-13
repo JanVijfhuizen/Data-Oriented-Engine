@@ -46,6 +46,8 @@ namespace game
 		float time = 0;
 		// Duration of the previous frame. In milliseconds.
 		float deltaTime = 0;
+		// Mouse position.
+		glm::vec2 mousePos;
 	};
 
 	/// <summary>
