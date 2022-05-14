@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Game.h"
 #include "GameState.h"
+#include "Systems/CollisionSystem.h"
 
 namespace game
 {
@@ -24,20 +25,19 @@ namespace game
 
 	void GameUpdate(const EngineOutData& outData)
 	{
-		static float f = 0;
-		f += outData.deltaTime * .003f;
-
-		// Temp.
-		TextTask task{};
-		task.text = "general kenobi";
-		task.spacingPct = abs(sin(f));
-		task.leftTop.y = .5;
-		gameState.uiSystem.Add(task);
+		
 	}
 
 	void Start(const EngineOutData outData)
 	{
 		auto& allocator = *outData.allocator;
+		auto& chain = gameState.chain;
+
+		chain.Add<MovementSystem>(outData);
+		chain.Add<CollisionSystem>(outData);
+		chain.Add<AnimationSystem>(outData);
+		chain.Add<RenderSystem<RenderTask>>(outData);
+		chain.Add<TextSystem>(outData);
 
 		// Set up archetypes.
 		gameState.playerArchetype.Allocate(allocator, 2);
@@ -45,30 +45,23 @@ namespace game
 
 		// Define resource usage for systems.
 		PlayerArchetypeCreateInfo playerArchetypeInfo{};
-		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
-		playerArchetypeInfo.animationSystem = &gameState.animationSystem;
-		playerArchetypeInfo.movementSystem = &gameState.movementSystem;
+		playerArchetypeInfo.renderSystem = gameState.chain.Get<EntityRenderSystem>();
+		playerArchetypeInfo.animationSystem = gameState.chain.Get<AnimationSystem>();
+		playerArchetypeInfo.movementSystem = gameState.chain.Get<MovementSystem>();
 		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
 
 		CursorArchetypeCreateInfo cursorArchetypeInfo{};
-		cursorArchetypeInfo.renderSystem = &gameState.renderSystem;
-		cursorArchetypeInfo.animationSystem = &gameState.animationSystem;
+		cursorArchetypeInfo.renderSystem = gameState.chain.Get<EntityRenderSystem>();
+		cursorArchetypeInfo.animationSystem = gameState.chain.Get<AnimationSystem>();
 		gameState.cursorArchetype.DefineResourceUsage(cursorArchetypeInfo);
 
-		// Temp.
-		gameState.uiSystem.IncreaseRequestedLength(2);
-
-		// Set up systems.
-		gameState.movementSystem.Allocate(allocator);
-		gameState.collisionSystem.Allocate(allocator);
-
-		gameState.animationSystem.Allocate(allocator);
-		gameState.renderSystem.Allocate(outData);
-		gameState.uiSystem.Allocate(outData);
+		chain.Allocate(outData);
 
 		// Start the game.
 		gameState.playerArchetype.Start(playerArchetypeInfo);
 		gameState.cursorArchetype.Start(cursorArchetypeInfo);
+
+		chain.Start(outData);
 
 		GameStart(outData);
 	}
@@ -78,31 +71,24 @@ namespace game
 		// Update archetypes.
 		{
 			PlayerArchetypeUpdateInfo playerArchetypeInfo{};
-			playerArchetypeInfo.renderSystem = &gameState.renderSystem;
-			playerArchetypeInfo.animationSystem = &gameState.animationSystem;
+			playerArchetypeInfo.renderSystem = gameState.chain.Get<EntityRenderSystem>();
+			playerArchetypeInfo.animationSystem = gameState.chain.Get<AnimationSystem>();
 			playerArchetypeInfo.mousePosition = outData.mousePos;
-			playerArchetypeInfo.movementSystem = &gameState.movementSystem;
+			playerArchetypeInfo.movementSystem = gameState.chain.Get<MovementSystem>();
 			gameState.playerArchetype.Update(playerArchetypeInfo);
 		}
 
 		{
 			CursorArchetypeUpdateInfo cursorArchetypeInfo{};
-			cursorArchetypeInfo.renderSystem = &gameState.renderSystem;
-			cursorArchetypeInfo.animationSystem = &gameState.animationSystem;
+			cursorArchetypeInfo.renderSystem = gameState.chain.Get<EntityRenderSystem>();
+			cursorArchetypeInfo.animationSystem = gameState.chain.Get<AnimationSystem>();
 			cursorArchetypeInfo.mousePosition = outData.mousePos;
 			gameState.cursorArchetype.Update(cursorArchetypeInfo);
 		}
 
 		GameUpdate(outData);
 
-		// Update game systems.
-		gameState.movementSystem.Update();
-		gameState.collisionSystem.Update();
-
-		// Update graphic systems.
-		gameState.animationSystem.Update(outData);
-		gameState.renderSystem.Update(outData, {});
-		gameState.uiSystem.Update(outData);
+		gameState.chain.Update(outData);
 
 		EngineInData inData{};
 		return inData;
@@ -110,20 +96,19 @@ namespace game
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
 	{
-		gameState.renderSystem.DestroySwapChainAssets(outData);
-		gameState.renderSystem.CreateSwapChainAssets(outData);
+		auto renderSystem = gameState.chain.Get<EntityRenderSystem>();
+		renderSystem->DestroySwapChainAssets(outData);
+		renderSystem->CreateSwapChainAssets(outData);
+		auto textSystem = gameState.chain.Get<TextSystem>();
+		textSystem->DestroySwapChainAssets(outData);
+		textSystem->CreateSwapChainAssets(outData);
 	}
 
 	void Exit(const EngineOutData outData)
 	{
 		auto& allocator = *outData.allocator;
 
-		gameState.collisionSystem.Free(allocator);
-		gameState.movementSystem.Free(allocator);
-
-		gameState.uiSystem.Free(outData);
-		gameState.renderSystem.Free(outData);
-		gameState.animationSystem.Free(allocator);
+		gameState.chain.Free(outData);
 
 		gameState.cursorArchetype.Free(allocator);
 		gameState.playerArchetype.Free(allocator);

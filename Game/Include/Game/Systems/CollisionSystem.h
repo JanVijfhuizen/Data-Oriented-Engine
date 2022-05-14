@@ -12,9 +12,9 @@ namespace game
 		Transform* transform;
 	};
 
-	class CollisionSystem final : public jlb::TaskSystem<CollisionTask>
+	class CollisionSystem final : public TaskSystem<CollisionTask>
 	{
-	public:
-		void Update();
+	protected:
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
 	};
 }

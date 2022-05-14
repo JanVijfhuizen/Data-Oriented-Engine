@@ -1,6 +1,7 @@
 #pragma once
 #include "SubTexture.h"
 #include "Components/Transform.h"
+#include "Systems/RenderSystem.h"
 
 namespace game
 {
@@ -9,4 +10,6 @@ namespace game
 		Transform transform{};
 		SubTexture subTexture{};
 	};
+
+	typedef RenderSystem<RenderTask> EntityRenderSystem;
 }

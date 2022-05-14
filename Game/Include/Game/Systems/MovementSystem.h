@@ -10,9 +10,9 @@ namespace game
 		struct Transform* transform;
 	};
 
-	class MovementSystem final : public jlb::TaskSystem<MovementTask>
+	class MovementSystem final : public TaskSystem<MovementTask>
 	{
-	public:
-		void Update();
+	protected:
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
 	};
 }

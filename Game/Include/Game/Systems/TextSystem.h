@@ -13,16 +13,9 @@ namespace game
 		float spacingPct = .2f;
 	};
 
-	class TextSystem final : public jlb::TaskSystem<TextTask>
+	class TextSystem final : public TaskSystem<TextTask>
 	{
-	public:
-		void Allocate(const EngineOutData& engineOutData);
-		void Free(const EngineOutData& engineOutData);
-		void Update(const EngineOutData& engineOutData);
-
 	private:
-		using TaskSystem<TextTask>::Allocate;
-
 		struct InternalRenderTask final
 		{
 			Transform transform{};
@@ -31,5 +24,9 @@ namespace game
 
 		const size_t _renderSizeUsage = 1000;
 		RenderSystem<InternalRenderTask> _renderSystem{};
+
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Free(const EngineOutData& outData, SystemChain& chain) override;
 	};
 }

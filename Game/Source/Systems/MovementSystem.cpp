@@ -4,7 +4,7 @@
 
 namespace game
 {
-	void MovementSystem::Update()
+	void MovementSystem::Update(const EngineOutData& outData, SystemChain& chain)
 	{
 		for (auto& task : *this)
 			task.transform->position += task.dir * task.speed;

@@ -152,7 +152,6 @@
     <ClInclude Include="Include\Archetype.h" />
     <ClInclude Include="Include\IndexSequence.h" />
     <ClInclude Include="Include\StackAllocator.h" />
-    <ClInclude Include="Include\TaskSystem.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
     <ClInclude Include="Include\FileLoader.h" />
