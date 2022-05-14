@@ -187,8 +187,10 @@
     <ClInclude Include="Include\Game\Systems\RenderSystem.h" />
     <ClInclude Include="Include\Game\Graphics\Vertex.h" />
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
+    <ClInclude Include="Include\Game\SystemChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\SystemChain.cpp" />
     <ClCompile Include="Source\Systems\CollisionSystem.cpp" />
     <ClCompile Include="Source\Systems\MovementSystem.cpp" />
     <ClCompile Include="Source\Archetypes\CursorArchetype.cpp" />

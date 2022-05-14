@@ -40,6 +40,10 @@ namespace jlb
 		template <typename T>
 		void MFree(const Allocation<T>& allocation);
 
+		// Same as MFree, except it does not check the order of allocations and other safety checks.
+		template <typename T>
+		void MFreeUnsafe(T* ptr);
+
 		// Malloc but simplified for allocating types. Does not call constructors.
 		template <typename T>
 		[[nodiscard]] Allocation<T> New(size_t count = 1);
@@ -73,6 +77,25 @@ namespace jlb
 		const size_t size = _data[_current - 1];
 		_current -= size;
 		_id--;
+	}
+
+	template <typename T>
+	void StackAllocator::MFreeUnsafe(T* ptr)
+	{
+		StackAllocator* allocator = this;
+		while(allocator)
+		{
+			T* currentPtr = reinterpret_cast<T*>(&_data[_current]);
+			if(currentPtr != ptr)
+			{
+				allocator = allocator->_next;
+				continue;
+			}
+
+			const size_t size = _data[_current - 1];
+			_current -= size;
+			_id--;
+		}
 	}
 
 	template <typename T>
