@@ -8,6 +8,21 @@
 
 namespace game
 {
+	class A
+	{
+		float a = 1;
+		float b = 2;
+		float c = 3;
+
+	protected:
+		virtual~A() = default;
+	};
+
+	class B : public A
+	{
+		float d = 4;
+	};
+
 	void OnKeyInput(const int key, const int action)
 	{
 		PlayerArchetype::OnKeyInput(key, action, *gameState.chain.Get<PlayerArchetype>());
@@ -21,9 +36,7 @@ namespace game
 	void GameStart(const EngineOutData& outData)
 	{
 		// Set up game world.
-		auto playerArchetype = gameState.chain.Get<PlayerArchetype>();
-		auto& player1 = playerArchetype->Add();
-		auto& player2 = playerArchetype->Add();
+		gameState.chain.Get<PlayerArchetype>()->Add();
 		gameState.chain.Get<CursorArchetype>()->Add();
 	}
 
