@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Game.h"
 #include "GameState.h"
-#include <iostream>
 
 namespace game
 {
@@ -38,9 +37,11 @@ namespace game
 
 	void Start(const EngineOutData outData)
 	{
+		auto& allocator = *outData.allocator;
+
 		// Set up archetypes.
-		gameState.playerArchetype.Allocate(*outData.allocator, 2);
-		gameState.cursorArchetype.Allocate(*outData.allocator, 1);
+		gameState.playerArchetype.Allocate(allocator, 2);
+		gameState.cursorArchetype.Allocate(allocator, 1);
 
 		// Define resource usage for systems.
 		PlayerArchetypeCreateInfo playerArchetypeInfo{};
@@ -58,9 +59,10 @@ namespace game
 		gameState.uiSystem.IncreaseRequestedLength(2);
 
 		// Set up systems.
-		gameState.movementSystem.Allocate(*outData.allocator);
+		gameState.movementSystem.Allocate(allocator);
+		gameState.collisionSystem.Allocate(allocator);
 
-		gameState.animationSystem.Allocate(*outData.allocator);
+		gameState.animationSystem.Allocate(allocator);
 		gameState.renderSystem.Allocate(outData);
 		gameState.uiSystem.Allocate(outData);
 
@@ -95,6 +97,7 @@ namespace game
 
 		// Update game systems.
 		gameState.movementSystem.Update();
+		gameState.collisionSystem.Update();
 
 		// Update graphic systems.
 		gameState.animationSystem.Update(outData);
@@ -113,13 +116,16 @@ namespace game
 
 	void Exit(const EngineOutData outData)
 	{
-		gameState.movementSystem.Free(*outData.allocator);
+		auto& allocator = *outData.allocator;
+
+		gameState.collisionSystem.Free(allocator);
+		gameState.movementSystem.Free(allocator);
 
 		gameState.uiSystem.Free(outData);
 		gameState.renderSystem.Free(outData);
-		gameState.animationSystem.Free(*outData.allocator);
+		gameState.animationSystem.Free(allocator);
 
-		gameState.cursorArchetype.Free(*outData.allocator);
-		gameState.playerArchetype.Free(*outData.allocator);
+		gameState.cursorArchetype.Free(allocator);
+		gameState.playerArchetype.Free(allocator);
 	}
 }

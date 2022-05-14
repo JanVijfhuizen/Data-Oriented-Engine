@@ -162,9 +162,7 @@
     <ClInclude Include="Include\Game\Components\Character.h" />
     <ClInclude Include="Include\Game\Components\Collider.h" />
     <ClInclude Include="Include\Game\Components\Controller.h" />
-    <ClInclude Include="Include\Game\Components\Light.h" />
     <ClInclude Include="Include\Game\Components\Renderer.h" />
-    <ClInclude Include="Include\Game\Components\ShadowCaster.h" />
     <ClInclude Include="Include\Game\Components\Transform.h" />
     <ClInclude Include="Include\Game\EngineData.h" />
     <ClInclude Include="Include\Game\framework.h" />
@@ -181,6 +179,7 @@
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
+    <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextSystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
@@ -190,6 +189,7 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\CollisionSystem.cpp" />
     <ClCompile Include="Source\Systems\MovementSystem.cpp" />
     <ClCompile Include="Source\Archetypes\CursorArchetype.cpp" />
     <ClCompile Include="Source\Graphics\SubTexture.cpp" />

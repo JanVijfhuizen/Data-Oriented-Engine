@@ -6,6 +6,7 @@
 #include "Systems/AnimationSystem.h"
 #include "Archetypes/CursorArchetype.h"
 #include "Systems/MovementSystem.h"
+#include "Systems/CollisionSystem.h"
 
 namespace game
 {
@@ -17,6 +18,7 @@ namespace game
 
 		// Game Systems.
 		MovementSystem movementSystem{};
+		CollisionSystem collisionSystem{};
 
 		// Graphic Systems.
 		AnimationSystem animationSystem{};
