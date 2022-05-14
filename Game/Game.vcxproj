@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Game\Archetype.h" />
     <ClInclude Include="Include\Game\Archetypes\CursorArchetype.h" />
     <ClInclude Include="Include\Game\Components\Animator.h" />
     <ClInclude Include="Include\Game\Components\Character.h" />

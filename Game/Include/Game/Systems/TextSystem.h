@@ -6,6 +6,7 @@
 
 namespace game
 {
+	/*
 	struct TextTask final
 	{
 		jlb::StringView text{};
@@ -15,6 +16,10 @@ namespace game
 
 	class TextSystem final : public TaskSystem<TextTask>
 	{
+	public:
+		void CreateSwapChainAssets(const EngineOutData& engineOutData);
+		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
+
 	private:
 		struct InternalRenderTask final
 		{
@@ -29,4 +34,5 @@ namespace game
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Free(const EngineOutData& outData, SystemChain& chain) override;
 	};
+	*/
 }

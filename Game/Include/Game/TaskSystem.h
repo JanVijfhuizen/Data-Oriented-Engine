@@ -37,12 +37,12 @@ namespace game
 	template <typename Task>
 	void TaskSystem<Task>::Allocate(const EngineOutData& outData, SystemChain& chain)
 	{
-		jlb::Vector<Task>::Allocate(outData.allocator, _requestedLength);
+		jlb::Vector<Task>::Allocate(*outData.allocator, _requestedLength);
 	}
 
 	template <typename Task>
 	void TaskSystem<Task>::Free(const EngineOutData& outData, SystemChain& chain)
 	{
-		jlb::Vector<Task>::Free(outData.allocator);
+		jlb::Vector<Task>::Free(*outData.allocator);
 	}
 }

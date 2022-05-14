@@ -5,6 +5,7 @@
 
 namespace game
 {
+	/*
 	void TextSystem::CreateSwapChainAssets(const EngineOutData& engineOutData)
 	{
 		_renderSystem.CreateSwapChainAssets(engineOutData);
@@ -62,4 +63,5 @@ namespace game
 		_renderSystem.Free(outData);
 		TaskSystem<TextTask>::Free(outData, chain);
 	}
+*/
 }

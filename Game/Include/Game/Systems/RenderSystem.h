@@ -267,7 +267,7 @@ namespace game
 		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(Task) * jlb::TaskSystem<Task>::GetLength();
+		vertBufferInfo.size = sizeof(Task) * TaskSystem<Task>::GetLength();
 		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -294,7 +294,7 @@ namespace game
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(Task) * jlb::TaskSystem<Task>::GetLength();
+		bindings[0].size = sizeof(Task) * TaskSystem<Task>::GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -341,7 +341,7 @@ namespace game
 			VkDescriptorBufferInfo instanceInfo{};
 			instanceInfo.buffer = _instanceBuffers[i];
 			instanceInfo.offset = 0;
-			instanceInfo.range = sizeof(Task) * jlb::TaskSystem<Task>::GetLength();
+			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
 
 			auto& instanceWrite = writes[0];
 			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

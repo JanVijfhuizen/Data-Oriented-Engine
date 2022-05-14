@@ -66,10 +66,11 @@ namespace game
 	template <typename T>
 	void SystemChain::Add(const EngineOutData& outData)
 	{
-		auto allocation = outData.allocator.New<T>();
-		_head->_previous = allocation.ptr;
+		auto allocation = outData.allocator->New<T>();
+		ISystemChainable* ptr = static_cast<ISystemChainable*>(allocation.ptr);
+		_head->_previous = ptr;
 		allocation.ptr->_next = _head;
-		_head = allocation.ptr;
+		_head = ptr;
 	}
 
 	template <typename T>
@@ -77,7 +78,7 @@ namespace game
 	{
 		for (auto& chainable : *this)
 		{
-			T* cast = dynamic_cast<T*>(chainable);
+			T* cast = dynamic_cast<T*>(&chainable);
 			if (cast)
 				return cast;
 		}

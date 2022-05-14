@@ -149,7 +149,6 @@
     <ClCompile Include="Source\StringView.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Archetype.h" />
     <ClInclude Include="Include\IndexSequence.h" />
     <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\Array.h" />
