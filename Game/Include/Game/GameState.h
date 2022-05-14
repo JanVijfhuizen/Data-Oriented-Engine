@@ -5,6 +5,7 @@
 #include "Graphics/RenderTask.h"
 #include "Systems/AnimationSystem.h"
 #include "Archetypes/CursorArchetype.h"
+#include "Systems/MovementSystem.h"
 
 namespace game
 {
@@ -14,7 +15,10 @@ namespace game
 		PlayerArchetype playerArchetype{};
 		CursorArchetype cursorArchetype{};
 
-		// Systems.
+		// Game Systems.
+		MovementSystem movementSystem{};
+
+		// Graphic Systems.
 		AnimationSystem animationSystem{};
 		RenderSystem<RenderTask> renderSystem{};
 		TextSystem uiSystem{};

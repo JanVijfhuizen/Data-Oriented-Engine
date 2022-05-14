@@ -4,6 +4,7 @@
 #include "Graphics/RenderConventions.h"
 #include "Systems/AnimationSystem.h"
 #include "Handlers/InputHandler.h"
+#include "Systems/MovementSystem.h"
 
 void game::PlayerArchetype::OnKeyInput(const int key, const int action, PlayerArchetype& instance)
 {
@@ -30,6 +31,7 @@ void game::PlayerArchetype::DefineResourceUsage(PlayerArchetypeCreateInfo& info)
 {
 	info.renderSystem->IncreaseRequestedLength(GetLength());
 	info.animationSystem->IncreaseRequestedLength(GetLength());
+	info.movementSystem->IncreaseRequestedLength(GetLength());
 }
 
 void game::PlayerArchetype::Start(PlayerArchetypeCreateInfo& info)
@@ -54,12 +56,19 @@ void game::PlayerArchetype::OnEntityUpdate(Player& entity, PlayerArchetypeUpdate
 
 	info.animationSystem->Add(AnimationSystem::CreateDefaultTask(entity.renderer, entity.animator));
 
-	transform.position += 0.02f * glm::vec2(_playerController.direction);
+	if (_playerController.direction.x != 0 || _playerController.direction.y != 0)
+	{
+		MovementTask movementTask{};
+		movementTask.speed = 0.02f;
+		movementTask.dir = normalize(glm::vec2(_playerController.direction));
+		movementTask.transform = &entity.transform;
+		info.movementSystem->Add(movementTask);
+	}
 
-	RenderTask task{};
-	auto& taskTransform = task.transform;
+	RenderTask renderTask{};
+	auto& taskTransform = renderTask.transform;
 	taskTransform = transform;
 	taskTransform.scale = RenderConventions::ENTITY_SIZE;
-	task.subTexture = renderer.subTexture;
-	info.renderSystem->Add(task);
+	renderTask.subTexture = renderer.subTexture;
+	info.renderSystem->Add(renderTask);
 }

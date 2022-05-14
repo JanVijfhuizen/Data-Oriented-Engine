@@ -14,8 +14,9 @@
 namespace game
 {
 	class AnimationSystem;
+	class MovementSystem;
 
-	struct Player
+	struct Player final
 	{
 		Animator animator{};
 		Controller controller{};
@@ -30,12 +31,14 @@ namespace game
 	{
 		RenderSystem<RenderTask>* renderSystem;
 		AnimationSystem* animationSystem;
+		MovementSystem* movementSystem;
 	};
 
 	struct PlayerArchetypeUpdateInfo final
 	{
 		RenderSystem<RenderTask>* renderSystem;
 		AnimationSystem* animationSystem;
+		MovementSystem* movementSystem;
 		glm::vec2 mousePosition;
 	};
 

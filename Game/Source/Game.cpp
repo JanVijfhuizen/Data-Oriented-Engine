@@ -15,6 +15,27 @@ namespace game
 		CursorArchetype::OnMouseKeyInput(key, action, gameState.cursorArchetype);
 	}
 
+	void GameStart(const EngineOutData& outData)
+	{
+		// Set up game world.
+		auto& player1 = gameState.playerArchetype.Add();
+		auto& player2 = gameState.playerArchetype.Add();
+		gameState.cursorArchetype.Add();
+	}
+
+	void GameUpdate(const EngineOutData& outData)
+	{
+		static float f = 0;
+		f += outData.deltaTime * .003f;
+
+		// Temp.
+		TextTask task{};
+		task.text = "general kenobi";
+		task.spacingPct = abs(sin(f));
+		task.leftTop.y = .5;
+		gameState.uiSystem.Add(task);
+	}
+
 	void Start(const EngineOutData outData)
 	{
 		// Set up archetypes.
@@ -25,6 +46,7 @@ namespace game
 		PlayerArchetypeCreateInfo playerArchetypeInfo{};
 		playerArchetypeInfo.renderSystem = &gameState.renderSystem;
 		playerArchetypeInfo.animationSystem = &gameState.animationSystem;
+		playerArchetypeInfo.movementSystem = &gameState.movementSystem;
 		gameState.playerArchetype.DefineResourceUsage(playerArchetypeInfo);
 
 		CursorArchetypeCreateInfo cursorArchetypeInfo{};
@@ -36,6 +58,8 @@ namespace game
 		gameState.uiSystem.IncreaseRequestedLength(2);
 
 		// Set up systems.
+		gameState.movementSystem.Allocate(*outData.allocator);
+
 		gameState.animationSystem.Allocate(*outData.allocator);
 		gameState.renderSystem.Allocate(outData);
 		gameState.uiSystem.Allocate(outData);
@@ -44,10 +68,7 @@ namespace game
 		gameState.playerArchetype.Start(playerArchetypeInfo);
 		gameState.cursorArchetype.Start(cursorArchetypeInfo);
 
-		// Set up game world.
-		auto& player1 = gameState.playerArchetype.Add();
-		auto& player2 = gameState.playerArchetype.Add();
-		gameState.cursorArchetype.Add();
+		GameStart(outData);
 	}
 
 	EngineInData Update(const EngineOutData outData)
@@ -58,6 +79,7 @@ namespace game
 			playerArchetypeInfo.renderSystem = &gameState.renderSystem;
 			playerArchetypeInfo.animationSystem = &gameState.animationSystem;
 			playerArchetypeInfo.mousePosition = outData.mousePos;
+			playerArchetypeInfo.movementSystem = &gameState.movementSystem;
 			gameState.playerArchetype.Update(playerArchetypeInfo);
 		}
 
@@ -69,19 +91,12 @@ namespace game
 			gameState.cursorArchetype.Update(cursorArchetypeInfo);
 		}
 
-		{
-			static float f = 0;
-			f += outData.deltaTime * .003f;
+		GameUpdate(outData);
 
-			// Temp.
-			TextTask task{};
-			task.text = "general kenobi";
-			task.spacingPct = abs(sin(f));
-			task.leftTop.y = .5;
-			gameState.uiSystem.Add(task);
-		}
+		// Update game systems.
+		gameState.movementSystem.Update();
 
-		// Update systems.
+		// Update graphic systems.
 		gameState.animationSystem.Update(outData);
 		gameState.renderSystem.Update(outData, {});
 		gameState.uiSystem.Update(outData);
@@ -98,6 +113,8 @@ namespace game
 
 	void Exit(const EngineOutData outData)
 	{
+		gameState.movementSystem.Free(*outData.allocator);
+
 		gameState.uiSystem.Free(outData);
 		gameState.renderSystem.Free(outData);
 		gameState.animationSystem.Free(*outData.allocator);

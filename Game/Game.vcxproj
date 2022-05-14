@@ -181,6 +181,7 @@
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
+    <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextSystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\MovementSystem.cpp" />
     <ClCompile Include="Source\Archetypes\CursorArchetype.cpp" />
     <ClCompile Include="Source\Graphics\SubTexture.cpp" />
     <ClCompile Include="Source\Handlers\InputHandler.cpp" />

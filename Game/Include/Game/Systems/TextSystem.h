@@ -23,7 +23,7 @@ namespace game
 	private:
 		using TaskSystem<TextTask>::Allocate;
 
-		struct InternalRenderTask
+		struct InternalRenderTask final
 		{
 			Transform transform{};
 			SubTexture subTexture{};
