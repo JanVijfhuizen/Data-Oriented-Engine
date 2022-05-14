@@ -20,6 +20,7 @@ layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
 layout(push_constant) uniform PushConstants
 {
     vec2 resolution;
+    vec2 cameraPosition;
     float pixelSize;
 } pushConstants;
 
@@ -34,7 +35,7 @@ void HandleInstance(in InstanceData instance)
     outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
     
-    gl_Position = CalculatePosition(instance.transform, inPosition, pushConstants.resolution, pushConstants.pixelSize);
+    gl_Position = CalculatePosition(instance.transform, pushConstants.cameraPosition, inPosition, pushConstants.resolution, pushConstants.pixelSize);
 }
 
 void main() 

@@ -27,10 +27,16 @@ namespace game
 			jlb::StringView fragPath = "Shaders/frag.spv";
 		};
 
+		struct UpdateInfo final
+		{
+			glm::vec2 cameraPosition{};
+			float pixelSize = 0.008f;
+		};
+
 		void Allocate(const EngineOutData& engineOutData, const CreateInfo& createInfo = {});
 		void Free(const EngineOutData& engineOutData);
 
-		void Update(const EngineOutData& engineOutData);
+		void Update(const EngineOutData& engineOutData, const UpdateInfo& updateInfo);
 
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
@@ -44,7 +50,7 @@ namespace game
 		struct PushConstant final
 		{
 			glm::vec2 resolution;
-			float pixelSize = 0.008;
+			UpdateInfo updateInfo;
 		};
 
 		VkShaderModule _vertModule;
@@ -95,7 +101,7 @@ namespace game
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::Update(const EngineOutData& engineOutData)
+	void RenderSystem<Task>::Update(const EngineOutData& engineOutData, const UpdateInfo& updateInfo)
 	{
 		auto& cmd = engineOutData.swapChainCommandBuffer;
 
@@ -116,6 +122,7 @@ namespace game
 
 		PushConstant pushConstant{};
 		pushConstant.resolution = engineOutData.resolution;
+		pushConstant.updateInfo = updateInfo;
 
 		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
 		vkCmdDrawIndexed(cmd, _mesh.indexCount, jlb::TaskSystem<Task>::GetCount(), 0, 0, 0);

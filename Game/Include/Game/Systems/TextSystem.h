@@ -6,14 +6,14 @@
 
 namespace game
 {
-	struct UITask final
+	struct TextTask final
 	{
 		jlb::StringView text{};
 		glm::vec2 leftTop;
 		float spacingPct = .2f;
 	};
 
-	class UISystem final : public jlb::TaskSystem<UITask>
+	class TextSystem final : public jlb::TaskSystem<TextTask>
 	{
 	public:
 		void Allocate(const EngineOutData& engineOutData);
@@ -21,7 +21,7 @@ namespace game
 		void Update(const EngineOutData& engineOutData);
 
 	private:
-		using TaskSystem<UITask>::Allocate;
+		using TaskSystem<TextTask>::Allocate;
 
 		struct InternalRenderTask
 		{

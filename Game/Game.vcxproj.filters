@@ -81,7 +81,7 @@
     <ClInclude Include="Include\Game\Graphics\SubTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Systems\UISystem.h">
+    <ClInclude Include="Include\Game\Systems\TextSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Graphics\RenderTask.h">
@@ -134,7 +134,7 @@
     <ClCompile Include="Source\Graphics\TextureHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Systems\UISystem.cpp">
+    <ClCompile Include="Source\Systems\TextSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\AnimationSystem.cpp">

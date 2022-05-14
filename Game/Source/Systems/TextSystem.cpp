@@ -1,28 +1,28 @@
 ﻿#include "pch.h"
-#include "Systems/UISystem.h"
+#include "Systems/TextSystem.h"
 #include "Graphics/TextureHandler.h"
 #include "Graphics/RenderConventions.h"
 
 namespace game
 {
-	void UISystem::Allocate(const EngineOutData& engineOutData)
+	void TextSystem::Allocate(const EngineOutData& engineOutData)
 	{
 		RenderSystem<InternalRenderTask>::CreateInfo createInfo{};
 		createInfo.vertPath = "Shaders/ui-vert.spv";
 		createInfo.fragPath = "Shaders/ui-frag.spv";
 		createInfo.atlasTexturePath = "Textures/ui-atlas.png";
-		TaskSystem<UITask>::Allocate(*engineOutData.allocator);
+		TaskSystem<TextTask>::Allocate(*engineOutData.allocator);
 		_renderSystem.IncreaseRequestedLength(_renderSizeUsage);
 		_renderSystem.Allocate(engineOutData, createInfo);
 	}
 
-	void UISystem::Free(const EngineOutData& engineOutData)
+	void TextSystem::Free(const EngineOutData& engineOutData)
 	{
 		_renderSystem.Free(engineOutData);
-		TaskSystem<UITask>::Free(*engineOutData.allocator);
+		TaskSystem<TextTask>::Free(*engineOutData.allocator);
 	}
 
-	void UISystem::Update(const EngineOutData& engineOutData)
+	void TextSystem::Update(const EngineOutData& engineOutData)
 	{
 		const auto& texture = _renderSystem.GetTexture();
 		InternalRenderTask renderTask{};
@@ -50,6 +50,6 @@ namespace game
 		}
 
 		SetCount(0);
-		_renderSystem.Update(engineOutData);
+		_renderSystem.Update(engineOutData, {});
 	}
 }

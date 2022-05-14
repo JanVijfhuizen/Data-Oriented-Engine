@@ -74,7 +74,7 @@ namespace game
 			f += outData.deltaTime * .003f;
 
 			// Temp.
-			UITask task{};
+			TextTask task{};
 			task.text = "general kenobi";
 			task.spacingPct = abs(sin(f));
 			task.leftTop.y = .5;
@@ -83,7 +83,7 @@ namespace game
 
 		// Update systems.
 		gameState.animationSystem.Update(outData);
-		gameState.renderSystem.Update(outData);
+		gameState.renderSystem.Update(outData, {});
 		gameState.uiSystem.Update(outData);
 
 		EngineInData inData{};

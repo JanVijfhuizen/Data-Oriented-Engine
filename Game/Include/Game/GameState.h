@@ -1,7 +1,7 @@
 #pragma once
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/RenderSystem.h"
-#include "Systems/UISystem.h"
+#include "Systems/TextSystem.h"
 #include "Graphics/RenderTask.h"
 #include "Systems/AnimationSystem.h"
 #include "Archetypes/CursorArchetype.h"
@@ -17,6 +17,6 @@ namespace game
 		// Systems.
 		AnimationSystem animationSystem{};
 		RenderSystem<RenderTask> renderSystem{};
-		UISystem uiSystem{};
+		TextSystem uiSystem{};
 	} gameState;
 }
