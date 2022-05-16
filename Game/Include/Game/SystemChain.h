@@ -11,7 +11,7 @@ namespace game
 	{
 		friend SystemChain;
 
-	protected:
+	public:
 		virtual void Allocate(const EngineOutData& outData, SystemChain& chain) = 0;
 		virtual void Free(const EngineOutData& outData, SystemChain& chain) = 0;
 

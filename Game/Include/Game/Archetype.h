@@ -10,8 +10,6 @@ namespace game
 	class Archetype : public TaskSystem<Entity>
 	{
 	public:
-		using Base = Archetype<Entity, UpdateInfo>;
-
 		Entity& Add(Entity& entity) override;
 		Entity& Add(Entity&& entity = {}) override;
 		void RemoveAt(size_t index) override;

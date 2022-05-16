@@ -5,24 +5,10 @@
 #include "Archetypes/CursorArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/MovementSystem.h"
+#include <new>
 
 namespace game
 {
-	class A
-	{
-		float a = 1;
-		float b = 2;
-		float c = 3;
-
-	protected:
-		virtual~A() = default;
-	};
-
-	class B : public A
-	{
-		float d = 4;
-	};
-
 	void OnKeyInput(const int key, const int action)
 	{
 		PlayerArchetype::OnKeyInput(key, action, *gameState.chain.Get<PlayerArchetype>());
@@ -47,9 +33,8 @@ namespace game
 
 	void Start(const EngineOutData outData)
 	{
-		auto& chain = gameState.chain;
-
 		// Add archetypes.
+		auto& chain = gameState.chain;
 		chain.Add<PlayerArchetype>(outData);
 		chain.Add<CursorArchetype>(outData);
 

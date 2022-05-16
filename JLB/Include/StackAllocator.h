@@ -108,7 +108,7 @@ namespace jlb
 		allocation.src = alloc.src;
 
 		for (size_t i = 0; i < count; ++i)
-			allocation.ptr[i] = T();
+			new(&allocation.ptr[i]) T();
 		return allocation;
 	}
 }

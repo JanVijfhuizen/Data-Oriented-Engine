@@ -25,7 +25,7 @@ namespace game
 		Transform transform{};
 	};
 
-	struct PlayerArchetypeUpdateInfo final
+	struct PlayerUpdateInfo final
 	{
 		AnimationSystem* animationSystem;
 		EntityRenderSystem* entityRenderSystem;
@@ -33,7 +33,7 @@ namespace game
 		glm::vec2 mousePosition;
 	};
 
-	class PlayerArchetype final : public Archetype<Player, PlayerArchetypeUpdateInfo>
+	class PlayerArchetype final : public Archetype<Player, PlayerUpdateInfo>
 	{
 	public:
 		static void OnKeyInput(int key, int action, PlayerArchetype& instance);
@@ -46,7 +46,7 @@ namespace game
 		Controller _playerController{};
 		Animation _testAnim{};
 
-		PlayerArchetypeUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
-		void OnEntityUpdate(Player& entity, PlayerArchetypeUpdateInfo& info) override;
+		PlayerUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
+		void OnEntityUpdate(Player& entity, PlayerUpdateInfo& info) override;
 	};
 }

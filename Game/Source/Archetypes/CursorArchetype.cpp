@@ -59,7 +59,7 @@ namespace game
 		IncreaseRequestedLength(1);
 
 		auto& allocator = *outData.allocator;
-		Base::Allocate(outData, chain);
+		Archetype<Cursor, CursorUpdateInfo>::Allocate(outData, chain);
 		_idleAnim.frames.Allocate(allocator, 2);
 		_pressedAnim.frames.Allocate(allocator, 2);
 
@@ -72,7 +72,7 @@ namespace game
 		auto& allocator = *outData.allocator;
 		_pressedAnim.frames.Free(allocator);
 		_idleAnim.frames.Free(allocator);
-		Base::Free(outData, chain);
+		Archetype<Cursor, CursorUpdateInfo>::Free(outData, chain);
 	}
 
 	void CursorArchetype::OnAdd(Cursor& entity)

@@ -21,7 +21,7 @@ namespace game
 	{
 		IncreaseRequestedLength(1);
 
-		Base::Allocate(outData, chain);
+		Archetype<Player, PlayerUpdateInfo>::Allocate(outData, chain);
 		_testAnim.frames.Allocate(*outData.allocator, 2);
 
 		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(GetLength());
@@ -32,7 +32,7 @@ namespace game
 	void PlayerArchetype::Free(const EngineOutData& outData, SystemChain& chain)
 	{
 		_testAnim.frames.Free(*outData.allocator);
-		Base::Free(outData, chain);
+		Archetype<Player, PlayerUpdateInfo>::Free(outData, chain);
 	}
 
 	void PlayerArchetype::Start(const EngineOutData& outData, SystemChain& chain)
@@ -42,9 +42,9 @@ namespace game
 		_testAnim.frames[1].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Player + 1);
 	}
 
-	PlayerArchetypeUpdateInfo PlayerArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
+	PlayerUpdateInfo PlayerArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
 	{
-		PlayerArchetypeUpdateInfo info{};
+		PlayerUpdateInfo info{};
 		info.animationSystem = chain.Get<AnimationSystem>();
 		info.entityRenderSystem = chain.Get<EntityRenderSystem>();
 		info.movementSystem = chain.Get<MovementSystem>();
@@ -52,7 +52,7 @@ namespace game
 		return info;
 	}
 
-	void PlayerArchetype::OnEntityUpdate(Player& entity, PlayerArchetypeUpdateInfo& info)
+	void PlayerArchetype::OnEntityUpdate(Player& entity, PlayerUpdateInfo& info)
 	{
 		auto& transform = entity.transform;
 		auto& renderer = entity.renderer;
