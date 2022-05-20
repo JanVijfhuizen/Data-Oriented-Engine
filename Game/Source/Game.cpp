@@ -42,7 +42,7 @@ namespace game
 		chain.Add<MovementSystem>(outData);
 		chain.Add<CollisionSystem>(outData);
 		chain.Add<AnimationSystem>(outData);
-		chain.Add<RenderSystem<RenderTask>>(outData);
+		chain.Add<EntityRenderSystem>(outData);
 
 		chain.Allocate(outData);
 
