@@ -5,7 +5,7 @@
 #include "Components/Animator.h"
 #include "Systems/AnimationSystem.h"
 #include "Graphics/Animation.h"
-#include "Graphics/RenderTask.h"
+#include "Systems/EntityRenderSystem.h"
 
 namespace game
 {

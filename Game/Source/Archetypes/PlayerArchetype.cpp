@@ -71,7 +71,7 @@ namespace game
 			info.movementSystem->Add(movementTask);
 		}
 
-		RenderTask renderTask{};
+		EntityRenderTask renderTask{};
 		auto& taskTransform = renderTask.transform;
 		taskTransform = transform;
 		taskTransform.scale = RenderConventions::ENTITY_SIZE;
