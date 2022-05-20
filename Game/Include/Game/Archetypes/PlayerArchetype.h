@@ -25,36 +25,28 @@ namespace game
 		Transform transform{};
 	};
 
-	struct PlayerArchetypeCreateInfo final
+	struct PlayerUpdateInfo final
 	{
-		RenderSystem<RenderTask>* renderSystem;
 		AnimationSystem* animationSystem;
-		MovementSystem* movementSystem;
-	};
-
-	struct PlayerArchetypeUpdateInfo final
-	{
-		RenderSystem<RenderTask>* renderSystem;
-		AnimationSystem* animationSystem;
+		EntityRenderSystem* entityRenderSystem;
 		MovementSystem* movementSystem;
 		glm::vec2 mousePosition;
 	};
 
-	class PlayerArchetype final : public jlb::Archetype<Player, PlayerArchetypeCreateInfo, PlayerArchetypeUpdateInfo>
+	class PlayerArchetype final : public Archetype<Player, PlayerUpdateInfo>
 	{
 	public:
 		static void OnKeyInput(int key, int action, PlayerArchetype& instance);
 
-		void Allocate(jlb::StackAllocator& allocator, size_t size, const Player& fillValue = {}) override;
-		void Free(jlb::StackAllocator& allocator) override;
-		void DefineResourceUsage(PlayerArchetypeCreateInfo& info) override;
-		void Start(PlayerArchetypeCreateInfo& info) override;
+		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Free(const EngineOutData& outData, SystemChain& chain) override;
+		void Start(const EngineOutData& outData, SystemChain& chain) override;
 
 	private:
 		Controller _playerController{};
 		Animation _testAnim{};
 
-		void OnPreEntityUpdate(PlayerArchetypeUpdateInfo& info) override;
-		void OnEntityUpdate(Player& entity, PlayerArchetypeUpdateInfo& info) override;
+		PlayerUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
+		void OnEntityUpdate(Player& entity, PlayerUpdateInfo& info) override;
 	};
 }

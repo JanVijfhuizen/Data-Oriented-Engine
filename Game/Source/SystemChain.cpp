@@ -3,27 +3,25 @@
 
 namespace game
 {
+	SystemChain::Iterator::Iterator() = default;
+
 	SystemChain::Iterator::Iterator(ISystemChainable* chainable) : _ptr(chainable)
 	{
 
 	}
 
-	SystemChain::Iterator& SystemChain::Iterator::operator=(ISystemChainable* chainable)
-	{
-		this->_ptr = chainable;
-		return *this;
-	}
-
-	SystemChain::Iterator& SystemChain::Iterator::operator++()
+	const SystemChain::Iterator& SystemChain::Iterator::operator++()
 	{
 		if (_ptr)
 			_ptr = _ptr->_next;
 		return *this;
 	}
 
-	bool SystemChain::Iterator::operator!=(const Iterator& iterator) const
+	SystemChain::Iterator SystemChain::Iterator::operator++(int)
 	{
-		return _ptr != iterator._ptr;
+		if (_ptr)
+			_ptr = _ptr->_next;
+		return *this;
 	}
 
 	ISystemChainable& SystemChain::Iterator::operator*() const
@@ -50,7 +48,7 @@ namespace game
 		while (current)
 		{
 			ISystemChainable* next = current->_next;
-			outData.allocator->MFreeUnsafe(next);
+			outData.allocator->MFreeUnsafe(current->_src);
 			current = next;
 		}
 	}
@@ -78,8 +76,12 @@ namespace game
 	void SystemChain::ReverseExecute(void(ISystemChainable::* ptr)(const EngineOutData&, SystemChain&), const EngineOutData& outData)
 	{
 		ISystemChainable* current = _head;
-		while (current)
+		while (true)
+		{
+			if (!current->_next)
+				break;
 			current = current->_next;
+		}
 		while (current)
 		{
 			(current->*ptr)(outData, *this);

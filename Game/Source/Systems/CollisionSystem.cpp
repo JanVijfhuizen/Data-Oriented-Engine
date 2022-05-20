@@ -3,11 +3,11 @@
 
 namespace game
 {
-	void CollisionSystem::Update()
+	void CollisionSystem::Update(const EngineOutData& outData, SystemChain& chain)
 	{
 		for (auto& task : *this)
 		{
-			
+
 		}
 		SetCount(0);
 	}

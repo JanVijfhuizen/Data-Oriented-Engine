@@ -4,12 +4,20 @@
 
 namespace game
 {
-	void AnimationSystem::Update(const EngineOutData& engineOutData)
+	AnimationTask AnimationSystem::CreateDefaultTask(Renderer& renderer, Animator& animator)
 	{
-		const bool newFrame = abs(engineOutData.time - _frame) > frameDuration;
-		if(newFrame)
+		AnimationTask task{};
+		task.renderer = &renderer;
+		task.animator = &animator;
+		return task;
+	}
+
+	void AnimationSystem::Update(const EngineOutData& outData, SystemChain& chain)
+	{
+		const bool newFrame = abs(outData.time - _frame) > frameDuration;
+		if (newFrame)
 		{
-			_frame = engineOutData.time;
+			_frame = outData.time;
 
 			for (auto& task : *this)
 			{
@@ -40,13 +48,5 @@ namespace game
 		}
 
 		SetCount(0);
-	}
-
-	AnimationTask AnimationSystem::CreateDefaultTask(Renderer& renderer, Animator& animator)
-	{
-		AnimationTask task{};
-		task.renderer = &renderer;
-		task.animator = &animator;
-		return task;
 	}
 }
