@@ -48,7 +48,7 @@ namespace game
 		while (current)
 		{
 			ISystemChainable* next = current->_next;
-			outData.allocator->MFreeUnsafe(next);
+			outData.allocator->MFreeUnsafe(current->_src);
 			current = next;
 		}
 	}

@@ -19,6 +19,7 @@ namespace game
 		virtual void Update(const EngineOutData& outData, SystemChain& chain) = 0;
 
 	private:
+		size_t* _src = nullptr;
 		ISystemChainable* _previous = nullptr;
 		ISystemChainable* _next = nullptr;
 		const char* _typeName = nullptr;
@@ -79,6 +80,7 @@ namespace game
 	{
 		auto allocation = outData.allocator->New<T>();
 		ISystemChainable* ptr = static_cast<ISystemChainable*>(allocation.ptr);
+		ptr->_src = allocation.src;
 		ptr->_typeName = typeid(T).name();
 		if(_head)
 			_head->_previous = ptr;

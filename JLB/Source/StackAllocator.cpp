@@ -48,6 +48,19 @@ namespace jlb
 		return allocation;
 	}
 
+	void StackAllocator::MFreeUnsafe(size_t* src)
+	{
+		if (_data != src)
+		{
+			_next->MFreeUnsafe(src);
+			return;
+		}
+
+		const size_t size = _data[_current - 1];
+		_current -= size;
+		_id--;
+	}
+
 	bool StackAllocator::IsEmpty() const
 	{
 		return _current == 0;
