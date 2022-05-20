@@ -24,6 +24,7 @@ namespace game
 		using jlb::Vector<Task>::Allocate;
 		using jlb::Vector<Task>::AllocateAndCopy;
 		using jlb::Vector<Task>::Free;
+		using jlb::Vector<Task>::RemoveAt;
 
 		size_t _requestedLength = 0;
 	};

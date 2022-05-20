@@ -40,6 +40,13 @@ namespace game
 
 		[[nodiscard]] const Texture& GetTexture() const;
 
+	protected:
+		[[nodiscard]] virtual CreateInfo GetCreateInfo() = 0;
+
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Free(const EngineOutData& outData, SystemChain& chain) override;
+
 	private:
 		struct PushConstant final
 		{
@@ -61,12 +68,6 @@ namespace game
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
-
-		[[nodiscard]] virtual CreateInfo GetCreateInfo() = 0;
-
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
-		void Free(const EngineOutData& outData, SystemChain& chain) override;
 
 		void LoadShader(const EngineOutData& engineOutData, const CreateInfo& createInfo);
 		void UnloadShader(const EngineOutData& engineOutData) const;

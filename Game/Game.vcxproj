@@ -182,7 +182,7 @@
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
     <ClInclude Include="Include\Game\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
-    <ClInclude Include="Include\Game\Systems\TextSystem.h" />
+    <ClInclude Include="Include\Game\Systems\TextRenderSystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Systems\RenderSystem.h" />
@@ -200,7 +200,7 @@
     <ClCompile Include="Source\Graphics\SubTexture.cpp" />
     <ClCompile Include="Source\Handlers\InputHandler.cpp" />
     <ClCompile Include="Source\Systems\AnimationSystem.cpp" />
-    <ClCompile Include="Source\Systems\TextSystem.cpp" />
+    <ClCompile Include="Source\Systems\TextRenderSystem.cpp" />
     <ClCompile Include="Source\Graphics\TextureHandler.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />

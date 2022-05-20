@@ -6,6 +6,7 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/MovementSystem.h"
 #include <new>
+#include "Systems/TextRenderSystem.h"
 
 namespace game
 {
@@ -28,7 +29,13 @@ namespace game
 
 	void GameUpdate(const EngineOutData& outData)
 	{
-		
+		static float f = 0;
+		f += 0.001f;
+
+		TextRenderTask task{};
+		task.text = "general kenobi";
+		task.spacingPct = abs(sin(f));
+		gameState.chain.Get<TextRenderSystem>()->AddAsCharRenderTasks(task);
 	}
 
 	void Start(const EngineOutData outData)
@@ -43,6 +50,7 @@ namespace game
 		chain.Add<CollisionSystem>(outData);
 		chain.Add<AnimationSystem>(outData);
 		chain.Add<EntityRenderSystem>(outData);
+		chain.Add<TextRenderSystem>(outData);
 
 		chain.Allocate(outData);
 
