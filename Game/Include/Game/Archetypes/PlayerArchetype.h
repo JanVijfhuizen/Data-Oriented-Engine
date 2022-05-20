@@ -6,7 +6,7 @@
 #include "Components/Renderer.h"
 #include "Components/Transform.h"
 #include "Systems/RenderSystem.h"
-#include "Graphics/RenderTask.h"
+#include "Systems/EntityRenderSystem.h"
 #include "Graphics/Animation.h"
 #include "Components/Animator.h"
 

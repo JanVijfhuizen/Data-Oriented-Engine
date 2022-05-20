@@ -22,9 +22,9 @@ namespace game
 	public:
 		struct CreateInfo final
 		{
-			jlb::StringView atlasTexturePath = "Textures/atlas.png";
-			jlb::StringView vertPath = "Shaders/vert.spv";
-			jlb::StringView fragPath = "Shaders/frag.spv";
+			jlb::StringView atlasTexturePath;
+			jlb::StringView vertPath;
+			jlb::StringView fragPath;
 		};
 
 		struct UpdateInfo final
@@ -32,6 +32,8 @@ namespace game
 			glm::vec2 cameraPosition{};
 			float pixelSize = 0.008f;
 		};
+
+		UpdateInfo updateInfo{};
 
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
@@ -59,6 +61,8 @@ namespace game
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
+
+		[[nodiscard]] virtual CreateInfo GetCreateInfo() = 0;
 
 		void Update(const EngineOutData& outData, SystemChain& chain) override;
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
@@ -134,8 +138,6 @@ namespace game
 		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
 		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-		UpdateInfo updateInfo{};
-
 		PushConstant pushConstant{};
 		pushConstant.resolution = outData.resolution;
 		pushConstant.updateInfo = updateInfo;
@@ -149,7 +151,7 @@ namespace game
 	template <typename Task>
 	void RenderSystem<Task>::Allocate(const EngineOutData& outData, SystemChain& chain)
 	{
-		const CreateInfo createInfo{};
+		const CreateInfo createInfo = GetCreateInfo();
 
 		TaskSystem<Task>::Allocate(outData, chain);
 		LoadTextureAtlas(outData, createInfo);

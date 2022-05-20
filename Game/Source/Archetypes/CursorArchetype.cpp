@@ -98,7 +98,7 @@ namespace game
 
 		transform.position = glm::vec2(-1) + updateInfo.mousePosition * 2.f * sensitivity;
 
-		RenderTask task{};
+		EntityRenderTask task{};
 		auto& taskTransform = task.transform;
 		taskTransform = transform;
 		taskTransform.scale = RenderConventions::CURSOR_SIZE;
