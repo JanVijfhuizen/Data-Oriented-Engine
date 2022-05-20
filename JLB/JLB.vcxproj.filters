@@ -68,12 +68,6 @@
     <ClInclude Include="Include\StackVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Archetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\TaskSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\FileLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>

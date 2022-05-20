@@ -4,9 +4,8 @@
 #include "Components/Renderer.h"
 #include "Components/Animator.h"
 #include "Systems/AnimationSystem.h"
-#include "Graphics/RenderTask.h"
-#include "Systems/RenderSystem.h"
 #include "Graphics/Animation.h"
+#include "Graphics/RenderTask.h"
 
 namespace game
 {
@@ -17,31 +16,19 @@ namespace game
 		Transform transform{};
 	};
 
-	struct CursorArchetypeCreateInfo final
+	struct CursorUpdateInfo
 	{
-		RenderSystem<RenderTask>* renderSystem;
 		AnimationSystem* animationSystem;
-	};
-
-	struct CursorArchetypeUpdateInfo final
-	{
-		RenderSystem<RenderTask>* renderSystem;
-		AnimationSystem* animationSystem;
+		EntityRenderSystem* entityRenderSystem;
 		glm::vec2 mousePosition;
 	};
 
-	class CursorArchetype final : public jlb::Archetype<Cursor, CursorArchetypeCreateInfo, CursorArchetypeUpdateInfo>
+	class CursorArchetype final : public Archetype<Cursor, CursorUpdateInfo>
 	{
 	public:
 		float sensitivity = 50;
 
 		static void OnMouseKeyInput(int key, int action, CursorArchetype& instance);
-
-		void Allocate(jlb::StackAllocator& allocator, size_t size, const Cursor& fillValue = {}) override;
-		void Free(jlb::StackAllocator& allocator) override;
-
-		void DefineResourceUsage(CursorArchetypeCreateInfo& info) override;
-		void Start(CursorArchetypeCreateInfo& info) override;
 
 	private:
 		int _lMouseKey = 0;
@@ -49,7 +36,13 @@ namespace game
 		Animation _idleAnim{};
 		Animation _pressedAnim{};
 
+		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Free(const EngineOutData& outData, SystemChain& chain) override;
+
+		void Start(const EngineOutData& outData, SystemChain& chain) override;
+
 		void OnAdd(Cursor& entity) override;
-		void OnEntityUpdate(Cursor& entity, CursorArchetypeUpdateInfo& info) override;
+		CursorUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
+		void OnEntityUpdate(Cursor& entity, CursorUpdateInfo& updateInfo) override;
 	};
 }

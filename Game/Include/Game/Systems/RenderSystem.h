@@ -17,7 +17,7 @@
 namespace game
 {
 	template <typename Task>
-	class RenderSystem : public jlb::TaskSystem<Task>
+	class RenderSystem : public TaskSystem<Task>
 	{
 	public:
 		struct CreateInfo final
@@ -33,20 +33,12 @@ namespace game
 			float pixelSize = 0.008f;
 		};
 
-		void Allocate(const EngineOutData& engineOutData, const CreateInfo& createInfo = {});
-		void Free(const EngineOutData& engineOutData);
-
-		void Update(const EngineOutData& engineOutData, const UpdateInfo& updateInfo);
-
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
 
 		[[nodiscard]] const Texture& GetTexture() const;
 
 	private:
-		using jlb::TaskSystem<Task>::Allocate;
-		using jlb::TaskSystem<Task>::Free;
-
 		struct PushConstant final
 		{
 			glm::vec2 resolution;
@@ -68,6 +60,10 @@ namespace game
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
 
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Free(const EngineOutData& outData, SystemChain& chain) override;
+
 		void LoadShader(const EngineOutData& engineOutData, const CreateInfo& createInfo);
 		void UnloadShader(const EngineOutData& engineOutData) const;
 		void LoadTextureAtlas(const EngineOutData& engineOutData, const CreateInfo& createInfo);
@@ -77,58 +73,6 @@ namespace game
 		void CreateShaderAssets(const EngineOutData& engineOutData);
 		void DestroyShaderAssets(const EngineOutData& engineOutData);
 	};
-
-	template <typename Task>
-	void RenderSystem<Task>::Allocate(const EngineOutData& engineOutData, const CreateInfo& createInfo)
-	{
-		jlb::TaskSystem<Task>::Allocate(*engineOutData.allocator);
-		LoadTextureAtlas(engineOutData, createInfo);
-		LoadShader(engineOutData, createInfo);
-		CreateMesh(engineOutData);
-		CreateShaderAssets(engineOutData);
-		CreateSwapChainAssets(engineOutData);
-	}
-
-	template <typename Task>
-	void RenderSystem<Task>::Free(const EngineOutData& engineOutData)
-	{
-		DestroySwapChainAssets(engineOutData);
-		DestroyShaderAssets(engineOutData);
-		MeshHandler::Destroy(engineOutData, _mesh);
-		UnloadShader(engineOutData);
-		UnloadTextureAtlas(engineOutData);
-		jlb::TaskSystem<Task>::Free(*engineOutData.allocator);
-	}
-
-	template <typename Task>
-	void RenderSystem<Task>::Update(const EngineOutData& engineOutData, const UpdateInfo& updateInfo)
-	{
-		auto& cmd = engineOutData.swapChainCommandBuffer;
-
-		auto& logicalDevice = engineOutData.app->logicalDevice;
-		auto& memBlock = _instanceMemBlocks[engineOutData.swapChainImageIndex];
-		void* instanceData;
-		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
-		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(jlb::TaskSystem<Task>::GetData()), sizeof(Task) * jlb::TaskSystem<Task>::GetLength());
-		vkUnmapMemory(logicalDevice, memBlock.memory);
-
-		VkDeviceSize offset = 0;
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-			0, 1, &_descriptorSets[engineOutData.swapChainImageIndex], 0, nullptr);
-		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
-		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-		PushConstant pushConstant{};
-		pushConstant.resolution = engineOutData.resolution;
-		pushConstant.updateInfo = updateInfo;
-
-		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
-		vkCmdDrawIndexed(cmd, _mesh.indexCount, jlb::TaskSystem<Task>::GetCount(), 0, 0, 0);
-
-		jlb::TaskSystem<Task>::SetCount(0);
-	}
 
 	template <typename Task>
 	void RenderSystem<Task>::CreateSwapChainAssets(const EngineOutData& engineOutData)
@@ -168,6 +112,62 @@ namespace game
 	const Texture& RenderSystem<Task>::GetTexture() const
 	{
 		return _textureAtlas;
+	}
+
+	template <typename Task>
+	void RenderSystem<Task>::Update(const EngineOutData& outData, SystemChain& chain)
+	{
+		auto& cmd = outData.swapChainCommandBuffer;
+
+		auto& logicalDevice = outData.app->logicalDevice;
+		auto& memBlock = _instanceMemBlocks[outData.swapChainImageIndex];
+		void* instanceData;
+		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
+		assert(!result);
+		memcpy(instanceData, static_cast<const void*>(TaskSystem<Task>::GetData()), sizeof(Task) * TaskSystem<Task>::GetLength());
+		vkUnmapMemory(logicalDevice, memBlock.memory);
+
+		VkDeviceSize offset = 0;
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+			0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
+		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
+		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+		UpdateInfo updateInfo{};
+
+		PushConstant pushConstant{};
+		pushConstant.resolution = outData.resolution;
+		pushConstant.updateInfo = updateInfo;
+
+		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
+		vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
+
+		TaskSystem<Task>::SetCount(0);
+	}
+
+	template <typename Task>
+	void RenderSystem<Task>::Allocate(const EngineOutData& outData, SystemChain& chain)
+	{
+		const CreateInfo createInfo{};
+
+		TaskSystem<Task>::Allocate(outData, chain);
+		LoadTextureAtlas(outData, createInfo);
+		LoadShader(outData, createInfo);
+		CreateMesh(outData);
+		CreateShaderAssets(outData);
+		CreateSwapChainAssets(outData);
+	}
+
+	template <typename Task>
+	void RenderSystem<Task>::Free(const EngineOutData& outData, SystemChain& chain)
+	{
+		DestroySwapChainAssets(outData);
+		DestroyShaderAssets(outData);
+		MeshHandler::Destroy(outData, _mesh);
+		UnloadShader(outData);
+		UnloadTextureAtlas(outData);
+		TaskSystem<Task>::Free(outData, chain);
 	}
 
 	template <typename Task>
@@ -267,7 +267,7 @@ namespace game
 		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
 		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(Task) * jlb::TaskSystem<Task>::GetLength();
+		vertBufferInfo.size = sizeof(Task) * TaskSystem<Task>::GetLength();
 		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -294,7 +294,7 @@ namespace game
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(Task) * jlb::TaskSystem<Task>::GetLength();
+		bindings[0].size = sizeof(Task) * TaskSystem<Task>::GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -341,7 +341,7 @@ namespace game
 			VkDescriptorBufferInfo instanceInfo{};
 			instanceInfo.buffer = _instanceBuffers[i];
 			instanceInfo.offset = 0;
-			instanceInfo.range = sizeof(Task) * jlb::TaskSystem<Task>::GetLength();
+			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
 
 			auto& instanceWrite = writes[0];
 			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <cassert>
 
 namespace jlb
 {
@@ -40,6 +41,9 @@ namespace jlb
 		template <typename T>
 		void MFree(const Allocation<T>& allocation);
 
+		// Frees the last allocation at the given source, but does not do any additional safety checks.
+		void MFreeUnsafe(size_t* src);
+
 		// Malloc but simplified for allocating types. Does not call constructors.
 		template <typename T>
 		[[nodiscard]] Allocation<T> New(size_t count = 1);
@@ -70,9 +74,7 @@ namespace jlb
 			return _next->MFree(allocation);
 		assert(_id == allocation.id + 1);
 
-		const size_t size = _data[_current - 1];
-		_current -= size;
-		_id--;
+		MFreeUnsafe(allocation.src);
 	}
 
 	template <typename T>
@@ -85,7 +87,7 @@ namespace jlb
 		allocation.src = alloc.src;
 
 		for (size_t i = 0; i < count; ++i)
-			allocation.ptr[i] = T();
+			new(&allocation.ptr[i]) T();
 		return allocation;
 	}
 }

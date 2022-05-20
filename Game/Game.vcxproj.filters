@@ -42,12 +42,6 @@
     <ClInclude Include="Include\Game\Components\Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Components\Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Game\Components\ShadowCaster.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Game\Systems\RenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -108,6 +102,18 @@
     <ClInclude Include="Include\Game\Systems\MovementSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Game\Systems\CollisionSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Game\SystemChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Game\TaskSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Game\Archetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\dllmain.cpp">
@@ -153,6 +159,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\MovementSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Systems\CollisionSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SystemChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

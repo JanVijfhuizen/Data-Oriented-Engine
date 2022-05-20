@@ -23,29 +23,9 @@ namespace game
 			}
 	}
 
-	void CursorArchetype::Allocate(jlb::StackAllocator& allocator, const size_t size, const Cursor& fillValue)
+	void CursorArchetype::Start(const EngineOutData& outData, SystemChain& chain)
 	{
-		Base::Allocate(allocator, size, fillValue);
-		_idleAnim.frames.Allocate(allocator, 2);
-		_pressedAnim.frames.Allocate(allocator, 2);
-	}
-
-	void CursorArchetype::Free(jlb::StackAllocator& allocator)
-	{
-		_pressedAnim.frames.Free(allocator);
-		_idleAnim.frames.Free(allocator);
-		Base::Free(allocator);
-	}
-
-	void CursorArchetype::DefineResourceUsage(CursorArchetypeCreateInfo& info)
-	{
-		info.renderSystem->IncreaseRequestedLength(GetLength());
-		info.animationSystem->IncreaseRequestedLength(GetLength() * 2);
-	}
-
-	void CursorArchetype::Start(CursorArchetypeCreateInfo& info)
-	{
-		const auto& texture = info.renderSystem->GetTexture();
+		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
 
 		auto subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Cursor);
 		subTexture.rightBot = subTexture.leftTop;
@@ -74,25 +54,55 @@ namespace game
 		}
 	}
 
+	void CursorArchetype::Allocate(const EngineOutData& outData, SystemChain& chain)
+	{
+		IncreaseRequestedLength(1);
+
+		auto& allocator = *outData.allocator;
+		Archetype<Cursor, CursorUpdateInfo>::Allocate(outData, chain);
+		_idleAnim.frames.Allocate(allocator, 2);
+		_pressedAnim.frames.Allocate(allocator, 2);
+
+		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(GetLength());
+		chain.Get<AnimationSystem>()->IncreaseRequestedLength(GetLength() * 2);
+	}
+
+	void CursorArchetype::Free(const EngineOutData& outData, SystemChain& chain)
+	{
+		auto& allocator = *outData.allocator;
+		_pressedAnim.frames.Free(allocator);
+		_idleAnim.frames.Free(allocator);
+		Archetype<Cursor, CursorUpdateInfo>::Free(outData, chain);
+	}
+
 	void CursorArchetype::OnAdd(Cursor& entity)
 	{
 		entity.animator.animation = &_idleAnim;
 	}
 
-	void CursorArchetype::OnEntityUpdate(Cursor& entity, CursorArchetypeUpdateInfo& info)
+	CursorUpdateInfo CursorArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
+	{
+		CursorUpdateInfo info{};
+		info.animationSystem = chain.Get<AnimationSystem>();
+		info.entityRenderSystem = chain.Get<EntityRenderSystem>();
+		info.mousePosition = outData.mousePos;
+		return info;
+	}
+
+	void CursorArchetype::OnEntityUpdate(Cursor& entity, CursorUpdateInfo& updateInfo)
 	{
 		auto& transform = entity.transform;
 		auto& renderer = entity.renderer;
 
-		info.animationSystem->Add(AnimationSystem::CreateDefaultTask(entity.renderer, entity.animator));
+		updateInfo.animationSystem->Add(AnimationSystem::CreateDefaultTask(entity.renderer, entity.animator));
 
-		transform.position = glm::vec2(-1) + info.mousePosition * 2.f * sensitivity;
+		transform.position = glm::vec2(-1) + updateInfo.mousePosition * 2.f * sensitivity;
 
 		RenderTask task{};
 		auto& taskTransform = task.transform;
 		taskTransform = transform;
 		taskTransform.scale = RenderConventions::CURSOR_SIZE;
 		task.subTexture = renderer.subTexture;
-		info.renderSystem->Add(task);
+		updateInfo.entityRenderSystem->Add(task);
 	}
 }
