@@ -5,7 +5,6 @@
 #include "Archetypes/CursorArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/MovementSystem.h"
-#include <new>
 #include "Systems/TextRenderSystem.h"
 
 namespace game

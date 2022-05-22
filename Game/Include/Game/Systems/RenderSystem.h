@@ -16,10 +16,15 @@
 
 namespace game
 {
+	/// <summary>
+	/// Handles the rendering of sprites.<br>
+	/// Any rendering system that inherits from this must adhere to the shader formatting used in this system.
+	/// </summary>
 	template <typename Task>
 	class RenderSystem : public TaskSystem<Task>
 	{
 	public:
+		// Used to define the renderer.
 		struct CreateInfo final
 		{
 			jlb::StringView atlasTexturePath;
@@ -27,17 +32,20 @@ namespace game
 			jlb::StringView fragPath;
 		};
 
+		// Used to update the renderer.
 		struct UpdateInfo final
 		{
 			glm::vec2 cameraPosition{};
 			float pixelSize = 0.008f;
 		};
 
+		// Can safely be adjusted from outside the class.
 		UpdateInfo updateInfo{};
 
 		void CreateSwapChainAssets(const EngineOutData& engineOutData);
 		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
 
+		// Get the texture atlas used for this renderer.
 		[[nodiscard]] const Texture& GetTexture() const;
 
 	protected:

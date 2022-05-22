@@ -4,7 +4,6 @@ namespace game
 {
 	struct Collider final
 	{
-		bool moveable = false;
-		glm::vec2 delta{};
+		uint32_t mask = 0;
 	};
 }

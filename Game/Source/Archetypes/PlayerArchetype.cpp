@@ -5,6 +5,7 @@
 #include "Systems/AnimationSystem.h"
 #include "Handlers/InputHandler.h"
 #include "Systems/MovementSystem.h"
+#include "Systems/CollisionSystem.h"
 
 namespace game
 {
@@ -24,9 +25,12 @@ namespace game
 		Archetype<Player, PlayerUpdateInfo>::Allocate(outData, chain);
 		_testAnim.frames.Allocate(*outData.allocator, 2);
 
-		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(GetLength());
-		chain.Get<AnimationSystem>()->IncreaseRequestedLength(GetLength());
-		chain.Get<MovementSystem>()->IncreaseRequestedLength(GetLength());
+		const size_t length = GetLength();
+
+		chain.Get<CollisionSystem>()->IncreaseRequestedLength(length, true);
+		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(length);
+		chain.Get<AnimationSystem>()->IncreaseRequestedLength(length);
+		chain.Get<MovementSystem>()->IncreaseRequestedLength(length);
 	}
 
 	void PlayerArchetype::Free(const EngineOutData& outData, SystemChain& chain)
