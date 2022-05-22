@@ -10,8 +10,8 @@ namespace game
 	class Archetype : public TaskSystem<Entity>
 	{
 	public:
-		Entity& Add(Entity& entity) override;
-		Entity& Add(Entity&& entity = {}) override;
+		Entity& Add(const Entity& entity) override;
+		Entity& Add(const Entity&& entity = {}) override;
 		void RemoveAt(size_t index) override;
 
 	protected:
@@ -27,7 +27,7 @@ namespace game
 	};
 
 	template <typename Entity, typename UpdateInfo>
-	Entity& Archetype<Entity, UpdateInfo>::Add(Entity& entity)
+	Entity& Archetype<Entity, UpdateInfo>::Add(const Entity& entity)
 	{
 		auto& result = jlb::Vector<Entity>::Add(entity);
 		OnAdd(result);
@@ -35,7 +35,7 @@ namespace game
 	}
 
 	template <typename Entity, typename UpdateInfo>
-	Entity& Archetype<Entity, UpdateInfo>::Add(Entity&& entity)
+	Entity& Archetype<Entity, UpdateInfo>::Add(const Entity&& entity)
 	{
 		auto& result = jlb::Vector<Entity>::Add(entity);
 		OnAdd(result);

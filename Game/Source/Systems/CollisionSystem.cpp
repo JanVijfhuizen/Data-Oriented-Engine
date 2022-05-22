@@ -28,7 +28,7 @@ namespace game
 	{
 		TaskSystem<DynamicCollisionTask>::Allocate(outData, chain);
 		_statics.Allocate(*outData.allocator, _requestedStaticSize);
-		_validChecks.Allocate(*outData.allocator, _requestedStaticSize);
+		_validChecks.Allocate(*outData.allocator, GetRequestedLength());
 	}
 
 	void CollisionSystem::Free(const EngineOutData& outData, SystemChain& chain)
@@ -103,13 +103,42 @@ namespace game
 		SetCount(0);
 	}
 
-	bool CollisionSystem::Collides(DynamicCollisionTask& a, DynamicCollisionTask& b)
+	bool CollisionSystem::Collides(const DynamicCollisionTask& a, const DynamicCollisionTask& b) const
 	{
-		return false;
+		auto& aTransform = a.subTask.transform;
+		auto& bTransform = b.subTask.transform;
+
+		return CircleCollides(aTransform, bTransform);
 	}
 
-	bool CollisionSystem::Collides(DynamicCollisionTask& a, StaticCollisionTask& b)
+	bool CollisionSystem::Collides(const DynamicCollisionTask& a, const StaticCollisionTask& b) const
 	{
-		return false;
+		auto& aTransform = a.subTask.transform;
+		auto& bTransform = b.transform;
+
+		if (CircleCollides(aTransform, bTransform))
+			return true;
+
+		auto& aPos = aTransform.position;
+		auto& bPos = bTransform.position;
+
+		auto& aScale = aTransform.scale;
+		auto& bScale = bTransform.scale;
+
+		// AABB collision.
+		const bool xDis = aPos.x < bPos.x + bScale;
+		const bool xDis2 = aPos.x + aScale > bPos.x;
+		const bool yDis = aPos.y < bPos.y + bScale;
+		const bool yDis2 = aPos.y + aScale > bPos.y;
+
+		return xDis && xDis2 && yDis && yDis2;
+	}
+
+	bool CollisionSystem::CircleCollides(const Transform& a, const Transform& b) const
+	{
+		const float dis = glm::distance(a.position, b.position);
+		const float radius = (a.scale + b.scale) * .5f;
+
+		return dis < radius;
 	}
 }

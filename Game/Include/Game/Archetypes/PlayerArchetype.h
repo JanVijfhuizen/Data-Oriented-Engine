@@ -43,6 +43,8 @@ namespace game
 		void Start(const EngineOutData& outData, SystemChain& chain) override;
 
 	private:
+		using Archetype<Player, PlayerUpdateInfo>::IncreaseRequestedLength;
+
 		Controller _playerController{};
 		Animation _testAnim{};
 

@@ -1,11 +1,14 @@
 #pragma once
+#include "Graphics/RenderConventions.h"
 
 namespace game
 {
 	struct Transform final
 	{
+		// In pixels.
 		glm::vec2 position{};
 		float rotation{};
-		float scale{ 1 };
+		// In pixels.
+		float scale = RenderConventions::ENTITY_SIZE;
 	};
 }

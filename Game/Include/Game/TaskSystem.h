@@ -15,6 +15,7 @@ namespace game
 		// Increase the size that the system will be allocated with.
 		// Call this before actually allocating it.
 		void IncreaseRequestedLength(size_t size);
+		[[nodiscard]] size_t GetRequestedLength() const;
 
 	protected:
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
@@ -32,7 +33,14 @@ namespace game
 	template <typename Task>
 	void TaskSystem<Task>::IncreaseRequestedLength(const size_t size)
 	{
+		assert(!jlb::Vector<Task>::GetData());
 		_requestedLength += size;
+	}
+
+	template <typename Task>
+	size_t TaskSystem<Task>::GetRequestedLength() const
+	{
+		return _requestedLength;
 	}
 
 	template <typename Task>

@@ -6,6 +6,7 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/TextRenderSystem.h"
+#include "Archetypes/WallArchetype.h"
 
 namespace game
 {
@@ -19,11 +20,18 @@ namespace game
 		CursorArchetype::OnMouseKeyInput(key, action, *gameState.chain.Get<CursorArchetype>());
 	}
 
+	void DefineUsage(const EngineOutData& outData)
+	{
+		gameState.chain.Get<WallArchetype>()->IncreaseRequestedLength(1);
+	}
+
 	void GameStart(const EngineOutData& outData)
 	{
 		// Set up game world.
 		gameState.chain.Get<PlayerArchetype>()->Add();
 		gameState.chain.Get<CursorArchetype>()->Add();
+		auto& wall = gameState.chain.Get<WallArchetype>()->Add();
+		wall.transform.position = { 40, 70 };
 	}
 
 	void GameUpdate(const EngineOutData& outData)
@@ -42,6 +50,7 @@ namespace game
 		// Add archetypes.
 		auto& chain = gameState.chain;
 		chain.Add<PlayerArchetype>(outData);
+		chain.Add<WallArchetype>(outData);
 		chain.Add<CursorArchetype>(outData);
 
 		// Add systems.
@@ -51,6 +60,7 @@ namespace game
 		chain.Add<EntityRenderSystem>(outData);
 		chain.Add<TextRenderSystem>(outData);
 
+		DefineUsage(outData);
 		chain.Allocate(outData);
 
 		// Start the game.

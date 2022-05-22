@@ -40,7 +40,9 @@ namespace game
 
 		using TaskSystem<DynamicCollisionTask>::IncreaseRequestedLength;
 
-		bool Collides(DynamicCollisionTask& a, DynamicCollisionTask& b);
-		bool Collides(DynamicCollisionTask& a, StaticCollisionTask& b);
+		bool Collides(const DynamicCollisionTask& a, const DynamicCollisionTask& b) const;
+		bool Collides(const DynamicCollisionTask& a, const StaticCollisionTask& b) const;
+
+		bool CircleCollides(const Transform& a, const Transform& b) const;
 	};
 }

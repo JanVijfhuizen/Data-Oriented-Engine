@@ -7,6 +7,7 @@ namespace game
 	{
 		glm::vec2 dir;
 		float speed;
+		struct Collider* collider;
 		struct Transform* transform;
 	};
 

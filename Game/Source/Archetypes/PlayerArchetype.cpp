@@ -71,6 +71,7 @@ namespace game
 			MovementTask movementTask{};
 			movementTask.speed = 0.02f;
 			movementTask.dir = normalize(glm::vec2(_playerController.direction));
+			movementTask.collider = &entity.collider;
 			movementTask.transform = &entity.transform;
 			info.movementSystem->Add(movementTask);
 		}
@@ -78,7 +79,6 @@ namespace game
 		EntityRenderTask renderTask{};
 		auto& taskTransform = renderTask.transform;
 		taskTransform = transform;
-		taskTransform.scale = RenderConventions::ENTITY_SIZE;
 		renderTask.subTexture = renderer.subTexture;
 		info.entityRenderSystem->Add(renderTask);
 	}
