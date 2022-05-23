@@ -11,19 +11,19 @@ namespace game
 	{
 	public:
 		template <typename Vertex, typename Index>
-		[[nodiscard]] static Mesh Create(const EngineOutData& engineOutData, 
+		[[nodiscard]] static Mesh Create(const EngineOutData& outData, 
 			jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
-		static void Destroy(const EngineOutData& engineOutData, Mesh& mesh);
+		static void Destroy(const EngineOutData& outData, Mesh& mesh);
 	};
 
 	template <typename Vertex, typename Index>
-	Mesh MeshHandler::Create(const EngineOutData& engineOutData, 
+	Mesh MeshHandler::Create(const EngineOutData& outData, 
 		const jlb::ArrayView<Vertex> vertices, const jlb::ArrayView<Index> indices)
 	{
 		Mesh mesh{};
 
-		auto& app = *engineOutData.app;
-		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& app = *outData.app;
+		auto& vkAllocator = *outData.vkAllocator;
 
 		// Vertex staging buffer.
 		VkBufferCreateInfo vertBufferInfo{};

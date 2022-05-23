@@ -80,9 +80,7 @@ namespace game
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
 	{
-		auto renderSystem = gameState.chain.Get<EntityRenderSystem>();
-		renderSystem->DestroySwapChainAssets(outData);
-		renderSystem->CreateSwapChainAssets(outData);
+		gameState.chain.RecreateSwapChainAssets(outData);
 	}
 
 	void Exit(const EngineOutData outData)

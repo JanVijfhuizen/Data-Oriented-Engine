@@ -11,6 +11,14 @@ namespace game
 	{
 	}
 
+	void ISystemChainable::CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain)
+	{
+	}
+
+	void ISystemChainable::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)
+	{
+	}
+
 	SystemChain::Iterator::Iterator() = default;
 
 	SystemChain::Iterator::Iterator(ISystemChainable* chainable) : _ptr(chainable)
@@ -50,6 +58,9 @@ namespace game
 	void SystemChain::Free(const EngineOutData& outData)
 	{
 		for (auto& chainable : *this)
+			chainable.DestroySwapChainAssets(outData, *this);
+
+		for (auto& chainable : *this)
 			chainable.Free(outData, *this);
 
 		ISystemChainable* current = _head;
@@ -63,6 +74,7 @@ namespace game
 
 	void SystemChain::Awake(const EngineOutData& outData)
 	{
+		ReverseExecute(&ISystemChainable::CreateSwapChainAssets, outData);
 		ReverseExecute(&ISystemChainable::Awake, outData);
 	}
 
@@ -74,6 +86,15 @@ namespace game
 	void SystemChain::Update(const EngineOutData& outData)
 	{
 		ReverseExecute(&ISystemChainable::Update, outData);
+	}
+
+	void SystemChain::RecreateSwapChainAssets(const EngineOutData& outData)
+	{
+		for (auto& chain : *this)
+		{
+			chain.DestroySwapChainAssets(outData, *this);
+			chain.CreateSwapChainAssets(outData, *this);
+		}
 	}
 
 	SystemChain::Iterator SystemChain::begin() const
