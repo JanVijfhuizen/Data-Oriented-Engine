@@ -18,6 +18,6 @@ namespace game
 			jlb::ArrayView<Binding> bindings{};
 		};
 
-		[[nodiscard]] static VkDescriptorSetLayout Create(const EngineOutData& engineOutData, Info& info);
+		[[nodiscard]] static VkDescriptorSetLayout Create(const EngineOutData& outData, Info& info);
 	};
 }

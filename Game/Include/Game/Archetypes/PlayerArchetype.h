@@ -40,9 +40,11 @@ namespace game
 
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Free(const EngineOutData& outData, SystemChain& chain) override;
-		void Start(const EngineOutData& outData, SystemChain& chain) override;
+		void Awake(const EngineOutData& outData, SystemChain& chain) override;
 
 	private:
+		using Archetype<Player, PlayerUpdateInfo>::IncreaseRequestedLength;
+
 		Controller _playerController{};
 		Animation _testAnim{};
 

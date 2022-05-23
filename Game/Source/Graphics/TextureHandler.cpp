@@ -21,11 +21,11 @@ namespace game
 		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
-	Texture TextureHandler::LoadTexture(const EngineOutData& engineOutData, const jlb::StringView path)
+	Texture TextureHandler::LoadTexture(const EngineOutData& outData, const jlb::StringView path)
 	{
-		auto& app = *engineOutData.app;
+		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
-		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& vkAllocator = *outData.vkAllocator;
 
 		// Load pixels.
 		int texWidth, texHeight, texChannels;
@@ -149,9 +149,9 @@ namespace game
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	void TextureHandler::FreeTexture(const EngineOutData& engineOutData, Texture& texture)
+	void TextureHandler::FreeTexture(const EngineOutData& outData, Texture& texture)
 	{
-		vkDestroyImage(engineOutData.app->logicalDevice, texture.image, nullptr);
-		engineOutData.vkAllocator->FreeBlock(texture.memBlock);
+		vkDestroyImage(outData.app->logicalDevice, texture.image, nullptr);
+		outData.vkAllocator->FreeBlock(texture.memBlock);
 	}
 }

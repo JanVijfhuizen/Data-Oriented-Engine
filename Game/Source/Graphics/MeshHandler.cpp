@@ -3,10 +3,10 @@
 
 namespace game
 {
-	void MeshHandler::Destroy(const EngineOutData& engineOutData, Mesh& mesh)
+	void MeshHandler::Destroy(const EngineOutData& outData, Mesh& mesh)
 	{
-		auto& app = *engineOutData.app;
-		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& app = *outData.app;
+		auto& vkAllocator = *outData.vkAllocator;
 
 		vkDestroyBuffer(app.logicalDevice, mesh.indexBuffer, nullptr);
 		vkDestroyBuffer(app.logicalDevice, mesh.vertexBuffer, nullptr);

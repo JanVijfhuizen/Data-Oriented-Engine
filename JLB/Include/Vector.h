@@ -19,14 +19,14 @@ namespace jlb
 		/// </summary>
 		/// <param name="value">The value to be added to the vector.</param>
 		/// <returns>The added value inside the vector.</returns>
-		virtual T& Add(T& value);
+		virtual T& Add(const T& value);
 		/// <summary>
 		/// Place a value in the front of the vector and increase it's size by one.<br>
 		/// Cannot exceed the capacity of the managed memory.
 		/// </summary>
 		/// <param name="value">The value to be added to the vector.</param>
 		/// <returns>The added value inside the vector.</returns>
-		virtual T& Add(T&& value = {});
+		virtual T& Add(const T&& value = {});
 		/// <summary>
 		/// Remove the value at a certain index.
 		/// </summary>
@@ -47,7 +47,7 @@ namespace jlb
 		// The amount of values in this vector.
 		size_t _count = 0;
 
-		T& _Add(T& value);
+		T& _Add(const T& value);
 	};
 
 	template <typename T>
@@ -58,13 +58,13 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& Vector<T>::Add(T& value)
+	T& Vector<T>::Add(const T& value)
 	{
 		return _Add(value);
 	}
 
 	template <typename T>
-	T& Vector<T>::Add(T&& value)
+	T& Vector<T>::Add(const T&& value)
 	{
 		return _Add(value);
 	}
@@ -100,7 +100,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& Vector<T>::_Add(T& value)
+	T& Vector<T>::_Add(const T& value)
 	{
 		assert(_count + 1 <= Array<T>::GetLength());
 		return Array<T>::operator[](_count++) = value;

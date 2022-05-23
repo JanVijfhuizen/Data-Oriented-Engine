@@ -1,23 +1,49 @@
 ﻿#pragma once
 #include "TaskSystem.h"
-#include "Components/Collider.h"
 #include "Components/Transform.h"
+#include "Components/Collider.h"
 
 namespace game
 {
-	// Due to the repeated looping over the tasks I am copying the components instead of referencing them.
-	struct CollisionTask final
+	struct Collider;
+
+	struct StaticCollisionTask final
 	{
 		Collider collider;
 		Transform transform;
-		Collider* colliderSrc;
-		Transform* transformSrc;
 	};
 
-	class CollisionSystem final : public TaskSystem<CollisionTask>
+	struct DynamicCollisionTask final
 	{
+		StaticCollisionTask subTask;
+		Transform* outTransform;
+	};
+
+	class CollisionSystem final : public TaskSystem<DynamicCollisionTask>
+	{
+	public:
+		[[nodiscard]] static DynamicCollisionTask CreateDefaultTask(Collider& collider, Transform& transform, glm::vec2 delta);
+
+		void IncreaseRequestedLength(size_t size, bool isDynamic);
+		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Free(const EngineOutData& outData, SystemChain& chain) override;
+
+		void AddStatic(StaticCollisionTask& task);
+		void ClearStatics();
+
 	private:
-		[[nodiscard]] static CollisionTask CreateDefaultTask(Collider& collider, Transform& transform);
+		size_t _requestedStaticSize = 0;
+		Vector<StaticCollisionTask> _statics{};
+		Array<bool> _validChecks{};
+
 		void Update(const EngineOutData& outData, SystemChain& chain) override;
+
+		using TaskSystem<DynamicCollisionTask>::IncreaseRequestedLength;
+
+		[[nodiscard]] bool Collides(const DynamicCollisionTask& a, const DynamicCollisionTask& b) const;
+		[[nodiscard]] bool Collides(const DynamicCollisionTask& a, const StaticCollisionTask& b) const;
+
+		[[nodiscard]] bool IsOutOfRange(const Transform& aDynamic, const Transform& bStatic) const;
+		[[nodiscard]] bool CircleCollides(const Transform& a, const Transform& b) const;
 	};
 }

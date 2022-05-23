@@ -5,6 +5,7 @@
 #include "Systems/AnimationSystem.h"
 #include "Handlers/InputHandler.h"
 #include "Systems/MovementSystem.h"
+#include "Systems/CollisionSystem.h"
 
 namespace game
 {
@@ -24,9 +25,12 @@ namespace game
 		Archetype<Player, PlayerUpdateInfo>::Allocate(outData, chain);
 		_testAnim.frames.Allocate(*outData.allocator, 2);
 
-		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(GetLength());
-		chain.Get<AnimationSystem>()->IncreaseRequestedLength(GetLength());
-		chain.Get<MovementSystem>()->IncreaseRequestedLength(GetLength());
+		const size_t length = GetLength();
+
+		chain.Get<CollisionSystem>()->IncreaseRequestedLength(length, true);
+		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(length);
+		chain.Get<AnimationSystem>()->IncreaseRequestedLength(length);
+		chain.Get<MovementSystem>()->IncreaseRequestedLength(length);
 	}
 
 	void PlayerArchetype::Free(const EngineOutData& outData, SystemChain& chain)
@@ -35,7 +39,7 @@ namespace game
 		Archetype<Player, PlayerUpdateInfo>::Free(outData, chain);
 	}
 
-	void PlayerArchetype::Start(const EngineOutData& outData, SystemChain& chain)
+	void PlayerArchetype::Awake(const EngineOutData& outData, SystemChain& chain)
 	{
 		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
 		_testAnim.frames[0].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Player);
@@ -67,6 +71,7 @@ namespace game
 			MovementTask movementTask{};
 			movementTask.speed = 0.02f;
 			movementTask.dir = normalize(glm::vec2(_playerController.direction));
+			movementTask.collider = &entity.collider;
 			movementTask.transform = &entity.transform;
 			info.movementSystem->Add(movementTask);
 		}
@@ -74,7 +79,6 @@ namespace game
 		EntityRenderTask renderTask{};
 		auto& taskTransform = renderTask.transform;
 		taskTransform = transform;
-		taskTransform.scale = RenderConventions::ENTITY_SIZE;
 		renderTask.subTexture = renderer.subTexture;
 		info.entityRenderSystem->Add(renderTask);
 	}

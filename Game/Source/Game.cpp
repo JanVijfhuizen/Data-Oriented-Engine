@@ -5,8 +5,8 @@
 #include "Archetypes/CursorArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/MovementSystem.h"
-#include <new>
 #include "Systems/TextRenderSystem.h"
+#include "Archetypes/WallArchetype.h"
 
 namespace game
 {
@@ -20,17 +20,24 @@ namespace game
 		CursorArchetype::OnMouseKeyInput(key, action, *gameState.chain.Get<CursorArchetype>());
 	}
 
+	void DefineUsage(const EngineOutData& outData)
+	{
+		gameState.chain.Get<WallArchetype>()->IncreaseRequestedLength(1);
+	}
+
 	void GameStart(const EngineOutData& outData)
 	{
 		// Set up game world.
 		gameState.chain.Get<PlayerArchetype>()->Add();
 		gameState.chain.Get<CursorArchetype>()->Add();
+		auto& wall = gameState.chain.Get<WallArchetype>()->Add();
+		wall.transform.position = { 40, 70 };
 	}
 
 	void GameUpdate(const EngineOutData& outData)
 	{
 		static float f = 0;
-		f += 0.001f;
+		f += outData.deltaTime / 1000;
 
 		TextRenderTask task{};
 		task.text = "general kenobi";
@@ -43,6 +50,7 @@ namespace game
 		// Add archetypes.
 		auto& chain = gameState.chain;
 		chain.Add<PlayerArchetype>(outData);
+		chain.Add<WallArchetype>(outData);
 		chain.Add<CursorArchetype>(outData);
 
 		// Add systems.
@@ -52,11 +60,13 @@ namespace game
 		chain.Add<EntityRenderSystem>(outData);
 		chain.Add<TextRenderSystem>(outData);
 
+		DefineUsage(outData);
 		chain.Allocate(outData);
 
 		// Start the game.
-		chain.Start(outData);
+		chain.Awake(outData);
 		GameStart(outData);
+		chain.Start(outData);
 	}
 
 	EngineInData Update(const EngineOutData outData)
@@ -70,9 +80,7 @@ namespace game
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
 	{
-		auto renderSystem = gameState.chain.Get<EntityRenderSystem>();
-		renderSystem->DestroySwapChainAssets(outData);
-		renderSystem->CreateSwapChainAssets(outData);
+		gameState.chain.RecreateSwapChainAssets(outData);
 	}
 
 	void Exit(const EngineOutData outData)

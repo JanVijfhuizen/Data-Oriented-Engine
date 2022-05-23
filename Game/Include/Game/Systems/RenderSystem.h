@@ -16,10 +16,15 @@
 
 namespace game
 {
+	/// <summary>
+	/// Handles the rendering of sprites.<br>
+	/// Any rendering system that inherits from this must adhere to the shader formatting used in this system.
+	/// </summary>
 	template <typename Task>
 	class RenderSystem : public TaskSystem<Task>
 	{
 	public:
+		// Used to define the renderer.
 		struct CreateInfo final
 		{
 			jlb::StringView atlasTexturePath;
@@ -27,17 +32,17 @@ namespace game
 			jlb::StringView fragPath;
 		};
 
+		// Used to update the renderer.
 		struct UpdateInfo final
 		{
 			glm::vec2 cameraPosition{};
 			float pixelSize = 0.008f;
 		};
 
+		// Can safely be adjusted from outside the class.
 		UpdateInfo updateInfo{};
 
-		void CreateSwapChainAssets(const EngineOutData& engineOutData);
-		void DestroySwapChainAssets(const EngineOutData& engineOutData) const;
-
+		// Get the texture atlas used for this renderer.
 		[[nodiscard]] const Texture& GetTexture() const;
 
 	protected:
@@ -46,6 +51,9 @@ namespace game
 		void Update(const EngineOutData& outData, SystemChain& chain) override;
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Free(const EngineOutData& outData, SystemChain& chain) override;
+
+		void CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
+		void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
 
 	private:
 		struct PushConstant final
@@ -69,19 +77,21 @@ namespace game
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
 
-		void LoadShader(const EngineOutData& engineOutData, const CreateInfo& createInfo);
-		void UnloadShader(const EngineOutData& engineOutData) const;
-		void LoadTextureAtlas(const EngineOutData& engineOutData, const CreateInfo& createInfo);
-		void UnloadTextureAtlas(const EngineOutData& engineOutData);
+		void LoadShader(const EngineOutData& outData, const CreateInfo& createInfo);
+		void UnloadShader(const EngineOutData& outData) const;
+		void LoadTextureAtlas(const EngineOutData& outData, const CreateInfo& createInfo);
+		void UnloadTextureAtlas(const EngineOutData& outData);
 
-		void CreateMesh(const EngineOutData& engineOutData);
-		void CreateShaderAssets(const EngineOutData& engineOutData);
-		void DestroyShaderAssets(const EngineOutData& engineOutData);
+		void CreateMesh(const EngineOutData& outData);
+		void CreateShaderAssets(const EngineOutData& outData);
+		void DestroyShaderAssets(const EngineOutData& outData);
 	};
 
 	template <typename Task>
-	void RenderSystem<Task>::CreateSwapChainAssets(const EngineOutData& engineOutData)
+	void RenderSystem<Task>::CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain)
 	{
+		TaskSystem<Task>::CreateSwapChainAssets(outData, chain);
+
 		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
 		modules[0].module = _vertModule;
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -94,20 +104,22 @@ namespace game
 		PipelineHandler::Info pipelineInfo{};
 		pipelineInfo.vertInputAttribDescriptions = vertAttributes;
 		pipelineInfo.vertInputBindingDescriptions = vertBindings;
-		pipelineInfo.resolution = engineOutData.resolution;
+		pipelineInfo.resolution = outData.resolution;
 		pipelineInfo.modules = modules;
-		pipelineInfo.renderPass = engineOutData.swapChainRenderPass;
+		pipelineInfo.renderPass = outData.swapChainRenderPass;
 		pipelineInfo.layouts = _descriptorLayout;
 		pipelineInfo.pushConstantSize = sizeof(PushConstant);
 		pipelineInfo.usePushConstant = true;
 
-		PipelineHandler::Create(engineOutData, pipelineInfo, _pipelineLayout, _pipeline);
+		PipelineHandler::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::DestroySwapChainAssets(const EngineOutData& engineOutData) const
+	void RenderSystem<Task>::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)
 	{
-		auto& logicalDevice = engineOutData.app->logicalDevice;
+		TaskSystem<Task>::DestroySwapChainAssets(outData, chain);
+
+		auto& logicalDevice = outData.app->logicalDevice;
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
@@ -159,13 +171,11 @@ namespace game
 		LoadShader(outData, createInfo);
 		CreateMesh(outData);
 		CreateShaderAssets(outData);
-		CreateSwapChainAssets(outData);
 	}
 
 	template <typename Task>
 	void RenderSystem<Task>::Free(const EngineOutData& outData, SystemChain& chain)
 	{
-		DestroySwapChainAssets(outData);
 		DestroyShaderAssets(outData);
 		MeshHandler::Destroy(outData, _mesh);
 		UnloadShader(outData);
@@ -174,10 +184,10 @@ namespace game
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::LoadShader(const EngineOutData& engineOutData, const CreateInfo& createInfo)
+	void RenderSystem<Task>::LoadShader(const EngineOutData& outData, const CreateInfo& createInfo)
 	{
-		auto& logicalDevice = engineOutData.app->logicalDevice;
-		auto& tempAllocator = *engineOutData.tempAllocator;
+		auto& logicalDevice = outData.app->logicalDevice;
+		auto& tempAllocator = *outData.tempAllocator;
 
 		auto vert = jlb::FileLoader::Read(tempAllocator, createInfo.vertPath);
 		auto frag = jlb::FileLoader::Read(tempAllocator, createInfo.fragPath);
@@ -202,19 +212,19 @@ namespace game
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::UnloadShader(const EngineOutData& engineOutData) const
+	void RenderSystem<Task>::UnloadShader(const EngineOutData& outData) const
 	{
-		vkDestroyShaderModule(engineOutData.app->logicalDevice, _vertModule, nullptr);
-		vkDestroyShaderModule(engineOutData.app->logicalDevice, _fragModule, nullptr);
+		vkDestroyShaderModule(outData.app->logicalDevice, _vertModule, nullptr);
+		vkDestroyShaderModule(outData.app->logicalDevice, _fragModule, nullptr);
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::LoadTextureAtlas(const EngineOutData& engineOutData, const CreateInfo& createInfo)
+	void RenderSystem<Task>::LoadTextureAtlas(const EngineOutData& outData, const CreateInfo& createInfo)
 	{
-		auto& app = *engineOutData.app;
+		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
 
-		_textureAtlas = TextureHandler::LoadTexture(engineOutData, createInfo.atlasTexturePath);
+		_textureAtlas = TextureHandler::LoadTexture(outData, createInfo.atlasTexturePath);
 		const auto viewCreateInfo = vk::ImageHandler::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
 		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_atlasImageView);
 		assert(!result);
@@ -224,17 +234,17 @@ namespace game
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::UnloadTextureAtlas(const EngineOutData& engineOutData)
+	void RenderSystem<Task>::UnloadTextureAtlas(const EngineOutData& outData)
 	{
-		auto& logicalDevice = engineOutData.app->logicalDevice;
+		auto& logicalDevice = outData.app->logicalDevice;
 
 		vkDestroySampler(logicalDevice, _atlasSampler, nullptr);
 		vkDestroyImageView(logicalDevice, _atlasImageView, nullptr);
-		TextureHandler::FreeTexture(engineOutData, _textureAtlas);
+		TextureHandler::FreeTexture(outData, _textureAtlas);
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::CreateMesh(const EngineOutData& engineOutData)
+	void RenderSystem<Task>::CreateMesh(const EngineOutData& outData)
 	{
 		jlb::StackArray<Vertex, 4> vertices{};
 		vertices[0].position = { -1, -1 };
@@ -253,19 +263,22 @@ namespace game
 		indices[4] = 2;
 		indices[5] = 3;
 
-		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
+		for (auto& vertex : vertices)
+			vertex.position /= 2;
+
+		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(outData, vertices, indices);
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::CreateShaderAssets(const EngineOutData& engineOutData)
+	void RenderSystem<Task>::CreateShaderAssets(const EngineOutData& outData)
 	{
-		auto& app = *engineOutData.app;
-		auto& allocator = *engineOutData.allocator;
-		auto& tempAllocator = *engineOutData.tempAllocator;
-		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& app = *outData.app;
+		auto& allocator = *outData.allocator;
+		auto& tempAllocator = *outData.tempAllocator;
+		auto& vkAllocator = *outData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
 
-		const size_t swapChainImageCount = engineOutData.swapChainImageCount;
+		const size_t swapChainImageCount = outData.swapChainImageCount;
 
 		// Create instance storage buffer.
 		VkBufferCreateInfo vertBufferInfo{};
@@ -304,7 +317,7 @@ namespace game
 
 		LayoutHandler::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = bindings;
-		_descriptorLayout = LayoutHandler::Create(engineOutData, descriptorLayoutInfo);
+		_descriptorLayout = LayoutHandler::Create(outData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
 		VkDescriptorPoolSize poolSize{};
@@ -375,18 +388,18 @@ namespace game
 	}
 
 	template <typename Task>
-	void RenderSystem<Task>::DestroyShaderAssets(const EngineOutData& engineOutData)
+	void RenderSystem<Task>::DestroyShaderAssets(const EngineOutData& outData)
 	{
-		auto& app = *engineOutData.app;
+		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
-		auto& allocator = *engineOutData.allocator;
-		auto& vkAllocator = *engineOutData.vkAllocator;
+		auto& allocator = *outData.allocator;
+		auto& vkAllocator = *outData.vkAllocator;
 
 		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
-		_descriptorSets.Free(*engineOutData.allocator);
+		_descriptorSets.Free(*outData.allocator);
 
-		for (int32_t i = engineOutData.swapChainImageCount - 1; i >= 0; --i)
+		for (int32_t i = outData.swapChainImageCount - 1; i >= 0; --i)
 		{
 			vkDestroyBuffer(logicalDevice, _instanceBuffers[i], nullptr);
 			vkAllocator.FreeBlock(_instanceMemBlocks[i]);

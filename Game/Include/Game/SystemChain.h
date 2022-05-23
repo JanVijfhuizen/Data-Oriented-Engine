@@ -11,12 +11,16 @@ namespace game
 	{
 		friend SystemChain;
 
-	public:
+	protected:
 		virtual void Allocate(const EngineOutData& outData, SystemChain& chain) = 0;
 		virtual void Free(const EngineOutData& outData, SystemChain& chain) = 0;
 
-		virtual void Start(const EngineOutData& outData, SystemChain& chain) {};
+		virtual void Awake(const EngineOutData& outData, SystemChain& chain);
+		virtual void Start(const EngineOutData& outData, SystemChain& chain);
 		virtual void Update(const EngineOutData& outData, SystemChain& chain) = 0;
+
+		virtual void CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain);
+		virtual void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain);
 
 	private:
 		size_t* _src = nullptr;
@@ -63,8 +67,11 @@ namespace game
 		void Allocate(const EngineOutData& outData);
 		void Free(const EngineOutData& outData);
 
+		void Awake(const EngineOutData& outData);
 		void Start(const EngineOutData& outData);
 		void Update(const EngineOutData& outData);
+
+		void RecreateSwapChainAssets(const EngineOutData& outData);
 
 		[[nodiscard]] Iterator begin() const;
 		[[nodiscard]] Iterator end();
