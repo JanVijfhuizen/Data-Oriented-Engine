@@ -8,9 +8,10 @@ namespace game
 	{
 		auto collisionSystem = chain.Get<CollisionSystem>();
 
+		const float dt = outData.deltaTime;
 		for (auto& task : *this)
 		{
-			const auto collisionTask = CollisionSystem::CreateDefaultTask(*task.collider, *task.transform, task.dir * task.speed);
+			const auto collisionTask = CollisionSystem::CreateDefaultTask(*task.collider, *task.transform, task.dir * task.speed * dt);
 			collisionSystem->Add(collisionTask);
 		}
 		SetCount(0);

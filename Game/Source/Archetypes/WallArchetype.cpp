@@ -19,15 +19,20 @@ namespace game
 		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(length);
 	}
 
+	void WallArchetype::Awake(const EngineOutData& outData, SystemChain& chain)
+	{
+		Archetype<Wall, WallUpdateInfo>::Awake(outData, chain);
+
+		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
+		_subTexture = GenerateSubTexture(texture);
+	}
+
 	void WallArchetype::Start(const EngineOutData& outData, SystemChain& chain)
 	{
 		Archetype<Wall, WallUpdateInfo>::Start(outData, chain);
 
 		auto collisionSystem = chain.Get<CollisionSystem>();
-		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
-		_subTexture = GenerateSubTexture(texture);
 
-		// TODO somewhere else.
 		for (auto& wall : *this)
 		{
 			StaticCollisionTask collisionTask{};

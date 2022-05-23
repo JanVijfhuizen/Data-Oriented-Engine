@@ -39,7 +39,7 @@ namespace game
 		Archetype<Player, PlayerUpdateInfo>::Free(outData, chain);
 	}
 
-	void PlayerArchetype::Start(const EngineOutData& outData, SystemChain& chain)
+	void PlayerArchetype::Awake(const EngineOutData& outData, SystemChain& chain)
 	{
 		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
 		_testAnim.frames[0].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Player);

@@ -15,7 +15,8 @@ namespace game
 		virtual void Allocate(const EngineOutData& outData, SystemChain& chain) = 0;
 		virtual void Free(const EngineOutData& outData, SystemChain& chain) = 0;
 
-		virtual void Start(const EngineOutData& outData, SystemChain& chain) {};
+		virtual void Awake(const EngineOutData& outData, SystemChain& chain);
+		virtual void Start(const EngineOutData& outData, SystemChain& chain);
 		virtual void Update(const EngineOutData& outData, SystemChain& chain) = 0;
 
 	private:
@@ -63,6 +64,7 @@ namespace game
 		void Allocate(const EngineOutData& outData);
 		void Free(const EngineOutData& outData);
 
+		void Awake(const EngineOutData& outData);
 		void Start(const EngineOutData& outData);
 		void Update(const EngineOutData& outData);
 

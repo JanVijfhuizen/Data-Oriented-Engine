@@ -40,9 +40,10 @@ namespace game
 
 		using TaskSystem<DynamicCollisionTask>::IncreaseRequestedLength;
 
-		bool Collides(const DynamicCollisionTask& a, const DynamicCollisionTask& b) const;
-		bool Collides(const DynamicCollisionTask& a, const StaticCollisionTask& b) const;
+		[[nodiscard]] bool Collides(const DynamicCollisionTask& a, const DynamicCollisionTask& b) const;
+		[[nodiscard]] bool Collides(const DynamicCollisionTask& a, const StaticCollisionTask& b) const;
 
-		bool CircleCollides(const Transform& a, const Transform& b) const;
+		[[nodiscard]] bool IsOutOfRange(const Transform& aDynamic, const Transform& bStatic) const;
+		[[nodiscard]] bool CircleCollides(const Transform& a, const Transform& b) const;
 	};
 }

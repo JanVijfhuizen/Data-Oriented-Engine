@@ -103,6 +103,13 @@ namespace game
 		SetCount(0);
 	}
 
+	bool CollisionSystem::IsOutOfRange(const Transform& aDynamic, const Transform& bStatic) const
+	{
+		const float dis = glm::distance(aDynamic.position, bStatic.position);
+		const float radius = (glm::length(glm::vec2(aDynamic.scale)) + glm::length(glm::vec2(bStatic.scale))) * .5f;
+		return dis > radius;
+	}
+
 	bool CollisionSystem::Collides(const DynamicCollisionTask& a, const DynamicCollisionTask& b) const
 	{
 		auto& aTransform = a.subTask.transform;
@@ -113,21 +120,22 @@ namespace game
 
 	bool CollisionSystem::Collides(const DynamicCollisionTask& a, const StaticCollisionTask& b) const
 	{
-		auto& aTransform = a.subTask.transform;
-		auto& bTransform = b.transform;
+		const auto& aTransform = a.subTask.transform;
+		const auto& bTransform = b.transform;
 
-		if (CircleCollides(aTransform, bTransform))
-			return true;
+		if (IsOutOfRange(aTransform, bTransform))
+			return false;
 
-		auto& aPos = aTransform.position;
-		auto& bPos = bTransform.position;
+		const auto& aPos = aTransform.position;
+		const auto& bPos = bTransform.position;
 
-		auto& aScale = aTransform.scale;
-		auto& bScale = bTransform.scale;
+		const auto& aScale = aTransform.scale;
+		const auto& bScale = bTransform.scale;
 
 		// AABB collision.
 		const bool xDis = aPos.x < bPos.x + bScale;
 		const bool xDis2 = aPos.x + aScale > bPos.x;
+
 		const bool yDis = aPos.y < bPos.y + bScale;
 		const bool yDis2 = aPos.y + aScale > bPos.y;
 

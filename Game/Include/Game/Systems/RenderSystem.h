@@ -261,6 +261,9 @@ namespace game
 		indices[4] = 2;
 		indices[5] = 3;
 
+		for (auto& vertex : vertices)
+			vertex.position /= 2;
+
 		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(engineOutData, vertices, indices);
 	}
 

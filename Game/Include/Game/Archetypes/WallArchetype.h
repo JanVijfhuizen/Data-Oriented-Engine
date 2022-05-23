@@ -26,6 +26,7 @@ namespace game
 		SubTexture GenerateSubTexture(const Texture& texture) const;
 
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Awake(const EngineOutData& outData, SystemChain& chain) override;
 		void Start(const EngineOutData& outData, SystemChain& chain) override;
 
 		WallUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;

@@ -37,7 +37,7 @@ namespace game
 	void GameUpdate(const EngineOutData& outData)
 	{
 		static float f = 0;
-		f += 0.001f;
+		f += outData.deltaTime / 1000;
 
 		TextRenderTask task{};
 		task.text = "general kenobi";
@@ -64,8 +64,9 @@ namespace game
 		chain.Allocate(outData);
 
 		// Start the game.
-		chain.Start(outData);
+		chain.Awake(outData);
 		GameStart(outData);
+		chain.Start(outData);
 	}
 
 	EngineInData Update(const EngineOutData outData)

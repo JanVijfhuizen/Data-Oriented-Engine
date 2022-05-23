@@ -3,6 +3,14 @@
 
 namespace game
 {
+	void ISystemChainable::Awake(const EngineOutData& outData, SystemChain& chain)
+	{
+	}
+
+	void ISystemChainable::Start(const EngineOutData& outData, SystemChain& chain)
+	{
+	}
+
 	SystemChain::Iterator::Iterator() = default;
 
 	SystemChain::Iterator::Iterator(ISystemChainable* chainable) : _ptr(chainable)
@@ -51,6 +59,11 @@ namespace game
 			outData.allocator->MFreeUnsafe(current->_src);
 			current = next;
 		}
+	}
+
+	void SystemChain::Awake(const EngineOutData& outData)
+	{
+		ReverseExecute(&ISystemChainable::Awake, outData);
 	}
 
 	void SystemChain::Start(const EngineOutData& outData)
