@@ -58,7 +58,7 @@ namespace game
 		void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
 
 	private:
-		struct PushConstant final
+		struct PushConstants final
 		{
 			glm::vec2 resolution;
 			UpdateInfo updateInfo;
@@ -107,7 +107,7 @@ namespace game
 		pipelineInfo.modules = modules;
 		pipelineInfo.renderPass = outData.swapChainRenderPass;
 		pipelineInfo.layouts = _descriptorLayout;
-		pipelineInfo.pushConstantSize = sizeof(PushConstant);
+		pipelineInfo.pushConstantSize = sizeof(PushConstants);
 		pipelineInfo.usePushConstant = true;
 
 		PipelineHandler::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
@@ -116,12 +116,12 @@ namespace game
 	template <typename Task>
 	void RenderSystem<Task>::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)
 	{
-		TaskSystem<Task>::DestroySwapChainAssets(outData, chain);
-
 		auto& logicalDevice = outData.app->logicalDevice;
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
+
+		TaskSystem<Task>::DestroySwapChainAssets(outData, chain);
 	}
 
 	template <typename Task>
@@ -150,11 +150,11 @@ namespace game
 		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
 		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-		PushConstant pushConstant{};
+		PushConstants pushConstant{};
 		pushConstant.resolution = outData.resolution;
 		pushConstant.updateInfo = updateInfo;
 
-		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
+		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
 		vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
 
 		TaskSystem<Task>::SetCount(0);

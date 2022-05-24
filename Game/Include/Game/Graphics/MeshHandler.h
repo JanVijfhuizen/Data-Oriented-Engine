@@ -10,11 +10,31 @@ namespace game
 	class MeshHandler final
 	{
 	public:
+		template <typename Type>
+		void CreateBuffer(const EngineOutData& outData, jlb::ArrayView<Type> data);
+
 		template <typename Vertex, typename Index>
 		[[nodiscard]] static Mesh Create(const EngineOutData& outData, 
 			jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
 		static void Destroy(const EngineOutData& outData, Mesh& mesh);
 	};
+
+	template <typename Type>
+	void MeshHandler::CreateBuffer(const EngineOutData& outData, const jlb::ArrayView<Type> data)
+	{
+		auto& app = *outData.app;
+		auto& vkAllocator = *outData.vkAllocator;
+
+		VkBufferCreateInfo bufferInfo{};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = sizeof(Type) * data.length;
+		bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		VkBuffer stagingBuffer;
+		auto result = vkCreateBuffer(app.logicalDevice, &bufferInfo, nullptr, &stagingBuffer);
+		assert(!result);
+	}
 
 	template <typename Vertex, typename Index>
 	Mesh MeshHandler::Create(const EngineOutData& outData, 
