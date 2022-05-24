@@ -284,13 +284,15 @@ namespace game
 		_descriptorLayout = LayoutHandler::Create(outData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
-		VkDescriptorPoolSize poolSize{};
-		poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		poolSize.descriptorCount = swapChainImageCount;
+		VkDescriptorPoolSize poolSizes[2];
+		poolSizes[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		poolSizes[0].descriptorCount = swapChainImageCount;
+		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		poolSizes[1].descriptorCount = swapChainImageCount;
 		VkDescriptorPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		poolInfo.poolSizeCount = 1;
-		poolInfo.pPoolSizes = &poolSize;
+		poolInfo.poolSizeCount = sizeof poolSizes / sizeof(VkDescriptorPoolSize);
+		poolInfo.pPoolSizes = poolSizes;
 		poolInfo.maxSets = swapChainImageCount;
 
 		auto result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &_descriptorPool);
