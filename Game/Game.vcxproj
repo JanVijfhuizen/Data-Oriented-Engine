@@ -171,6 +171,7 @@
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\GameState.h" />
     <ClInclude Include="Include\Game\Graphics\Animation.h" />
+    <ClInclude Include="Include\Game\Graphics\Buffer.h" />
     <ClInclude Include="Include\Game\Graphics\Mesh.h" />
     <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />

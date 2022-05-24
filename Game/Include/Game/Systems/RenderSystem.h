@@ -147,8 +147,8 @@ namespace game
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
 		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
 			0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
-		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
-		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
+		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
 		PushConstants pushConstant{};
 		pushConstant.resolution = outData.resolution;

@@ -1,14 +1,12 @@
 #pragma once
-#include "VkRenderer/VkMemBlock.h"
+#include "Buffer.h"
 
 namespace game
 {
 	struct Mesh final
 	{
-		VkBuffer vertexBuffer;
-		VkBuffer indexBuffer;
-		vk::MemBlock vertexMemBlock;
-		vk::MemBlock indexMemBlock;
+		Buffer vertexBuffer;
+		Buffer indexBuffer;
 		size_t indexCount;
 	};
 }
