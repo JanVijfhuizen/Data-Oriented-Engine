@@ -7,6 +7,7 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/TextRenderSystem.h"
 #include "Archetypes/WallArchetype.h"
+#include "Systems/DebugRenderSystem.h"
 
 namespace game
 {
@@ -59,6 +60,7 @@ namespace game
 		chain.Add<AnimationSystem>(outData);
 		chain.Add<EntityRenderSystem>(outData);
 		chain.Add<TextRenderSystem>(outData);
+		chain.Add<DebugRenderSystem>(outData);
 
 		DefineUsage(outData);
 		chain.Allocate(outData);

@@ -50,9 +50,9 @@ namespace game
 	protected:
 		[[nodiscard]] virtual CreateInfo GetCreateInfo() = 0;
 
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Free(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
 
 		void CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
 		void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
