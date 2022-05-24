@@ -13,6 +13,8 @@
 #include "VkRenderer/VkImageHandler.h"
 #include "VkRenderer/VkSamplerHandler.h"
 #include "Graphics/LayoutHandler.h"
+#include "Graphics/Shader.h"
+#include "Handlers/ShaderHandler.h"
 
 namespace game
 {
@@ -62,8 +64,7 @@ namespace game
 			UpdateInfo updateInfo;
 		};
 
-		VkShaderModule _vertModule;
-		VkShaderModule _fragModule;
+		Shader _shader;
 		Texture _textureAtlas;
 		VkImageView _atlasImageView;
 		VkSampler _atlasSampler;
@@ -77,8 +78,6 @@ namespace game
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
 
-		void LoadShader(const EngineOutData& outData, const CreateInfo& createInfo);
-		void UnloadShader(const EngineOutData& outData) const;
 		void LoadTextureAtlas(const EngineOutData& outData, const CreateInfo& createInfo);
 		void UnloadTextureAtlas(const EngineOutData& outData);
 
@@ -93,9 +92,9 @@ namespace game
 		TaskSystem<Task>::CreateSwapChainAssets(outData, chain);
 
 		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
-		modules[0].module = _vertModule;
+		modules[0].module = _shader.vert;
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
-		modules[1].module = _fragModule;
+		modules[1].module = _shader.frag;
 		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 		auto vertAttributes = Vertex::GetAttributeDescriptions();
@@ -168,7 +167,7 @@ namespace game
 
 		TaskSystem<Task>::Allocate(outData, chain);
 		LoadTextureAtlas(outData, createInfo);
-		LoadShader(outData, createInfo);
+		_shader = ShaderHandler::Create(outData, createInfo.vertPath, createInfo.fragPath);
 		CreateMesh(outData);
 		CreateShaderAssets(outData);
 	}
@@ -178,44 +177,9 @@ namespace game
 	{
 		DestroyShaderAssets(outData);
 		MeshHandler::Destroy(outData, _mesh);
-		UnloadShader(outData);
+		ShaderHandler::Destroy(outData, _shader);
 		UnloadTextureAtlas(outData);
 		TaskSystem<Task>::Free(outData, chain);
-	}
-
-	template <typename Task>
-	void RenderSystem<Task>::LoadShader(const EngineOutData& outData, const CreateInfo& createInfo)
-	{
-		auto& logicalDevice = outData.app->logicalDevice;
-		auto& tempAllocator = *outData.tempAllocator;
-
-		auto vert = jlb::FileLoader::Read(tempAllocator, createInfo.vertPath);
-		auto frag = jlb::FileLoader::Read(tempAllocator, createInfo.fragPath);
-
-		VkShaderModuleCreateInfo vertCreateInfo{};
-		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		vertCreateInfo.codeSize = vert.GetLength();
-		vertCreateInfo.pCode = reinterpret_cast<const uint32_t*>(vert.GetData());
-
-		VkShaderModuleCreateInfo fragCreateInfo{};
-		fragCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		fragCreateInfo.codeSize = frag.GetLength();
-		fragCreateInfo.pCode = reinterpret_cast<const uint32_t*>(frag.GetData());
-
-		auto result = vkCreateShaderModule(logicalDevice, &vertCreateInfo, nullptr, &_vertModule);
-		assert(!result);
-		result = vkCreateShaderModule(logicalDevice, &fragCreateInfo, nullptr, &_fragModule);
-		assert(!result);
-
-		frag.Free(tempAllocator);
-		vert.Free(tempAllocator);
-	}
-
-	template <typename Task>
-	void RenderSystem<Task>::UnloadShader(const EngineOutData& outData) const
-	{
-		vkDestroyShaderModule(outData.app->logicalDevice, _vertModule, nullptr);
-		vkDestroyShaderModule(outData.app->logicalDevice, _fragModule, nullptr);
 	}
 
 	template <typename Task>

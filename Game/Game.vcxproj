@@ -176,9 +176,11 @@
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
     <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
     <ClInclude Include="Include\Game\Graphics\RenderConventions.h" />
+    <ClInclude Include="Include\Game\Graphics\Shader.h" />
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
+    <ClInclude Include="Include\Game\Handlers\ShaderHandler.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
     <ClInclude Include="Include\Game\Systems\EntityRenderSystem.h" />
@@ -193,6 +195,7 @@
     <ClInclude Include="Include\Game\TaskSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />
     <ClCompile Include="Source\Archetypes\WallArchetype.cpp" />
     <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />
     <ClCompile Include="Source\SystemChain.cpp" />
