@@ -13,7 +13,7 @@ namespace vk
 {
 	void SwapChain::Allocate(jlb::StackAllocator& allocator, App& app, IWindowHandler& windowHandler)
 	{
-		auto support = Bootstrap::QuerySwapChainSupport(allocator, app);
+		auto support = boots::QuerySwapChainSupport(allocator, app);
 		const uint32_t imageCount = support.GetRecommendedImageCount();
 		_surfaceFormat = ChooseSurfaceFormat(support.formats);
 		_presentMode = ChoosePresentMode(support.presentModes);
@@ -186,10 +186,10 @@ namespace vk
 
 	void SwapChain::Recreate(jlb::StackAllocator& tempAllocator, App& app, IWindowHandler& windowHandler)
 	{
-		auto support = Bootstrap::QuerySwapChainSupport(tempAllocator, app);
+		auto support = boots::QuerySwapChainSupport(tempAllocator, app);
 		_extent = ChooseExtent(support.capabilities, windowHandler.GetResolution());
 
-		const auto families = Bootstrap::GetQueueFamilies(tempAllocator, app);
+		const auto families = boots::GetQueueFamilies(tempAllocator, app);
 
 		uint32_t queueFamilyIndices[] =
 		{

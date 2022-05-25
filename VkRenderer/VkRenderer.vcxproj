@@ -23,6 +23,7 @@
     <ClInclude Include="Include\VkRenderer\VkApp.h" />
     <ClInclude Include="Include\VkRenderer\VkBootstrap.h" />
     <ClInclude Include="Include\VkRenderer\VkCommandHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkIWindowHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkMemBlock.h" />
     <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkStackAllocator.h" />

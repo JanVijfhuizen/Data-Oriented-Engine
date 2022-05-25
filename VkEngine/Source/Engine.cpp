@@ -39,9 +39,9 @@ namespace vke
 		// Set up the vulkan application.
 		vk::App app{};
 		{
-			vk::AppInfo appInfo = vk::Bootstrap::CreateDefaultInfo(setupAllocator);
+			vk::AppInfo appInfo = vk::boots::CreateDefaultInfo(setupAllocator);
 			appInfo.windowHandler = &windowHandler;
-			app = vk::Bootstrap::CreateApp(setupAllocator, appInfo);
+			app = vk::boots::CreateApp(setupAllocator, appInfo);
 			appInfo.Free(setupAllocator);
 		}
 
@@ -131,7 +131,7 @@ namespace vke
 		// Clean up the Vulkan swapchain.
 		swapChain.Free(allocator, app);
 		// Destroy the Vulkan app.
-		vk::Bootstrap::DestroyApp(app);
+		vk::boots::DestroyApp(app);
 		// Destroy the window.
 		windowHandler.Cleanup();
 

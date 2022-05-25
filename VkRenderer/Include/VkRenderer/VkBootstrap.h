@@ -1,6 +1,5 @@
 ﻿#pragma once
-#include "Array.h"
-#include "StringView.h"
+#include "VkIWindowHandler.h"
 
 namespace jlb 
 {
@@ -10,34 +9,6 @@ namespace jlb
 namespace vk
 {
 	struct App;
-
-	/// <summary>
-	/// Interface for communicating with the Vulkan Bootstrap class.
-	/// </summary>
-	class IWindowHandler
-	{
-	public:
-		virtual ~IWindowHandler() = default;
-		/// <summary>
-		/// Create a vulkan surface to render to.
-		/// </summary>
-		/// <param name="instance">Vulkan application instance.</param>
-		[[nodiscard]] virtual VkSurfaceKHR CreateSurface(VkInstance instance) = 0;
-		/// <summary>
-		/// Gets the required vulkan extensions needed to render to this window.
-		/// </summary>
-		/// <param name="allocator">Allocator used to create the array.</param>
-		/// <returns>Allocated array with the required extensions.</returns>
-		[[nodiscard]] virtual jlb::Array<jlb::StringView> GetRequiredExtensions(jlb::StackAllocator& allocator) = 0;
-		/// <summary>
-		/// Returns the required extension count.
-		/// </summary>
-		[[nodiscard]] virtual size_t GetRequiredExtensionsCount() = 0;
-		/// <summary>
-		/// Returns the window resolution.
-		/// </summary>
-		[[nodiscard]] virtual glm::ivec2 GetResolution() = 0;
-	};
 
 	/// <summary>
 	/// Information from which the Vulkan Bootstrap class can create a vulkan application.
@@ -72,12 +43,8 @@ namespace vk
 		void Free(jlb::StackAllocator& tempAllocator);
 	};
 
-	/// <summary>
-	/// Class that simplifies creating a Vulkan application by abstracting the boilerplate code.
-	/// </summary>
-	class Bootstrap final
+	namespace boots
 	{
-	public:
 		/// <summary>
 		/// Contains swap chain support details for a Vulkan physical device.
 		/// </summary>
@@ -122,65 +89,28 @@ namespace vk
 		/// For more advanced use, it is adviced to create one yourself.
 		/// </summary>
 		/// <returns>Info struct from which a Vulkan application can be created.</returns>
-		[[nodiscard]] static AppInfo CreateDefaultInfo(jlb::StackAllocator& tempAllocator);
+		[[nodiscard]] AppInfo CreateDefaultInfo(jlb::StackAllocator& tempAllocator);
 		/// <summary>
 		/// Creates a new Vulkan application.
 		/// </summary>
 		/// <param name="info">Info struct from which to create the application.</param>
 		/// <returns>The created Vulkan application.</returns>
-		[[nodiscard]] static App CreateApp(jlb::StackAllocator& tempAllocator, AppInfo info);
-		
+		[[nodiscard]] App CreateApp(jlb::StackAllocator& tempAllocator, AppInfo info);
+
 		/// <summary>
 		/// Destroys a Vulkan application.
 		/// </summary>
 		/// <param name="app">Application to be destroyed.</param>
-		static void DestroyApp(App& app);
+		void DestroyApp(App& app);
 
 		/// <summary>
 		/// Returns a struct containing information about the GPU hardware's swap chain support.
 		/// </summary>
 		/// <param name="app">Vulkan Application.</param>
-		[[nodiscard]] static SwapChainSupportDetails QuerySwapChainSupport(jlb::StackAllocator& allocator, App& app);
+		[[nodiscard]] SwapChainSupportDetails QuerySwapChainSupport(jlb::StackAllocator& allocator, App& app);
 		/// <summary>
 		/// Returns the GPU's render queue families.
 		/// </summary>
-		[[nodiscard]] static QueueFamilies GetQueueFamilies(jlb::StackAllocator& tempAllocator, App& app);
-
-	private:
-		static void CheckValidationSupport(jlb::StackAllocator& tempAllocator, AppInfo& info);
-		static void CreateInstance(jlb::StackAllocator& tempAllocator, AppInfo& info, App& app);
-		static void EnableValidationLayers(
-			AppInfo& info,
-			VkDebugUtilsMessengerCreateInfoEXT& debugInfo,
-			VkInstanceCreateInfo& instanceInfo);
-
-		static void SelectPhysicalDevice(jlb::StackAllocator& tempAllocator, AppInfo& info, App& app);
-		[[nodiscard]] static QueueFamilies GetQueueFamilies(jlb::StackAllocator& tempAllocator, VkSurfaceKHR surface, VkPhysicalDevice physicalDevice);
-		[[nodiscard]] static bool CheckDeviceExtensionSupport(jlb::StackAllocator& tempAllocator, VkPhysicalDevice device, jlb::Array<jlb::StringView>& extensions);
-		[[nodiscard]] static SwapChainSupportDetails QuerySwapChainSupport(jlb::StackAllocator& allocator, App& app, VkPhysicalDevice device);
-
-		static void CreateLogicalDevice(jlb::StackAllocator& tempAllocator, AppInfo& info, App& app);
-		static void CreateCommandPool(jlb::StackAllocator& tempAllocator, App& app);
-
-		[[nodiscard]] static VkApplicationInfo CreateApplicationInfo(AppInfo& info);
-		[[nodiscard]] static jlb::Array<jlb::StringView> GetExtensions(jlb::StackAllocator& allocator, AppInfo& info);
-
-		static void CreateDebugger(App& app);
-		static VkResult CreateDebugUtilsMessengerEXT(
-			VkInstance instance,
-			const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-			const VkAllocationCallbacks* pAllocator,
-			VkDebugUtilsMessengerEXT* pDebugMessenger);
-		static void DestroyDebugUtilsMessengerEXT(
-			VkInstance instance,
-			VkDebugUtilsMessengerEXT debugMessenger,
-			const VkAllocationCallbacks* pAllocator);
-
-		static VkDebugUtilsMessengerCreateInfoEXT CreateDebugInfo();
-		static VkBool32 DebugCallback(
-			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-			VkDebugUtilsMessageTypeFlagsEXT messageType,
-			const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-			void* pUserData);
-	};
+		[[nodiscard]] QueueFamilies GetQueueFamilies(jlb::StackAllocator& tempAllocator, App& app);
+	}
 }
