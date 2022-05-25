@@ -15,6 +15,7 @@
 #include "Graphics/LayoutHandler.h"
 #include "Graphics/Shader.h"
 #include "Handlers/ShaderHandler.h"
+#include "Graphics/InstanceUtils.h"
 
 namespace game
 {
@@ -72,8 +73,7 @@ namespace game
 		VkDescriptorPool _descriptorPool;
 		VkDescriptorSetLayout _descriptorLayout;
 		jlb::Array<VkDescriptorSet> _descriptorSets{};
-		jlb::Array<VkBuffer> _instanceBuffers{};
-		jlb::Array<vk::MemBlock> _instanceMemBlocks{};
+		jlb::Array<Buffer> _instanceBuffers{};
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
@@ -136,7 +136,7 @@ namespace game
 		auto& cmd = outData.swapChainCommandBuffer;
 
 		auto& logicalDevice = outData.app->logicalDevice;
-		auto& memBlock = _instanceMemBlocks[outData.swapChainImageIndex];
+		auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
 		void* instanceData;
 		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
 		assert(!result);
@@ -239,37 +239,11 @@ namespace game
 		auto& app = *outData.app;
 		auto& allocator = *outData.allocator;
 		auto& tempAllocator = *outData.tempAllocator;
-		auto& vkAllocator = *outData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
 
+		_instanceBuffers = CreateInstanceStorageBuffers<Task>(outData, TaskSystem<Task>::GetLength());
+
 		const size_t swapChainImageCount = outData.swapChainImageCount;
-
-		// Create instance storage buffer.
-		VkBufferCreateInfo vertBufferInfo{};
-		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(Task) * TaskSystem<Task>::GetLength();
-		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		_instanceBuffers.Allocate(allocator, swapChainImageCount);
-		_instanceMemBlocks.Allocate(allocator, swapChainImageCount);
-
-		for (size_t i = 0; i < swapChainImageCount; ++i)
-		{
-			auto& buffer = _instanceBuffers[i];
-			auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &buffer);
-			assert(!result);
-
-			VkMemoryRequirements memRequirements;
-			vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
-
-			const uint32_t poolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.AllocateBlock(app, memRequirements.size, memRequirements.alignment, poolId);
-
-			result = vkBindBufferMemory(logicalDevice, buffer, memBlock.memory, memBlock.offset);
-			assert(!result);
-		}
 
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
@@ -321,7 +295,7 @@ namespace game
 
 			// Bind instance buffer.
 			VkDescriptorBufferInfo instanceInfo{};
-			instanceInfo.buffer = _instanceBuffers[i];
+			instanceInfo.buffer = _instanceBuffers[i].buffer;
 			instanceInfo.offset = 0;
 			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
 
@@ -359,19 +333,14 @@ namespace game
 		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
 		auto& allocator = *outData.allocator;
-		auto& vkAllocator = *outData.vkAllocator;
 
 		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
 		_descriptorSets.Free(*outData.allocator);
 
 		for (int32_t i = outData.swapChainImageCount - 1; i >= 0; --i)
-		{
-			vkDestroyBuffer(logicalDevice, _instanceBuffers[i], nullptr);
-			vkAllocator.FreeBlock(_instanceMemBlocks[i]);
-		}
+			FreeBuffer(outData, _instanceBuffers[i]);
 
-		_instanceMemBlocks.Free(allocator);
 		_instanceBuffers.Free(allocator);
 	}
 }

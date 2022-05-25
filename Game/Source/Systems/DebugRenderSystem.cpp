@@ -23,10 +23,7 @@ namespace game
 
 	void DebugRenderSystem::Free(const EngineOutData& outData, SystemChain& chain)
 	{
-		// Destroy mesh.
-		vkDestroyBuffer(outData.app->logicalDevice, _vertexBuffer.buffer, nullptr);
-		outData.vkAllocator->FreeBlock(_vertexBuffer.memBlock);
-
+		FreeBuffer(outData, _vertexBuffer);
 		ShaderHandler::Destroy(outData, _shader);
 		TaskSystem<DebugRenderTask>::Free(outData, chain);
 	}

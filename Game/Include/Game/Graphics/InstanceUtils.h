@@ -7,11 +7,12 @@
 namespace game
 {
 	template <typename Type>
-	[[nodiscard]] jlb::Array<Buffer> CreateInstanceStorageBuffers(EngineOutData& outData, const size_t length)
+	[[nodiscard]] jlb::Array<Buffer> CreateInstanceStorageBuffers(const EngineOutData& outData, size_t length);
+
+	template <typename Type>
+	jlb::Array<Buffer> CreateInstanceStorageBuffers(const EngineOutData& outData, const size_t length)
 	{
 		auto& app = *outData.app;
-		auto& allocator = *outData.allocator;
-		auto& tempAllocator = *outData.tempAllocator;
 		auto& vkAllocator = *outData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
 

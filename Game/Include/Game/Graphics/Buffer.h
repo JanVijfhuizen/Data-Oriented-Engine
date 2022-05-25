@@ -8,4 +8,6 @@ namespace game
 		VkBuffer buffer;
 		vk::MemBlock memBlock;
 	};
+
+	void FreeBuffer(const EngineOutData& outData, Buffer& buffer);
 }
