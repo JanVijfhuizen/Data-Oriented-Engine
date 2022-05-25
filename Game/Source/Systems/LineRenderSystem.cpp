@@ -34,25 +34,25 @@ namespace game
 
 	void LineRenderSystem::Update(const EngineOutData& outData, SystemChain& chain)
 	{
+		auto& cmd = outData.swapChainCommandBuffer;
+
+		auto& logicalDevice = outData.app->logicalDevice;
+		auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
+		void* instanceData;
+		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
+		assert(!result);
+		memcpy(instanceData, static_cast<const void*>(GetData()), sizeof(LineRenderTask) * GetLength());
+		vkUnmapMemory(logicalDevice, memBlock.memory);
+
+		VkDeviceSize offset = 0;
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+			0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
+		vkCmdBindVertexBuffers(cmd, 0, 1, &_vertexBuffer.buffer, &offset);
+
 		auto& cameras = *chain.Get<CameraArchetype>();
 		for (const auto& camera : cameras)
 		{
-			auto& cmd = outData.swapChainCommandBuffer;
-
-			auto& logicalDevice = outData.app->logicalDevice;
-			auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
-			void* instanceData;
-			const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
-			assert(!result);
-			memcpy(instanceData, static_cast<const void*>(GetData()), sizeof(LineRenderTask) * GetLength());
-			vkUnmapMemory(logicalDevice, memBlock.memory);
-
-			VkDeviceSize offset = 0;
-			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-				0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
-			vkCmdBindVertexBuffers(cmd, 0, 1, &_vertexBuffer.buffer, &offset);
-
 			PushConstants pushConstant{};
 			pushConstant.resolution = outData.resolution;
 			pushConstant.camera = camera;
