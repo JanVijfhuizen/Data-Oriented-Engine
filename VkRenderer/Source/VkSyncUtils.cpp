@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
-#include "VkSyncHandler.h"
+#include "VkSyncUtils.h"
 
-namespace vk
+namespace vk::sync
 {
-	VkFenceCreateInfo SyncHandler::CreateFenceDefaultInfo()
+	VkFenceCreateInfo CreateFenceDefaultInfo()
 	{
 		VkFenceCreateInfo fenceInfo{};
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -11,7 +11,7 @@ namespace vk
 		return fenceInfo;
 	}
 
-	VkSemaphoreCreateInfo SyncHandler::CreateSemaphoreDefaultInfo()
+	VkSemaphoreCreateInfo CreateSemaphoreDefaultInfo()
 	{
 		VkSemaphoreCreateInfo semaphoreInfo{};
 		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;

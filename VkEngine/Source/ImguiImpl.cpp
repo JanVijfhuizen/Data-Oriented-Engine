@@ -3,7 +3,7 @@
 #include "VkRenderer/VkApp.h"
 #include "WindowHandler.h"
 #include "VkRenderer/VkSwapChain.h"
-#include "VkRenderer/VkCommandHandler.h"
+#include "VkRenderer/VkCommandBufferUtils.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 
@@ -53,12 +53,12 @@ namespace vke
 
 		ImGui_ImplVulkan_Init(&init_info, swapChain.GetRenderPass());
 
-		auto cmdBufferInfo = vk::CommandHandler::CreateBufferDefaultInfo(app);
+		auto cmdBufferInfo = vk::cmdBuffer::CreateDefaultInfo(app);
 		VkCommandBuffer cmdBuffer;
 		auto result = vkAllocateCommandBuffers(app.logicalDevice, &cmdBufferInfo, &cmdBuffer);
 		assert(!result);
 
-		auto cmdBeginInfo = vk::CommandHandler::CreateBufferBeginDefaultInfo();
+		auto cmdBeginInfo = vk::cmdBuffer::CreateBeginDefaultInfo();
 		vkBeginCommandBuffer(cmdBuffer, &cmdBeginInfo);
 
 		ImGui_ImplVulkan_CreateFontsTexture(cmdBuffer);

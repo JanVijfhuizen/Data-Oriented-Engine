@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
-#include "VkCommandHandler.h"
+#include "VkCommandBufferUtils.h"
 #include "VkApp.h"
 
-namespace vk
+namespace vk::cmdBuffer
 {
-	VkCommandBufferAllocateInfo CommandHandler::CreateBufferDefaultInfo(App& app)
+	VkCommandBufferAllocateInfo CreateDefaultInfo(App& app)
 	{
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -14,7 +14,7 @@ namespace vk
 		return allocInfo;
 	}
 
-	VkCommandBufferBeginInfo CommandHandler::CreateBufferBeginDefaultInfo()
+	VkCommandBufferBeginInfo CreateBeginDefaultInfo()
 	{
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -22,7 +22,7 @@ namespace vk
 		return beginInfo;
 	}
 
-	VkSubmitInfo CommandHandler::CreateSubmitDefaultInfo(const jlb::ArrayView<VkCommandBuffer> commandBuffers)
+	VkSubmitInfo CreateSubmitDefaultInfo(const jlb::ArrayView<VkCommandBuffer> commandBuffers)
 	{
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

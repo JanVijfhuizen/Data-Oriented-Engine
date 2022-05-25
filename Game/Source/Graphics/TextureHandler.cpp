@@ -5,9 +5,9 @@
 #include "StringView.h"
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkStackAllocator.h"
-#include "VkRenderer/VkCommandHandler.h"
-#include "VkRenderer/VkSyncHandler.h"
-#include "VkRenderer/VkImageHandler.h"
+#include "VkRenderer/VkCommandBufferUtils.h"
+#include "VkRenderer/VkSyncUtils.h"
+#include "VkRenderer/VkImageUtils.h"
 
 namespace game
 {
@@ -63,7 +63,7 @@ namespace game
 		stbi_image_free(pixels);
 
 		// Create image.
-		auto imageInfo = vk::ImageHandler::CreateDefaultInfo({texWidth, texHeight}, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+		auto imageInfo = vk::image::CreateDefaultInfo({texWidth, texHeight}, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
 		VkImage image;
 		result = vkCreateImage(logicalDevice, &imageInfo, nullptr, &image);
@@ -79,31 +79,31 @@ namespace game
 
 		// Start transfer.
 		VkCommandBuffer cmdBuffer;
-		auto cmdBufferAllocInfo = vk::CommandHandler::CreateBufferDefaultInfo(app);
+		auto cmdBufferAllocInfo = vk::cmdBuffer::CreateDefaultInfo(app);
 		result = vkAllocateCommandBuffers(app.logicalDevice, &cmdBufferAllocInfo, &cmdBuffer);
 		assert(!result);
 
 		VkFence fence;
-		auto fenceInfo = vk::SyncHandler::CreateFenceDefaultInfo();
+		auto fenceInfo = vk::sync::CreateFenceDefaultInfo();
 		result = vkCreateFence(app.logicalDevice, &fenceInfo, nullptr, &fence);
 		assert(!result);
 		result = vkResetFences(app.logicalDevice, 1, &fence);
 		assert(!result);
 
 		// Begin recording.
-		auto cmdBeginInfo = vk::CommandHandler::CreateBufferBeginDefaultInfo();
+		auto cmdBeginInfo = vk::cmdBuffer::CreateBeginDefaultInfo();
 		vkBeginCommandBuffer(cmdBuffer, &cmdBeginInfo);
 
-		vk::ImageHandler::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
-		vk::ImageHandler::CopyBufferToImage(stagingBuffer, image, cmdBuffer, { texWidth, texHeight });
-		vk::ImageHandler::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+		vk::image::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+		vk::image::CopyBufferToImage(stagingBuffer, image, cmdBuffer, { texWidth, texHeight });
+		vk::image::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
 
 		// End recording.
 		result = vkEndCommandBuffer(cmdBuffer);
 		assert(!result);
 
 		// Submit.
-		auto cmdSubmitInfo = vk::CommandHandler::CreateSubmitDefaultInfo(cmdBuffer);
+		auto cmdSubmitInfo = vk::cmdBuffer::CreateSubmitDefaultInfo(cmdBuffer);
 		result = vkQueueSubmit(app.queues.graphics, 1, &cmdSubmitInfo, fence);
 		assert(!result);
 

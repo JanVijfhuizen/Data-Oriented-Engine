@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
-#include "VkRenderPassHandler.h"
+#include "VkRenderPassUtils.h"
 
-namespace vk
+namespace vk::renderPass
 {
-	VkAttachmentDescription RenderPassHandler::CreateAttachmentDescriptionDefaultInfo()
+	VkAttachmentDescription CreateAttachmentDescriptionDefaultInfo()
 	{
 		VkAttachmentDescription attachmentInfo{};
 		attachmentInfo.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -16,7 +16,7 @@ namespace vk
 		return attachmentInfo;
 	}
 
-	VkAttachmentReference RenderPassHandler::CreateAttachmentReferenceDefaultInfo()
+	VkAttachmentReference CreateAttachmentReferenceDefaultInfo()
 	{
 		VkAttachmentReference colorAttachmentRef{};
 		colorAttachmentRef.attachment = 0;
@@ -24,14 +24,14 @@ namespace vk
 		return colorAttachmentRef;
 	}
 
-	VkSubpassDescription RenderPassHandler::CreateSubpassDescriptionDefaultInfo()
+	VkSubpassDescription CreateSubpassDescriptionDefaultInfo()
 	{
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		return subpass;
 	}
 
-	VkSubpassDependency RenderPassHandler::CreateSubpassDependencyDefaultInfo()
+	VkSubpassDependency CreateSubpassDependencyDefaultInfo()
 	{
 		VkSubpassDependency dependency{};
 		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -43,7 +43,7 @@ namespace vk
 		return dependency;
 	}
 
-	VkRenderPassCreateInfo RenderPassHandler::CreateDefaultInfo(
+	VkRenderPassCreateInfo CreateDefaultInfo(
 		const jlb::ArrayView<VkAttachmentDescription> attachmentDescriptions,
 		const jlb::ArrayView<VkSubpassDescription> subpassDescriptions,
 		const jlb::ArrayView<VkSubpassDependency> subpassDependencies)
@@ -59,7 +59,7 @@ namespace vk
 		return renderPassInfo;
 	}
 
-	VkRenderPassBeginInfo RenderPassHandler::CreateBeginDefaultInfo()
+	VkRenderPassBeginInfo CreateBeginDefaultInfo()
 	{
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
-#include "VkFrameBufferHandler.h"
+#include "VkFrameBufferUtils.h"
 
-namespace vk
+namespace vk::frameBuffer
 {
-	VkFramebufferCreateInfo FrameBufferHandler::CreateDefaultInfo()
+	VkFramebufferCreateInfo CreateDefaultInfo()
 	{
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

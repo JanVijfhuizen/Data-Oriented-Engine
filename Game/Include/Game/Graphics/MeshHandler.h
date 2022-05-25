@@ -1,7 +1,7 @@
 #pragma once
 #include "VkRenderer/VkStackAllocator.h"
-#include "VkRenderer/VkCommandHandler.h"
-#include "VkRenderer/VkSyncHandler.h"
+#include "VkRenderer/VkCommandBufferUtils.h"
+#include "VkRenderer/VkSyncUtils.h"
 #include "Mesh.h"
 #include "VkRenderer/VkApp.h"
 #include "Buffer.h"
@@ -78,18 +78,18 @@ namespace game
 		assert(!result);
 
 		VkCommandBuffer cmdBuffer;
-		auto cmdBufferAllocInfo = vk::CommandHandler::CreateBufferDefaultInfo(app);
+		auto cmdBufferAllocInfo = vk::cmdBuffer::CreateDefaultInfo(app);
 		result = vkAllocateCommandBuffers(app.logicalDevice, &cmdBufferAllocInfo, &cmdBuffer);
 		assert(!result);
 
 		VkFence fence;
-		auto fenceInfo = vk::SyncHandler::CreateFenceDefaultInfo();
+		auto fenceInfo = vk::sync::CreateFenceDefaultInfo();
 		result = vkCreateFence(app.logicalDevice, &fenceInfo, nullptr, &fence);
 		assert(!result);
 		result = vkResetFences(app.logicalDevice, 1, &fence);
 		assert(!result);
 
-		auto cmdBeginInfo = vk::CommandHandler::CreateBufferBeginDefaultInfo();
+		auto cmdBeginInfo = vk::cmdBuffer::CreateBeginDefaultInfo();
 		vkBeginCommandBuffer(cmdBuffer, &cmdBeginInfo);
 
 		VkBufferCopy region{};
@@ -101,7 +101,7 @@ namespace game
 		result = vkEndCommandBuffer(cmdBuffer);
 		assert(!result);
 
-		auto cmdSubmitInfo = vk::CommandHandler::CreateSubmitDefaultInfo(cmdBuffer);
+		auto cmdSubmitInfo = vk::cmdBuffer::CreateSubmitDefaultInfo(cmdBuffer);
 		result = vkQueueSubmit(app.queues.graphics, 1, &cmdSubmitInfo, fence);
 		assert(!result);
 

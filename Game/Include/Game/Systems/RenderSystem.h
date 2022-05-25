@@ -10,8 +10,8 @@
 #include "Graphics/MeshHandler.h"
 #include "FileLoader.h"
 #include "Graphics/TextureHandler.h"
-#include "VkRenderer/VkImageHandler.h"
-#include "VkRenderer/VkSamplerHandler.h"
+#include "VkRenderer/VkImageUtils.h"
+#include "VkRenderer/VkSamplerUtils.h"
 #include "Graphics/LayoutHandler.h"
 #include "Graphics/Shader.h"
 #include "Handlers/ShaderHandler.h"
@@ -184,10 +184,10 @@ namespace game
 		auto& logicalDevice = app.logicalDevice;
 
 		_textureAtlas = TextureHandler::LoadTexture(outData, createInfo.atlasTexturePath);
-		const auto viewCreateInfo = vk::ImageHandler::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
+		const auto viewCreateInfo = vk::image::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
 		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_atlasImageView);
 		assert(!result);
-		const auto samplerCreateInfo = vk::SamplerHandler::CreateDefaultInfo(app);
+		const auto samplerCreateInfo = vk::sampler::CreateDefaultInfo(app);
 		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_atlasSampler);
 		assert(!result);
 	}
