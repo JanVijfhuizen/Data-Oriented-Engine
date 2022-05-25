@@ -2,6 +2,7 @@
 #include "TaskSystem.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Buffer.h"
+#include "Archetypes/CameraArchetype.h"
 
 namespace game
 {
@@ -17,8 +18,7 @@ namespace game
 		struct PushConstants final
 		{
 			glm::vec2 resolution;
-			glm::vec2 cameraPosition{};
-			float pixelSize = 0.008f;
+			Camera camera;
 		};
 
 		Shader _shader;

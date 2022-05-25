@@ -23,15 +23,21 @@ namespace game
 
 	void DefineUsage(const EngineOutData& outData)
 	{
-		gameState.chain.Get<WallArchetype>()->IncreaseRequestedLength(1);
-		gameState.chain.Get<LineRenderSystem>()->IncreaseRequestedLength(2);
+		auto& chain = gameState.chain;
+
+		chain.Get<CameraArchetype>()->IncreaseRequestedLength(1);
+		chain.Get<WallArchetype>()->IncreaseRequestedLength(1);
+		chain.Get<LineRenderSystem>()->IncreaseRequestedLength(2);
 	}
 
 	void GameStart(const EngineOutData& outData)
 	{
+		auto& chain = gameState.chain;
+
 		// Set up game world.
-		gameState.chain.Get<PlayerArchetype>()->Add();
-		gameState.chain.Get<CursorArchetype>()->Add();
+		chain.Get<CameraArchetype>()->Add();
+		chain.Get<PlayerArchetype>()->Add();
+		chain.Get<CursorArchetype>()->Add();
 		auto& wall = gameState.chain.Get<WallArchetype>()->Add();
 		wall.transform.position = { 40, 70 };
 	}
@@ -40,6 +46,10 @@ namespace game
 	{
 		static float f = 0;
 		f += outData.deltaTime / 1000;
+
+		auto& camera = (*gameState.chain.Get<CameraArchetype>())[0];
+		camera.pixelSize = 0.008f + 0.004f * sin(f);
+		camera.position = { sin(f) * 64, cos(f) * 64 };
 
 		TextRenderTask task{};
 		task.text = "general kenobi";
@@ -59,6 +69,7 @@ namespace game
 	{
 		// Add archetypes.
 		auto& chain = gameState.chain;
+		chain.Add<CameraArchetype>(outData);
 		chain.Add<PlayerArchetype>(outData);
 		chain.Add<WallArchetype>(outData);
 		chain.Add<CursorArchetype>(outData);

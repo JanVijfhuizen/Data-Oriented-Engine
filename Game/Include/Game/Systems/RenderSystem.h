@@ -16,6 +16,7 @@
 #include "Graphics/Shader.h"
 #include "Handlers/ShaderHandler.h"
 #include "Graphics/InstanceUtils.h"
+#include "Archetypes/CameraArchetype.h"
 
 namespace game
 {
@@ -35,16 +36,6 @@ namespace game
 			jlb::StringView fragPath;
 		};
 
-		// Used to update the renderer.
-		struct UpdateInfo final
-		{
-			glm::vec2 cameraPosition{};
-			float pixelSize = 0.008f;
-		};
-
-		// Can safely be adjusted from outside the class.
-		UpdateInfo updateInfo{};
-
 		// Get the texture atlas used for this renderer.
 		[[nodiscard]] const Texture& GetTexture() const;
 
@@ -62,7 +53,7 @@ namespace game
 		struct PushConstants final
 		{
 			glm::vec2 resolution;
-			UpdateInfo updateInfo;
+			Camera camera;
 		};
 
 		Shader _shader;
@@ -133,30 +124,34 @@ namespace game
 	template <typename Task>
 	void RenderSystem<Task>::Update(const EngineOutData& outData, SystemChain& chain)
 	{
-		auto& cmd = outData.swapChainCommandBuffer;
+		auto& cameras = *chain.Get<CameraArchetype>();
 
-		auto& logicalDevice = outData.app->logicalDevice;
-		auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
-		void* instanceData;
-		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
-		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(TaskSystem<Task>::GetData()), sizeof(Task) * TaskSystem<Task>::GetLength());
-		vkUnmapMemory(logicalDevice, memBlock.memory);
+		if (cameras.GetCount())
+		{
+			auto& cmd = outData.swapChainCommandBuffer;
 
-		VkDeviceSize offset = 0;
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-			0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
-		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
-		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+			auto& logicalDevice = outData.app->logicalDevice;
+			auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
+			void* instanceData;
+			const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
+			assert(!result);
+			memcpy(instanceData, static_cast<const void*>(TaskSystem<Task>::GetData()), sizeof(Task) * TaskSystem<Task>::GetLength());
+			vkUnmapMemory(logicalDevice, memBlock.memory);
 
-		PushConstants pushConstant{};
-		pushConstant.resolution = outData.resolution;
-		pushConstant.updateInfo = updateInfo;
+			VkDeviceSize offset = 0;
+			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+				0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
+			vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
+			vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
-		vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
+			PushConstants pushConstant{};
+			pushConstant.resolution = outData.resolution;
+			pushConstant.camera = cameras[0];
 
+			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
+			vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
+		}
 		TaskSystem<Task>::SetCount(0);
 	}
 
