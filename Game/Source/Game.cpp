@@ -7,7 +7,7 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/TextRenderSystem.h"
 #include "Archetypes/WallArchetype.h"
-#include "Systems/DebugRenderSystem.h"
+#include "Systems/LineRenderSystem.h"
 
 namespace game
 {
@@ -24,6 +24,7 @@ namespace game
 	void DefineUsage(const EngineOutData& outData)
 	{
 		gameState.chain.Get<WallArchetype>()->IncreaseRequestedLength(1);
+		gameState.chain.Get<LineRenderSystem>()->IncreaseRequestedLength(2);
 	}
 
 	void GameStart(const EngineOutData& outData)
@@ -44,6 +45,14 @@ namespace game
 		task.text = "general kenobi";
 		task.spacingPct = abs(sin(f));
 		gameState.chain.Get<TextRenderSystem>()->AddAsCharRenderTasks(task);
+
+		auto lineRenderSystem = gameState.chain.Get<LineRenderSystem>();
+		auto& lineTask = lineRenderSystem->Add();
+		lineTask.start = { 0, 0 };
+		lineTask.end = {sin(f) * 50, cos(f) * 100};
+		auto& lineTask2 = lineRenderSystem->Add();
+		lineTask2.start = { sin(f) * 100 + 200, 50 * sin(f * 2) };
+		lineTask2.end = { sin(f) * 64, cos(f) * 32 };
 	}
 
 	void Start(const EngineOutData outData)
@@ -60,7 +69,7 @@ namespace game
 		chain.Add<AnimationSystem>(outData);
 		chain.Add<EntityRenderSystem>(outData);
 		chain.Add<TextRenderSystem>(outData);
-		chain.Add<DebugRenderSystem>(outData);
+		chain.Add<LineRenderSystem>(outData);
 
 		DefineUsage(outData);
 		chain.Allocate(outData);

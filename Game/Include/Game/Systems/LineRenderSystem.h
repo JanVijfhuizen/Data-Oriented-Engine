@@ -1,33 +1,35 @@
 ﻿#pragma once
 #include "TaskSystem.h"
 #include "Graphics/Shader.h"
-#include "Graphics/PipelineHandler.h"
 #include "Graphics/Buffer.h"
 
 namespace game
 {
-	struct DebugRenderTask final
+	struct LineRenderTask final
 	{
-		// Line vertices.
-		glm::vec2 positions[2];
-		glm::vec3 color;
+		glm::vec2 start{};
+		glm::vec2 end{};
 	};
 
-	class DebugRenderSystem final : public TaskSystem<DebugRenderTask>
+	class LineRenderSystem final : public TaskSystem<LineRenderTask>
 	{
 	private:
 		struct PushConstants final
 		{
 			glm::vec2 resolution;
-			glm::vec2 cameraPosition;
-			float pixelSize;
+			glm::vec2 cameraPosition{};
+			float pixelSize = 0.008f;
 		};
 
 		Shader _shader;
 		Buffer _vertexBuffer;
+		jlb::Array<Buffer> _instanceBuffers;
+
 		VkPipeline _pipeline;
 		VkPipelineLayout _pipelineLayout;
 		VkDescriptorSetLayout _descriptorLayout;
+		VkDescriptorPool _descriptorPool;
+		jlb::Array<VkDescriptorSet> _descriptorSets{};
 
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Free(const EngineOutData& outData, SystemChain& chain) override;

@@ -28,6 +28,7 @@ namespace game
 			VkRenderPass renderPass;
 			VkPipeline basePipeline = VK_NULL_HANDLE;
 			int32_t basePipelineIndex = -1;
+			VkPrimitiveTopology topologyType = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		};
 
 		static void Create(const EngineOutData& outData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline);

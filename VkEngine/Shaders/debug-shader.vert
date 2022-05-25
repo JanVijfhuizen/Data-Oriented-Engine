@@ -5,8 +5,8 @@ layout(location = 0) in int inIndex;
 
 struct InstanceData
 {
-    vec2 positions[2];
-    vec3 color;
+	vec2 start;
+	vec2 end;
 };
 
 layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
@@ -21,21 +21,13 @@ layout(push_constant) uniform PushConstants
     float pixelSize;
 } pushConstants;
 
-layout(location = 0) out Data
-{
-    vec3 color;
-} outData;
-
 void HandleInstance(in InstanceData instance)
 {
-    outData.color = instance.color;
-
     float aspectFix = pushConstants.resolution.y / pushConstants.resolution.x;
-    vec2 worldPos = (instance.positions[inIndex] - pushConstants.cameraPosition) * pushConstants.pixelSize;
-    vec4 worldPosv4 = vec4(worldPos, 1, 1);
-    worldPosv4 *= aspectFix;
+    vec2 worldPos = (instance.start * inIndex + instance.end * (1 - inIndex) - pushConstants.cameraPosition) * pushConstants.pixelSize;
+    worldPos *= aspectFix;
 
-    gl_Position = worldPosv4;
+	gl_Position = vec4(worldPos, 1, 1);
 }
 
 void main() 

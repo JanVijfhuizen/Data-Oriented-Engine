@@ -123,7 +123,7 @@
     <ClInclude Include="Include\Game\Graphics\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Systems\DebugRenderSystem.h">
+    <ClInclude Include="Include\Game\Systems\LineRenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Graphics\Buffer.h">
@@ -194,7 +194,7 @@
     <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Systems\DebugRenderSystem.cpp">
+    <ClCompile Include="Source\Systems\LineRenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Buffer.cpp">

@@ -240,10 +240,9 @@ namespace game
 		auto& allocator = *outData.allocator;
 		auto& tempAllocator = *outData.tempAllocator;
 		auto& logicalDevice = app.logicalDevice;
+		const size_t swapChainImageCount = outData.swapChainImageCount;
 
 		_instanceBuffers = CreateInstanceStorageBuffers<Task>(outData, TaskSystem<Task>::GetLength());
-
-		const size_t swapChainImageCount = outData.swapChainImageCount;
 
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
