@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\Game\Archetype.h" />
+    <ClInclude Include="Include\Game\Archetypes\CameraArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\CursorArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\WallArchetype.h" />
     <ClInclude Include="Include\Game\Components\Animator.h" />
@@ -171,16 +172,21 @@
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\GameState.h" />
     <ClInclude Include="Include\Game\Graphics\Animation.h" />
+    <ClInclude Include="Include\Game\Graphics\Buffer.h" />
+    <ClInclude Include="Include\Game\Graphics\InstanceUtils.h" />
     <ClInclude Include="Include\Game\Graphics\Mesh.h" />
     <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
     <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
     <ClInclude Include="Include\Game\Graphics\RenderConventions.h" />
+    <ClInclude Include="Include\Game\Graphics\Shader.h" />
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
+    <ClInclude Include="Include\Game\Handlers\ShaderHandler.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
+    <ClInclude Include="Include\Game\Systems\LineRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderSystem.h" />
@@ -193,6 +199,10 @@
     <ClInclude Include="Include\Game\TaskSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Archetypes\CameraArchetype.cpp" />
+    <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />
+    <ClCompile Include="Source\Graphics\Buffer.cpp" />
+    <ClCompile Include="Source\Systems\LineRenderSystem.cpp" />
     <ClCompile Include="Source\Archetypes\WallArchetype.cpp" />
     <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />
     <ClCompile Include="Source\SystemChain.cpp" />

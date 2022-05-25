@@ -13,6 +13,10 @@
 #include "VkRenderer/VkImageHandler.h"
 #include "VkRenderer/VkSamplerHandler.h"
 #include "Graphics/LayoutHandler.h"
+#include "Graphics/Shader.h"
+#include "Handlers/ShaderHandler.h"
+#include "Graphics/InstanceUtils.h"
+#include "Archetypes/CameraArchetype.h"
 
 namespace game
 {
@@ -32,38 +36,27 @@ namespace game
 			jlb::StringView fragPath;
 		};
 
-		// Used to update the renderer.
-		struct UpdateInfo final
-		{
-			glm::vec2 cameraPosition{};
-			float pixelSize = 0.008f;
-		};
-
-		// Can safely be adjusted from outside the class.
-		UpdateInfo updateInfo{};
-
 		// Get the texture atlas used for this renderer.
 		[[nodiscard]] const Texture& GetTexture() const;
 
 	protected:
 		[[nodiscard]] virtual CreateInfo GetCreateInfo() = 0;
 
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Free(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineOutData& outData, SystemChain& chain) override;
 
 		void CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
 		void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
 
 	private:
-		struct PushConstant final
+		struct PushConstants final
 		{
 			glm::vec2 resolution;
-			UpdateInfo updateInfo;
+			Camera camera;
 		};
 
-		VkShaderModule _vertModule;
-		VkShaderModule _fragModule;
+		Shader _shader;
 		Texture _textureAtlas;
 		VkImageView _atlasImageView;
 		VkSampler _atlasSampler;
@@ -71,14 +64,11 @@ namespace game
 		VkDescriptorPool _descriptorPool;
 		VkDescriptorSetLayout _descriptorLayout;
 		jlb::Array<VkDescriptorSet> _descriptorSets{};
-		jlb::Array<VkBuffer> _instanceBuffers{};
-		jlb::Array<vk::MemBlock> _instanceMemBlocks{};
+		jlb::Array<Buffer> _instanceBuffers{};
 
 		VkPipelineLayout _pipelineLayout;
 		VkPipeline _pipeline;
 
-		void LoadShader(const EngineOutData& outData, const CreateInfo& createInfo);
-		void UnloadShader(const EngineOutData& outData) const;
 		void LoadTextureAtlas(const EngineOutData& outData, const CreateInfo& createInfo);
 		void UnloadTextureAtlas(const EngineOutData& outData);
 
@@ -93,9 +83,9 @@ namespace game
 		TaskSystem<Task>::CreateSwapChainAssets(outData, chain);
 
 		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
-		modules[0].module = _vertModule;
+		modules[0].module = _shader.vert;
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
-		modules[1].module = _fragModule;
+		modules[1].module = _shader.frag;
 		modules[1].flags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 		auto vertAttributes = Vertex::GetAttributeDescriptions();
@@ -108,7 +98,7 @@ namespace game
 		pipelineInfo.modules = modules;
 		pipelineInfo.renderPass = outData.swapChainRenderPass;
 		pipelineInfo.layouts = _descriptorLayout;
-		pipelineInfo.pushConstantSize = sizeof(PushConstant);
+		pipelineInfo.pushConstantSize = sizeof(PushConstants);
 		pipelineInfo.usePushConstant = true;
 
 		PipelineHandler::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
@@ -117,12 +107,12 @@ namespace game
 	template <typename Task>
 	void RenderSystem<Task>::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)
 	{
-		TaskSystem<Task>::DestroySwapChainAssets(outData, chain);
-
 		auto& logicalDevice = outData.app->logicalDevice;
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
+
+		TaskSystem<Task>::DestroySwapChainAssets(outData, chain);
 	}
 
 	template <typename Task>
@@ -134,29 +124,33 @@ namespace game
 	template <typename Task>
 	void RenderSystem<Task>::Update(const EngineOutData& outData, SystemChain& chain)
 	{
-		auto& cmd = outData.swapChainCommandBuffer;
+		auto& cameras = *chain.Get<CameraArchetype>();
+		for (const auto& camera : cameras)
+		{
+			auto& cmd = outData.swapChainCommandBuffer;
 
-		auto& logicalDevice = outData.app->logicalDevice;
-		auto& memBlock = _instanceMemBlocks[outData.swapChainImageIndex];
-		void* instanceData;
-		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
-		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(TaskSystem<Task>::GetData()), sizeof(Task) * TaskSystem<Task>::GetLength());
-		vkUnmapMemory(logicalDevice, memBlock.memory);
+			auto& logicalDevice = outData.app->logicalDevice;
+			auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
+			void* instanceData;
+			const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
+			assert(!result);
+			memcpy(instanceData, static_cast<const void*>(TaskSystem<Task>::GetData()), sizeof(Task) * TaskSystem<Task>::GetLength());
+			vkUnmapMemory(logicalDevice, memBlock.memory);
 
-		VkDeviceSize offset = 0;
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-			0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
-		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer, &offset);
-		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+			VkDeviceSize offset = 0;
+			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+				0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
+			vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
+			vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-		PushConstant pushConstant{};
-		pushConstant.resolution = outData.resolution;
-		pushConstant.updateInfo = updateInfo;
+			PushConstants pushConstant{};
+			pushConstant.resolution = outData.resolution;
+			pushConstant.camera = camera;
 
-		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
-		vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
+			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
+			vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
+		}
 
 		TaskSystem<Task>::SetCount(0);
 	}
@@ -168,7 +162,7 @@ namespace game
 
 		TaskSystem<Task>::Allocate(outData, chain);
 		LoadTextureAtlas(outData, createInfo);
-		LoadShader(outData, createInfo);
+		_shader = ShaderHandler::Create(outData, createInfo.vertPath, createInfo.fragPath);
 		CreateMesh(outData);
 		CreateShaderAssets(outData);
 	}
@@ -178,44 +172,9 @@ namespace game
 	{
 		DestroyShaderAssets(outData);
 		MeshHandler::Destroy(outData, _mesh);
-		UnloadShader(outData);
+		ShaderHandler::Destroy(outData, _shader);
 		UnloadTextureAtlas(outData);
 		TaskSystem<Task>::Free(outData, chain);
-	}
-
-	template <typename Task>
-	void RenderSystem<Task>::LoadShader(const EngineOutData& outData, const CreateInfo& createInfo)
-	{
-		auto& logicalDevice = outData.app->logicalDevice;
-		auto& tempAllocator = *outData.tempAllocator;
-
-		auto vert = jlb::FileLoader::Read(tempAllocator, createInfo.vertPath);
-		auto frag = jlb::FileLoader::Read(tempAllocator, createInfo.fragPath);
-
-		VkShaderModuleCreateInfo vertCreateInfo{};
-		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		vertCreateInfo.codeSize = vert.GetLength();
-		vertCreateInfo.pCode = reinterpret_cast<const uint32_t*>(vert.GetData());
-
-		VkShaderModuleCreateInfo fragCreateInfo{};
-		fragCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		fragCreateInfo.codeSize = frag.GetLength();
-		fragCreateInfo.pCode = reinterpret_cast<const uint32_t*>(frag.GetData());
-
-		auto result = vkCreateShaderModule(logicalDevice, &vertCreateInfo, nullptr, &_vertModule);
-		assert(!result);
-		result = vkCreateShaderModule(logicalDevice, &fragCreateInfo, nullptr, &_fragModule);
-		assert(!result);
-
-		frag.Free(tempAllocator);
-		vert.Free(tempAllocator);
-	}
-
-	template <typename Task>
-	void RenderSystem<Task>::UnloadShader(const EngineOutData& outData) const
-	{
-		vkDestroyShaderModule(outData.app->logicalDevice, _vertModule, nullptr);
-		vkDestroyShaderModule(outData.app->logicalDevice, _fragModule, nullptr);
 	}
 
 	template <typename Task>
@@ -266,7 +225,7 @@ namespace game
 		for (auto& vertex : vertices)
 			vertex.position /= 2;
 
-		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(outData, vertices, indices);
+		_mesh = MeshHandler::CreateIndexed<Vertex, Vertex::Index>(outData, vertices, indices);
 	}
 
 	template <typename Task>
@@ -275,37 +234,10 @@ namespace game
 		auto& app = *outData.app;
 		auto& allocator = *outData.allocator;
 		auto& tempAllocator = *outData.tempAllocator;
-		auto& vkAllocator = *outData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
-
 		const size_t swapChainImageCount = outData.swapChainImageCount;
 
-		// Create instance storage buffer.
-		VkBufferCreateInfo vertBufferInfo{};
-		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(Task) * TaskSystem<Task>::GetLength();
-		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		_instanceBuffers.Allocate(allocator, swapChainImageCount);
-		_instanceMemBlocks.Allocate(allocator, swapChainImageCount);
-
-		for (size_t i = 0; i < swapChainImageCount; ++i)
-		{
-			auto& buffer = _instanceBuffers[i];
-			auto result = vkCreateBuffer(logicalDevice, &vertBufferInfo, nullptr, &buffer);
-			assert(!result);
-
-			VkMemoryRequirements memRequirements;
-			vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
-
-			const uint32_t poolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			auto& memBlock = _instanceMemBlocks[i] = vkAllocator.AllocateBlock(app, memRequirements.size, memRequirements.alignment, poolId);
-
-			result = vkBindBufferMemory(logicalDevice, buffer, memBlock.memory, memBlock.offset);
-			assert(!result);
-		}
+		_instanceBuffers = CreateInstanceStorageBuffers<Task>(outData, TaskSystem<Task>::GetLength());
 
 		// Create descriptor layout.
 		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
@@ -320,13 +252,15 @@ namespace game
 		_descriptorLayout = LayoutHandler::Create(outData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
-		VkDescriptorPoolSize poolSize{};
-		poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		poolSize.descriptorCount = swapChainImageCount;
+		VkDescriptorPoolSize poolSizes[2];
+		poolSizes[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		poolSizes[0].descriptorCount = swapChainImageCount;
+		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		poolSizes[1].descriptorCount = swapChainImageCount;
 		VkDescriptorPoolCreateInfo poolInfo{};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		poolInfo.poolSizeCount = 1;
-		poolInfo.pPoolSizes = &poolSize;
+		poolInfo.poolSizeCount = sizeof poolSizes / sizeof(VkDescriptorPoolSize);
+		poolInfo.pPoolSizes = poolSizes;
 		poolInfo.maxSets = swapChainImageCount;
 
 		auto result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &_descriptorPool);
@@ -355,7 +289,7 @@ namespace game
 
 			// Bind instance buffer.
 			VkDescriptorBufferInfo instanceInfo{};
-			instanceInfo.buffer = _instanceBuffers[i];
+			instanceInfo.buffer = _instanceBuffers[i].buffer;
 			instanceInfo.offset = 0;
 			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
 
@@ -393,19 +327,14 @@ namespace game
 		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
 		auto& allocator = *outData.allocator;
-		auto& vkAllocator = *outData.vkAllocator;
 
 		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
 		_descriptorSets.Free(*outData.allocator);
 
 		for (int32_t i = outData.swapChainImageCount - 1; i >= 0; --i)
-		{
-			vkDestroyBuffer(logicalDevice, _instanceBuffers[i], nullptr);
-			vkAllocator.FreeBlock(_instanceMemBlocks[i]);
-		}
+			FreeBuffer(outData, _instanceBuffers[i]);
 
-		_instanceMemBlocks.Free(allocator);
 		_instanceBuffers.Free(allocator);
 	}
 }

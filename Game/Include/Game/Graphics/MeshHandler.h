@@ -4,104 +4,77 @@
 #include "VkRenderer/VkSyncHandler.h"
 #include "Mesh.h"
 #include "VkRenderer/VkApp.h"
+#include "Buffer.h"
 
 namespace game
 {
 	class MeshHandler final
 	{
 	public:
+		/// <summary>
+		/// Creates a buffer in device local memory.
+		/// </summary>
+		/// <param name="usageFlags">Automatically includes DST usage.</param>
+		template <typename Type>
+		[[nodiscard]] static Buffer Create(const EngineOutData& outData, jlb::ArrayView<Type> vertices, VkBufferUsageFlags usageFlags);
+
+		/// <summary>
+		/// Creates a vertex and index buffer in device local memory.
+		/// </summary>
 		template <typename Vertex, typename Index>
-		[[nodiscard]] static Mesh Create(const EngineOutData& outData, 
+		[[nodiscard]] static Mesh CreateIndexed(const EngineOutData& outData, 
 			jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
 		static void Destroy(const EngineOutData& outData, Mesh& mesh);
 	};
 
-	template <typename Vertex, typename Index>
-	Mesh MeshHandler::Create(const EngineOutData& outData, 
-		const jlb::ArrayView<Vertex> vertices, const jlb::ArrayView<Index> indices)
+	template <typename Type>
+	Buffer MeshHandler::Create(const EngineOutData& outData, const jlb::ArrayView<Type> vertices, const VkBufferUsageFlags usageFlags)
 	{
-		Mesh mesh{};
-
 		auto& app = *outData.app;
 		auto& vkAllocator = *outData.vkAllocator;
 
-		// Vertex staging buffer.
-		VkBufferCreateInfo vertBufferInfo{};
-		vertBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		vertBufferInfo.size = sizeof(Vertex) * vertices.length;
-		vertBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		VkBufferCreateInfo bufferInfo{};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = sizeof(Type) * vertices.length;
+		bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		// Index staging buffer.
-		VkBufferCreateInfo indBufferInfo{};
-		indBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		indBufferInfo.size = sizeof(Index) * indices.length;
-		indBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-		indBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		VkBuffer vertStagingBuffer;
-		VkBuffer indStagingBuffer;
-
-		// Create buffers.
-		auto result = vkCreateBuffer(app.logicalDevice, &vertBufferInfo, nullptr, &vertStagingBuffer);
-		assert(!result);
-		result = vkCreateBuffer(app.logicalDevice, &indBufferInfo, nullptr, &indStagingBuffer);
+		VkBuffer stagingBuffer;
+		auto result = vkCreateBuffer(app.logicalDevice, &bufferInfo, nullptr, &stagingBuffer);
 		assert(!result);
 
 		// Get buffer requirements.
-		VkMemoryRequirements vertStagingMemRequirements;
-		vkGetBufferMemoryRequirements(app.logicalDevice, vertStagingBuffer, &vertStagingMemRequirements);
-		VkMemoryRequirements indStagingMemRequirements;
-		vkGetBufferMemoryRequirements(app.logicalDevice, indStagingBuffer, &indStagingMemRequirements);
+		VkMemoryRequirements stagingMemRequirements;
+		vkGetBufferMemoryRequirements(app.logicalDevice, stagingBuffer, &stagingMemRequirements);
 
 		// Define and allocate memory.
-		const uint32_t vertStagingBufferPoolId = vkAllocator.GetPoolId(app, vertStagingMemRequirements.memoryTypeBits, 
+		const uint32_t vertStagingBufferPoolId = vkAllocator.GetPoolId(app, stagingMemRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		auto vertStagingBlock = vkAllocator.AllocateBlock(app, vertBufferInfo.size, vertStagingMemRequirements.alignment, vertStagingBufferPoolId);
-		const uint32_t indStagingBufferPoolId = vkAllocator.GetPoolId(app, indStagingMemRequirements.memoryTypeBits,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		auto indStagingBlock = vkAllocator.AllocateBlock(app, indBufferInfo.size, indStagingMemRequirements.alignment, indStagingBufferPoolId);
+		const auto stagingBlock = vkAllocator.AllocateBlock(app, bufferInfo.size, stagingMemRequirements.alignment, vertStagingBufferPoolId);
 
-		result = vkBindBufferMemory(app.logicalDevice, vertStagingBuffer, vertStagingBlock.memory, vertStagingBlock.offset);
-		assert(!result);
-		result = vkBindBufferMemory(app.logicalDevice, indStagingBuffer, indStagingBlock.memory, indStagingBlock.offset);
+		result = vkBindBufferMemory(app.logicalDevice, stagingBuffer, stagingBlock.memory, stagingBlock.offset);
 		assert(!result);
 
 		// Move vertex/index data to a staging buffer.
-		void* vertStagingData;
-		vkMapMemory(app.logicalDevice, vertStagingBlock.memory, vertStagingBlock.offset, vertStagingBlock.size, 0, &vertStagingData);
-		memcpy(vertStagingData, static_cast<const void*>(vertices.data), vertBufferInfo.size);
-		vkUnmapMemory(app.logicalDevice, vertStagingBlock.memory);
+		void* stagingData;
+		vkMapMemory(app.logicalDevice, stagingBlock.memory, stagingBlock.offset, stagingBlock.size, 0, &stagingData);
+		memcpy(stagingData, static_cast<const void*>(vertices.data), bufferInfo.size);
+		vkUnmapMemory(app.logicalDevice, stagingBlock.memory);
 
-		void* indStagingData;
-		vkMapMemory(app.logicalDevice, indStagingBlock.memory, indStagingBlock.offset, indStagingBlock.size, 0, &indStagingData);
-		memcpy(indStagingData, static_cast<const void*>(indices.data), indBufferInfo.size);
-		vkUnmapMemory(app.logicalDevice, indStagingBlock.memory);
+		bufferInfo.usage = usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-		// Create output buffers.
-		vertBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-		indBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-
-		result = vkCreateBuffer(app.logicalDevice, &vertBufferInfo, nullptr, &mesh.vertexBuffer);
-		assert(!result);
-		result = vkCreateBuffer(app.logicalDevice, &indBufferInfo, nullptr, &mesh.indexBuffer);
+		VkBuffer buffer;
+		result = vkCreateBuffer(app.logicalDevice, &bufferInfo, nullptr, &buffer);
 		assert(!result);
 
-		VkMemoryRequirements vertMemRequirements;
-		vkGetBufferMemoryRequirements(app.logicalDevice, mesh.vertexBuffer, &vertMemRequirements);
-		VkMemoryRequirements indMemRequirements;
-		vkGetBufferMemoryRequirements(app.logicalDevice, mesh.indexBuffer, &indMemRequirements);
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(app.logicalDevice, buffer, &memRequirements);
 
-		const uint32_t vertBufferPoolId = vkAllocator.GetPoolId(app, vertMemRequirements.memoryTypeBits,
+		const uint32_t vertBufferPoolId = vkAllocator.GetPoolId(app, memRequirements.memoryTypeBits,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		mesh.vertexMemBlock = vkAllocator.AllocateBlock(app, vertBufferInfo.size, vertMemRequirements.alignment, vertBufferPoolId);
-		const uint32_t indBufferPoolId = vkAllocator.GetPoolId(app, indMemRequirements.memoryTypeBits,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		mesh.indexMemBlock = vkAllocator.AllocateBlock(app, indBufferInfo.size, indMemRequirements.alignment, indBufferPoolId);
+		const auto memBlock = vkAllocator.AllocateBlock(app, bufferInfo.size, memRequirements.alignment, vertBufferPoolId);
 
-		result = vkBindBufferMemory(app.logicalDevice, mesh.vertexBuffer, mesh.vertexMemBlock.memory, mesh.vertexMemBlock.offset);
-		assert(!result);
-		result = vkBindBufferMemory(app.logicalDevice, mesh.indexBuffer, mesh.indexMemBlock.memory, mesh.indexMemBlock.offset);
+		result = vkBindBufferMemory(app.logicalDevice, buffer, memBlock.memory, memBlock.offset);
 		assert(!result);
 
 		VkCommandBuffer cmdBuffer;
@@ -119,17 +92,11 @@ namespace game
 		auto cmdBeginInfo = vk::CommandHandler::CreateBufferBeginDefaultInfo();
 		vkBeginCommandBuffer(cmdBuffer, &cmdBeginInfo);
 
-		VkBufferCopy vertRegion{};
-		vertRegion.srcOffset = 0;
-		vertRegion.dstOffset = 0;
-		vertRegion.size = mesh.vertexMemBlock.size;
-		vkCmdCopyBuffer(cmdBuffer, vertStagingBuffer, mesh.vertexBuffer, 1, &vertRegion);
-
-		VkBufferCopy indRegion{};
-		indRegion.srcOffset = 0;
-		indRegion.dstOffset = 0;
-		indRegion.size = mesh.indexMemBlock.size;
-		vkCmdCopyBuffer(cmdBuffer, indStagingBuffer, mesh.indexBuffer, 1, &indRegion);
+		VkBufferCopy region{};
+		region.srcOffset = 0;
+		region.dstOffset = 0;
+		region.size = memBlock.size;
+		vkCmdCopyBuffer(cmdBuffer, stagingBuffer, buffer, 1, &region);
 
 		result = vkEndCommandBuffer(cmdBuffer);
 		assert(!result);
@@ -140,14 +107,24 @@ namespace game
 
 		result = vkWaitForFences(app.logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX);
 		assert(!result);
+
 		vkDestroyFence(app.logicalDevice, fence, nullptr);
+		vkDestroyBuffer(app.logicalDevice, stagingBuffer, nullptr);
+		vkAllocator.FreeBlock(stagingBlock);
 
-		vkDestroyBuffer(app.logicalDevice, indStagingBuffer, nullptr);
-		vkDestroyBuffer(app.logicalDevice, vertStagingBuffer, nullptr);
+		Buffer meshBuffer{};
+		meshBuffer.buffer = buffer;
+		meshBuffer.memBlock = memBlock;
+		return meshBuffer;
+	}
 
-		vkAllocator.FreeBlock(indStagingBlock);
-		vkAllocator.FreeBlock(vertStagingBlock);
-
+	template <typename Vertex, typename Index>
+	Mesh MeshHandler::CreateIndexed(const EngineOutData& outData, 
+		const jlb::ArrayView<Vertex> vertices, const jlb::ArrayView<Index> indices)
+	{
+		Mesh mesh{};
+		mesh.vertexBuffer = Create(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		mesh.indexBuffer = Create(outData, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 		mesh.indexCount = indices.length;
 		return mesh;
 	}
