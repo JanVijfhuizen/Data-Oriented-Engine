@@ -27,31 +27,34 @@
     <ClInclude Include="Include\VkRenderer\VkSwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkSyncHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkSyncUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkImageHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkImageUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkCommandHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkCommandBufferUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkFrameBufferHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkFrameBufferUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkRenderPassUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\VkRenderer\VkMemBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkBufferHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkBufferUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkRenderer\VkSamplerHandler.h">
+    <ClInclude Include="Include\VkRenderer\VkSamplerUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\VkRenderer\VkStackAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VkRenderer\VkIWindowHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,25 +68,25 @@
     <ClCompile Include="Source\VkSwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkSyncHandler.cpp">
+    <ClCompile Include="Source\VkSyncUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkImageHandler.cpp">
+    <ClCompile Include="Source\VkImageUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkCommandHandler.cpp">
+    <ClCompile Include="Source\VkCommandBufferUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkFrameBufferHandler.cpp">
+    <ClCompile Include="Source\VkFrameBufferUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkRenderPassHandler.cpp">
+    <ClCompile Include="Source\VkRenderPassUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkBufferHandler.cpp">
+    <ClCompile Include="Source\VkBufferUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VkSamplerHandler.cpp">
+    <ClCompile Include="Source\VkSamplerUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\VkStackAllocator.cpp">

@@ -22,32 +22,33 @@
     <ClInclude Include="Include\VkRenderer\pch.h" />
     <ClInclude Include="Include\VkRenderer\VkApp.h" />
     <ClInclude Include="Include\VkRenderer\VkBootstrap.h" />
-    <ClInclude Include="Include\VkRenderer\VkCommandHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkCommandBufferUtils.h" />
+    <ClInclude Include="Include\VkRenderer\VkIWindowHandler.h" />
     <ClInclude Include="Include\VkRenderer\VkMemBlock.h" />
-    <ClInclude Include="Include\VkRenderer\VkRenderPassHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkRenderPassUtils.h" />
     <ClInclude Include="Include\VkRenderer\VkStackAllocator.h" />
-    <ClInclude Include="Include\VkRenderer\VkSyncHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkSyncUtils.h" />
     <ClInclude Include="Include\VkRenderer\VkSwapChain.h" />
-    <ClInclude Include="Include\VkRenderer\VkImageHandler.h" />
-    <ClInclude Include="Include\VkRenderer\VkFrameBufferHandler.h" />
-    <ClInclude Include="Include\VkRenderer\VkBufferHandler.h" />
-    <ClInclude Include="Include\VkRenderer\VkSamplerHandler.h" />
+    <ClInclude Include="Include\VkRenderer\VkImageUtils.h" />
+    <ClInclude Include="Include\VkRenderer\VkFrameBufferUtils.h" />
+    <ClInclude Include="Include\VkRenderer\VkBufferUtils.h" />
+    <ClInclude Include="Include\VkRenderer\VkSamplerUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\VkStackAllocator.cpp" />
-    <ClCompile Include="Source\VkSamplerHandler.cpp" />
-    <ClCompile Include="Source\VkRenderPassHandler.cpp" />
-    <ClCompile Include="Source\VkCommandHandler.cpp" />
-    <ClCompile Include="Source\VkSyncHandler.cpp" />
+    <ClCompile Include="Source\VkSamplerUtils.cpp" />
+    <ClCompile Include="Source\VkRenderPassUtils.cpp" />
+    <ClCompile Include="Source\VkCommandBufferUtils.cpp" />
+    <ClCompile Include="Source\VkSyncUtils.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\VkBootstrap.cpp" />
     <ClCompile Include="Source\VkSwapChain.cpp" />
-    <ClCompile Include="Source\VkImageHandler.cpp" />
-    <ClCompile Include="Source\VkFrameBufferHandler.cpp" />
-    <ClCompile Include="Source\VkBufferHandler.cpp" />
+    <ClCompile Include="Source\VkImageUtils.cpp" />
+    <ClCompile Include="Source\VkFrameBufferUtils.cpp" />
+    <ClCompile Include="Source\VkBufferUtils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

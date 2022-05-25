@@ -27,7 +27,7 @@ namespace game
 	{
 		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
 
-		auto subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Cursor);
+		auto subTexture = texture::GenerateSubTexture(texture, renderConventions::ENTITY_SIZE, renderConventions::Cursor);
 		subTexture.rightBot = subTexture.leftTop;
 
 		// Idle animation.
@@ -37,8 +37,8 @@ namespace game
 			auto& f2 = _idleAnim.frames[1];
 			auto& s1 = f1.subTexture;
 			auto& s2 = f2.subTexture;
-			s1 = subTexture + TextureHandler::GenerateSubTexture(texture, RenderConventions::CURSOR_SIZE, 0);
-			s2 = subTexture + TextureHandler::GenerateSubTexture(texture, RenderConventions::CURSOR_SIZE, 1);
+			s1 = subTexture + texture::GenerateSubTexture(texture, renderConventions::CURSOR_SIZE, 0);
+			s2 = subTexture + texture::GenerateSubTexture(texture, renderConventions::CURSOR_SIZE, 1);
 			f1.delay = delay;
 			f2.delay = delay;
 		}
@@ -49,8 +49,8 @@ namespace game
 			auto& f2 = _pressedAnim.frames[1];
 			auto& s1 = f1.subTexture;
 			auto& s2 = f2.subTexture;
-			s1 = subTexture + TextureHandler::GenerateSubTexture(texture, RenderConventions::CURSOR_SIZE, 2);
-			s2 = subTexture + TextureHandler::GenerateSubTexture(texture, RenderConventions::CURSOR_SIZE, 3);
+			s1 = subTexture + texture::GenerateSubTexture(texture, renderConventions::CURSOR_SIZE, 2);
+			s2 = subTexture + texture::GenerateSubTexture(texture, renderConventions::CURSOR_SIZE, 3);
 		}
 	}
 
@@ -101,7 +101,7 @@ namespace game
 		EntityRenderTask task{};
 		auto& taskTransform = task.transform;
 		taskTransform = transform;
-		taskTransform.scale = RenderConventions::CURSOR_SIZE;
+		taskTransform.scale = renderConventions::CURSOR_SIZE;
 		task.subTexture = renderer.subTexture;
 		updateInfo.entityRenderSystem->Add(task);
 	}

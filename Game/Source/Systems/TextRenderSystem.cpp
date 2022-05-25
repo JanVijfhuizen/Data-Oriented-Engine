@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderSystem.h"
-#include "Graphics/TextureHandler.h"
+#include "Graphics/TextureUtils.h"
 #include "Graphics/RenderConventions.h"
 
 namespace game
@@ -8,7 +8,7 @@ namespace game
 	void TextRenderSystem::AddAsCharRenderTasks(TextRenderTask& textRenderTask)
 	{
 		Transform transform{};
-		transform.scale = RenderConventions::TEXT_SIZE;
+		transform.scale = renderConventions::TEXT_SIZE;
 
 		const char* strLit = textRenderTask.text;
 		const size_t s = strlen(textRenderTask.text);
@@ -25,7 +25,7 @@ namespace game
 
 			CharRenderTask charRenderTask{};
 			charRenderTask.transform = transform;
-			charRenderTask.subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::TEXT_SIZE, index);
+			charRenderTask.subTexture = texture::GenerateSubTexture(texture, renderConventions::TEXT_SIZE, index);
 			Add(charRenderTask);
 		}
 	}

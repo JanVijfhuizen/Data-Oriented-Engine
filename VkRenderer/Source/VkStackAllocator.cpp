@@ -143,7 +143,7 @@ namespace vk
 	{
 		VkMemoryAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocInfo.allocationSize = jlb::Math::Max(size, _pageSize);
+		allocInfo.allocationSize = jlb::math::Max(size, _pageSize);
 		allocInfo.memoryTypeIndex = poolId;
 
 		const auto result = vkAllocateMemory(app.logicalDevice, &allocInfo, nullptr, &pool.memory);

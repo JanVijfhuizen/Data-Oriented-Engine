@@ -125,6 +125,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)/Jlb/Include;$(SolutionDir)/VkRenderer/Include;$(ProjectDir)Include/Game</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +146,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)/Jlb/Include;$(SolutionDir)/VkRenderer/Include;$(ProjectDir)Include/Game</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -173,16 +175,16 @@
     <ClInclude Include="Include\Game\GameState.h" />
     <ClInclude Include="Include\Game\Graphics\Animation.h" />
     <ClInclude Include="Include\Game\Graphics\Buffer.h" />
-    <ClInclude Include="Include\Game\Graphics\InstanceUtils.h" />
+    <ClInclude Include="Include\Game\Graphics\InstancingUtils.h" />
     <ClInclude Include="Include\Game\Graphics\Mesh.h" />
-    <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
-    <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
-    <ClInclude Include="Include\Game\Graphics\LayoutHandler.h" />
+    <ClInclude Include="Include\Game\Graphics\MeshUtils.h" />
+    <ClInclude Include="Include\Game\Graphics\PipelineUtils.h" />
+    <ClInclude Include="Include\Game\Graphics\LayoutUtils.h" />
     <ClInclude Include="Include\Game\Graphics\RenderConventions.h" />
     <ClInclude Include="Include\Game\Graphics\Shader.h" />
     <ClInclude Include="Include\Game\Graphics\SubTexture.h" />
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
-    <ClInclude Include="Include\Game\Graphics\TextureHandler.h" />
+    <ClInclude Include="Include\Game\Graphics\TextureUtils.h" />
     <ClInclude Include="Include\Game\Handlers\ShaderHandler.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
@@ -213,13 +215,13 @@
     <ClCompile Include="Source\Handlers\InputHandler.cpp" />
     <ClCompile Include="Source\Systems\AnimationSystem.cpp" />
     <ClCompile Include="Source\Systems\TextRenderSystem.cpp" />
-    <ClCompile Include="Source\Graphics\TextureHandler.cpp" />
+    <ClCompile Include="Source\Graphics\TextureUtils.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />
     <ClCompile Include="Source\Game.cpp" />
-    <ClCompile Include="Source\Graphics\MeshHandler.cpp" />
-    <ClCompile Include="Source\Graphics\PipelineHandler.cpp" />
-    <ClCompile Include="Source\Graphics\LayoutHandler.cpp" />
+    <ClCompile Include="Source\Graphics\MeshUtils.cpp" />
+    <ClCompile Include="Source\Graphics\PipelineUtils.cpp" />
+    <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

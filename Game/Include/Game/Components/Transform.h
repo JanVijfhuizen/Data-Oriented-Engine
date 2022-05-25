@@ -9,6 +9,6 @@ namespace game
 		glm::vec2 position{};
 		float rotation{};
 		// In pixels.
-		float scale = RenderConventions::ENTITY_SIZE;
+		float scale = renderConventions::ENTITY_SIZE;
 	};
 }

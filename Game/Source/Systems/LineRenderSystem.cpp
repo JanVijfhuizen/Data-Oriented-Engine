@@ -3,11 +3,11 @@
 #include "Handlers/ShaderHandler.h"
 #include "StringView.h"
 #include "StackArray.h"
-#include "Graphics/PipelineHandler.h"
+#include "Graphics/PipelineUtils.h"
 #include "VkRenderer/VkApp.h"
-#include "Graphics/MeshHandler.h"
-#include "Graphics/LayoutHandler.h"
-#include "Graphics/InstanceUtils.h"
+#include "Graphics/MeshUtils.h"
+#include "Graphics/LayoutUtils.h"
+#include "Graphics/InstancingUtils.h"
 
 namespace game
 {
@@ -20,7 +20,7 @@ namespace game
 		jlb::StackArray<int, 2> vertices{};
 		vertices[0] = 0;
 		vertices[1] = 1;
-		_vertexBuffer = MeshHandler::Create<int>(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		_vertexBuffer = mesh::CreateBuffer<int>(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 		CreateShaderAssets(outData);
 	}
 
@@ -71,17 +71,17 @@ namespace game
 		auto& logicalDevice = app.logicalDevice;
 		const size_t swapChainImageCount = outData.swapChainImageCount;
 
-		_instanceBuffers = CreateInstanceStorageBuffers<LineRenderTask>(outData, GetLength());
+		_instanceBuffers = instancing::CreateStorageBuffers<LineRenderTask>(outData, GetLength());
 
 		// Create descriptor layout.
-		LayoutHandler::Info::Binding binding{};
+		layout::Info::Binding binding{};
 		binding.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		binding.size = sizeof(LineRenderTask) * GetLength();
 		binding.flag = VK_SHADER_STAGE_VERTEX_BIT;
 
-		LayoutHandler::Info descriptorLayoutInfo{};
+		layout::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = binding;
-		_descriptorLayout = LayoutHandler::Create(outData, descriptorLayoutInfo);
+		_descriptorLayout = layout::Create(outData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
 		VkDescriptorPoolSize poolSize;
@@ -154,7 +154,7 @@ namespace game
 	void LineRenderSystem::CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain)
 	{
 		TaskSystem<LineRenderTask>::CreateSwapChainAssets(outData, chain);
-		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
+		jlb::StackArray<pipeline::Info::Module, 2> modules{};
 		modules[0].module = _shader.vert;
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
 		modules[1].module = _shader.frag;
@@ -171,7 +171,7 @@ namespace game
 		attributeDescription.format = VK_FORMAT_R32_SINT;
 		attributeDescription.offset = 0;
 
-		PipelineHandler::Info pipelineInfo{};
+		pipeline::Info pipelineInfo{};
 		pipelineInfo.vertInputAttribDescriptions = attributeDescription;
 		pipelineInfo.vertInputBindingDescriptions = bindingDescription;
 		pipelineInfo.resolution = outData.resolution;
@@ -182,7 +182,7 @@ namespace game
 		pipelineInfo.usePushConstant = true;
 		pipelineInfo.topologyType = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
-		PipelineHandler::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
+		pipeline::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
 	void LineRenderSystem::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)

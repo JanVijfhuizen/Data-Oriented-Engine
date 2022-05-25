@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
-#include "Graphics/LayoutHandler.h"
+#include "Graphics/LayoutUtils.h"
 #include "Array.h"
 #include "VkRenderer/VkApp.h"
 
-namespace game
+namespace game::layout
 {
-	VkDescriptorSetLayout LayoutHandler::Create(const EngineOutData& outData, Info& info)
+	VkDescriptorSetLayout Create(const EngineOutData& outData, Info& info)
 	{
 		jlb::Array<VkDescriptorSetLayoutBinding> bindings{};
 		bindings.Allocate(*outData.tempAllocator, info.bindings.length);

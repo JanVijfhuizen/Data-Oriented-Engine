@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
-#include "Graphics/PipelineHandler.h"
+#include "Graphics/PipelineUtils.h"
 #include "Array.h"
 #include "VkRenderer/VkApp.h"
 
-namespace game
+namespace game::pipeline
 {
-	void PipelineHandler::Create(const EngineOutData& outData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline)
+	void Create(const EngineOutData& outData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline)
 	{
 		jlb::Array<VkPipelineShaderStageCreateInfo> modules{};
 		modules.Allocate(*outData.tempAllocator, info.modules.length);

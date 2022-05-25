@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
-#include "VkSamplerHandler.h"
+#include "VkSamplerUtils.h"
 #include "VkApp.h"
 
-namespace vk
+namespace vk::sampler
 {
-	VkSamplerCreateInfo SamplerHandler::CreateDefaultInfo(App& app)
+	VkSamplerCreateInfo CreateDefaultInfo(App& app)
 	{
 		VkPhysicalDeviceProperties properties{};
 		vkGetPhysicalDeviceProperties(app.physicalDevice, &properties);

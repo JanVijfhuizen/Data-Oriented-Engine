@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
-#include "VkImageHandler.h"
+#include "VkImageUtils.h"
 #include <exception>
 #include "VkApp.h"
 
-namespace vk
+namespace vk::image
 {
-	VkImageCreateInfo ImageHandler::CreateDefaultInfo(const glm::ivec2 resolution, const VkImageUsageFlags usage)
+	VkImageCreateInfo CreateDefaultInfo(const glm::ivec2 resolution, const VkImageUsageFlags usage)
 	{
 		VkImageCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -24,7 +24,7 @@ namespace vk
 		return createInfo;
 	}
 
-	VkImageViewCreateInfo ImageHandler::CreateViewDefaultInfo(const VkImage image, const VkFormat format)
+	VkImageViewCreateInfo CreateViewDefaultInfo(const VkImage image, const VkFormat format)
 	{
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -48,7 +48,7 @@ namespace vk
 		return createInfo;
 	}
 
-	void ImageHandler::CopyBufferToImage(const VkBuffer buffer, const VkImage image, 
+	void CopyBufferToImage(const VkBuffer buffer, const VkImage image, 
 		const VkCommandBuffer cmdBuffer, const glm::ivec2 resolution)
 	{
 		VkBufferImageCopy region{};
@@ -79,7 +79,7 @@ namespace vk
 		);
 	}
 
-	void ImageHandler::TransitionLayout(const VkImage image, const VkCommandBuffer cmdBuffer, const VkImageLayout oldLayout,
+	void TransitionLayout(const VkImage image, const VkCommandBuffer cmdBuffer, const VkImageLayout oldLayout,
 		const VkImageLayout newLayout, const VkImageAspectFlags aspectFlags)
 	{
 		VkImageMemoryBarrier barrier{};
@@ -110,7 +110,7 @@ namespace vk
 		);
 	}
 
-	void ImageHandler::GetLayoutMasks(const VkImageLayout layout, VkAccessFlags& outAccessFlags,
+	void GetLayoutMasks(const VkImageLayout layout, VkAccessFlags& outAccessFlags,
 		VkPipelineStageFlags& outPipelineStageFlags)
 	{
 		switch (layout)
@@ -136,7 +136,7 @@ namespace vk
 		}
 	}
 
-	VkFormat ImageHandler::FindSupportedFormat(App& app, jlb::ArrayView<VkFormat> candidates, const VkImageTiling tiling,
+	VkFormat FindSupportedFormat(App& app, jlb::ArrayView<VkFormat> candidates, const VkImageTiling tiling,
 		const VkFormatFeatureFlags features)
 	{
 		for (auto& format : candidates)

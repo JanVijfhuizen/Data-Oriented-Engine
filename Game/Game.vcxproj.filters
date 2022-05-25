@@ -54,19 +54,19 @@
     <ClInclude Include="Include\Game\Graphics\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Graphics\PipelineHandler.h">
+    <ClInclude Include="Include\Game\Graphics\PipelineUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Graphics\MeshHandler.h">
+    <ClInclude Include="Include\Game\Graphics\MeshUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Graphics\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Graphics\LayoutHandler.h">
+    <ClInclude Include="Include\Game\Graphics\LayoutUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Graphics\TextureHandler.h">
+    <ClInclude Include="Include\Game\Graphics\TextureUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Graphics\Texture.h">
@@ -129,7 +129,7 @@
     <ClInclude Include="Include\Game\Graphics\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Graphics\InstanceUtils.h">
+    <ClInclude Include="Include\Game\Graphics\InstancingUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Archetypes\CameraArchetype.h">
@@ -152,16 +152,16 @@
     <ClCompile Include="Source\Graphics\Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\PipelineHandler.cpp">
+    <ClCompile Include="Source\Graphics\PipelineUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\MeshHandler.cpp">
+    <ClCompile Include="Source\Graphics\MeshUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\LayoutHandler.cpp">
+    <ClCompile Include="Source\Graphics\LayoutUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\TextureHandler.cpp">
+    <ClCompile Include="Source\Graphics\TextureUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\TextRenderSystem.cpp">

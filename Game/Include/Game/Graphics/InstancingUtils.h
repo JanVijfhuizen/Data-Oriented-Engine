@@ -4,13 +4,13 @@
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkStackAllocator.h"
 
-namespace game
+namespace game::instancing
 {
 	template <typename Type>
-	[[nodiscard]] jlb::Array<Buffer> CreateInstanceStorageBuffers(const EngineOutData& outData, size_t length);
+	[[nodiscard]] jlb::Array<Buffer> CreateStorageBuffers(const EngineOutData& outData, size_t length);
 
 	template <typename Type>
-	jlb::Array<Buffer> CreateInstanceStorageBuffers(const EngineOutData& outData, const size_t length)
+	jlb::Array<Buffer> CreateStorageBuffers(const EngineOutData& outData, const size_t length)
 	{
 		auto& app = *outData.app;
 		auto& vkAllocator = *outData.vkAllocator;

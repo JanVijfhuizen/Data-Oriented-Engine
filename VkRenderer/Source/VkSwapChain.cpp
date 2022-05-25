@@ -3,17 +3,17 @@
 #include "VkBootstrap.h"
 #include "VkApp.h"
 #include "JlbMath.h"
-#include "VkImageHandler.h"
-#include "VkSyncHandler.h"
-#include "VkCommandHandler.h"
-#include "VkFrameBufferHandler.h"
-#include "VkRenderPassHandler.h"
+#include "VkImageUtils.h"
+#include "VkSyncUtils.h"
+#include "VkCommandBufferUtils.h"
+#include "VkFrameBufferUtils.h"
+#include "VkRenderPassUtils.h"
 
 namespace vk
 {
 	void SwapChain::Allocate(jlb::StackAllocator& allocator, App& app, IWindowHandler& windowHandler)
 	{
-		auto support = Bootstrap::QuerySwapChainSupport(allocator, app);
+		auto support = boots::QuerySwapChainSupport(allocator, app);
 		const uint32_t imageCount = support.GetRecommendedImageCount();
 		_surfaceFormat = ChooseSurfaceFormat(support.formats);
 		_presentMode = ChoosePresentMode(support.presentModes);
@@ -56,12 +56,12 @@ namespace vk
 		auto& image = _images[_imageIndex];
 
 		// Begin render command.
-		auto cmd = CommandHandler::CreateBufferBeginDefaultInfo();
+		auto cmd = cmdBuffer::CreateBeginDefaultInfo();
 		vkResetCommandBuffer(image.cmdBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
 		vkBeginCommandBuffer(image.cmdBuffer, &cmd);
 
 		// Begin render pass.
-		auto renderPassBeginInfo = RenderPassHandler::CreateBeginDefaultInfo();
+		auto renderPassBeginInfo = renderPass::CreateBeginDefaultInfo();
 		renderPassBeginInfo.renderPass = _renderPass;
 		renderPassBeginInfo.framebuffer = image.frameBuffer;
 		renderPassBeginInfo.renderArea.extent = _extent;
@@ -88,7 +88,7 @@ namespace vk
 		allWaitSemaphores[waitSemaphores.length] = frame.imageAvailableSemaphore;
 
 		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		auto submitInfo = CommandHandler::CreateSubmitDefaultInfo(image.cmdBuffer);
+		auto submitInfo = cmdBuffer::CreateSubmitDefaultInfo(image.cmdBuffer);
 		submitInfo.waitSemaphoreCount = allWaitSemaphores.GetLength();
 		submitInfo.pWaitSemaphores = allWaitSemaphores.GetData();
 		submitInfo.pWaitDstStageMask = &waitStage;
@@ -178,18 +178,18 @@ namespace vk
 		const auto& minExtent = capabilities.minImageExtent;
 		const auto& maxExtent = capabilities.maxImageExtent;
 
-		actualExtent.width = jlb::Math::Clamp(actualExtent.width, minExtent.width, maxExtent.width);
-		actualExtent.height = jlb::Math::Clamp(actualExtent.height, minExtent.height, maxExtent.height);
+		actualExtent.width = jlb::math::Clamp(actualExtent.width, minExtent.width, maxExtent.width);
+		actualExtent.height = jlb::math::Clamp(actualExtent.height, minExtent.height, maxExtent.height);
 
 		return actualExtent;
 	}
 
 	void SwapChain::Recreate(jlb::StackAllocator& tempAllocator, App& app, IWindowHandler& windowHandler)
 	{
-		auto support = Bootstrap::QuerySwapChainSupport(tempAllocator, app);
+		auto support = boots::QuerySwapChainSupport(tempAllocator, app);
 		_extent = ChooseExtent(support.capabilities, windowHandler.GetResolution());
 
-		const auto families = Bootstrap::GetQueueFamilies(tempAllocator, app);
+		const auto families = boots::GetQueueFamilies(tempAllocator, app);
 
 		uint32_t queueFamilyIndices[] =
 		{
@@ -236,7 +236,7 @@ namespace vk
 		vkImages.Allocate(tempAllocator, length);
 		vkGetSwapchainImagesKHR(app.logicalDevice, _swapChain, &length, vkImages.GetData());
 
-		auto cmdBufferAllocInfo = CommandHandler::CreateBufferDefaultInfo(app);
+		auto cmdBufferAllocInfo = cmdBuffer::CreateDefaultInfo(app);
 		cmdBufferAllocInfo.commandBufferCount = length;
 		jlb::Array<VkCommandBuffer> cmdBuffers{};
 		cmdBuffers.Allocate(tempAllocator, length);
@@ -244,20 +244,20 @@ namespace vk
 		assert(!cmdResult);
 
 		// Create render pass.
-		auto colorAttachmentReference = RenderPassHandler::CreateAttachmentReferenceDefaultInfo();
-		auto subpassDescription = RenderPassHandler::CreateSubpassDescriptionDefaultInfo();
+		auto colorAttachmentReference = renderPass::CreateAttachmentReferenceDefaultInfo();
+		auto subpassDescription = renderPass::CreateSubpassDescriptionDefaultInfo();
 		subpassDescription.colorAttachmentCount = 1;
 		subpassDescription.pColorAttachments = &colorAttachmentReference;
 
-		auto subpassDependency = RenderPassHandler::CreateSubpassDependencyDefaultInfo();
+		auto subpassDependency = renderPass::CreateSubpassDependencyDefaultInfo();
 		subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		subpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		subpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-		auto attachmentDescription = RenderPassHandler::CreateAttachmentDescriptionDefaultInfo();
+		auto attachmentDescription = renderPass::CreateAttachmentDescriptionDefaultInfo();
 		attachmentDescription.format = _surfaceFormat.format;
 
-		const auto renderPassCreateInfo = RenderPassHandler::CreateDefaultInfo(attachmentDescription, subpassDescription, subpassDependency);
+		const auto renderPassCreateInfo = renderPass::CreateDefaultInfo(attachmentDescription, subpassDescription, subpassDependency);
 		const auto renderPassresult = vkCreateRenderPass(app.logicalDevice, &renderPassCreateInfo, nullptr, &_renderPass);
 		assert(!renderPassresult);
 
@@ -267,13 +267,13 @@ namespace vk
 			auto& image = _images[i];
 			image.colorImage = vkImages[i];
 
-			auto viewCreateInfo = ImageHandler::CreateViewDefaultInfo(image.colorImage, _surfaceFormat.format);
+			auto viewCreateInfo = image::CreateViewDefaultInfo(image.colorImage, _surfaceFormat.format);
 			const auto viewResult = vkCreateImageView(app.logicalDevice, &viewCreateInfo, nullptr, &image.colorImageView);
 			assert(!viewResult);
 
 			image.cmdBuffer = cmdBuffers[i];
 
-			auto frameBufferCreateInfo = FrameBufferHandler::CreateDefaultInfo();
+			auto frameBufferCreateInfo = frameBuffer::CreateDefaultInfo();
 			frameBufferCreateInfo.renderPass = _renderPass;
 			frameBufferCreateInfo.attachmentCount = 1;
 			frameBufferCreateInfo.pAttachments = &image.colorImageView;
@@ -287,13 +287,13 @@ namespace vk
 		// Create frames.
 		for (auto& frame : _frames)
 		{
-			auto semaphoreCreateInfo = SyncHandler::CreateSemaphoreDefaultInfo();
+			auto semaphoreCreateInfo = sync::CreateSemaphoreDefaultInfo();
 			auto semaphoreResult = vkCreateSemaphore(app.logicalDevice, &semaphoreCreateInfo, nullptr, &frame.imageAvailableSemaphore);
 			assert(!semaphoreResult);
 			semaphoreResult = vkCreateSemaphore(app.logicalDevice, &semaphoreCreateInfo, nullptr, &frame.renderFinishedSemaphore);
 			assert(!semaphoreResult);
 
-			auto fenceCreateInfo = SyncHandler::CreateFenceDefaultInfo();
+			auto fenceCreateInfo = sync::CreateFenceDefaultInfo();
 			const auto fenceResult = vkCreateFence(app.logicalDevice, &fenceCreateInfo, nullptr, &frame.inFlightFence);
 			assert(!fenceResult);
 		}

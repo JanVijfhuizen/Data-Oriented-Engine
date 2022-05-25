@@ -1,27 +1,27 @@
 ﻿#include "pch.h"
-#include "Graphics/TextureHandler.h"
+#include "Graphics/TextureUtils.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "StringView.h"
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkStackAllocator.h"
-#include "VkRenderer/VkCommandHandler.h"
-#include "VkRenderer/VkSyncHandler.h"
-#include "VkRenderer/VkImageHandler.h"
+#include "VkRenderer/VkCommandBufferUtils.h"
+#include "VkRenderer/VkSyncUtils.h"
+#include "VkRenderer/VkImageUtils.h"
 
-namespace game
+namespace game::texture
 {
-	VkFormat TextureHandler::GetTextureFormat()
+	VkFormat GetFormat()
 	{
 		return VK_FORMAT_R8G8B8A8_SRGB;
 	}
 
-	VkImageLayout TextureHandler::GetImageLayout()
+	VkImageLayout GetImageLayout()
 	{
 		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
-	Texture TextureHandler::LoadTexture(const EngineOutData& outData, const jlb::StringView path)
+	Texture Load(const EngineOutData& outData, const jlb::StringView path)
 	{
 		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
@@ -63,7 +63,7 @@ namespace game
 		stbi_image_free(pixels);
 
 		// Create image.
-		auto imageInfo = vk::ImageHandler::CreateDefaultInfo({texWidth, texHeight}, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+		auto imageInfo = vk::image::CreateDefaultInfo({texWidth, texHeight}, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
 		VkImage image;
 		result = vkCreateImage(logicalDevice, &imageInfo, nullptr, &image);
@@ -79,31 +79,31 @@ namespace game
 
 		// Start transfer.
 		VkCommandBuffer cmdBuffer;
-		auto cmdBufferAllocInfo = vk::CommandHandler::CreateBufferDefaultInfo(app);
+		auto cmdBufferAllocInfo = vk::cmdBuffer::CreateDefaultInfo(app);
 		result = vkAllocateCommandBuffers(app.logicalDevice, &cmdBufferAllocInfo, &cmdBuffer);
 		assert(!result);
 
 		VkFence fence;
-		auto fenceInfo = vk::SyncHandler::CreateFenceDefaultInfo();
+		auto fenceInfo = vk::sync::CreateFenceDefaultInfo();
 		result = vkCreateFence(app.logicalDevice, &fenceInfo, nullptr, &fence);
 		assert(!result);
 		result = vkResetFences(app.logicalDevice, 1, &fence);
 		assert(!result);
 
 		// Begin recording.
-		auto cmdBeginInfo = vk::CommandHandler::CreateBufferBeginDefaultInfo();
+		auto cmdBeginInfo = vk::cmdBuffer::CreateBeginDefaultInfo();
 		vkBeginCommandBuffer(cmdBuffer, &cmdBeginInfo);
 
-		vk::ImageHandler::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
-		vk::ImageHandler::CopyBufferToImage(stagingBuffer, image, cmdBuffer, { texWidth, texHeight });
-		vk::ImageHandler::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+		vk::image::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+		vk::image::CopyBufferToImage(stagingBuffer, image, cmdBuffer, { texWidth, texHeight });
+		vk::image::TransitionLayout(image, cmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
 
 		// End recording.
 		result = vkEndCommandBuffer(cmdBuffer);
 		assert(!result);
 
 		// Submit.
-		auto cmdSubmitInfo = vk::CommandHandler::CreateSubmitDefaultInfo(cmdBuffer);
+		auto cmdSubmitInfo = vk::cmdBuffer::CreateSubmitDefaultInfo(cmdBuffer);
 		result = vkQueueSubmit(app.queues.graphics, 1, &cmdSubmitInfo, fence);
 		assert(!result);
 
@@ -122,7 +122,7 @@ namespace game
 		return texture;
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
+	SubTexture GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
 		const glm::ivec2 lTop, const glm::ivec2 rBot)
 	{
 		const float xMul = static_cast<float>(chunkSize) / texture.resolution.x;
@@ -136,20 +136,20 @@ namespace game
 		return sub;
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
+	SubTexture GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
 		const size_t index)
 	{
 		const glm::ivec2 lTop = IndexToCoordinates(texture, chunkSize, index);
 		return GenerateSubTexture(texture, chunkSize, lTop, lTop + glm::ivec2{1, 1});
 	}
 
-	glm::ivec2 TextureHandler::IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
+	glm::ivec2 IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
 	{
 		const glm::ivec2 resolution = texture.resolution / glm::ivec2{chunkSize, chunkSize};
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	void TextureHandler::FreeTexture(const EngineOutData& outData, Texture& texture)
+	void Free(const EngineOutData& outData, Texture& texture)
 	{
 		vkDestroyImage(outData.app->logicalDevice, texture.image, nullptr);
 		outData.vkAllocator->FreeBlock(texture.memBlock);

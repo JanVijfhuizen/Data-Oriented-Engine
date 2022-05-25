@@ -5,17 +5,17 @@
 #include "VkRenderer/VkMemBlock.h"
 #include "StringView.h"
 #include "VkRenderer/VkApp.h"
-#include "Graphics/PipelineHandler.h"
+#include "Graphics/PipelineUtils.h"
 #include "Graphics/Vertex.h"
-#include "Graphics/MeshHandler.h"
+#include "Graphics/MeshUtils.h"
 #include "FileLoader.h"
-#include "Graphics/TextureHandler.h"
-#include "VkRenderer/VkImageHandler.h"
-#include "VkRenderer/VkSamplerHandler.h"
-#include "Graphics/LayoutHandler.h"
+#include "Graphics/TextureUtils.h"
+#include "VkRenderer/VkImageUtils.h"
+#include "VkRenderer/VkSamplerUtils.h"
+#include "Graphics/LayoutUtils.h"
 #include "Graphics/Shader.h"
 #include "Handlers/ShaderHandler.h"
-#include "Graphics/InstanceUtils.h"
+#include "Graphics/InstancingUtils.h"
 #include "Archetypes/CameraArchetype.h"
 
 namespace game
@@ -82,7 +82,7 @@ namespace game
 	{
 		TaskSystem<Task>::CreateSwapChainAssets(outData, chain);
 
-		jlb::StackArray<PipelineHandler::Info::Module, 2> modules{};
+		jlb::StackArray<pipeline::Info::Module, 2> modules{};
 		modules[0].module = _shader.vert;
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
 		modules[1].module = _shader.frag;
@@ -91,7 +91,7 @@ namespace game
 		auto vertAttributes = Vertex::GetAttributeDescriptions();
 		auto vertBindings = Vertex::GetBindingDescriptions();
 
-		PipelineHandler::Info pipelineInfo{};
+		pipeline::Info pipelineInfo{};
 		pipelineInfo.vertInputAttribDescriptions = vertAttributes;
 		pipelineInfo.vertInputBindingDescriptions = vertBindings;
 		pipelineInfo.resolution = outData.resolution;
@@ -101,7 +101,7 @@ namespace game
 		pipelineInfo.pushConstantSize = sizeof(PushConstants);
 		pipelineInfo.usePushConstant = true;
 
-		PipelineHandler::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
+		pipeline::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
 	template <typename Task>
@@ -171,7 +171,7 @@ namespace game
 	void RenderSystem<Task>::Free(const EngineOutData& outData, SystemChain& chain)
 	{
 		DestroyShaderAssets(outData);
-		MeshHandler::Destroy(outData, _mesh);
+		mesh::Destroy(outData, _mesh);
 		ShaderHandler::Destroy(outData, _shader);
 		UnloadTextureAtlas(outData);
 		TaskSystem<Task>::Free(outData, chain);
@@ -183,11 +183,11 @@ namespace game
 		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
 
-		_textureAtlas = TextureHandler::LoadTexture(outData, createInfo.atlasTexturePath);
-		const auto viewCreateInfo = vk::ImageHandler::CreateViewDefaultInfo(_textureAtlas.image, TextureHandler::GetTextureFormat());
+		_textureAtlas = texture::Load(outData, createInfo.atlasTexturePath);
+		const auto viewCreateInfo = vk::image::CreateViewDefaultInfo(_textureAtlas.image, texture::GetFormat());
 		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_atlasImageView);
 		assert(!result);
-		const auto samplerCreateInfo = vk::SamplerHandler::CreateDefaultInfo(app);
+		const auto samplerCreateInfo = vk::sampler::CreateDefaultInfo(app);
 		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_atlasSampler);
 		assert(!result);
 	}
@@ -199,7 +199,7 @@ namespace game
 
 		vkDestroySampler(logicalDevice, _atlasSampler, nullptr);
 		vkDestroyImageView(logicalDevice, _atlasImageView, nullptr);
-		TextureHandler::FreeTexture(outData, _textureAtlas);
+		texture::Free(outData, _textureAtlas);
 	}
 
 	template <typename Task>
@@ -225,7 +225,7 @@ namespace game
 		for (auto& vertex : vertices)
 			vertex.position /= 2;
 
-		_mesh = MeshHandler::CreateIndexed<Vertex, Vertex::Index>(outData, vertices, indices);
+		_mesh = mesh::CreateIndexed<Vertex, Vertex::Index>(outData, vertices, indices);
 	}
 
 	template <typename Task>
@@ -237,19 +237,19 @@ namespace game
 		auto& logicalDevice = app.logicalDevice;
 		const size_t swapChainImageCount = outData.swapChainImageCount;
 
-		_instanceBuffers = CreateInstanceStorageBuffers<Task>(outData, TaskSystem<Task>::GetLength());
+		_instanceBuffers = instancing::CreateStorageBuffers<Task>(outData, TaskSystem<Task>::GetLength());
 
 		// Create descriptor layout.
-		jlb::StackArray<LayoutHandler::Info::Binding, 2> bindings{};
+		jlb::StackArray<layout::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		bindings[0].size = sizeof(Task) * TaskSystem<Task>::GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-		LayoutHandler::Info descriptorLayoutInfo{};
+		layout::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = bindings;
-		_descriptorLayout = LayoutHandler::Create(outData, descriptorLayoutInfo);
+		_descriptorLayout = layout::Create(outData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
 		VkDescriptorPoolSize poolSizes[2];
@@ -304,7 +304,7 @@ namespace game
 
 			// Bind texture atlas.
 			VkDescriptorImageInfo  atlasInfo{};
-			atlasInfo.imageLayout = TextureHandler::GetImageLayout();
+			atlasInfo.imageLayout = texture::GetImageLayout();
 			atlasInfo.imageView = _atlasImageView;
 			atlasInfo.sampler = _atlasSampler;
 

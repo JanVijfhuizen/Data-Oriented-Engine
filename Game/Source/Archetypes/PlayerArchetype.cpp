@@ -42,8 +42,8 @@ namespace game
 	void PlayerArchetype::Awake(const EngineOutData& outData, SystemChain& chain)
 	{
 		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
-		_testAnim.frames[0].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Player);
-		_testAnim.frames[1].subTexture = TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Player + 1);
+		_testAnim.frames[0].subTexture = texture::GenerateSubTexture(texture, renderConventions::ENTITY_SIZE, renderConventions::Player);
+		_testAnim.frames[1].subTexture = texture::GenerateSubTexture(texture, renderConventions::ENTITY_SIZE, renderConventions::Player + 1);
 	}
 
 	PlayerUpdateInfo PlayerArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
