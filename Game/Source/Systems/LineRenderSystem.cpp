@@ -35,7 +35,7 @@ namespace game
 	void LineRenderSystem::Update(const EngineOutData& outData, SystemChain& chain)
 	{
 		auto& cameras = *chain.Get<CameraArchetype>();
-		if (cameras.GetCount())
+		for (const auto& camera : cameras)
 		{
 			auto& cmd = outData.swapChainCommandBuffer;
 
@@ -55,7 +55,7 @@ namespace game
 
 			PushConstants pushConstant{};
 			pushConstant.resolution = outData.resolution;
-			pushConstant.camera = cameras[0];
+			pushConstant.camera = camera;
 
 			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
 			vkCmdDraw(cmd, 2, GetCount(), 0, 0);

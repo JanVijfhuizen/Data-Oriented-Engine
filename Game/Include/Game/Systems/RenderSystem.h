@@ -125,8 +125,7 @@ namespace game
 	void RenderSystem<Task>::Update(const EngineOutData& outData, SystemChain& chain)
 	{
 		auto& cameras = *chain.Get<CameraArchetype>();
-
-		if (cameras.GetCount())
+		for (const auto& camera : cameras)
 		{
 			auto& cmd = outData.swapChainCommandBuffer;
 
@@ -147,11 +146,12 @@ namespace game
 
 			PushConstants pushConstant{};
 			pushConstant.resolution = outData.resolution;
-			pushConstant.camera = cameras[0];
+			pushConstant.camera = camera;
 
 			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
 			vkCmdDrawIndexed(cmd, _mesh.indexCount, TaskSystem<Task>::GetCount(), 0, 0, 0);
 		}
+
 		TaskSystem<Task>::SetCount(0);
 	}
 
