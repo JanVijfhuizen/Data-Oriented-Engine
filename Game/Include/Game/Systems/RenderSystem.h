@@ -230,7 +230,7 @@ namespace game
 		for (auto& vertex : vertices)
 			vertex.position /= 2;
 
-		_mesh = MeshHandler::Create<Vertex, Vertex::Index>(outData, vertices, indices);
+		_mesh = MeshHandler::CreateIndexed<Vertex, Vertex::Index>(outData, vertices, indices);
 	}
 
 	template <typename Task>

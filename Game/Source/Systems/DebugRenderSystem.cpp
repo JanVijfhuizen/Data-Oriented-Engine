@@ -5,6 +5,7 @@
 #include "StackArray.h"
 #include "Graphics/PipelineHandler.h"
 #include "VkRenderer/VkApp.h"
+#include "Graphics/MeshHandler.h"
 
 namespace game
 {
@@ -12,10 +13,20 @@ namespace game
 	{
 		TaskSystem<DebugRenderTask>::Allocate(outData, chain);
 		_shader = ShaderHandler::Create(outData, "Shaders/debug-vert.spv","Shaders/debug-frag.spv");
+
+		// Create mesh.
+		jlb::StackArray<int, 2> vertices{};
+		vertices[0] = 0;
+		vertices[1] = 1;
+		_vertexBuffer = MeshHandler::Create<int>(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	}
 
 	void DebugRenderSystem::Free(const EngineOutData& outData, SystemChain& chain)
 	{
+		// Destroy mesh.
+		vkDestroyBuffer(outData.app->logicalDevice, _vertexBuffer.buffer, nullptr);
+		outData.vkAllocator->FreeBlock(_vertexBuffer.memBlock);
+
 		ShaderHandler::Destroy(outData, _shader);
 		TaskSystem<DebugRenderTask>::Free(outData, chain);
 	}
@@ -27,10 +38,12 @@ namespace game
 
 	void DebugRenderSystem::CreateShaderAssets(const EngineOutData& outData)
 	{
+		
 	}
 
 	void DebugRenderSystem::DestroyShaderAssets(const EngineOutData& outData)
 	{
+		
 	}
 
 	void DebugRenderSystem::CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain)

@@ -2,6 +2,7 @@
 #include "TaskSystem.h"
 #include "Graphics/Shader.h"
 #include "Graphics/PipelineHandler.h"
+#include "Graphics/Buffer.h"
 
 namespace game
 {
@@ -23,6 +24,7 @@ namespace game
 		};
 
 		Shader _shader;
+		Buffer _vertexBuffer;
 		VkPipeline _pipeline;
 		VkPipelineLayout _pipelineLayout;
 		VkDescriptorSetLayout _descriptorLayout;

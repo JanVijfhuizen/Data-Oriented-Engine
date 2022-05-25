@@ -172,6 +172,7 @@
     <ClInclude Include="Include\Game\GameState.h" />
     <ClInclude Include="Include\Game\Graphics\Animation.h" />
     <ClInclude Include="Include\Game\Graphics\Buffer.h" />
+    <ClInclude Include="Include\Game\Graphics\InstanceUtils.h" />
     <ClInclude Include="Include\Game\Graphics\Mesh.h" />
     <ClInclude Include="Include\Game\Graphics\MeshHandler.h" />
     <ClInclude Include="Include\Game\Graphics\PipelineHandler.h" />
@@ -198,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />
+    <ClCompile Include="Source\Graphics\Buffer.cpp" />
     <ClCompile Include="Source\Systems\DebugRenderSystem.cpp" />
     <ClCompile Include="Source\Archetypes\WallArchetype.cpp" />
     <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />

@@ -11,24 +11,31 @@ namespace game
 	class MeshHandler final
 	{
 	public:
+		/// <summary>
+		/// Creates a buffer in device local memory.
+		/// </summary>
+		/// <param name="usageFlags">Automatically includes DST usage.</param>
 		template <typename Type>
-		[[nodiscard]] static Buffer CreateBuffer(const EngineOutData& outData, jlb::ArrayView<Type> data, VkBufferUsageFlags usageFlags);
+		[[nodiscard]] static Buffer Create(const EngineOutData& outData, jlb::ArrayView<Type> vertices, VkBufferUsageFlags usageFlags);
 
+		/// <summary>
+		/// Creates a vertex and index buffer in device local memory.
+		/// </summary>
 		template <typename Vertex, typename Index>
-		[[nodiscard]] static Mesh Create(const EngineOutData& outData, 
+		[[nodiscard]] static Mesh CreateIndexed(const EngineOutData& outData, 
 			jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
 		static void Destroy(const EngineOutData& outData, Mesh& mesh);
 	};
 
 	template <typename Type>
-	Buffer MeshHandler::CreateBuffer(const EngineOutData& outData, const jlb::ArrayView<Type> data, const VkBufferUsageFlags usageFlags)
+	Buffer MeshHandler::Create(const EngineOutData& outData, const jlb::ArrayView<Type> vertices, const VkBufferUsageFlags usageFlags)
 	{
 		auto& app = *outData.app;
 		auto& vkAllocator = *outData.vkAllocator;
 
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = sizeof(Type) * data.length;
+		bufferInfo.size = sizeof(Type) * vertices.length;
 		bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -51,10 +58,10 @@ namespace game
 		// Move vertex/index data to a staging buffer.
 		void* stagingData;
 		vkMapMemory(app.logicalDevice, stagingBlock.memory, stagingBlock.offset, stagingBlock.size, 0, &stagingData);
-		memcpy(stagingData, static_cast<const void*>(data.data), bufferInfo.size);
+		memcpy(stagingData, static_cast<const void*>(vertices.data), bufferInfo.size);
 		vkUnmapMemory(app.logicalDevice, stagingBlock.memory);
 
-		bufferInfo.usage = usageFlags;
+		bufferInfo.usage = usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
 		VkBuffer buffer;
 		result = vkCreateBuffer(app.logicalDevice, &bufferInfo, nullptr, &buffer);
@@ -112,12 +119,12 @@ namespace game
 	}
 
 	template <typename Vertex, typename Index>
-	Mesh MeshHandler::Create(const EngineOutData& outData, 
+	Mesh MeshHandler::CreateIndexed(const EngineOutData& outData, 
 		const jlb::ArrayView<Vertex> vertices, const jlb::ArrayView<Index> indices)
 	{
 		Mesh mesh{};
-		mesh.vertexBuffer = CreateBuffer(outData, vertices, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-		mesh.indexBuffer = CreateBuffer(outData, indices, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+		mesh.vertexBuffer = Create(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		mesh.indexBuffer = Create(outData, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 		mesh.indexCount = indices.length;
 		return mesh;
 	}
