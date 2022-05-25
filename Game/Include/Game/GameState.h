@@ -3,7 +3,7 @@
 
 namespace game
 {
-	struct GameState final
+	inline struct GameState final
 	{
 		SystemChain chain{};
 	} gameState;
