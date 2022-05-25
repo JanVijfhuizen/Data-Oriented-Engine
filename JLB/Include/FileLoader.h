@@ -4,13 +4,17 @@
 namespace jlb
 {
 	class StringView;
+}
 
-	/// <summary>
-	/// Simple class that is able to load and read files.
-	/// </summary>
-	class FileLoader final
+namespace jlb
+{
+	class StringView;
+
+	namespace file
 	{
-	public:
-		static Array<char> Read(StackAllocator& allocator, StringView path);
-	};
+		/// <summary>
+		/// Read a file and return the content as a array of chars.
+		/// </summary>
+		Array<char> Read(StackAllocator& allocator, StringView path);
+	}
 }

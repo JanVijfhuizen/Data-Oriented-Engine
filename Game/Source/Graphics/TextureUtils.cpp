@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "Graphics/TextureHandler.h"
+#include "Graphics/TextureUtils.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "StringView.h"
@@ -9,19 +9,19 @@
 #include "VkRenderer/VkSyncUtils.h"
 #include "VkRenderer/VkImageUtils.h"
 
-namespace game
+namespace game::texture
 {
-	VkFormat TextureHandler::GetTextureFormat()
+	VkFormat GetFormat()
 	{
 		return VK_FORMAT_R8G8B8A8_SRGB;
 	}
 
-	VkImageLayout TextureHandler::GetImageLayout()
+	VkImageLayout GetImageLayout()
 	{
 		return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
-	Texture TextureHandler::LoadTexture(const EngineOutData& outData, const jlb::StringView path)
+	Texture Load(const EngineOutData& outData, const jlb::StringView path)
 	{
 		auto& app = *outData.app;
 		auto& logicalDevice = app.logicalDevice;
@@ -122,7 +122,7 @@ namespace game
 		return texture;
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
+	SubTexture GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
 		const glm::ivec2 lTop, const glm::ivec2 rBot)
 	{
 		const float xMul = static_cast<float>(chunkSize) / texture.resolution.x;
@@ -136,20 +136,20 @@ namespace game
 		return sub;
 	}
 
-	SubTexture TextureHandler::GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
+	SubTexture GenerateSubTexture(const Texture& texture, const size_t chunkSize, 
 		const size_t index)
 	{
 		const glm::ivec2 lTop = IndexToCoordinates(texture, chunkSize, index);
 		return GenerateSubTexture(texture, chunkSize, lTop, lTop + glm::ivec2{1, 1});
 	}
 
-	glm::ivec2 TextureHandler::IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
+	glm::ivec2 IndexToCoordinates(const Texture& texture, const size_t chunkSize, const size_t index)
 	{
 		const glm::ivec2 resolution = texture.resolution / glm::ivec2{chunkSize, chunkSize};
 		return { index % resolution.x, index / resolution.x };
 	}
 
-	void TextureHandler::FreeTexture(const EngineOutData& outData, Texture& texture)
+	void Free(const EngineOutData& outData, Texture& texture)
 	{
 		vkDestroyImage(outData.app->logicalDevice, texture.image, nullptr);
 		outData.vkAllocator->FreeBlock(texture.memBlock);

@@ -6,29 +6,25 @@
 #include "VkRenderer/VkApp.h"
 #include "Buffer.h"
 
-namespace game
+namespace game::mesh
 {
-	class MeshHandler final
-	{
-	public:
-		/// <summary>
-		/// Creates a buffer in device local memory.
-		/// </summary>
-		/// <param name="usageFlags">Automatically includes DST usage.</param>
-		template <typename Type>
-		[[nodiscard]] static Buffer Create(const EngineOutData& outData, jlb::ArrayView<Type> vertices, VkBufferUsageFlags usageFlags);
+	/// <summary>
+	/// Creates a buffer in device local memory.
+	/// </summary>
+	/// <param name="usageFlags">Automatically includes DST usage.</param>
+	template <typename Type>
+	[[nodiscard]] Buffer CreateBuffer(const EngineOutData& outData, jlb::ArrayView<Type> vertices, VkBufferUsageFlags usageFlags);
 
-		/// <summary>
-		/// Creates a vertex and index buffer in device local memory.
-		/// </summary>
-		template <typename Vertex, typename Index>
-		[[nodiscard]] static Mesh CreateIndexed(const EngineOutData& outData, 
-			jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
-		static void Destroy(const EngineOutData& outData, Mesh& mesh);
-	};
+	/// <summary>
+	/// Creates a vertex and index buffer in device local memory.
+	/// </summary>
+	template <typename Vertex, typename Index>
+	[[nodiscard]] Mesh CreateIndexed(const EngineOutData& outData,
+		jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
+	void Destroy(const EngineOutData& outData, Mesh& mesh);
 
 	template <typename Type>
-	Buffer MeshHandler::Create(const EngineOutData& outData, const jlb::ArrayView<Type> vertices, const VkBufferUsageFlags usageFlags)
+	Buffer CreateBuffer(const EngineOutData& outData, const jlb::ArrayView<Type> vertices, const VkBufferUsageFlags usageFlags)
 	{
 		auto& app = *outData.app;
 		auto& vkAllocator = *outData.vkAllocator;
@@ -119,12 +115,12 @@ namespace game
 	}
 
 	template <typename Vertex, typename Index>
-	Mesh MeshHandler::CreateIndexed(const EngineOutData& outData, 
+	Mesh CreateIndexed(const EngineOutData& outData, 
 		const jlb::ArrayView<Vertex> vertices, const jlb::ArrayView<Index> indices)
 	{
 		Mesh mesh{};
-		mesh.vertexBuffer = Create(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-		mesh.indexBuffer = Create(outData, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+		mesh.vertexBuffer = CreateBuffer(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		mesh.indexBuffer = CreateBuffer(outData, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 		mesh.indexCount = indices.length;
 		return mesh;
 	}

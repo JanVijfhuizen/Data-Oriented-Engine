@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Graphics/MeshHandler.h"
+#include "Graphics/MeshUtils.h"
 
-namespace game
+namespace game::mesh
 {
-	void MeshHandler::Destroy(const EngineOutData& outData, Mesh& mesh)
+	void Destroy(const EngineOutData& outData, Mesh& mesh)
 	{
 		auto& app = *outData.app;
 		auto& vkAllocator = *outData.vkAllocator;

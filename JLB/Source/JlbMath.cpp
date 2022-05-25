@@ -1,9 +1,9 @@
 ﻿#include "JlbMath.h"
 #include <cassert>
 
-namespace jlb
+namespace jlb::math
 {
-	float Math::Clamp(float clampable, float min, float max)
+	float Clamp(float clampable, float min, float max)
 	{
 		assert(min < max);
 		return clampable > max ? max : clampable < min ? min : clampable;

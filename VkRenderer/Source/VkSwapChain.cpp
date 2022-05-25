@@ -178,8 +178,8 @@ namespace vk
 		const auto& minExtent = capabilities.minImageExtent;
 		const auto& maxExtent = capabilities.maxImageExtent;
 
-		actualExtent.width = jlb::Math::Clamp(actualExtent.width, minExtent.width, maxExtent.width);
-		actualExtent.height = jlb::Math::Clamp(actualExtent.height, minExtent.height, maxExtent.height);
+		actualExtent.width = jlb::math::Clamp(actualExtent.width, minExtent.width, maxExtent.width);
+		actualExtent.height = jlb::math::Clamp(actualExtent.height, minExtent.height, maxExtent.height);
 
 		return actualExtent;
 	}

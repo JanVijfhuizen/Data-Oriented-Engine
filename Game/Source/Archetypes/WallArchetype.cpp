@@ -7,7 +7,7 @@ namespace game
 {
 	SubTexture WallArchetype::GenerateSubTexture(const Texture& texture) const
 	{
-		return TextureHandler::GenerateSubTexture(texture, RenderConventions::ENTITY_SIZE, RenderConventions::Player);
+		return texture::GenerateSubTexture(texture, renderConventions::ENTITY_SIZE, renderConventions::Player);
 	}
 
 	void WallArchetype::Allocate(const EngineOutData& outData, SystemChain& chain)

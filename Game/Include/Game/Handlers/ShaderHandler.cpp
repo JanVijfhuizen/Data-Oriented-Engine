@@ -13,8 +13,8 @@ namespace game
 		auto& logicalDevice = outData.app->logicalDevice;
 		auto& tempAllocator = *outData.tempAllocator;
 
-		auto vert = jlb::FileLoader::Read(tempAllocator, vertPath);
-		auto frag = jlb::FileLoader::Read(tempAllocator, fragPath);
+		auto vert = jlb::file::Read(tempAllocator, vertPath);
+		auto frag = jlb::file::Read(tempAllocator, fragPath);
 
 		VkShaderModuleCreateInfo vertCreateInfo{};
 		vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
