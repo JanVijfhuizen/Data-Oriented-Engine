@@ -44,6 +44,7 @@ namespace game
 
 	void GameUpdate(const EngineOutData& outData)
 	{
+		return;
 		static float f = 0;
 		f += outData.deltaTime / 1000;
 
