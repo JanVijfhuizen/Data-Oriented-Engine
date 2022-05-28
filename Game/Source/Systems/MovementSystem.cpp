@@ -13,6 +13,7 @@ namespace game
 		{
 			const auto collisionTask = CollisionSystem::CreateDefaultTask(*task.collider, *task.transform, task.dir * task.speed * dt);
 			collisionSystem->Add(collisionTask);
+			task.transform->rotation += .001f;
 		}
 		SetCount(0);
 	}
