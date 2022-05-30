@@ -2,6 +2,7 @@
 #include "Systems/HumanoidBodySystem.h"
 #include "Components/HumanoidBody.h"
 #include "Graphics/Texture.h"
+#include "Graphics/RenderConventions.h"
 
 namespace game
 {
@@ -10,17 +11,17 @@ namespace game
 	{
 		HumanoidBodyVisuals visuals{};
 		auto& head = visuals.head;
-		head.leftTop = { 5, 0 };
-		head.rightBot = head.leftTop + glm::vec2(6);
+		head.leftTop = renderConventions::ENTITY_HEAD_POS;
+		head.rightBot = head.leftTop + glm::vec2(renderConventions::ENTITY_HEAD_SIZE);
 		auto& torso = visuals.torso;
-		torso.leftTop = head.leftTop + glm::vec2(0, 6);
-		torso.rightBot = torso.leftTop + glm::vec2(6);
+		torso.leftTop = renderConventions::ENTITY_TORSO_POS;
+		torso.rightBot = torso.leftTop + glm::vec2(renderConventions::ENTITY_TORSO_SIZE);
 		auto& lArm = visuals.lArm;
-		lArm.leftTop = { 0, 5 };
-		lArm.rightBot = lArm.leftTop + glm::vec2(4);
+		lArm.leftTop = renderConventions::ENTITY_L_ARM_POS;
+		lArm.rightBot = lArm.leftTop + glm::vec2(renderConventions::ENTITY_ARM_SIZE);
 		auto& lLeg = visuals.lLeg;
-		lLeg.leftTop = torso.leftTop + glm::vec2(-1, 6);
-		lLeg.rightBot = lLeg.leftTop + glm::vec2(4);
+		lLeg.leftTop = renderConventions::ENTITY_L_LEG_POS;
+		lLeg.rightBot = lLeg.leftTop + glm::vec2(renderConventions::ENTITY_LEG_SIZE);
 
 		MirrorLeftSide(visuals);
 

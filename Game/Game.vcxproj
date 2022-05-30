@@ -201,8 +201,10 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
     <ClInclude Include="Include\Game\SystemChain.h" />
     <ClInclude Include="Include\Game\TaskSystem.h" />
+    <ClInclude Include="Include\Game\Utils\Math.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Utils\Math.cpp" />
     <ClCompile Include="Source\Systems\HumanoidBodySystem.cpp" />
     <ClCompile Include="Source\Archetypes\CameraArchetype.cpp" />
     <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />

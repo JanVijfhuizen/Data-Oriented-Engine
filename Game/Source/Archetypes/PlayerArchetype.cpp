@@ -58,7 +58,6 @@ namespace game
 		if (_playerController.direction.x != 0 || _playerController.direction.y != 0)
 		{
 			MovementTask movementTask{};
-			movementTask.speed = 0.02f;
 			movementTask.dir = normalize(glm::vec2(_playerController.direction));
 			movementTask.collider = &entity.collider;
 			movementTask.transform = &transform;
