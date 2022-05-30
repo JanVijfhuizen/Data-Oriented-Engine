@@ -7,11 +7,12 @@ namespace game
 {
 	struct MovementTask final
 	{
-		glm::vec2 dir;
+		glm::ivec2 dir{};
 		float moveSpeed = 0.005f * renderConventions::ENTITY_SIZE;
 		float rotationSpeed = math::PI / 200;
-		struct Collider* collider;
-		struct Transform* transform;
+
+		struct Collider* collider = nullptr;
+		struct Transform* transform = nullptr;
 	};
 
 	class MovementSystem final : public TaskSystem<MovementTask>

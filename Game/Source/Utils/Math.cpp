@@ -31,4 +31,9 @@ namespace game::math
 	{
 		return a + (b - a) * pct;
 	}
+
+	bool IsZero(const glm::ivec2& v)
+	{
+		return v.x == 0 && v.y == 0;
+	}
 }

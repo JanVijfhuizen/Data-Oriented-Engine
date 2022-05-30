@@ -6,7 +6,6 @@
 #include "Components/Renderer.h"
 #include "Systems/RenderSystem.h"
 #include "Systems/EntityRenderSystem.h"
-#include "Components/Animator.h"
 #include "Components/HumanoidBody.h"
 
 namespace game

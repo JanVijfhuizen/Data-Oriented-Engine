@@ -55,14 +55,11 @@ namespace game
 	{
 		auto& transform = entity.body.torso;
 
-		if (_playerController.direction.x != 0 || _playerController.direction.y != 0)
-		{
-			MovementTask movementTask{};
-			movementTask.dir = normalize(glm::vec2(_playerController.direction));
-			movementTask.collider = &entity.collider;
-			movementTask.transform = &transform;
-			info.movementSystem->Add(movementTask);
-		}
+		MovementTask movementTask{};
+		movementTask.dir = _playerController.direction;
+		movementTask.collider = &entity.collider;
+		movementTask.transform = &transform;
+		info.movementSystem->Add(movementTask);
 
 		EntityRenderTask renderTask{};
 		auto& taskTransform = renderTask.transform;

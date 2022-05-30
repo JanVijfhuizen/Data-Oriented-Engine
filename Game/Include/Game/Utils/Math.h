@@ -9,4 +9,5 @@ namespace game::math
 	[[nodiscard]] float WrapAngle(float f);
 	[[nodiscard]] float Lerp(float a, float b, float delta);
 	[[nodiscard]] float LerpPct(float a, float b, float pct);
+	[[nodiscard]] bool IsZero(const glm::ivec2& v);
 }
