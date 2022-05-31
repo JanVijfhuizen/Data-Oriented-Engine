@@ -12,9 +12,11 @@ namespace game::math
 	{
 		const float diff = abs(a - b);
 		const bool diffMoreThanPI = diff > PI;
-		a += diffMoreThanPI ? b > a ? PI * 2 : 0 : 0;
-		b += diffMoreThanPI ? a > b ? PI * 2 : 0 : 0;
-		return WrapAngle(Lerp(a, b, delta));
+
+		const float nA = a + (diffMoreThanPI ? (b > a ? PI * 2 : 0) : 0);
+		const float nB = b + (diffMoreThanPI ? (a > b ? PI * 2 : 0) : 0);
+
+		return WrapAngle(Lerp(nA, nB, delta));
 	}
 
 	float WrapAngle(const float f)
