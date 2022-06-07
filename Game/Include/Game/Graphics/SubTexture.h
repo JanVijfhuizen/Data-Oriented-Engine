@@ -4,8 +4,19 @@ namespace game
 {
 	struct SubTexture final
 	{
-		glm::vec2 leftTop{};
-		glm::vec2 rightBot{1};
+		union
+		{
+			struct
+			{
+				glm::vec2 leftTop;
+				glm::vec2 rightBot;
+			};
+			glm::vec2 values[2]
+			{
+				glm::vec2{0},
+				glm::vec2{1}
+			};
+		};
 
 		[[nodiscard]] SubTexture operator +(const SubTexture& a) const;
 		[[nodiscard]] SubTexture operator -(const SubTexture& a) const;

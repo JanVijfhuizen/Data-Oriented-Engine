@@ -4,30 +4,25 @@
 #include <Components/Character.h>
 #include <Components/Collider.h>
 #include "Components/Renderer.h"
-#include "Components/Transform.h"
 #include "Systems/RenderSystem.h"
 #include "Systems/EntityRenderSystem.h"
-#include "Graphics/Animation.h"
-#include "Components/Animator.h"
+#include "Components/HumanoidBody.h"
 
 namespace game
 {
-	class AnimationSystem;
 	class MovementSystem;
 
 	struct Player final
 	{
-		Animator animator{};
 		Controller controller{};
 		Collider collider{};
 		Character character{};
 		Renderer renderer{};
-		Transform transform{};
+		HumanoidBodyInstance body{};
 	};
 
 	struct PlayerUpdateInfo final
 	{
-		AnimationSystem* animationSystem;
 		EntityRenderSystem* entityRenderSystem;
 		MovementSystem* movementSystem;
 		glm::vec2 mousePosition;
@@ -46,7 +41,7 @@ namespace game
 		using Archetype<Player, PlayerUpdateInfo>::IncreaseRequestedLength;
 
 		Controller _playerController{};
-		Animation _testAnim{};
+		HumanoidBodyVisuals _bodyVisuals{};
 
 		PlayerUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
 		void OnEntityUpdate(Player& entity, PlayerUpdateInfo& info) override;

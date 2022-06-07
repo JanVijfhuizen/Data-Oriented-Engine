@@ -6,6 +6,7 @@ namespace game
 	struct Camera final
 	{
 		glm::vec2 position{};
+		// Size of the pixelart compared to the horizontal length of the window.
 		float pixelSize = 0.008f;
 	};
 
