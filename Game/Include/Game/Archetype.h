@@ -9,11 +9,6 @@ namespace game
 	template <typename Entity, typename UpdateInfo>
 	class Archetype : public TaskSystem<Entity>
 	{
-	public:
-		Entity& Add(const Entity& entity) override;
-		Entity& Add(const Entity&& entity = {}) override;
-		void RemoveAt(size_t index) override;
-
 	protected:
 		void Update(const EngineOutData& outData, SystemChain& chain) override;
 
@@ -21,33 +16,7 @@ namespace game
 		virtual UpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) = 0;
 		virtual void OnEntityUpdate(Entity& entity, UpdateInfo& info) = 0;
 		virtual void OnPostEntityUpdate(const EngineOutData& outData, SystemChain& chain) {}
-
-		virtual void OnAdd(Entity& entity) {};
-		virtual void OnRemove(Entity& entity, size_t index) {};
 	};
-
-	template <typename Entity, typename UpdateInfo>
-	Entity& Archetype<Entity, UpdateInfo>::Add(const Entity& entity)
-	{
-		auto& result = jlb::Vector<Entity>::Add(entity);
-		OnAdd(result);
-		return result;
-	}
-
-	template <typename Entity, typename UpdateInfo>
-	Entity& Archetype<Entity, UpdateInfo>::Add(const Entity&& entity)
-	{
-		auto& result = jlb::Vector<Entity>::Add(entity);
-		OnAdd(result);
-		return result;
-	}
-
-	template <typename Entity, typename UpdateInfo>
-	void Archetype<Entity, UpdateInfo>::RemoveAt(const size_t index)
-	{
-		OnRemove(this->operator[](index), index);
-		jlb::Vector<Entity>::RemoveAt(index);
-	}
 
 	template <typename Entity, typename UpdateInfo>
 	void Archetype<Entity, UpdateInfo>::Update(const EngineOutData& outData, SystemChain& chain)

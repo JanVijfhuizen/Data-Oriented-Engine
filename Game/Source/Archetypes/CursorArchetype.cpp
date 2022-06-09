@@ -54,6 +54,13 @@ namespace game
 		}
 	}
 
+	Cursor& CursorArchetype::Add(const Cursor& task)
+	{
+		auto& entity = Archetype<Cursor, CursorUpdateInfo>::Add(task);
+		entity.animator.animation = &_idleAnim;
+		return entity;
+	}
+
 	void CursorArchetype::Allocate(const EngineOutData& outData, SystemChain& chain)
 	{
 		IncreaseRequestedLength(1);
@@ -73,11 +80,6 @@ namespace game
 		_pressedAnim.frames.Free(allocator);
 		_idleAnim.frames.Free(allocator);
 		Archetype<Cursor, CursorUpdateInfo>::Free(outData, chain);
-	}
-
-	void CursorArchetype::OnAdd(Cursor& entity)
-	{
-		entity.animator.animation = &_idleAnim;
 	}
 
 	CursorUpdateInfo CursorArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)

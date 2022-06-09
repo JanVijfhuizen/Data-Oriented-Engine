@@ -33,8 +33,8 @@ namespace game
 
 	private:
 		size_t _requestedStaticSize = 0;
-		Vector<StaticCollisionTask> _statics{};
-		Array<bool> _validChecks{};
+		jlb::Vector<StaticCollisionTask> _statics{};
+		jlb::Array<bool> _validChecks{};
 
 		void Update(const EngineOutData& outData, SystemChain& chain) override;
 

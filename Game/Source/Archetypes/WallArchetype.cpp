@@ -61,8 +61,10 @@ namespace game
 		info.entityRenderSystem->Add(renderTask);
 	}
 
-	void WallArchetype::OnAdd(Wall& entity)
+	Wall& WallArchetype::Add(const Wall& task)
 	{
+		auto& entity = TaskSystem<Wall>::Add(task);
 		entity.renderer.subTexture = _subTexture;
+		return entity;
 	}
 }

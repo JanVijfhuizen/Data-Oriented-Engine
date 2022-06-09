@@ -21,9 +21,12 @@ namespace game
 
 	class WallArchetype : public Archetype<Wall, WallUpdateInfo>
 	{
+	public:
+		Wall& Add(const Wall& task = {}) override;
+
 	protected:
 		// TODO: make virtual to support multiple wall types.
-		SubTexture GenerateSubTexture(const Texture& texture) const;
+		[[nodiscard]] SubTexture GenerateSubTexture(const Texture& texture) const;
 
 		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
 		void Awake(const EngineOutData& outData, SystemChain& chain) override;
@@ -32,7 +35,6 @@ namespace game
 		WallUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
 		void OnEntityUpdate(Wall& entity, WallUpdateInfo& info) override;
 
-		void OnAdd(Wall& entity) override;
 	private:
 		SubTexture _subTexture;
 	};

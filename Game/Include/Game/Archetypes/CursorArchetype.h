@@ -29,6 +29,7 @@ namespace game
 		float sensitivity = 50;
 
 		static void OnMouseKeyInput(int key, int action, CursorArchetype& instance);
+		Cursor& Add(const Cursor& task = {}) override;
 
 	private:
 		int _lMouseKey = 0;
@@ -40,8 +41,6 @@ namespace game
 		void Free(const EngineOutData& outData, SystemChain& chain) override;
 
 		void Start(const EngineOutData& outData, SystemChain& chain) override;
-
-		void OnAdd(Cursor& entity) override;
 		CursorUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
 		void OnEntityUpdate(Cursor& entity, CursorUpdateInfo& updateInfo) override;
 	};
