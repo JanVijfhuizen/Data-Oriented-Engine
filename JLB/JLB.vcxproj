@@ -149,7 +149,6 @@
     <ClCompile Include="Source\StringView.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\IndexSequence.h" />
     <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
@@ -163,7 +162,6 @@
     <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />
-    <ClInclude Include="Include\Tuple.h" />
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
