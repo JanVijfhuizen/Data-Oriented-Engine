@@ -1,54 +1,40 @@
 ﻿#pragma once
 #include "Array.h"
+#include "ArrayUtils.h"
 
 namespace jlb
 {
-	/// <summary>
-	/// Unordered vector that does not have ownership over the memory that it uses.<br>
-	/// It does not resize the capacity automatically.
-	/// </summary>
+	// Unordered vector.
 	template <typename T>
 	class Vector : public Array<T>
 	{
 	public:
+		[[nodiscard]] Iterator<T> end() const override;
+
 		void Free(StackAllocator& allocator) override;
 
-		/// <summary>
-		/// Place a value in the front of the vector and increase it's size by one.<br>
-		/// Cannot exceed the capacity of the managed memory.
-		/// </summary>
-		/// <param name="value">The value to be added to the vector.</param>
-		/// <returns>The added value inside the vector.</returns>
 		virtual T& Add(const T& value);
-		/// <summary>
-		/// Place a value in the front of the vector and increase it's size by one.<br>
-		/// Cannot exceed the capacity of the managed memory.
-		/// </summary>
-		/// <param name="value">The value to be added to the vector.</param>
-		/// <returns>The added value inside the vector.</returns>
 		virtual T& Add(const T&& value = {});
-		/// <summary>
-		/// Remove the value at a certain index.
-		/// </summary>
-		/// <param name="index">Index where the value will be removed.</param>
 		virtual void RemoveAt(size_t index);
-		/// <summary>
-		/// Set the count of the vector. Cannot exceed the capacity of the managed memory.
-		/// </summary>
-		/// <param name="count"></param>
-		void SetCount(size_t count);
-		/// <summary>
-		/// Gets the amount of values in the vector.
-		/// </summary>
+
 		[[nodiscard]] size_t GetCount() const;
-		[[nodiscard]] Iterator<T> end() override;
+		// Cannot exceed the capacity of the managed memory.
+		void SetCount(size_t count);
+
+		ArrayView<T> GetView() const override;
 
 	private:
 		// The amount of values in this vector.
 		size_t _count = 0;
 
-		T& _Add(const T& value);
+		[[nodiscard]] T& _Add(const T& value);
 	};
+
+	template <typename T>
+	Iterator<T> Vector<T>::end() const
+	{
+		return GetView().end();
+	}
 
 	template <typename T>
 	void Vector<T>::Free(StackAllocator& allocator)
@@ -73,7 +59,8 @@ namespace jlb
 	void Vector<T>::RemoveAt(const size_t index)
 	{
 		// Swap the removed value with the last instance.
-		Array<T>::Swap(index, --_count);
+		Swap(GetView(), index, _count - 1);
+		_count--;
 	}
 
 	template <typename T>
@@ -84,25 +71,24 @@ namespace jlb
 	}
 
 	template <typename T>
+	ArrayView<T> Vector<T>::GetView() const
+	{
+		auto view = Array<T>::GetView();
+		view.length = _count;
+		return view;
+	}
+
+	template <typename T>
 	size_t Vector<T>::GetCount() const
 	{
 		return _count;
 	}
 
 	template <typename T>
-	Iterator<T> Vector<T>::end()
-	{
-		Iterator<T> it;
-		it.memory = Array<T>::GetData();
-		it.index = _count;
-		it.length = Array<T>::GetLength();
-		return it;
-	}
-
-	template <typename T>
 	T& Vector<T>::_Add(const T& value)
 	{
 		assert(_count + 1 <= Array<T>::GetLength());
-		return Array<T>::operator[](_count++) = value;
+		++_count;
+		return GetView()[_count - 1] = value;
 	}
 }

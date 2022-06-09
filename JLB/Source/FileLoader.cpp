@@ -17,7 +17,7 @@ namespace jlb
 		buffer.Allocate(allocator, fileSize);
 
 		file.seekg(0);
-		file.read(buffer.GetData(), fileSize);
+		file.read(buffer.GetView().data, fileSize);
 		file.close();
 		return buffer;
 	}

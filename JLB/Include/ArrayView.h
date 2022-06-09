@@ -10,18 +10,19 @@ namespace jlb
 	template <typename T>
 	struct ArrayView
 	{
-		T* data;
-		size_t length;
+		T* data = nullptr;
+		size_t length = 0;
 
 		ArrayView() = default;
 		// ReSharper disable once CppNonExplicitConvertingConstructor
 		ArrayView(T& singleValue);
 		ArrayView(T* data, size_t length);
 
-		[[nodiscard]] T& operator[](size_t index);
+		[[nodiscard]] T& operator[](size_t index) const;
+		[[nodiscard]] operator bool() const;
 
-		[[nodiscard]] Iterator<T> begin();
-		[[nodiscard]] Iterator<T> end();
+		[[nodiscard]] Iterator<T> begin() const;
+		[[nodiscard]] Iterator<T> end() const;
 	};
 
 	template <typename T>
@@ -37,14 +38,20 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& ArrayView<T>::operator[](const size_t index)
+	ArrayView<T>::operator bool() const
+	{
+		return data;
+	}
+
+	template <typename T>
+	T& ArrayView<T>::operator[](const size_t index) const
 	{
 		assert(index < length);
 		return data[index];
 	}
 
 	template <typename T>
-	Iterator<T> ArrayView<T>::begin()
+	Iterator<T> ArrayView<T>::begin() const
 	{
 		Iterator<T> it;
 		it.memory = data;
@@ -54,7 +61,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	Iterator<T> ArrayView<T>::end()
+	Iterator<T> ArrayView<T>::end() const
 	{
 		Iterator<T> it;
 		it.memory = data;

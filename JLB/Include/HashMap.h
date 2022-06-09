@@ -8,37 +8,22 @@ namespace jlb
 	/// Data container that that prioritizes quick lookup speed.
 	/// </summary>
 	template <typename T>
-	class HashMap : public Array<KeyPair<T>>
+	class HashMap
 	{
 	public:
 		// Function used to get a hash value from a value.
 		size_t(*hasher)(T& value);
 
-		/// <summary>
-		/// Inserts a value into the hashset. Does not store duplicates.
-		/// </summary>
-		/// <param name="value">Value to be inserted.</param>
-		void Insert(T& value);
-		/// <summary>
-		/// Inserts a value into the hashset. Does not store duplicates.
-		/// </summary>
-		/// <param name="value">Value to be inserted.</param>
-		void Insert(T&& value);
-		/// <summary>
-		/// Checks if the HashMap contains a certain value.
-		/// </summary>
-		/// <param name="value">Value to be checked.</param>
-		/// <returns>If the HashMap contains the value.</returns>
-		[[nodiscard]] bool Contains(T& value);
-		/// <summary>
-		/// Remove by value.
-		/// </summary>
-		/// <param name="value">Value to be removed.</param>
-		void Erase(T& value);
+		virtual void Allocate(StackAllocator& allocator, size_t size);
+		virtual void Free(StackAllocator& allocator);
 
-		/// <summary>
-		/// Gets the amount of values in the HashMap.
-		/// </summary>
+		// Duplicates are not inserted.
+		void Insert(T& value);
+		// Duplicates are not inserted.
+		void Insert(T&& value);
+
+		[[nodiscard]] bool Contains(T& value);
+		void Erase(T& value);
 		[[nodiscard]] size_t GetCount() const;
 
 	protected:
@@ -46,13 +31,23 @@ namespace jlb
 		[[nodiscard]] bool Contains(T& value, size_t& outIndex);
 		void _Insert(T& value);
 
-		KeyPair<T>& operator[](size_t index) override;
-		Iterator<KeyPair<T>> begin() override;
-		Iterator<KeyPair<T>> end() override;
-
 	private:
 		size_t _count = 0;
+		Array<KeyPair<T>> _array{};
 	};
+
+	template <typename T>
+	void HashMap<T>::Allocate(StackAllocator& allocator, const size_t size)
+	{
+		_array.Allocate(allocator, size);
+	}
+
+	template <typename T>
+	void HashMap<T>::Free(StackAllocator& allocator)
+	{
+		_array.Free(allocator);
+		_count = 0;
+	}
 
 	template <typename T>
 	void HashMap<T>::Insert(T& value)
@@ -73,17 +68,17 @@ namespace jlb
 		const bool contains = Contains(value, index);
 		assert(contains);
 
-		const size_t length = Array<KeyPair<T>>::GetLength();
+		const size_t length = _array.GetLength();
 		assert(_count > 0);
 
-		auto& keyPair = Array<KeyPair<T>>::operator[](index);
+		auto& keyPair = _array[index];
 
 		// Check how big the key group is.
 		size_t i = 1;
 		while(i < length)
 		{
 			const size_t otherIndex = (index + i) % length;
-			auto& otherKeyPair = Array<KeyPair<T>>::operator[](otherIndex);
+			auto& otherKeyPair = _array[otherIndex];
 			if (otherKeyPair.key != keyPair.key)
 				break;
 			++i;
@@ -92,7 +87,7 @@ namespace jlb
 		// Setting the keypair value to the default value.
 		keyPair = {};
 		// Move the key group one place backwards by swapping the first and last index.
-		Array<KeyPair<T>>::Swap(index, index + i - 1);
+		Swap(_array, index, index + i - 1);
 		--_count;
 	}
 
@@ -113,13 +108,13 @@ namespace jlb
 	size_t HashMap<T>::GetHash(T& value)
 	{
 		assert(hasher);
-		return hasher(value) % Array<KeyPair<T>>::GetLength();
+		return hasher(value) % _array.GetLength();
 	}
 
 	template <typename T>
 	bool HashMap<T>::Contains(T& value, size_t& outIndex)
 	{
-		const size_t length = Array<KeyPair<T>>::GetLength();
+		const size_t length = _array.GetLength();
 		assert(_count < length);
 
 		// Get and use the hash as an index.
@@ -128,7 +123,7 @@ namespace jlb
 		for (size_t i = 0; i < length; ++i)
 		{
 			const size_t index = (hash + i) % length;
-			auto& keyPair = Array<KeyPair<T>>::operator[](index);
+			auto& keyPair = _array[index];
 
 			// If the hash is different, continue.
 			if (keyPair.key != hash)
@@ -149,7 +144,7 @@ namespace jlb
 	template <typename T>
 	void HashMap<T>::_Insert(T& value)
 	{
-		const size_t length = Array<KeyPair<T>>::GetLength();
+		const size_t length = _array.GetLength();
 		assert(_count < length);
 
 		// If it already contains this value, replace the old one with the newer value.
@@ -161,7 +156,7 @@ namespace jlb
 		for (size_t i = 0; i < length; ++i)
 		{
 			const size_t index = (hash + i) % length;
-			auto& keyPair = Array<KeyPair<T>>::operator[](index);
+			auto& keyPair = _array[index];
 			// Set to true the first time the key group has been found.
 			if (keyPair.key != SIZE_MAX)
 				continue;
@@ -171,23 +166,5 @@ namespace jlb
 			++_count;
 			break;
 		}
-	}
-
-	template <typename T>
-	KeyPair<T>& HashMap<T>::operator[](const size_t index)
-	{
-		return Array<KeyPair<T>>::operator[](index);
-	}
-
-	template <typename T>
-	Iterator<KeyPair<T>> HashMap<T>::begin()
-	{
-		return Array<KeyPair<T>>::begin();
-	}
-
-	template <typename T>
-	Iterator<KeyPair<T>> HashMap<T>::end()
-	{
-		return Array<KeyPair<T>>::end();
 	}
 }

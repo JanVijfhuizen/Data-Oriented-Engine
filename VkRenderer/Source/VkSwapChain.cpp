@@ -8,6 +8,7 @@
 #include "VkCommandBufferUtils.h"
 #include "VkFrameBufferUtils.h"
 #include "VkRenderPassUtils.h"
+#include "ArrayUtils.h"
 
 namespace vk
 {
@@ -84,7 +85,7 @@ namespace vk
 
 		jlb::Array<VkSemaphore> allWaitSemaphores{};
 		allWaitSemaphores.Allocate(tempAllocator, waitSemaphores.length + 1);
-		allWaitSemaphores.Copy(0, waitSemaphores.length, waitSemaphores.data);
+		jlb::Copy(allWaitSemaphores.GetView(), 0, waitSemaphores.length, waitSemaphores.data);
 		allWaitSemaphores[waitSemaphores.length] = frame.imageAvailableSemaphore;
 
 		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
