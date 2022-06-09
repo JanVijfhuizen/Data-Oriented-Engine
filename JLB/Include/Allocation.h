@@ -6,9 +6,7 @@ namespace jlb
 	// Identifier for memory allocations.
 	struct AllocationID final
 	{
-		// Source pointer, used to validate on free.
-		size_t id = SIZE_MAX;
-		// Source pointer, used to validate on free.
+		size_t index = SIZE_MAX;
 		size_t* src = nullptr;
 
 		[[nodiscard]] operator bool() const;

@@ -3,9 +3,7 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// An array that operates on the stack, rather than on the heap.
-	/// </summary>
+	// An array that operates on the stack, rather than on the heap.
 	template <typename T, size_t S>
 	struct StackArray
 	{
@@ -15,22 +13,6 @@ namespace jlb
 		StackArray(T* src);
 		virtual ~StackArray() = default;
 
-		/// <summary>
-		/// Swaps values at the defined indexes.
-		/// </summary>
-		/// <param name="a">Index A.</param>
-		/// <param name="b">Index B.</param>
-		void Swap(size_t a, size_t b);
-		/// <summary>
-		/// Copy the data from the source into this array.
-		/// </summary>
-		/// <param name="begin">Begin index.</param>
-		/// <param name="end">End index.</param>
-		/// <param name="src">Source data.</param>
-		void Copy(size_t begin, size_t end, T* src);
-		/// <summary>
-		/// Get a raw pointer to the managed memory.
-		/// </summary>
 		[[nodiscard]] T* GetData();
 		[[nodiscard]] static size_t GetLength();
 
@@ -54,21 +36,6 @@ namespace jlb
 	StackArray<T, S>::StackArray(T* src)
 	{
 		memcpy(_memory, src, S * sizeof(T));
-	}
-
-	template <typename T, size_t S>
-	void StackArray<T, S>::Swap(size_t a, size_t b)
-	{
-		assert(a < S && b < S);
-		const T temp = _memory[a];
-		_memory[a] = _memory[b];
-		_memory[b] = temp;
-	}
-
-	template <typename T, size_t S>
-	void StackArray<T, S>::Copy(size_t begin, size_t end, T* src)
-	{
-		memcpy(&_memory[begin], src, (end - begin) * sizeof(T));
 	}
 
 	template <typename T, size_t S>

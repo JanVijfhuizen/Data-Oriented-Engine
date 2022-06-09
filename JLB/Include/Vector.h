@@ -4,7 +4,7 @@
 
 namespace jlb
 {
-	// Unordered vector.
+	// Unordered vector that has ownership over the memory it uses.
 	template <typename T>
 	class Vector : public Array<T>
 	{
@@ -21,7 +21,7 @@ namespace jlb
 		// Cannot exceed the capacity of the managed memory.
 		void SetCount(size_t count);
 
-		ArrayView<T> GetView() const override;
+		[[nodiscard]] ArrayView<T> GetView() const override;
 
 	private:
 		// The amount of values in this vector.

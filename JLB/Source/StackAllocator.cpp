@@ -41,7 +41,7 @@ namespace jlb
 
 		Allocation<void> allocation{};
 		allocation.ptr = &_data[_current];
-		allocation.id.id = _id++;
+		allocation.id.index = _id++;
 		allocation.id.src = _data;
 		_current += chunkSize + 1;
 		_data[_current - 1] = chunkSize + 1;
@@ -82,7 +82,7 @@ namespace jlb
 	{
 		if (_data != allocation.src)
 			return _next->MFree(allocation);
-		assert(_id == allocation.id + 1);
+		assert(_id == allocation.index + 1);
 
 		MFreeUnsafe(allocation.src);
 	}

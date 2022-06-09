@@ -161,7 +161,6 @@
     <ClInclude Include="Include\Iterator.h" />
     <ClInclude Include="Include\KeyPair.h" />
     <ClInclude Include="Include\JlbMath.h" />
-    <ClInclude Include="Include\Stack.h" />
     <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />

@@ -3,9 +3,7 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// Standard iterator for data containers like vectors/arrays.
-	/// </summary>
+	// Standard iterator for data containers like vectors/arrays.
 	template <typename T>
 	class Iterator final
 	{

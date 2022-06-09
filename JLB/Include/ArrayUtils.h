@@ -3,11 +3,16 @@
 
 namespace jlb
 {
-	/// Swaps values at the defined indexes in the given array.
+	template <typename T>
+	void Swap(ArrayView<T> view, size_t a, size_t b);
+
+	template <typename T>
+	void Copy(ArrayView<T> view, size_t begin, size_t end, T* src);
+
 	template <typename T>
 	void Swap(const ArrayView<T> view, const size_t a, const size_t b)
 	{
-		assert(a < view.length && b < view.length);
+		assert(a < view.length&& b < view.length);
 		const T temp = view.data[a];
 		view.data[a] = view.data[b];
 		view.data[b] = temp;

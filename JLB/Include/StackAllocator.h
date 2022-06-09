@@ -4,9 +4,7 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// Memory allocator that follows a last-in-first-out policy to optimize memory usage.
-	/// </summary>
+	// Memory allocator that follows a last-in-first-out policy to optimize memory usage.
 	class StackAllocator final
 	{
 	public:

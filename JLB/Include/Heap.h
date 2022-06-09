@@ -5,9 +5,7 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// Binary tree that can be used to quickly sort data based on the key value.
-	/// </summary>
+	// Binary tree that can be used to quickly sort data based on the key value.
 	template <typename T>
 	class Heap
 	{

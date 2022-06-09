@@ -4,9 +4,7 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// Data container that that prioritizes quick lookup speed.
-	/// </summary>
+	// Data container that that prioritizes quick lookup speed.
 	template <typename T>
 	class HashMap
 	{

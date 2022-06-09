@@ -3,9 +3,7 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// Basic structure to hold both a key and a value.
-	/// </summary>
+	// Basic structure which holds a key and a value.
 	template <typename T>
 	struct KeyPair final
 	{

@@ -15,7 +15,7 @@ namespace jlb
 
 		ArrayView() = default;
 		// ReSharper disable once CppNonExplicitConvertingConstructor
-		ArrayView(T& singleValue);
+		ArrayView(T& instance);
 		ArrayView(T* data, size_t length);
 
 		[[nodiscard]] T& operator[](size_t index) const;
@@ -26,7 +26,7 @@ namespace jlb
 	};
 
 	template <typename T>
-	ArrayView<T>::ArrayView(T& singleValue) : data(&singleValue), length(1)
+	ArrayView<T>::ArrayView(T& instance) : data(&instance), length(1)
 	{
 		
 	}
