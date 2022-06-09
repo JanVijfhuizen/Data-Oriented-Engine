@@ -2,12 +2,12 @@
 #include "Game.h"
 #include "GameState.h"
 #include "Systems/CollisionSystem.h"
-#include "Archetypes/CursorArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/TextRenderSystem.h"
 #include "Archetypes/WallArchetype.h"
 #include "Systems/LineRenderSystem.h"
+#include "Systems/AnimationSystem.h"
 
 namespace game
 {
@@ -18,7 +18,7 @@ namespace game
 
 	void OnMouseInput(const int key, const int action)
 	{
-		CursorArchetype::OnMouseKeyInput(key, action, *gameState.chain.Get<CursorArchetype>());
+		
 	}
 
 	void DefineUsage(const EngineOutData& outData)
@@ -37,14 +37,13 @@ namespace game
 		// Set up game world.
 		chain.Get<CameraArchetype>()->Add();
 		chain.Get<PlayerArchetype>()->Add();
-		chain.Get<CursorArchetype>()->Add();
 		auto& wall = gameState.chain.Get<WallArchetype>()->Add();
 		wall.transform.position = { 40, 70 };
 	}
 
 	void GameUpdate(const EngineOutData& outData)
 	{
-		return;
+		//return;
 		static float f = 0;
 		f += outData.deltaTime / 1000;
 
@@ -73,7 +72,6 @@ namespace game
 		chain.Add<CameraArchetype>(outData);
 		chain.Add<PlayerArchetype>(outData);
 		chain.Add<WallArchetype>(outData);
-		chain.Add<CursorArchetype>(outData);
 
 		// Add systems.
 		chain.Add<MovementSystem>(outData);
