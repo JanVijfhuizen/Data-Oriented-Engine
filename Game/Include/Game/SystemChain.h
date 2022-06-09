@@ -87,7 +87,7 @@ namespace game
 	{
 		auto allocation = outData.allocator->New<T>();
 		ISystemChainable* ptr = static_cast<ISystemChainable*>(allocation.ptr);
-		ptr->_src = allocation.src;
+		ptr->_src = allocation.id.src;
 		ptr->_typeName = typeid(T).name();
 		if(_head)
 			_head->_previous = ptr;

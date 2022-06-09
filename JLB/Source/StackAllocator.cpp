@@ -22,7 +22,7 @@ namespace jlb
 		delete[] _data;
 	}
 
-	StackAllocator::Allocation<void> StackAllocator::Malloc(const size_t size)
+	Allocation<void> StackAllocator::Malloc(const size_t size)
 	{
 		const size_t chunkSize = ToChunkSize(size);
 
@@ -41,8 +41,8 @@ namespace jlb
 
 		Allocation<void> allocation{};
 		allocation.ptr = &_data[_current];
-		allocation.id = _id++;
-		allocation.src = _data;
+		allocation.id.id = _id++;
+		allocation.id.src = _data;
 		_current += chunkSize + 1;
 		_data[_current - 1] = chunkSize + 1;
 		return allocation;
@@ -76,5 +76,14 @@ namespace jlb
 	size_t StackAllocator::ToChunkSize(const size_t size)
 	{
 		return size / sizeof(size_t) + (size % sizeof(size_t) > 0);
+	}
+
+	void StackAllocator::MFree(const AllocationID& allocation)
+	{
+		if (_data != allocation.src)
+			return _next->MFree(allocation);
+		assert(_id == allocation.id + 1);
+
+		MFreeUnsafe(allocation.src);
 	}
 }

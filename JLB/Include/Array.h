@@ -69,7 +69,7 @@ namespace jlb
 		[[nodiscard]] operator ArrayView<T>() const;
 
 	private:
-		StackAllocator::Allocation<T> _allocation{};
+		Allocation<T> _allocation{};
 		size_t _length = 0;
 	};
 
@@ -89,7 +89,7 @@ namespace jlb
 	template <typename T>
 	void Array<T>::Allocate(StackAllocator& allocator, const size_t size, const T& fillValue)
 	{
-		assert(!_allocation);
+		assert(!_allocation.id);
 
 		_allocation = allocator.New<T>(size);
 		_length = size;
@@ -110,9 +110,9 @@ namespace jlb
 	template <typename T>
 	void Array<T>::Free(StackAllocator& allocator)
 	{
-		if (!_allocation)
+		if (!_allocation.id)
 			return;
-		allocator.MFree(_allocation);
+		allocator.MFree(_allocation.id);
 		_allocation = {};
 	}
 
