@@ -5,9 +5,8 @@ namespace jlb
 {
 	// Standard iterator for data containers like vectors/arrays.
 	template <typename T>
-	class Iterator final
+	struct Iterator final
 	{
-	public:
 		// Start of iteration.
 		T* memory = nullptr;
 		// Length of iteration.
@@ -24,7 +23,7 @@ namespace jlb
 		friend bool operator==(const Iterator& a, const Iterator& b)
 		{
 			return a.index == b.index;
-		};
+		}
 
 		friend bool operator!= (const Iterator& a, const Iterator& b)
 		{
