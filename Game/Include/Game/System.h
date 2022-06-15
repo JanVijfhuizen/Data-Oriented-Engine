@@ -7,7 +7,7 @@ namespace game
 	struct SystemInfo final
 	{
 		SystemManager* manager = nullptr;
-		EngineOutData* engineOutData = nullptr;
+		EngineOutData const* engineOutData = nullptr;
 	};
 
 	class System

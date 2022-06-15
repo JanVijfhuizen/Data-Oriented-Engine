@@ -67,6 +67,9 @@ namespace game
 
 	void Start(const EngineOutData outData)
 	{
+		auto& systems = gameState.systems;
+		systems.Allocate(*outData.allocator, 6);
+
 		// Add archetypes.
 		auto& chain = gameState.chain;
 		chain.Add<CameraArchetype>(outData);
@@ -86,13 +89,16 @@ namespace game
 
 		// Start the game.
 		chain.Awake(outData);
+		systems.Awake(outData);
 		GameStart(outData);
 		chain.Start(outData);
+		systems.Start(outData);
 	}
 
 	EngineInData Update(const EngineOutData outData)
 	{
 		GameUpdate(outData);
+		gameState.systems.Update(outData);
 		gameState.chain.Update(outData);
 
 		EngineInData inData{};
@@ -107,5 +113,6 @@ namespace game
 	void Exit(const EngineOutData outData)
 	{
 		gameState.chain.Free(outData);
+		gameState.systems.Free(outData);
 	}
 }

@@ -10,11 +10,11 @@ namespace game
 	{
 	public:
 		void Allocate(jlb::StackAllocator& allocator, size_t length = 0);
-		void Free(jlb::StackAllocator& allocator);
+		void Free(const EngineOutData& outData);
 
-		void Awake(EngineOutData& outData);
-		void Start(EngineOutData& outData);
-		void Update(EngineOutData& outData);
+		void Awake(const EngineOutData& outData);
+		void Start(const EngineOutData& outData);
+		void Update(const EngineOutData& outData);
 
 		template <typename T>
 		void CreateSystem(jlb::StackAllocator& allocator);
@@ -27,7 +27,7 @@ namespace game
 		jlb::Vector<System*> _vector{};
 		jlb::Vector<jlb::AllocationID> _allocations{};
 
-		[[nodiscard]] SystemInfo GetSystemInfo(EngineOutData& outData);
+		[[nodiscard]] SystemInfo GetSystemInfo(const EngineOutData& outData);
 	};
 
 	template <typename T>

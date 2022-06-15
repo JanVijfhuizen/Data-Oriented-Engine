@@ -10,39 +10,45 @@ namespace game
 		_vector.Allocate(allocator, length);
 	}
 
-	void SystemManager::Free(jlb::StackAllocator& allocator)
+	void SystemManager::Free(const EngineOutData& outData)
 	{
+		auto& allocator = *outData.allocator;
+		auto info = GetSystemInfo(outData);
+
 		_vector.Free(allocator);
 		_map.Free(allocator);
 
-		for (int32_t i = _allocations.GetLength() - 1; i >= 0; --i)
+		for (int32_t i = _vector.GetCount() - 1; i >= 0; --i)
+		{
+			_vector[i]->Free(info);
 			allocator.MFree(_allocations[i]);
+		}
 
 		_allocations.Free(allocator);
 	}
 
-	void SystemManager::Awake(EngineOutData& outData)
+	void SystemManager::Awake(const EngineOutData& outData)
 	{
 		auto info = GetSystemInfo(outData);
 		for (auto& sys : _vector)
 			sys->Awake(info);
 	}
 
-	void SystemManager::Start(EngineOutData& outData)
+	void SystemManager::Start(const EngineOutData& outData)
 	{
 		auto info = GetSystemInfo(outData);
 		for (auto& sys : _vector)
 			sys->Start(info);
 	}
 
-	void SystemManager::Update(EngineOutData& outData)
+	void SystemManager::Update(const EngineOutData& outData)
 	{
 		auto info = GetSystemInfo(outData);
 		for (auto& sys : _vector)
 			sys->Update(info);
 	}
 
-	SystemInfo SystemManager::GetSystemInfo(EngineOutData& outData)
+	SystemInfo SystemManager::GetSystemInfo(const EngineOutData& outData)
 	{
 		SystemInfo info{};
 		info.engineOutData = &outData;
