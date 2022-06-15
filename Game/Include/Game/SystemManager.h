@@ -1,21 +1,20 @@
 ﻿#pragma once
-#include "HashMap.h"
 #include "System.h"
 #include "Vector.h"
+#include "Map.h"
+#include <vcruntime_typeinfo.h>
 
 namespace game
 {
-	struct SystemManagerCreateInfo final
-	{
-		jlb::StackAllocator* allocator = nullptr;
-		size_t length = 0;
-	};
-
 	class SystemManager final
 	{
 	public:
-		void Allocate(jlb::StackAllocator& allocator, const SystemManagerCreateInfo& info);
+		void Allocate(jlb::StackAllocator& allocator, size_t length = 0);
 		void Free(jlb::StackAllocator& allocator);
+
+		void Awake(EngineOutData& outData);
+		void Start(EngineOutData& outData);
+		void Update(EngineOutData& outData);
 
 		template <typename T>
 		void CreateSystem(jlb::StackAllocator& allocator);
@@ -24,8 +23,11 @@ namespace game
 		[[nodiscard]] T& Get();
 
 	private:
-		jlb::HashMap<System*> _systems{};
+		jlb::Map<System*> _map{};
+		jlb::Vector<System*> _vector{};
 		jlb::Vector<jlb::AllocationID> _allocations{};
+
+		[[nodiscard]] SystemInfo GetSystemInfo(EngineOutData& outData);
 	};
 
 	template <typename T>
@@ -34,13 +36,14 @@ namespace game
 		assert(_allocations.GetCount() < _allocations.GetLength());
 
 		auto allocation = allocator.New<T>();
-		_systems.Insert(allocation.ptr);
+		_map.Insert(allocation.ptr, typeid(T).hash_code());
+		_vector.Add(allocation.ptr);
 		_allocations.Add(allocation.id);
 	}
 
 	template <typename T>
 	T& SystemManager::Get()
 	{
-		return _systems[typeid(T)];
+		return *_map.Contains(typeid(T).hash_code());
 	}
 }

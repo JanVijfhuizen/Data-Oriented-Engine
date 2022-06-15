@@ -12,7 +12,14 @@ namespace game
 
 	class System
 	{
+		friend SystemManager;
+
+	protected:
 		virtual void Allocate(SystemInfo& info) = 0;
 		virtual void Free(SystemInfo& info) = 0;
+
+		virtual void Awake(SystemInfo& info) = 0;
+		virtual void Start(SystemInfo& info) = 0;
+		virtual void Update(SystemInfo& info) = 0;
 	};
 }
