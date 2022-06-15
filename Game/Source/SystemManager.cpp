@@ -15,15 +15,14 @@ namespace game
 		auto& allocator = *outData.allocator;
 		auto info = GetSystemInfo(outData);
 
-		_vector.Free(allocator);
-		_map.Free(allocator);
-
 		for (int32_t i = _vector.GetCount() - 1; i >= 0; --i)
 		{
 			_vector[i]->Free(info);
 			allocator.MFree(_allocations[i]);
 		}
 
+		_vector.Free(allocator);
+		_map.Free(allocator);
 		_allocations.Free(allocator);
 	}
 

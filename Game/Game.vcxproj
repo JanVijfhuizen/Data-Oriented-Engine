@@ -194,6 +194,7 @@
     <ClInclude Include="Include\Game\Systems\LineRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
+    <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderSystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
@@ -205,7 +206,9 @@
     <ClInclude Include="Include\Game\Utils\Math.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\ResourceManager.cpp" />
     <ClCompile Include="Source\SystemManager.cpp" />
+    <ClCompile Include="Source\Systems\System.cpp" />
     <ClCompile Include="Source\Utils\Math.cpp" />
     <ClCompile Include="Source\Systems\HumanoidBodySystem.cpp" />
     <ClCompile Include="Source\Archetypes\CameraArchetype.cpp" />

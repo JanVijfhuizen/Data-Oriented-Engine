@@ -20,7 +20,7 @@ namespace game
 		void CreateSystem(jlb::StackAllocator& allocator);
 
 		template <typename T>
-		[[nodiscard]] T& Get();
+		[[nodiscard]] T* Get();
 
 	private:
 		jlb::Map<System*> _map{};
@@ -42,8 +42,9 @@ namespace game
 	}
 
 	template <typename T>
-	T& SystemManager::Get()
+	T* SystemManager::Get()
 	{
-		return *_map.Contains(typeid(T).hash_code());
+		System** ptr = _map.Contains(typeid(T).hash_code());
+		return static_cast<T*>(*ptr);
 	}
 }

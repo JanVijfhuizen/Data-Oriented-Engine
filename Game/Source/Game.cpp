@@ -8,6 +8,7 @@
 #include "Archetypes/WallArchetype.h"
 #include "Systems/LineRenderSystem.h"
 #include "Systems/AnimationSystem.h"
+#include "Systems/ResourceManager.h"
 
 namespace game
 {
@@ -69,6 +70,7 @@ namespace game
 	{
 		auto& systems = gameState.systems;
 		systems.Allocate(*outData.allocator, 6);
+		systems.CreateSystem<ResourceManager>(*outData.allocator);
 
 		// Add archetypes.
 		auto& chain = gameState.chain;
