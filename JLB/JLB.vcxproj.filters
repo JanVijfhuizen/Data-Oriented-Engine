@@ -77,5 +77,8 @@
     <ClInclude Include="Include\ArrayUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

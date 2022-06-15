@@ -28,7 +28,7 @@ namespace jlb
 		// Frees the last allocation at the given source, but does not do any additional safety checks.
 		void MFreeUnsafe(size_t* src);
 
-		// Malloc but simplified for allocating types. Does not call constructors.
+		// Malloc but simplified for allocating types.
 		template <typename T>
 		[[nodiscard]] Allocation<T> New(size_t count = 1);
 		[[nodiscard]] bool IsEmpty() const;

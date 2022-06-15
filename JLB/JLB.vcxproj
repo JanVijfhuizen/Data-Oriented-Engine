@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="Include\Allocation.h" />
     <ClInclude Include="Include\ArrayUtils.h" />
+    <ClInclude Include="Include\Map.h" />
     <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
