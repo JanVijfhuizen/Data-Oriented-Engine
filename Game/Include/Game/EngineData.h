@@ -1,7 +1,6 @@
 #pragma once
 #include "ArrayView.h"
 #include "SystemManager.h"
-#include "SystemInfo.h"
 
 namespace jlb
 {
@@ -45,7 +44,7 @@ namespace game
 		uint8_t swapChainImageCount;
 
 		// Manages all the engine's systems.
-		jlb::SystemManager<SystemInfo>* systemManager;
+		jlb::SystemManager<EngineOutData>* systemManager;
 
 		// Amount of time passed since the start of the game. In milliseconds.
 		float time = 0;

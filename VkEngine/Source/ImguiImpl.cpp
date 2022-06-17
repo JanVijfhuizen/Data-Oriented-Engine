@@ -39,7 +39,7 @@ namespace vke
 		//Initialize IMGUI library
 		ImGui::CreateContext();
 
-		ImGui_ImplGlfw_InitForVulkan(windowHandler.GetGLFWWIndow(), true);
+		ImGui_ImplGlfw_InitForVulkan(windowHandler.GetGLFWWindow(), true);
 
 		ImGui_ImplVulkan_InitInfo init_info = {};
 		init_info.Instance = app.instance;

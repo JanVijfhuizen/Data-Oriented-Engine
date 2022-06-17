@@ -200,7 +200,6 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
     <ClInclude Include="Include\Game\SystemChain.h" />
     <ClInclude Include="Include\Game\TaskSystem.h" />
-    <ClInclude Include="Include\Game\SystemInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Systems\HumanoidBodySystem.cpp" />

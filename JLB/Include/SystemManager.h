@@ -6,6 +6,9 @@
 
 namespace jlb
 {
+	/// <summary>
+	/// Manages all systems that can interact with the engine.
+	/// </summary>
 	template <typename T>
 	class SystemManager final
 	{
@@ -16,12 +19,17 @@ namespace jlb
 		void Awake(const T& data);
 		void Start(const T& data);
 		void Update(const T& data);
+		void OnRecreateSwapChainAssets(const T& data);
+		void OnKeyInput(const T& data, int key, int action);
+		void OnMouseInput(const T& data, int key, int action);
+
+		void Exit(const T& data);
 
 		template <typename U>
 		void CreateSystem(StackAllocator& allocator);
 
 		template <typename U>
-		[[nodiscard]] U* Get();
+		[[nodiscard]] U* GetSystem();
 
 	private:
 		Map<System<T>*> _map{};
@@ -55,6 +63,9 @@ namespace jlb
 	void SystemManager<T>::Awake(const T& data)
 	{
 		for (auto& sys : _vector)
+			sys->Allocate(data, *this);
+
+		for (auto& sys : _vector)
 			sys->Awake(data, *this);
 	}
 
@@ -73,6 +84,34 @@ namespace jlb
 	}
 
 	template <typename T>
+	void SystemManager<T>::OnRecreateSwapChainAssets(const T& data)
+	{
+		for (auto& sys : _vector)
+			sys->OnRecreateSwapChainAssets(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::OnKeyInput(const T& data, const int key, const int action)
+	{
+		for (auto& sys : _vector)
+			sys->OnKeyInput(data, *this, key, action);
+	}
+
+	template <typename T>
+	void SystemManager<T>::OnMouseInput(const T& data, const int key, const int action)
+	{
+		for (auto& sys : _vector)
+			sys->OnMouseInput(data, *this, key, action);
+	}
+
+	template <typename T>
+	void SystemManager<T>::Exit(const T& data)
+	{
+		for (auto& sys : _vector)
+			sys->Exit(data, *this);
+	}
+
+	template <typename T>
 	template <typename U>
 	void SystemManager<T>::CreateSystem(StackAllocator& allocator)
 	{
@@ -86,7 +125,7 @@ namespace jlb
 
 	template <typename T>
 	template <typename U>
-	U* SystemManager<T>::Get()
+	U* SystemManager<T>::GetSystem()
 	{
 		System<T>** ptr = _map.Contains(typeid(U).hash_code());
 		return static_cast<U*>(*ptr);

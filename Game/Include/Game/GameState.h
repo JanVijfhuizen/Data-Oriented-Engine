@@ -3,10 +3,10 @@
 
 namespace game
 {
+	// Outdated.
 	inline class GameState final
 	{
 	public:
-		// Outdated.
 		SystemChain chain{};
 	} gameState;
 }

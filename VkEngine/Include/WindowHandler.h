@@ -15,6 +15,7 @@ namespace vke
 			glm::ivec2 resolution{ 800, 600 };
 			jlb::StringView name = "My Window";
 			bool allowResizing = false;
+			game::EngineOutData* outData = nullptr;
 		};
 
 		void Construct(const Info& info);
@@ -55,12 +56,17 @@ namespace vke
 		/// <summary>
 		/// Returns the GLFW window.
 		/// </summary>
-		[[nodiscard]] GLFWwindow* GetGLFWWIndow() const;
+		[[nodiscard]] GLFWwindow* GetGLFWWindow() const;
+		/// <summary>
+		/// Returns the the engine's OutData. Needed for free function callbacks.
+		/// </summary>
+		[[nodiscard]] const game::EngineOutData& GetOutData() const;
 
 	private:
 		GLFWwindow* _window = nullptr;
 		bool _resized = false;
 		glm::ivec2 _resolution{};
+		game::EngineOutData* _outData = nullptr;
 
 		static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 	};

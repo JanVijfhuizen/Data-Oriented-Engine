@@ -7,7 +7,6 @@
 #include <chrono>
 #include "VkRenderer/VkStackAllocator.h"
 #include "SystemManager.h"
-#include "Game/SystemInfo.h"
 
 namespace vke
 {
@@ -23,6 +22,8 @@ namespace vke
 
 	int Engine::Run()
 	{
+		game::EngineOutData outData{};
+
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};
 		allocator.Allocate();
@@ -34,7 +35,8 @@ namespace vke
 		// Set up the window handler.
 		WindowHandler windowHandler{};
 		{
-			const WindowHandler::Info windowCreateInfo{};
+			WindowHandler::Info windowCreateInfo{};
+			windowCreateInfo.outData = &outData;
 			windowHandler.Construct(windowCreateInfo);
 		}
 
@@ -56,12 +58,12 @@ namespace vke
 		vkAllocator.Allocate(app);
 
 		// Set up the systme manager.
-		jlb::SystemManager<game::SystemInfo> systemManager;
+		jlb::SystemManager<game::EngineOutData> systemManager;
 		systemManager.Allocate(allocator, game::GetSystemCount());
 		game::AddSystems(systemManager);
 
 		// Prepare data to be forwarded to the game.
-		game::EngineOutData outData{};
+		
 		outData.allocator = &allocator;
 		outData.tempAllocator = &tempAllocator;
 		outData.vkAllocator = &vkAllocator;
@@ -79,14 +81,9 @@ namespace vke
 		assert(setupAllocator.IsEmpty());
 		setupAllocator.Free();
 
-		game::SystemInfo systemInfo{};
-		systemInfo.engineOutData = &outData;
-
-		systemManager.Awake(systemInfo);
-		systemManager.Start(systemInfo);
-
 		// Start the game.
-		game::Start(outData);
+		systemManager.Awake(outData);
+		systemManager.Start(outData);
 
 		bool quit = false;
 		while (!quit)
@@ -108,7 +105,7 @@ namespace vke
 			{
 				double x;
 				double y;
-				glfwGetCursorPos(windowHandler.GetGLFWWIndow(), &x, &y);
+				glfwGetCursorPos(windowHandler.GetGLFWWindow(), &x, &y);
 				x /= outData.resolution.x;
 				y /= outData.resolution.y;
 				outData.mousePos.x = x;
@@ -116,7 +113,7 @@ namespace vke
 			}
 
 			// Update the game.
-			game::Update(outData);
+			systemManager.Update(outData);
 
 			// Submit for presentation to the screen.
 			const auto presentResult = swapChain.EndFrame(allocator, app);
@@ -127,7 +124,7 @@ namespace vke
 				outData.resolution = swapChain.GetResolution();
 				outData.swapChainRenderPass = swapChain.GetRenderPass();
 				// Let the game know we have recreated the swapchain.
-				game::OnRecreateSwapChainAssets(outData);
+				systemManager.OnRecreateSwapChainAssets(outData);
 			}
 		}
 
@@ -136,10 +133,9 @@ namespace vke
 		assert(!idleResult);
 
 		// Let the game know we're quitting.
-		game::Exit(outData);
-
 		// Free all the systems.
-		systemManager.Free(allocator, systemInfo);
+		systemManager.Exit(outData);
+		systemManager.Free(allocator, outData);
 
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
