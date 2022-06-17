@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../../Ext/glm/vec2.hpp"
+#include <glm/vec2.hpp>
 
 namespace jlb::math
 {
