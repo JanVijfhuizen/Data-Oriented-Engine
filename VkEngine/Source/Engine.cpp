@@ -10,16 +10,6 @@
 
 namespace vke
 {
-	// Path for the version data used for checking/storing memory requirements.
-	const char* VERSION_PATH = 
-#ifdef _DEBUG
-	"version-debug.txt";
-#else
-	"version.txt";
-#endif
-	// Used in release mode to check if the version data needs to be refreshed.
-	constexpr size_t ENGINE_VERSION = 1;
-
 	int Engine::Run()
 	{
 		game::EngineOutData outData{};
