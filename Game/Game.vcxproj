@@ -186,6 +186,7 @@
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureUtils.h" />
     <ClInclude Include="Include\Game\Handlers\ShaderHandler.h" />
+    <ClInclude Include="Include\Game\IResourceLoader.h" />
     <ClInclude Include="Include\Game\System.h" />
     <ClInclude Include="Include\Game\SystemManager.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
@@ -203,13 +204,12 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
     <ClInclude Include="Include\Game\SystemChain.h" />
     <ClInclude Include="Include\Game\TaskSystem.h" />
-    <ClInclude Include="Include\Game\Utils\Math.h" />
+    <ClInclude Include="Include\Game\Resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Systems\ResourceManager.cpp" />
     <ClCompile Include="Source\SystemManager.cpp" />
-    <ClCompile Include="Source\Systems\System.cpp" />
-    <ClCompile Include="Source\Utils\Math.cpp" />
+    <ClCompile Include="Source\System.cpp" />
     <ClCompile Include="Source\Systems\HumanoidBodySystem.cpp" />
     <ClCompile Include="Source\Archetypes\CameraArchetype.cpp" />
     <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />

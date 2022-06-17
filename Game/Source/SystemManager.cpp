@@ -10,10 +10,10 @@ namespace game
 		_vector.Allocate(allocator, length);
 	}
 
-	void SystemManager::Free(const EngineOutData& outData)
+	void SystemManager::Free(const EngineOutData& outData, const GameState& gameState)
 	{
 		auto& allocator = *outData.allocator;
-		auto info = GetSystemInfo(outData);
+		const auto info = GetSystemInfo(outData, gameState);
 
 		for (int32_t i = _vector.GetCount() - 1; i >= 0; --i)
 		{
@@ -26,32 +26,32 @@ namespace game
 		_allocations.Free(allocator);
 	}
 
-	void SystemManager::Awake(const EngineOutData& outData)
+	void SystemManager::Awake(const EngineOutData& outData, const GameState& gameState)
 	{
-		auto info = GetSystemInfo(outData);
+		const auto info = GetSystemInfo(outData, gameState);
 		for (auto& sys : _vector)
 			sys->Awake(info);
 	}
 
-	void SystemManager::Start(const EngineOutData& outData)
+	void SystemManager::Start(const EngineOutData& outData, const GameState& gameState)
 	{
-		auto info = GetSystemInfo(outData);
+		const auto info = GetSystemInfo(outData, gameState);
 		for (auto& sys : _vector)
 			sys->Start(info);
 	}
 
-	void SystemManager::Update(const EngineOutData& outData)
+	void SystemManager::Update(const EngineOutData& outData, const GameState& gameState)
 	{
-		auto info = GetSystemInfo(outData);
+		const auto info = GetSystemInfo(outData, gameState);
 		for (auto& sys : _vector)
 			sys->Update(info);
 	}
 
-	SystemInfo SystemManager::GetSystemInfo(const EngineOutData& outData)
+	SystemInfo SystemManager::GetSystemInfo(const EngineOutData& outData, const GameState& gameState)
 	{
 		SystemInfo info{};
 		info.engineOutData = &outData;
-		info.manager = this;
+		info.gameState = &gameState;
 		return info;
 	}
 }

@@ -2,11 +2,12 @@
 
 namespace game
 {
+	class GameState;
 	class SystemManager;
 
 	struct SystemInfo final
 	{
-		SystemManager* manager = nullptr;
+		GameState const* gameState = nullptr;
 		EngineOutData const* engineOutData = nullptr;
 	};
 
@@ -15,11 +16,11 @@ namespace game
 		friend SystemManager;
 
 	protected:
-		virtual void Allocate(SystemInfo& info) = 0;
-		virtual void Free(SystemInfo& info) = 0;
+		virtual void Allocate(const SystemInfo& info) = 0;
+		virtual void Free(const SystemInfo& info) = 0;
 
-		virtual void Awake(SystemInfo& info);;
-		virtual void Start(SystemInfo& info);;
-		virtual void Update(SystemInfo& info);;
+		virtual void Awake(const SystemInfo& info);;
+		virtual void Start(const SystemInfo& info);;
+		virtual void Update(const SystemInfo& info);;
 	};
 }

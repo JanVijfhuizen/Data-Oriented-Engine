@@ -70,7 +70,6 @@ namespace game
 	{
 		auto& systems = gameState.systems;
 		systems.Allocate(*outData.allocator, 6);
-		systems.CreateSystem<ResourceManager>(*outData.allocator);
 
 		// Add archetypes.
 		auto& chain = gameState.chain;
@@ -91,16 +90,16 @@ namespace game
 
 		// Start the game.
 		chain.Awake(outData);
-		systems.Awake(outData);
+		systems.Awake(outData, gameState);
 		GameStart(outData);
 		chain.Start(outData);
-		systems.Start(outData);
+		systems.Start(outData, gameState);
 	}
 
 	EngineInData Update(const EngineOutData outData)
 	{
 		GameUpdate(outData);
-		gameState.systems.Update(outData);
+		gameState.systems.Update(outData, gameState);
 		gameState.chain.Update(outData);
 
 		EngineInData inData{};
@@ -115,6 +114,6 @@ namespace game
 	void Exit(const EngineOutData outData)
 	{
 		gameState.chain.Free(outData);
-		gameState.systems.Free(outData);
+		gameState.systems.Free(outData, gameState);
 	}
 }
