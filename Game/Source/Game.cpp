@@ -24,6 +24,16 @@ namespace game
 		
 	}
 
+	size_t GetSystemCount()
+	{
+		return 4;
+	}
+
+	void AddSystems(jlb::SystemManager<SystemInfo>& systemManager)
+	{
+
+	}
+
 	void DefineUsage(const EngineOutData& outData)
 	{
 		auto& chain = gameState.chain;
@@ -70,9 +80,6 @@ namespace game
 
 	void Start(const EngineOutData outData)
 	{
-		auto& systems = gameState.systems;
-		systems.Allocate(*outData.allocator, 6);
-
 		// Add archetypes.
 		auto& chain = gameState.chain;
 		chain.Add<CameraArchetype>(outData);
@@ -90,30 +97,16 @@ namespace game
 		DefineUsage(outData);
 		chain.Allocate(outData);
 
-		SystemInfo systemInfo{};
-		systemInfo.engineOutData = &outData;
-		systemInfo.resourceManager = &gameState.resourceManager;
-
 		// Start the game.
 		chain.Awake(outData);
-		systems.Awake(systemInfo);
 		GameStart(outData);
 		chain.Start(outData);
-		systems.Start(systemInfo);
 	}
 
-	EngineInData Update(const EngineOutData outData)
+	void Update(const EngineOutData outData)
 	{
-		SystemInfo systemInfo{};
-		systemInfo.engineOutData = &outData;
-		systemInfo.resourceManager = &gameState.resourceManager;
-
 		GameUpdate(outData);
-		gameState.systems.Update(systemInfo);
 		gameState.chain.Update(outData);
-
-		EngineInData inData{};
-		return inData;
 	}
 
 	void OnRecreateSwapChainAssets(const EngineOutData outData)
@@ -123,11 +116,6 @@ namespace game
 
 	void Exit(const EngineOutData outData)
 	{
-		SystemInfo systemInfo{};
-		systemInfo.engineOutData = &outData;
-		systemInfo.resourceManager = &gameState.resourceManager;
-
 		gameState.chain.Free(outData);
-		gameState.systems.Free(*outData.allocator, systemInfo);
 	}
 }

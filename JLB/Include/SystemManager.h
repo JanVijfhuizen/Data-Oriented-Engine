@@ -4,33 +4,33 @@
 #include "Map.h"
 #include <vcruntime_typeinfo.h>
 
-namespace game
+namespace jlb
 {
 	template <typename T>
 	class SystemManager final
 	{
 	public:
-		void Allocate(jlb::StackAllocator& allocator, size_t length = 0);
-		void Free(jlb::StackAllocator& allocator, const T& data);
+		void Allocate(StackAllocator& allocator, size_t length = 0);
+		void Free(StackAllocator& allocator, const T& data);
 
 		void Awake(const T& data);
 		void Start(const T& data);
 		void Update(const T& data);
 
 		template <typename U>
-		void CreateSystem(jlb::StackAllocator& allocator);
+		void CreateSystem(StackAllocator& allocator);
 
 		template <typename U>
 		[[nodiscard]] U* Get();
 
 	private:
-		jlb::Map<System<T>*> _map{};
-		jlb::Vector<System<T>*> _vector{};
-		jlb::Vector<jlb::AllocationID> _allocations{};
+		Map<System<T>*> _map{};
+		Vector<System<T>*> _vector{};
+		Vector<jlb::AllocationID> _allocations{};
 	};
 
 	template <typename T>
-	void SystemManager<T>::Allocate(jlb::StackAllocator& allocator, size_t length)
+	void SystemManager<T>::Allocate(StackAllocator& allocator, size_t length)
 	{
 		_allocations.Allocate(allocator, length);
 		_map.Allocate(allocator, length);
@@ -38,7 +38,7 @@ namespace game
 	}
 
 	template <typename T>
-	void SystemManager<T>::Free(jlb::StackAllocator& allocator, const T& data)
+	void SystemManager<T>::Free(StackAllocator& allocator, const T& data)
 	{
 		for (int32_t i = _vector.GetCount() - 1; i >= 0; --i)
 		{
@@ -74,7 +74,7 @@ namespace game
 
 	template <typename T>
 	template <typename U>
-	void SystemManager<T>::CreateSystem(jlb::StackAllocator& allocator)
+	void SystemManager<T>::CreateSystem(StackAllocator& allocator)
 	{
 		assert(_allocations.GetCount() < _allocations.GetLength());
 

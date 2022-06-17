@@ -186,15 +186,12 @@
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureUtils.h" />
     <ClInclude Include="Include\Game\Handlers\ShaderHandler.h" />
-    <ClInclude Include="Include\Game\System.h" />
-    <ClInclude Include="Include\Game\SystemManager.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
     <ClInclude Include="Include\Game\Systems\HumanoidBodySystem.h" />
     <ClInclude Include="Include\Game\Systems\LineRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
-    <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderSystem.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
@@ -203,11 +200,9 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
     <ClInclude Include="Include\Game\SystemChain.h" />
     <ClInclude Include="Include\Game\TaskSystem.h" />
-    <ClInclude Include="Include\Game\Resource.h" />
     <ClInclude Include="Include\Game\SystemInfo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Systems\ResourceManager.cpp" />
     <ClCompile Include="Source\Systems\HumanoidBodySystem.cpp" />
     <ClCompile Include="Source\Archetypes\CameraArchetype.cpp" />
     <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />

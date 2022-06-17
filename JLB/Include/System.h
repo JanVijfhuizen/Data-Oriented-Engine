@@ -1,6 +1,6 @@
 #pragma once
 
-namespace game
+namespace jlb
 {
 	class GameState;
 	template <typename T>

@@ -1,5 +1,7 @@
 #pragma once
 #include "ArrayView.h"
+#include "SystemManager.h"
+#include "SystemInfo.h"
 
 namespace jlb
 {
@@ -42,20 +44,14 @@ namespace game
 		// Amount of Vulkan swapchain images.
 		uint8_t swapChainImageCount;
 
+		// Manages all the engine's systems.
+		jlb::SystemManager<SystemInfo>* systemManager;
+
 		// Amount of time passed since the start of the game. In milliseconds.
 		float time = 0;
 		// Duration of the previous frame. In milliseconds.
 		float deltaTime = 0;
 		// Mouse position.
 		glm::vec2 mousePos;
-	};
-
-	/// <summary>
-	/// Data passed from the game into the engine.
-	/// </summary>
-	struct EngineInData final
-	{
-		// The swapchain will wait before submitting until these semaphores are done.
-		jlb::ArrayView<VkSemaphore> swapChainWaitSemaphores{};
 	};
 }

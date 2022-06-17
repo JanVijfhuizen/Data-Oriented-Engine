@@ -6,6 +6,8 @@
 #include "Game/EngineData.h"
 #include <chrono>
 #include "VkRenderer/VkStackAllocator.h"
+#include "SystemManager.h"
+#include "Game/SystemInfo.h"
 
 namespace vke
 {
@@ -53,6 +55,11 @@ namespace vke
 		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(app);
 
+		// Set up the systme manager.
+		jlb::SystemManager<game::SystemInfo> systemManager;
+		systemManager.Allocate(allocator, game::GetSystemCount());
+		game::AddSystems(systemManager);
+
 		// Prepare data to be forwarded to the game.
 		game::EngineOutData outData{};
 		outData.allocator = &allocator;
@@ -62,6 +69,7 @@ namespace vke
 		outData.resolution = swapChain.GetResolution();
 		outData.swapChainRenderPass = swapChain.GetRenderPass();
 		outData.swapChainImageCount = swapChain.GetLength();
+		outData.systemManager = &systemManager;
 
 		// Set up a clock.
 		using ms = std::chrono::duration<float, std::milli>;
@@ -70,6 +78,13 @@ namespace vke
 		// Delete the allocations made during the setup step, and make sure everything is properly deallocated.
 		assert(setupAllocator.IsEmpty());
 		setupAllocator.Free();
+
+		game::SystemInfo systemInfo{};
+		systemInfo.engineOutData = &outData;
+
+		systemManager.Awake(systemInfo);
+		systemManager.Start(systemInfo);
+
 		// Start the game.
 		game::Start(outData);
 
@@ -101,10 +116,10 @@ namespace vke
 			}
 
 			// Update the game.
-			auto inData = game::Update(outData);
+			game::Update(outData);
 
 			// Submit for presentation to the screen.
-			const auto presentResult = swapChain.EndFrame(allocator, app, inData.swapChainWaitSemaphores);
+			const auto presentResult = swapChain.EndFrame(allocator, app);
 			// Recreate the swapchain if the swapchain is inadequate/outdated, or if we're in a testrun.
 			if (presentResult)
 			{
@@ -122,6 +137,10 @@ namespace vke
 
 		// Let the game know we're quitting.
 		game::Exit(outData);
+
+		// Free all the systems.
+		systemManager.Free(allocator, systemInfo);
+
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
 
