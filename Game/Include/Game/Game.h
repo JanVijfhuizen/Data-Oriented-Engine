@@ -11,5 +11,5 @@
 
 namespace game
 {
-	extern "C" GAME_API void DefineSystems(jlb::Systems<EngineOutData>& systems);
+	extern "C" GAME_API void DefineSystems(jlb::Systems<EngineData>& systems);
 }

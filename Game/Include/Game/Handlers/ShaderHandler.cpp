@@ -7,11 +7,11 @@
 
 namespace game 
 {
-	Shader ShaderHandler::Create(const EngineOutData& outData,
+	Shader ShaderHandler::Create(const EngineData& EngineData,
 		const jlb::StringView vertPath, const jlb::StringView fragPath)
 	{
-		auto& logicalDevice = outData.app->logicalDevice;
-		auto& tempAllocator = *outData.tempAllocator;
+		auto& logicalDevice = EngineData.app->logicalDevice;
+		auto& tempAllocator = *EngineData.tempAllocator;
 
 		auto vert = jlb::file::Read(tempAllocator, vertPath);
 		auto frag = jlb::file::Read(tempAllocator, fragPath);
@@ -39,9 +39,9 @@ namespace game
 		return shader;
 	}
 
-	void ShaderHandler::Destroy(const EngineOutData& outData, const Shader& shader)
+	void ShaderHandler::Destroy(const EngineData& EngineData, const Shader& shader)
 	{
-		vkDestroyShaderModule(outData.app->logicalDevice, shader.vert, nullptr);
-		vkDestroyShaderModule(outData.app->logicalDevice, shader.frag, nullptr);
+		vkDestroyShaderModule(EngineData.app->logicalDevice, shader.vert, nullptr);
+		vkDestroyShaderModule(EngineData.app->logicalDevice, shader.frag, nullptr);
 	}
 }

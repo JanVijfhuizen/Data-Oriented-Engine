@@ -13,8 +13,8 @@ namespace vke
 	int Engine::Run()
 	{
 		// Create them here so that other objects can reference them.
-		game::EngineOutData outData{};
-		jlb::SystemManager<game::EngineOutData> systemManager;
+		game::EngineData outData{};
+		jlb::SystemManager<game::EngineData> systemManager;
 
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};
@@ -29,7 +29,7 @@ namespace vke
 		{
 			WindowHandler::Info windowCreateInfo{};
 			windowCreateInfo.systemManager = &systemManager;
-			windowCreateInfo.outData = &outData;
+			windowCreateInfo.engineData = &outData;
 			windowHandler.Allocate(windowCreateInfo);
 		}
 
@@ -52,7 +52,7 @@ namespace vke
 
 		// Set up the systme manager.
 		
-		auto systems = systemManager.CreateProxy();
+		auto systems = systemManager.CreateProxy(allocator, tempAllocator, outData);
 		game::DefineSystems(systems);
 		systemManager.Allocate(allocator, tempAllocator);
 

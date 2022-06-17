@@ -51,7 +51,7 @@ namespace vke
 		glfwSetFramebufferSizeCallback(_window, FramebufferResizeCallback);
 		_resolution = info.resolution;
 		_systemManager = info.systemManager;
-		_outData = info.outData;
+		_outData = info.engineData;
 
 		// Set input callback.
 		glfwSetKeyCallback(_window, GLFWKeyCallback);
@@ -136,12 +136,12 @@ namespace vke
 		return _window;
 	}
 
-	jlb::SystemManager<game::EngineOutData>& WindowHandler::GetSystemManager() const
+	jlb::SystemManager<game::EngineData>& WindowHandler::GetSystemManager() const
 	{
 		return *_systemManager;
 	}
 
-	const game::EngineOutData& WindowHandler::GetOutData() const
+	const game::EngineData& WindowHandler::GetOutData() const
 	{
 		return *_outData;
 	}

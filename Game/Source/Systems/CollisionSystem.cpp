@@ -24,18 +24,18 @@ namespace game
 			_requestedStaticSize += size;
 	}
 
-	void CollisionSystem::Allocate(const EngineOutData& outData, SystemChain& chain)
+	void CollisionSystem::Allocate(const EngineData& EngineData, SystemChain& chain)
 	{
-		TaskSystem<DynamicCollisionTask>::Allocate(outData, chain);
-		_statics.Allocate(*outData.allocator, _requestedStaticSize);
-		_validChecks.Allocate(*outData.allocator, GetRequestedLength());
+		TaskSystem<DynamicCollisionTask>::Allocate(EngineData, chain);
+		_statics.Allocate(*EngineData.allocator, _requestedStaticSize);
+		_validChecks.Allocate(*EngineData.allocator, GetRequestedLength());
 	}
 
-	void CollisionSystem::Free(const EngineOutData& outData, SystemChain& chain)
+	void CollisionSystem::Free(const EngineData& EngineData, SystemChain& chain)
 	{
-		_validChecks.Free(*outData.allocator);
-		_statics.Free(*outData.allocator);
-		TaskSystem<DynamicCollisionTask>::Free(outData, chain);
+		_validChecks.Free(*EngineData.allocator);
+		_statics.Free(*EngineData.allocator);
+		TaskSystem<DynamicCollisionTask>::Free(EngineData, chain);
 	}
 
 	void CollisionSystem::AddStatic(StaticCollisionTask& task)
@@ -48,7 +48,7 @@ namespace game
 		_statics.SetCount(0);
 	}
 
-	void CollisionSystem::Update(const EngineOutData& outData, SystemChain& chain)
+	void CollisionSystem::Update(const EngineData& EngineData, SystemChain& chain)
 	{
 		const size_t count = GetCount();
 

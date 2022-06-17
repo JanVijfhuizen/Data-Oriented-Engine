@@ -21,6 +21,6 @@ namespace game
 	private:
 		float _frame = FLT_MAX;
 
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineData& EngineData, SystemChain& chain) override;
 	};
 }

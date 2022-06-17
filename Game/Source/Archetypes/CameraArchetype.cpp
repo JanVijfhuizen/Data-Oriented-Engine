@@ -3,7 +3,7 @@
 
 namespace game
 {
-	CameraUpdateInfo CameraArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
+	CameraUpdateInfo CameraArchetype::OnPreEntityUpdate(const EngineData& EngineData, SystemChain& chain)
 	{
 		return {};
 	}

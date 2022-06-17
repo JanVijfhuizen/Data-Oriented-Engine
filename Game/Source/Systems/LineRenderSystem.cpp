@@ -11,33 +11,33 @@
 
 namespace game
 {
-	void LineRenderSystem::Allocate(const EngineOutData& outData, SystemChain& chain)
+	void LineRenderSystem::Allocate(const EngineData& EngineData, SystemChain& chain)
 	{
-		TaskSystem<LineRenderTask>::Allocate(outData, chain);
-		_shader = ShaderHandler::Create(outData, "Shaders/debug-vert.spv","Shaders/debug-frag.spv");
+		TaskSystem<LineRenderTask>::Allocate(EngineData, chain);
+		_shader = ShaderHandler::Create(EngineData, "Shaders/debug-vert.spv","Shaders/debug-frag.spv");
 
 		// Create mesh.
 		jlb::StackArray<int, 2> vertices{};
 		vertices[0] = 0;
 		vertices[1] = 1;
-		_vertexBuffer = mesh::CreateBuffer<int>(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-		CreateShaderAssets(outData);
+		_vertexBuffer = mesh::CreateBuffer<int>(EngineData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		CreateShaderAssets(EngineData);
 	}
 
-	void LineRenderSystem::Free(const EngineOutData& outData, SystemChain& chain)
+	void LineRenderSystem::Free(const EngineData& EngineData, SystemChain& chain)
 	{
-		DestroyShaderAssets(outData);
-		FreeBuffer(outData, _vertexBuffer);
-		ShaderHandler::Destroy(outData, _shader);
-		TaskSystem<LineRenderTask>::Free(outData, chain);
+		DestroyShaderAssets(EngineData);
+		FreeBuffer(EngineData, _vertexBuffer);
+		ShaderHandler::Destroy(EngineData, _shader);
+		TaskSystem<LineRenderTask>::Free(EngineData, chain);
 	}
 
-	void LineRenderSystem::Update(const EngineOutData& outData, SystemChain& chain)
+	void LineRenderSystem::Update(const EngineData& EngineData, SystemChain& chain)
 	{
-		auto& cmd = outData.swapChainCommandBuffer;
+		auto& cmd = EngineData.swapChainCommandBuffer;
 
-		auto& logicalDevice = outData.app->logicalDevice;
-		auto& memBlock = _instanceBuffers[outData.swapChainImageIndex].memBlock;
+		auto& logicalDevice = EngineData.app->logicalDevice;
+		auto& memBlock = _instanceBuffers[EngineData.swapChainImageIndex].memBlock;
 		void* instanceData;
 		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
 		assert(!result);
@@ -47,14 +47,14 @@ namespace game
 		VkDeviceSize offset = 0;
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
 		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-			0, 1, &_descriptorSets[outData.swapChainImageIndex], 0, nullptr);
+			0, 1, &_descriptorSets[EngineData.swapChainImageIndex], 0, nullptr);
 		vkCmdBindVertexBuffers(cmd, 0, 1, &_vertexBuffer.buffer, &offset);
 
 		auto& cameras = *chain.Get<CameraArchetype>();
 		for (const auto& camera : cameras)
 		{
 			PushConstants pushConstant{};
-			pushConstant.resolution = outData.resolution;
+			pushConstant.resolution = EngineData.resolution;
 			pushConstant.camera = camera;
 
 			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
@@ -63,15 +63,15 @@ namespace game
 		SetCount(0);
 	}
 
-	void LineRenderSystem::CreateShaderAssets(const EngineOutData& outData)
+	void LineRenderSystem::CreateShaderAssets(const EngineData& EngineData)
 	{
-		auto& app = *outData.app;
-		auto& allocator = *outData.allocator;
-		auto& tempAllocator = *outData.tempAllocator;
+		auto& app = *EngineData.app;
+		auto& allocator = *EngineData.allocator;
+		auto& tempAllocator = *EngineData.tempAllocator;
 		auto& logicalDevice = app.logicalDevice;
-		const size_t swapChainImageCount = outData.swapChainImageCount;
+		const size_t swapChainImageCount = EngineData.swapChainImageCount;
 
-		_instanceBuffers = instancing::CreateStorageBuffers<LineRenderTask>(outData, GetLength());
+		_instanceBuffers = instancing::CreateStorageBuffers<LineRenderTask>(EngineData, GetLength());
 
 		// Create descriptor layout.
 		layout::Info::Binding binding{};
@@ -81,7 +81,7 @@ namespace game
 
 		layout::Info descriptorLayoutInfo{};
 		descriptorLayoutInfo.bindings = binding;
-		_descriptorLayout = layout::Create(outData, descriptorLayoutInfo);
+		_descriptorLayout = layout::Create(EngineData, descriptorLayoutInfo);
 
 		// Create descriptor pool.
 		VkDescriptorPoolSize poolSize;
@@ -135,25 +135,25 @@ namespace game
 		}
 	}
 
-	void LineRenderSystem::DestroyShaderAssets(const EngineOutData& outData)
+	void LineRenderSystem::DestroyShaderAssets(const EngineData& EngineData)
 	{
-		auto& app = *outData.app;
+		auto& app = *EngineData.app;
 		auto& logicalDevice = app.logicalDevice;
-		auto& allocator = *outData.allocator;
+		auto& allocator = *EngineData.allocator;
 
 		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(logicalDevice, _descriptorLayout, nullptr);
-		_descriptorSets.Free(*outData.allocator);
+		_descriptorSets.Free(*EngineData.allocator);
 
-		for (int32_t i = outData.swapChainImageCount - 1; i >= 0; --i)
-			FreeBuffer(outData, _instanceBuffers[i]);
+		for (int32_t i = EngineData.swapChainImageCount - 1; i >= 0; --i)
+			FreeBuffer(EngineData, _instanceBuffers[i]);
 
 		_instanceBuffers.Free(allocator);
 	}
 
-	void LineRenderSystem::CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain)
+	void LineRenderSystem::CreateSwapChainAssets(const EngineData& EngineData, SystemChain& chain)
 	{
-		TaskSystem<LineRenderTask>::CreateSwapChainAssets(outData, chain);
+		TaskSystem<LineRenderTask>::CreateSwapChainAssets(EngineData, chain);
 		jlb::StackArray<pipeline::Info::Module, 2> modules{};
 		modules[0].module = _shader.vert;
 		modules[0].flags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -174,24 +174,24 @@ namespace game
 		pipeline::Info pipelineInfo{};
 		pipelineInfo.vertInputAttribDescriptions = attributeDescription;
 		pipelineInfo.vertInputBindingDescriptions = bindingDescription;
-		pipelineInfo.resolution = outData.resolution;
+		pipelineInfo.resolution = EngineData.resolution;
 		pipelineInfo.modules = modules;
-		pipelineInfo.renderPass = outData.swapChainRenderPass;
+		pipelineInfo.renderPass = EngineData.swapChainRenderPass;
 		pipelineInfo.layouts = _descriptorLayout;
 		pipelineInfo.pushConstantSize = sizeof(PushConstants);
 		pipelineInfo.usePushConstant = true;
 		pipelineInfo.topologyType = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
-		pipeline::Create(outData, pipelineInfo, _pipelineLayout, _pipeline);
+		pipeline::Create(EngineData, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
-	void LineRenderSystem::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)
+	void LineRenderSystem::DestroySwapChainAssets(const EngineData& EngineData, SystemChain& chain)
 	{
-		auto& logicalDevice = outData.app->logicalDevice;
+		auto& logicalDevice = EngineData.app->logicalDevice;
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
 
-		TaskSystem<LineRenderTask>::DestroySwapChainAssets(outData, chain);
+		TaskSystem<LineRenderTask>::DestroySwapChainAssets(EngineData, chain);
 	}
 }

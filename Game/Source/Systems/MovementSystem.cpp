@@ -5,10 +5,10 @@
 
 namespace game
 {
-	void MovementSystem::Update(const EngineOutData& outData, SystemChain& chain)
+	void MovementSystem::Update(const EngineData& EngineData, SystemChain& chain)
 	{
 		auto collisionSystem = chain.Get<CollisionSystem>();
-		const float dt = outData.deltaTime;
+		const float dt = EngineData.deltaTime;
 
 		for (const auto& task : *this)
 		{

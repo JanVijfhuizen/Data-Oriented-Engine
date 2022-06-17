@@ -3,19 +3,19 @@
 
 namespace game
 {
-	void ISystemChainable::Awake(const EngineOutData& outData, SystemChain& chain)
+	void ISystemChainable::Awake(const EngineData& EngineData, SystemChain& chain)
 	{
 	}
 
-	void ISystemChainable::Start(const EngineOutData& outData, SystemChain& chain)
+	void ISystemChainable::Start(const EngineData& EngineData, SystemChain& chain)
 	{
 	}
 
-	void ISystemChainable::CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain)
+	void ISystemChainable::CreateSwapChainAssets(const EngineData& EngineData, SystemChain& chain)
 	{
 	}
 
-	void ISystemChainable::DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain)
+	void ISystemChainable::DestroySwapChainAssets(const EngineData& EngineData, SystemChain& chain)
 	{
 	}
 
@@ -50,50 +50,50 @@ namespace game
 		return *_ptr;
 	}
 
-	void SystemChain::Allocate(const EngineOutData& outData)
+	void SystemChain::Allocate(const EngineData& EngineData)
 	{
-		ReverseExecute(&ISystemChainable::Allocate, outData);
+		ReverseExecute(&ISystemChainable::Allocate, EngineData);
 	}
 
-	void SystemChain::Free(const EngineOutData& outData)
+	void SystemChain::Free(const EngineData& EngineData)
 	{
 		for (auto& chainable : *this)
-			chainable.DestroySwapChainAssets(outData, *this);
+			chainable.DestroySwapChainAssets(EngineData, *this);
 
 		for (auto& chainable : *this)
-			chainable.Free(outData, *this);
+			chainable.Free(EngineData, *this);
 
 		ISystemChainable* current = _head;
 		while (current)
 		{
 			ISystemChainable* next = current->_next;
-			outData.allocator->MFreeUnsafe(current->_src);
+			EngineData.allocator->MFreeUnsafe(current->_src);
 			current = next;
 		}
 	}
 
-	void SystemChain::Awake(const EngineOutData& outData)
+	void SystemChain::Awake(const EngineData& EngineData)
 	{
-		ReverseExecute(&ISystemChainable::CreateSwapChainAssets, outData);
-		ReverseExecute(&ISystemChainable::Awake, outData);
+		ReverseExecute(&ISystemChainable::CreateSwapChainAssets, EngineData);
+		ReverseExecute(&ISystemChainable::Awake, EngineData);
 	}
 
-	void SystemChain::Start(const EngineOutData& outData)
+	void SystemChain::Start(const EngineData& EngineData)
 	{
-		ReverseExecute(&ISystemChainable::Start, outData);
+		ReverseExecute(&ISystemChainable::Start, EngineData);
 	}
 
-	void SystemChain::Update(const EngineOutData& outData)
+	void SystemChain::Update(const EngineData& EngineData)
 	{
-		ReverseExecute(&ISystemChainable::Update, outData);
+		ReverseExecute(&ISystemChainable::Update, EngineData);
 	}
 
-	void SystemChain::RecreateSwapChainAssets(const EngineOutData& outData)
+	void SystemChain::RecreateSwapChainAssets(const EngineData& EngineData)
 	{
 		for (auto& chain : *this)
 		{
-			chain.DestroySwapChainAssets(outData, *this);
-			chain.CreateSwapChainAssets(outData, *this);
+			chain.DestroySwapChainAssets(EngineData, *this);
+			chain.CreateSwapChainAssets(EngineData, *this);
 		}
 	}
 
@@ -107,7 +107,7 @@ namespace game
 		return nullptr;
 	}
 
-	void SystemChain::ReverseExecute(void(ISystemChainable::* ptr)(const EngineOutData&, SystemChain&), const EngineOutData& outData)
+	void SystemChain::ReverseExecute(void(ISystemChainable::* ptr)(const EngineData&, SystemChain&), const EngineData& EngineData)
 	{
 		ISystemChainable* current = _head;
 		while (true)
@@ -118,7 +118,7 @@ namespace game
 		}
 		while (current)
 		{
-			(current->*ptr)(outData, *this);
+			(current->*ptr)(EngineData, *this);
 			current = current->_previous;
 		}
 	}

@@ -16,8 +16,8 @@ namespace vke
 			jlb::StringView name = "My Window";
 			bool allowResizing = false;
 
-			jlb::SystemManager<game::EngineOutData>* systemManager = nullptr;
-			game::EngineOutData* outData = nullptr;
+			jlb::SystemManager<game::EngineData>* systemManager = nullptr;
+			game::EngineData* engineData = nullptr;
 		};
 
 		void Allocate(const Info& info);
@@ -62,19 +62,19 @@ namespace vke
 		/// <summary>
 		/// Returns the system manager.
 		/// </summary>
-		[[nodiscard]] jlb::SystemManager<game::EngineOutData>& GetSystemManager() const;
+		[[nodiscard]] jlb::SystemManager<game::EngineData>& GetSystemManager() const;
 		/// <summary>
 		/// Returns the engine's OutData. Needed for free function callbacks.
 		/// </summary>
-		[[nodiscard]] const game::EngineOutData& GetOutData() const;
+		[[nodiscard]] const game::EngineData& GetOutData() const;
 
 	private:
 		GLFWwindow* _window = nullptr;
 		bool _resized = false;
 		glm::ivec2 _resolution{};
 
-		jlb::SystemManager<game::EngineOutData>* _systemManager = nullptr;
-		game::EngineOutData* _outData = nullptr;
+		jlb::SystemManager<game::EngineData>* _systemManager = nullptr;
+		game::EngineData* _outData = nullptr;
 
 		static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 	};

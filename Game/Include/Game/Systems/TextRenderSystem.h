@@ -38,7 +38,7 @@ namespace game
 	private:
 		[[nodiscard]] CreateInfo GetCreateInfo() override;
 
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineData& EngineData, SystemChain& chain) override;
 
 		using RenderSystem<CharRenderTask>::IncreaseRequestedLength;
 	};

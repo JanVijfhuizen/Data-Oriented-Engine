@@ -18,6 +18,6 @@ namespace game
 	class MovementSystem final : public TaskSystem<MovementTask>
 	{
 	protected:
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineData& EngineData, SystemChain& chain) override;
 	};
 }

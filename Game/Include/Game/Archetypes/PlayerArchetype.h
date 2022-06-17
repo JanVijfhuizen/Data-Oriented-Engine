@@ -33,9 +33,9 @@ namespace game
 	public:
 		static void OnKeyInput(int key, int action, PlayerArchetype& instance);
 
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
-		void Free(const EngineOutData& outData, SystemChain& chain) override;
-		void Awake(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineData& EngineData, SystemChain& chain) override;
+		void Free(const EngineData& EngineData, SystemChain& chain) override;
+		void Awake(const EngineData& EngineData, SystemChain& chain) override;
 
 	private:
 		using Archetype<Player, PlayerUpdateInfo>::IncreaseRequestedLength;
@@ -43,7 +43,7 @@ namespace game
 		Controller _playerController{};
 		HumanoidBodyVisuals _bodyVisuals{};
 
-		PlayerUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
+		PlayerUpdateInfo OnPreEntityUpdate(const EngineData& EngineData, SystemChain& chain) override;
 		void OnEntityUpdate(Player& entity, PlayerUpdateInfo& info) override;
 	};
 }

@@ -10,26 +10,26 @@ namespace game
 		return texture::GenerateSubTexture(texture, renderConventions::ENTITY_SIZE, renderConventions::Player);
 	}
 
-	void WallArchetype::Allocate(const EngineOutData& outData, SystemChain& chain)
+	void WallArchetype::Allocate(const EngineData& EngineData, SystemChain& chain)
 	{
-		Archetype<Wall, WallUpdateInfo>::Allocate(outData, chain);
+		Archetype<Wall, WallUpdateInfo>::Allocate(EngineData, chain);
 
 		const size_t length = GetLength();
 		chain.Get<CollisionSystem>()->IncreaseRequestedLength(length, false);
 		chain.Get<EntityRenderSystem>()->IncreaseRequestedLength(length);
 	}
 
-	void WallArchetype::Awake(const EngineOutData& outData, SystemChain& chain)
+	void WallArchetype::Awake(const EngineData& EngineData, SystemChain& chain)
 	{
-		Archetype<Wall, WallUpdateInfo>::Awake(outData, chain);
+		Archetype<Wall, WallUpdateInfo>::Awake(EngineData, chain);
 
 		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
 		_subTexture = GenerateSubTexture(texture);
 	}
 
-	void WallArchetype::Start(const EngineOutData& outData, SystemChain& chain)
+	void WallArchetype::Start(const EngineData& EngineData, SystemChain& chain)
 	{
-		Archetype<Wall, WallUpdateInfo>::Start(outData, chain);
+		Archetype<Wall, WallUpdateInfo>::Start(EngineData, chain);
 
 		auto collisionSystem = chain.Get<CollisionSystem>();
 
@@ -42,7 +42,7 @@ namespace game
 		}
 	}
 
-	WallUpdateInfo WallArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
+	WallUpdateInfo WallArchetype::OnPreEntityUpdate(const EngineData& EngineData, SystemChain& chain)
 	{
 		WallUpdateInfo info{};
 		info.entityRenderSystem = chain.Get<EntityRenderSystem>();

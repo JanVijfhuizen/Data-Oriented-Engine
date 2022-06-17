@@ -13,21 +13,21 @@ namespace game::mesh
 	/// </summary>
 	/// <param name="usageFlags">Automatically includes DST usage.</param>
 	template <typename Type>
-	[[nodiscard]] Buffer CreateBuffer(const EngineOutData& outData, jlb::ArrayView<Type> vertices, VkBufferUsageFlags usageFlags);
+	[[nodiscard]] Buffer CreateBuffer(const EngineData& EngineData, jlb::ArrayView<Type> vertices, VkBufferUsageFlags usageFlags);
 
 	/// <summary>
 	/// Creates a vertex and index buffer in device local memory.
 	/// </summary>
 	template <typename Vertex, typename Index>
-	[[nodiscard]] Mesh CreateIndexed(const EngineOutData& outData,
+	[[nodiscard]] Mesh CreateIndexed(const EngineData& EngineData,
 		jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Index> indices);
-	void Destroy(const EngineOutData& outData, Mesh& mesh);
+	void Destroy(const EngineData& EngineData, Mesh& mesh);
 
 	template <typename Type>
-	Buffer CreateBuffer(const EngineOutData& outData, const jlb::ArrayView<Type> vertices, const VkBufferUsageFlags usageFlags)
+	Buffer CreateBuffer(const EngineData& EngineData, const jlb::ArrayView<Type> vertices, const VkBufferUsageFlags usageFlags)
 	{
-		auto& app = *outData.app;
-		auto& vkAllocator = *outData.vkAllocator;
+		auto& app = *EngineData.app;
+		auto& vkAllocator = *EngineData.vkAllocator;
 
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -115,12 +115,12 @@ namespace game::mesh
 	}
 
 	template <typename Vertex, typename Index>
-	Mesh CreateIndexed(const EngineOutData& outData, 
+	Mesh CreateIndexed(const EngineData& EngineData, 
 		const jlb::ArrayView<Vertex> vertices, const jlb::ArrayView<Index> indices)
 	{
 		Mesh mesh{};
-		mesh.vertexBuffer = CreateBuffer(outData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-		mesh.indexBuffer = CreateBuffer(outData, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+		mesh.vertexBuffer = CreateBuffer(EngineData, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		mesh.indexBuffer = CreateBuffer(EngineData, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 		mesh.indexCount = indices.length;
 		return mesh;
 	}

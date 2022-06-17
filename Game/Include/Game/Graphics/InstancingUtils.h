@@ -7,13 +7,13 @@
 namespace game::instancing
 {
 	template <typename Type>
-	[[nodiscard]] jlb::Array<Buffer> CreateStorageBuffers(const EngineOutData& outData, size_t length);
+	[[nodiscard]] jlb::Array<Buffer> CreateStorageBuffers(const EngineData& EngineData, size_t length);
 
 	template <typename Type>
-	jlb::Array<Buffer> CreateStorageBuffers(const EngineOutData& outData, const size_t length)
+	jlb::Array<Buffer> CreateStorageBuffers(const EngineData& EngineData, const size_t length)
 	{
-		auto& app = *outData.app;
-		auto& vkAllocator = *outData.vkAllocator;
+		auto& app = *EngineData.app;
+		auto& vkAllocator = *EngineData.vkAllocator;
 		auto& logicalDevice = app.logicalDevice;
 
 		VkBufferCreateInfo vertBufferInfo{};
@@ -22,10 +22,10 @@ namespace game::instancing
 		vertBufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 		vertBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		const size_t swapChainImageCount = outData.swapChainImageCount;
+		const size_t swapChainImageCount = EngineData.swapChainImageCount;
 
 		jlb::Array<Buffer> buffers{};
-		buffers.Allocate(*outData.allocator, swapChainImageCount);
+		buffers.Allocate(*EngineData.allocator, swapChainImageCount);
 
 		for (size_t i = 0; i < swapChainImageCount; ++i)
 		{

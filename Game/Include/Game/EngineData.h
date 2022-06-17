@@ -1,5 +1,4 @@
 #pragma once
-#include "ArrayView.h"
 #include "SystemManager.h"
 
 namespace jlb
@@ -16,12 +15,9 @@ namespace vk
 namespace game
 {
 	/// <summary>
-	/// Data passed from the engine to the game framework.<br>
-	/// One very important thing to note is that the allocators REQUIRE you to be very stable with memory allocations.<br>
-	/// The engine is going to allocate memory based on how much you use during the first frame.<br>
-	/// Allocating more than that will result in a crash. If you want to be more flexible with your memory, you can always allocate the traditional way.
+	/// Data passed from the engine to the game systems.<br>
 	/// </summary>
-	struct EngineOutData final
+	struct EngineData final
 	{
 		// Used for mostly permanent allocations.
 		jlb::StackAllocator* allocator;
@@ -44,7 +40,7 @@ namespace game
 		uint8_t swapChainImageCount;
 
 		// Manages all the engine's systems.
-		jlb::Systems<EngineOutData>* systems;
+		jlb::Systems<EngineData>* systems;
 
 		// Amount of time passed since the start of the game. In milliseconds.
 		float time = 0;

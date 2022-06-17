@@ -22,6 +22,6 @@ namespace game
 		[[nodiscard]] static SubTexture MirrorLeftSide(SubTexture& lSide);
 
 	private:
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineData& EngineData, SystemChain& chain) override;
 	};
 }

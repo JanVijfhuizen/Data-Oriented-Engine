@@ -32,8 +32,8 @@ namespace game
 		[[nodiscard]] jlb::Iterator<Task> end();
 
 	protected:
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
-		void Free(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineData& EngineData, SystemChain& chain) override;
+		void Free(const EngineData& EngineData, SystemChain& chain) override;
 
 	private:
 		jlb::Vector<Task> _tasks{};
@@ -114,14 +114,14 @@ namespace game
 	}
 
 	template <typename Task>
-	void TaskSystem<Task>::Allocate(const EngineOutData& outData, SystemChain& chain)
+	void TaskSystem<Task>::Allocate(const EngineData& EngineData, SystemChain& chain)
 	{
-		_tasks.Allocate(*outData.allocator, _requestedLength);
+		_tasks.Allocate(*EngineData.allocator, _requestedLength);
 	}
 
 	template <typename Task>
-	void TaskSystem<Task>::Free(const EngineOutData& outData, SystemChain& chain)
+	void TaskSystem<Task>::Free(const EngineData& EngineData, SystemChain& chain)
 	{
-		_tasks.Free(*outData.allocator);
+		_tasks.Free(*EngineData.allocator);
 	}
 }
