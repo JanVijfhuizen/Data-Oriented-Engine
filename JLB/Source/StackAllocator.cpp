@@ -73,6 +73,13 @@ namespace jlb
 		return 0;
 	}
 
+	bool StackAllocator::IsOnTop(const AllocationID& allocation) const
+	{
+		if (_id - 1 == allocation.index && allocation.src == _data)
+			return true;
+		return _next ? _next->IsOnTop(allocation) : false;
+	}
+
 	size_t StackAllocator::ToChunkSize(const size_t size)
 	{
 		return size / sizeof(size_t) + (size % sizeof(size_t) > 0);

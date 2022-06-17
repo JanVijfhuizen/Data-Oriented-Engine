@@ -34,6 +34,8 @@ namespace jlb
 		[[nodiscard]] bool IsEmpty() const;
 		// Get the amount of sub allocators made during it's runtime.
 		[[nodiscard]] size_t GetDepth() const;
+		// Check if this allocation is on top of one of the (sub) stack allocators.
+		[[nodiscard]] bool IsOnTop(const AllocationID& allocation) const;
 
 	private:
 		StackAllocator* _next = nullptr;

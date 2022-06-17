@@ -26,6 +26,8 @@ namespace jlb
 		[[nodiscard]] virtual Iterator<T> begin() const;
 		[[nodiscard]] virtual Iterator<T> end() const;
 
+		[[nodiscard]] AllocationID GetAllocationId() const;
+
 	private:
 		ArrayView<T> _view{};
 		AllocationID _allocationId{};
@@ -99,5 +101,11 @@ namespace jlb
 	Iterator<T> Array<T>::end() const
 	{
 		return _view.end();
+	}
+
+	template <typename T>
+	AllocationID Array<T>::GetAllocationId() const
+	{
+		return _allocationId;
 	}
 }

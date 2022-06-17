@@ -13,8 +13,10 @@ namespace jlb
 
 		void Free(StackAllocator& allocator) override;
 
-		virtual T& Add(const T& value);
-		virtual T& Add(const T&& value = {});
+		// Fill in the allocators if you want the vector to dynamically resize.
+		virtual T& Add(const T& value, StackAllocator* allocator = nullptr, StackAllocator* tempAllocator = nullptr);
+		// Fill in the allocators if you want the vector to dynamically resize.
+		virtual T& Add(const T&& value = {}, StackAllocator* allocator = nullptr, StackAllocator* tempAllocator = nullptr);
 		virtual void RemoveAt(size_t index);
 
 		[[nodiscard]] size_t GetCount() const;
@@ -27,7 +29,7 @@ namespace jlb
 		// The amount of values in this vector.
 		size_t _count = 0;
 
-		[[nodiscard]] T& _Add(const T& value);
+		[[nodiscard]] T& _Add(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator);
 	};
 
 	template <typename T>
@@ -44,15 +46,15 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& Vector<T>::Add(const T& value)
+	T& Vector<T>::Add(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
 	{
-		return _Add(value);
+		return _Add(value, allocator, tempAllocator);
 	}
 
 	template <typename T>
-	T& Vector<T>::Add(const T&& value)
+	T& Vector<T>::Add(const T&& value, StackAllocator* allocator, StackAllocator* tempAllocator)
 	{
-		return _Add(value);
+		return _Add(value, allocator, tempAllocator);
 	}
 
 	template <typename T>
@@ -85,9 +87,34 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& Vector<T>::_Add(const T& value)
+	T& Vector<T>::_Add(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
 	{
-		assert(_count + 1 <= Array<T>::GetLength());
+		const size_t length = Array<T>::GetLength();
+		if(_count + 1 > length)
+		{
+			assert(allocator && tempAllocator);
+			assert(allocator->IsOnTop(Array<T>::GetAllocationId()));
+
+			// Create temporary array to store vector data in.
+			Array<T> tempArray{};
+			tempArray.Allocate(*tempAllocator, length);
+			Copy(tempArray.GetView(), 0, length, Array<T>::GetData());
+
+			// Calculate new length with the power of 8.
+			size_t newLength = 8;
+			while (newLength <= length)
+				newLength *= 2;
+
+			// Free data and copy temporary array's values back in.
+			Free(*allocator);
+			Array<T>::Allocate(*allocator, newLength);
+			SetCount(length + 1);
+			Copy(GetView(), 0, length, tempArray.GetData());
+
+			// Delete temporary array.
+			tempArray.Free(*tempAllocator);
+		}
+
 		++_count;
 		return GetView()[_count - 1] = value;
 	}

@@ -186,7 +186,6 @@
     <ClInclude Include="Include\Game\Graphics\Texture.h" />
     <ClInclude Include="Include\Game\Graphics\TextureUtils.h" />
     <ClInclude Include="Include\Game\Handlers\ShaderHandler.h" />
-    <ClInclude Include="Include\Game\IResourceLoader.h" />
     <ClInclude Include="Include\Game\System.h" />
     <ClInclude Include="Include\Game\SystemManager.h" />
     <ClInclude Include="Include\Game\Systems\AnimationSystem.h" />
