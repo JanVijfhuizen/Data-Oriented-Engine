@@ -16,7 +16,7 @@ namespace vke
 
 		const auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));
 		auto& outData = self->GetOutData();
-		outData.systemManager->OnKeyInput(outData, key, action);
+		self->GetSystemManager().OnKeyInput(outData, key, action);
 	}
 
 	void GLFWMouseKeyCallback(GLFWwindow* window, const int button, const int action, const int mods)
@@ -30,10 +30,10 @@ namespace vke
 
 		const auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));
 		auto& outData = self->GetOutData();
-		outData.systemManager->OnMouseInput(outData, button, action);
+		self->GetSystemManager().OnMouseInput(outData, button, action);
 	}
 
-	void WindowHandler::Construct(const Info& info)
+	void WindowHandler::Allocate(const Info& info)
 	{
 		// Initialize GLFW for Vulkan.
 		const int result = glfwInit();
@@ -50,6 +50,7 @@ namespace vke
 		// Set callback for resize.
 		glfwSetFramebufferSizeCallback(_window, FramebufferResizeCallback);
 		_resolution = info.resolution;
+		_systemManager = info.systemManager;
 		_outData = info.outData;
 
 		// Set input callback.
@@ -59,7 +60,7 @@ namespace vke
 		GLFWwindowMouseState = GLFW_CURSOR_DISABLED;
 	}
 
-	void WindowHandler::Cleanup() const
+	void WindowHandler::Free() const
 	{
 		glfwDestroyWindow(_window);
 		glfwTerminate();
@@ -133,6 +134,11 @@ namespace vke
 	GLFWwindow* WindowHandler::GetGLFWWindow() const
 	{
 		return _window;
+	}
+
+	jlb::SystemManager<game::EngineOutData>& WindowHandler::GetSystemManager() const
+	{
+		return *_systemManager;
 	}
 
 	const game::EngineOutData& WindowHandler::GetOutData() const

@@ -15,11 +15,13 @@ namespace vke
 			glm::ivec2 resolution{ 800, 600 };
 			jlb::StringView name = "My Window";
 			bool allowResizing = false;
+
+			jlb::SystemManager<game::EngineOutData>* systemManager = nullptr;
 			game::EngineOutData* outData = nullptr;
 		};
 
-		void Construct(const Info& info);
-		void Cleanup() const;
+		void Allocate(const Info& info);
+		void Free() const;
 
 		/// <summary>
 		/// Creates a vulkan surface, used by the renderer.
@@ -58,7 +60,11 @@ namespace vke
 		/// </summary>
 		[[nodiscard]] GLFWwindow* GetGLFWWindow() const;
 		/// <summary>
-		/// Returns the the engine's OutData. Needed for free function callbacks.
+		/// Returns the system manager.
+		/// </summary>
+		[[nodiscard]] jlb::SystemManager<game::EngineOutData>& GetSystemManager() const;
+		/// <summary>
+		/// Returns the engine's OutData. Needed for free function callbacks.
 		/// </summary>
 		[[nodiscard]] const game::EngineOutData& GetOutData() const;
 
@@ -66,6 +72,8 @@ namespace vke
 		GLFWwindow* _window = nullptr;
 		bool _resized = false;
 		glm::ivec2 _resolution{};
+
+		jlb::SystemManager<game::EngineOutData>* _systemManager = nullptr;
 		game::EngineOutData* _outData = nullptr;
 
 		static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);

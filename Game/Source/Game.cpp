@@ -4,13 +4,8 @@
 
 namespace game
 {
-	size_t GetSystemCount()
+	void DefineSystems(jlb::Systems<EngineOutData>& systems)
 	{
-		return 0;
-	}
-
-	void AddSystems(jlb::SystemManager<EngineOutData>& systemManager)
-	{
-
+		
 	}
 }

@@ -12,7 +12,9 @@ namespace vke
 {
 	int Engine::Run()
 	{
+		// Create them here so that other objects can reference them.
 		game::EngineOutData outData{};
+		jlb::SystemManager<game::EngineOutData> systemManager;
 
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};
@@ -26,8 +28,9 @@ namespace vke
 		WindowHandler windowHandler{};
 		{
 			WindowHandler::Info windowCreateInfo{};
+			windowCreateInfo.systemManager = &systemManager;
 			windowCreateInfo.outData = &outData;
-			windowHandler.Construct(windowCreateInfo);
+			windowHandler.Allocate(windowCreateInfo);
 		}
 
 		// Set up the vulkan application.
@@ -48,9 +51,10 @@ namespace vke
 		vkAllocator.Allocate(app);
 
 		// Set up the systme manager.
-		jlb::SystemManager<game::EngineOutData> systemManager;
-		systemManager.Allocate(allocator, game::GetSystemCount());
-		game::AddSystems(systemManager);
+		
+		auto systems = systemManager.CreateProxy();
+		game::DefineSystems(systems);
+		systemManager.Allocate(allocator, tempAllocator);
 
 		// Prepare data to be forwarded to the game.
 		
@@ -61,7 +65,7 @@ namespace vke
 		outData.resolution = swapChain.GetResolution();
 		outData.swapChainRenderPass = swapChain.GetRenderPass();
 		outData.swapChainImageCount = swapChain.GetLength();
-		outData.systemManager = &systemManager;
+		outData.systems = &systems;
 
 		// Set up a clock.
 		using ms = std::chrono::duration<float, std::milli>;
@@ -138,7 +142,7 @@ namespace vke
 		// Destroy the Vulkan app.
 		vk::boots::DestroyApp(app);
 		// Destroy the window.
-		windowHandler.Cleanup();
+		windowHandler.Free();
 
 		// Make sure everyting is properly deallocated.
 		assert(tempAllocator.IsEmpty());

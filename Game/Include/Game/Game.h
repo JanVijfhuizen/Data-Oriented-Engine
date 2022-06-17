@@ -11,6 +11,5 @@
 
 namespace game
 {
-	extern "C" GAME_API size_t GetSystemCount();
-	extern "C" GAME_API void AddSystems(jlb::SystemManager<EngineOutData>& systemManager);
+	extern "C" GAME_API void DefineSystems(jlb::Systems<EngineOutData>& systems);
 }
