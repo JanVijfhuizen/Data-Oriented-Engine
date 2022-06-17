@@ -3,24 +3,20 @@
 namespace game
 {
 	class GameState;
+	template <typename T>
 	class SystemManager;
 
-	struct SystemInfo final
-	{
-		GameState const* gameState = nullptr;
-		EngineOutData const* engineOutData = nullptr;
-	};
-
+	template <typename T>
 	class System
 	{
-		friend SystemManager;
+		friend SystemManager<T>;
 
 	protected:
-		virtual void Allocate(const SystemInfo& info) = 0;
-		virtual void Free(const SystemInfo& info) = 0;
+		virtual void Allocate(const T& info, SystemManager<T>& systemManager) = 0;
+		virtual void Free(const T& info, SystemManager<T>& systemManager) = 0;
 
-		virtual void Awake(const SystemInfo& info);;
-		virtual void Start(const SystemInfo& info);;
-		virtual void Update(const SystemInfo& info);;
+		virtual void Awake(const T& info, SystemManager<T>& systemManager) {};
+		virtual void Start(const T& info, SystemManager<T>& systemManager) {};
+		virtual void Update(const T& info, SystemManager<T>& systemManager) {};
 	};
 }

@@ -6,45 +6,89 @@
 
 namespace game
 {
+	template <typename T>
 	class SystemManager final
 	{
 	public:
 		void Allocate(jlb::StackAllocator& allocator, size_t length = 0);
-		void Free(const EngineOutData& outData, const GameState& gameState);
+		void Free(jlb::StackAllocator& allocator, const T& data);
 
-		void Awake(const EngineOutData& outData, const GameState& gameState);
-		void Start(const EngineOutData& outData, const GameState& gameState);
-		void Update(const EngineOutData& outData, const GameState& gameState);
+		void Awake(const T& data);
+		void Start(const T& data);
+		void Update(const T& data);
 
-		template <typename T>
+		template <typename U>
 		void CreateSystem(jlb::StackAllocator& allocator);
 
-		template <typename T>
-		[[nodiscard]] T* Get();
+		template <typename U>
+		[[nodiscard]] U* Get();
 
 	private:
-		jlb::Map<System*> _map{};
-		jlb::Vector<System*> _vector{};
+		jlb::Map<System<T>*> _map{};
+		jlb::Vector<System<T>*> _vector{};
 		jlb::Vector<jlb::AllocationID> _allocations{};
-
-		[[nodiscard]] SystemInfo GetSystemInfo(const EngineOutData& outData, const GameState& gameState);
 	};
 
 	template <typename T>
-	void SystemManager::CreateSystem(jlb::StackAllocator& allocator)
+	void SystemManager<T>::Allocate(jlb::StackAllocator& allocator, size_t length)
+	{
+		_allocations.Allocate(allocator, length);
+		_map.Allocate(allocator, length);
+		_vector.Allocate(allocator, length);
+	}
+
+	template <typename T>
+	void SystemManager<T>::Free(jlb::StackAllocator& allocator, const T& data)
+	{
+		for (int32_t i = _vector.GetCount() - 1; i >= 0; --i)
+		{
+			_vector[i]->Free(data, *this);
+			allocator.MFree(_allocations[i]);
+		}
+
+		_vector.Free(allocator);
+		_map.Free(allocator);
+		_allocations.Free(allocator);
+	}
+
+	template <typename T>
+	void SystemManager<T>::Awake(const T& data)
+	{
+		for (auto& sys : _vector)
+			sys->Awake(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::Start(const T& data)
+	{
+		for (auto& sys : _vector)
+			sys->Start(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::Update(const T& data)
+	{
+		for (auto& sys : _vector)
+			sys->Update(data, *this);
+	}
+
+	template <typename T>
+	template <typename U>
+	void SystemManager<T>::CreateSystem(jlb::StackAllocator& allocator)
 	{
 		assert(_allocations.GetCount() < _allocations.GetLength());
 
 		auto allocation = allocator.New<T>();
-		_map.Insert(allocation.ptr, typeid(T).hash_code());
+		_map.Insert(allocation.ptr, typeid(U).hash_code());
 		_vector.Add(allocation.ptr);
 		_allocations.Add(allocation.id);
 	}
 
 	template <typename T>
-	T* SystemManager::Get()
+	template <typename U>
+	U* SystemManager<T>::Get()
 	{
-		System** ptr = _map.Contains(typeid(T).hash_code());
-		return static_cast<T*>(*ptr);
+		System<T>** ptr = _map.Contains(typeid(U).hash_code());
+		return static_cast<U*>(*ptr);
 	}
 }

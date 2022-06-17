@@ -8,7 +8,9 @@
 #include "Archetypes/WallArchetype.h"
 #include "Systems/LineRenderSystem.h"
 #include "Systems/AnimationSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Archetypes/CameraArchetype.h"
+#include "Systems/EntityRenderSystem.h"
+#include "Components/Transform.h"
 
 namespace game
 {
@@ -88,18 +90,26 @@ namespace game
 		DefineUsage(outData);
 		chain.Allocate(outData);
 
+		SystemInfo systemInfo{};
+		systemInfo.engineOutData = &outData;
+		systemInfo.resourceManager = &gameState.resourceManager;
+
 		// Start the game.
 		chain.Awake(outData);
-		systems.Awake(outData, gameState);
+		systems.Awake(systemInfo);
 		GameStart(outData);
 		chain.Start(outData);
-		systems.Start(outData, gameState);
+		systems.Start(systemInfo);
 	}
 
 	EngineInData Update(const EngineOutData outData)
 	{
+		SystemInfo systemInfo{};
+		systemInfo.engineOutData = &outData;
+		systemInfo.resourceManager = &gameState.resourceManager;
+
 		GameUpdate(outData);
-		gameState.systems.Update(outData, gameState);
+		gameState.systems.Update(systemInfo);
 		gameState.chain.Update(outData);
 
 		EngineInData inData{};
@@ -113,7 +123,11 @@ namespace game
 
 	void Exit(const EngineOutData outData)
 	{
+		SystemInfo systemInfo{};
+		systemInfo.engineOutData = &outData;
+		systemInfo.resourceManager = &gameState.resourceManager;
+
 		gameState.chain.Free(outData);
-		gameState.systems.Free(outData, gameState);
+		gameState.systems.Free(*outData.allocator, systemInfo);
 	}
 }
