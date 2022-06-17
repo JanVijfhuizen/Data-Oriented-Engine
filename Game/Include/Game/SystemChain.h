@@ -12,15 +12,15 @@ namespace game
 		friend SystemChain;
 
 	protected:
-		virtual void Allocate(const EngineOutData& outData, SystemChain& chain) = 0;
-		virtual void Free(const EngineOutData& outData, SystemChain& chain) = 0;
+		virtual void Allocate(const EngineData& EngineData, SystemChain& chain) = 0;
+		virtual void Free(const EngineData& EngineData, SystemChain& chain) = 0;
 
-		virtual void Awake(const EngineOutData& outData, SystemChain& chain);
-		virtual void Start(const EngineOutData& outData, SystemChain& chain);
-		virtual void Update(const EngineOutData& outData, SystemChain& chain) = 0;
+		virtual void Awake(const EngineData& EngineData, SystemChain& chain);
+		virtual void Start(const EngineData& EngineData, SystemChain& chain);
+		virtual void Update(const EngineData& EngineData, SystemChain& chain) = 0;
 
-		virtual void CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain);
-		virtual void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain);
+		virtual void CreateSwapChainAssets(const EngineData& EngineData, SystemChain& chain);
+		virtual void DestroySwapChainAssets(const EngineData& EngineData, SystemChain& chain);
 
 	private:
 		size_t* _src = nullptr;
@@ -59,19 +59,19 @@ namespace game
 		};
 
 		template <typename T>
-		void Add(const EngineOutData& outData);
+		void Add(const EngineData& EngineData);
 
 		template <typename T>
 		[[nodiscard]] T* Get();
 
-		void Allocate(const EngineOutData& outData);
-		void Free(const EngineOutData& outData);
+		void Allocate(const EngineData& EngineData);
+		void Free(const EngineData& EngineData);
 
-		void Awake(const EngineOutData& outData);
-		void Start(const EngineOutData& outData);
-		void Update(const EngineOutData& outData);
+		void Awake(const EngineData& EngineData);
+		void Start(const EngineData& EngineData);
+		void Update(const EngineData& EngineData);
 
-		void RecreateSwapChainAssets(const EngineOutData& outData);
+		void RecreateSwapChainAssets(const EngineData& EngineData);
 
 		[[nodiscard]] Iterator begin() const;
 		[[nodiscard]] Iterator end();
@@ -79,15 +79,15 @@ namespace game
 	private:
 		ISystemChainable* _head = nullptr;
 
-		void ReverseExecute(void (ISystemChainable::* ptr)(const EngineOutData&, SystemChain&), const EngineOutData& outData);
+		void ReverseExecute(void (ISystemChainable::* ptr)(const EngineData&, SystemChain&), const EngineData& EngineData);
 	};
 
 	template <typename T>
-	void SystemChain::Add(const EngineOutData& outData)
+	void SystemChain::Add(const EngineData& EngineData)
 	{
-		auto allocation = outData.allocator->New<T>();
+		auto allocation = EngineData.allocator->New<T>();
 		ISystemChainable* ptr = static_cast<ISystemChainable*>(allocation.ptr);
-		ptr->_src = allocation.src;
+		ptr->_src = allocation.id.src;
 		ptr->_typeName = typeid(T).name();
 		if(_head)
 			_head->_previous = ptr;

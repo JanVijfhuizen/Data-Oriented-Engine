@@ -31,14 +31,14 @@ namespace game
 		VkDescriptorPool _descriptorPool;
 		jlb::Array<VkDescriptorSet> _descriptorSets{};
 
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
-		void Free(const EngineOutData& outData, SystemChain& chain) override;
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineData& EngineData, SystemChain& chain) override;
+		void Free(const EngineData& EngineData, SystemChain& chain) override;
+		void Update(const EngineData& EngineData, SystemChain& chain) override;
 
-		void CreateShaderAssets(const EngineOutData& outData);
-		void DestroyShaderAssets(const EngineOutData& outData);
+		void CreateShaderAssets(const EngineData& EngineData);
+		void DestroyShaderAssets(const EngineData& EngineData);
 
-		void CreateSwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
-		void DestroySwapChainAssets(const EngineOutData& outData, SystemChain& chain) override;
+		void CreateSwapChainAssets(const EngineData& EngineData, SystemChain& chain) override;
+		void DestroySwapChainAssets(const EngineData& EngineData, SystemChain& chain) override;
 	};
 }

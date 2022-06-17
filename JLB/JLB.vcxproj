@@ -117,7 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/Include;$(SolutionDir)Ext</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,7 +133,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/Include;$(SolutionDir)Ext</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,13 +143,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Allocation.cpp" />
+    <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\StackAllocator.cpp" />
     <ClCompile Include="Source\FileLoader.cpp" />
     <ClCompile Include="Source\JlbMath.cpp" />
     <ClCompile Include="Source\StringView.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\IndexSequence.h" />
+    <ClInclude Include="Include\Allocation.h" />
+    <ClInclude Include="Include\ArrayUtils.h" />
+    <ClInclude Include="Include\Map.h" />
+    <ClInclude Include="Include\Resource.h" />
+    <ClInclude Include="Include\ResourceManager.h" />
     <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
@@ -159,12 +165,12 @@
     <ClInclude Include="Include\Iterator.h" />
     <ClInclude Include="Include\KeyPair.h" />
     <ClInclude Include="Include\JlbMath.h" />
-    <ClInclude Include="Include\Stack.h" />
     <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />
-    <ClInclude Include="Include\Tuple.h" />
     <ClInclude Include="Include\Vector.h" />
+    <ClInclude Include="Include\System.h" />
+    <ClInclude Include="Include\SystemManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

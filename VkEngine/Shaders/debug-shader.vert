@@ -3,6 +3,8 @@
 
 layout(location = 0) in int inIndex;
 
+#include "utils.shader"
+
 struct InstanceData
 {
 	vec2 start;
@@ -23,11 +25,7 @@ layout(push_constant) uniform PushConstants
 
 void HandleInstance(in InstanceData instance)
 {
-    float aspectFix = pushConstants.resolution.y / pushConstants.resolution.x;
-    vec2 worldPos = (instance.start * inIndex + instance.end * (1 - inIndex) - pushConstants.cameraPosition) * pushConstants.pixelSize;
-    worldPos *= aspectFix;
-
-	gl_Position = vec4(worldPos, 1, 1);
+    gl_Position = CalculatePoint(instance.start * inIndex + instance.end * (1 - inIndex), pushConstants.cameraPosition, pushConstants.resolution, pushConstants.pixelSize);
 }
 
 void main() 

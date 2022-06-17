@@ -25,18 +25,18 @@ namespace game
 		[[nodiscard]] static DynamicCollisionTask CreateDefaultTask(Collider& collider, Transform& transform, glm::vec2 delta);
 
 		void IncreaseRequestedLength(size_t size, bool isDynamic);
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
-		void Free(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineData& EngineData, SystemChain& chain) override;
+		void Free(const EngineData& EngineData, SystemChain& chain) override;
 
 		void AddStatic(StaticCollisionTask& task);
 		void ClearStatics();
 
 	private:
 		size_t _requestedStaticSize = 0;
-		Vector<StaticCollisionTask> _statics{};
-		Array<bool> _validChecks{};
+		jlb::Vector<StaticCollisionTask> _statics{};
+		jlb::Array<bool> _validChecks{};
 
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineData& EngineData, SystemChain& chain) override;
 
 		using TaskSystem<DynamicCollisionTask>::IncreaseRequestedLength;
 

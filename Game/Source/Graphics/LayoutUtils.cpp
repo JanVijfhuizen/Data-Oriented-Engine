@@ -5,10 +5,10 @@
 
 namespace game::layout
 {
-	VkDescriptorSetLayout Create(const EngineOutData& outData, Info& info)
+	VkDescriptorSetLayout Create(const EngineData& EngineData, Info& info)
 	{
 		jlb::Array<VkDescriptorSetLayoutBinding> bindings{};
-		bindings.Allocate(*outData.tempAllocator, info.bindings.length);
+		bindings.Allocate(*EngineData.tempAllocator, info.bindings.length);
 
 		for (size_t i = 0; i < bindings.GetLength(); ++i)
 		{
@@ -29,10 +29,10 @@ namespace game::layout
 		layoutInfo.pBindings = bindings.GetData();
 
 		VkDescriptorSetLayout layout;
-		const auto result = vkCreateDescriptorSetLayout(outData.app->logicalDevice, &layoutInfo, nullptr, &layout);
+		const auto result = vkCreateDescriptorSetLayout(EngineData.app->logicalDevice, &layoutInfo, nullptr, &layout);
 		assert(!result);
 		
-		bindings.Free(*outData.tempAllocator);
+		bindings.Free(*EngineData.tempAllocator);
 		return layout;
 	}
 }

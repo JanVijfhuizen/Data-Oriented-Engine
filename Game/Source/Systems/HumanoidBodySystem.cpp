@@ -48,7 +48,7 @@ namespace game
 		return rSide;
 	}
 
-	void HumanoidBodySystem::Update(const EngineOutData& outData, SystemChain& chain)
+	void HumanoidBodySystem::Update(const EngineData& EngineData, SystemChain& chain)
 	{
 
 	}

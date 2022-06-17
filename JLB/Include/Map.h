@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Array.h"
 #include "KeyPair.h"
 
@@ -6,28 +6,24 @@ namespace jlb
 {
 	// Data container that that prioritizes quick lookup speed.
 	template <typename T>
-	class HashMap
+	class Map
 	{
 	public:
-		// Function used to get a hash value from a value.
-		size_t(*hasher)(T& value) = nullptr;
-
 		virtual void Allocate(StackAllocator& allocator, size_t size);
 		virtual void Free(StackAllocator& allocator);
 
 		// Duplicates are not inserted.
-		void Insert(T& value);
+		void Insert(T& value, size_t key);
 		// Duplicates are not inserted.
-		void Insert(T&& value);
+		void Insert(T&& value, size_t key);
 
-		[[nodiscard]] bool Contains(T& value);
+		[[nodiscard]] T* Contains(size_t key);
 		void Erase(T& value);
 		[[nodiscard]] size_t GetCount() const;
 
 	protected:
-		[[nodiscard]] size_t GetHash(T& value);
-		[[nodiscard]] bool Contains(T& value, size_t& outIndex);
-		void _Insert(T& value);
+		[[nodiscard]] size_t GetHash(size_t key);
+		void _Insert(T& value, size_t key);
 
 	private:
 		size_t _count = 0;
@@ -35,32 +31,32 @@ namespace jlb
 	};
 
 	template <typename T>
-	void HashMap<T>::Allocate(StackAllocator& allocator, const size_t size)
+	void Map<T>::Allocate(StackAllocator& allocator, const size_t size)
 	{
 		_array.Allocate(allocator, size);
 	}
 
 	template <typename T>
-	void HashMap<T>::Free(StackAllocator& allocator)
+	void Map<T>::Free(StackAllocator& allocator)
 	{
 		_array.Free(allocator);
 		_count = 0;
 	}
 
 	template <typename T>
-	void HashMap<T>::Insert(T& value)
+	void Map<T>::Insert(T& value, const size_t key)
 	{
-		_Insert(value);
+		_Insert(value, key);
 	}
 
 	template <typename T>
-	void HashMap<T>::Insert(T&& value)
+	void Map<T>::Insert(T&& value, const size_t key)
 	{
-		_Insert(value);
+		_Insert(value, key);
 	}
 
 	template <typename T>
-	void HashMap<T>::Erase(T& value)
+	void Map<T>::Erase(T& value)
 	{
 		size_t index;
 		const bool contains = Contains(value, index);
@@ -73,7 +69,7 @@ namespace jlb
 
 		// Check how big the key group is.
 		size_t i = 1;
-		while(i < length)
+		while (i < length)
 		{
 			const size_t otherIndex = (index + i) % length;
 			auto& otherKeyPair = _array[otherIndex];
@@ -90,33 +86,13 @@ namespace jlb
 	}
 
 	template <typename T>
-	bool HashMap<T>::Contains(T& value)
-	{
-		size_t n;
-		return Contains(value, n);
-	}
-
-	template <typename T>
-	size_t HashMap<T>::GetCount() const
-	{
-		return _count;
-	}
-
-	template <typename T>
-	size_t HashMap<T>::GetHash(T& value)
-	{
-		assert(hasher);
-		return hasher(value) % _array.GetLength();
-	}
-
-	template <typename T>
-	bool HashMap<T>::Contains(T& value, size_t& outIndex)
+	T* Map<T>::Contains(const size_t key)
 	{
 		const size_t length = _array.GetLength();
 		assert(_count < length);
 
 		// Get and use the hash as an index.
-		const size_t hash = GetHash(value);
+		const size_t hash = GetHash(key);
 
 		for (size_t i = 0; i < length; ++i)
 		{
@@ -124,32 +100,36 @@ namespace jlb
 			auto& keyPair = _array[index];
 
 			// If the hash is different, continue.
-			if (keyPair.key != hash)
-				continue;
-
-			// If the actual value has been found.
-			// We have to compare the values due to the fact that one hash might be generated more than once.
-			if (keyPair.value == value)
-			{
-				outIndex = index;
-				return true;
-			}
+			if (keyPair.key == key)
+				return &keyPair.value;
 		}
 
-		return false;
+		return nullptr;
 	}
 
 	template <typename T>
-	void HashMap<T>::_Insert(T& value)
+	size_t Map<T>::GetCount() const
+	{
+		return _count;
+	}
+
+	template <typename T>
+	size_t Map<T>::GetHash(const size_t key)
+	{
+		return key % _array.GetLength();
+	}
+
+	template <typename T>
+	void Map<T>::_Insert(T& value, const size_t key)
 	{
 		const size_t length = _array.GetLength();
 		assert(_count < length);
 
 		// If it already contains this value, replace the old one with the newer value.
-		if (Contains(value))
+		if (Contains(key))
 			return;
 
-		const size_t hash = GetHash(value);
+		const size_t hash = GetHash(key);
 
 		for (size_t i = 0; i < length; ++i)
 		{
@@ -159,7 +139,7 @@ namespace jlb
 			if (keyPair.key != SIZE_MAX)
 				continue;
 
-			keyPair.key = hash;
+			keyPair.key = key;
 			keyPair.value = value;
 			++_count;
 			break;

@@ -5,10 +5,10 @@
 
 namespace game::pipeline
 {
-	void Create(const EngineOutData& outData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline)
+	void Create(const EngineData& EngineData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline)
 	{
 		jlb::Array<VkPipelineShaderStageCreateInfo> modules{};
-		modules.Allocate(*outData.tempAllocator, info.modules.length);
+		modules.Allocate(*EngineData.tempAllocator, info.modules.length);
 		for (size_t i = 0; i < info.modules.length; ++i)
 		{
 			auto& module = modules[i];
@@ -102,7 +102,7 @@ namespace game::pipeline
 		pipelineLayoutInfo.pushConstantRangeCount = info.usePushConstant;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
 
-		auto result = vkCreatePipelineLayout(outData.app->logicalDevice, &pipelineLayoutInfo, nullptr, &outLayout);
+		auto result = vkCreatePipelineLayout(EngineData.app->logicalDevice, &pipelineLayoutInfo, nullptr, &outLayout);
 		assert(!result);
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -123,9 +123,9 @@ namespace game::pipeline
 		pipelineInfo.basePipelineHandle = info.basePipeline;
 		pipelineInfo.basePipelineIndex = info.basePipelineIndex;
 
-		result = vkCreateGraphicsPipelines(outData.app->logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &outPipeline);
+		result = vkCreateGraphicsPipelines(EngineData.app->logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &outPipeline);
 		assert(!result);
 
-		modules.Free(*outData.tempAllocator);
+		modules.Free(*EngineData.tempAllocator);
 	}
 }

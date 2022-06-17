@@ -3,38 +3,21 @@
 
 namespace jlb
 {
-	/// <summary>
-	/// An unsorted vector that operates on the stack, rather than on the heap.
-	/// </summary>
+	// An unsorted vector that operates on the stack, rather than on the heap.
 	template <typename T, size_t S>
 	struct StackVector : StackArray<T, S>
 	{
-		/// <summary>
-		/// Add object to the vector.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns>Reference to the added object.</returns>
 		T& Add(T& value);
-		/// <summary>
-		/// Add object to the vector.
-		/// </summary>
-		/// <returns>Reference to the added object.</returns>
 		T& Add(T&& value);
-		/// <summary>
-		/// Removes object at the given index.
-		/// </summary>
 		void Erase(size_t index);
-		/// <summary>
-		/// Returns the amount of objects in the vector.
-		/// </summary>
-		[[nodiscard]] size_t GetCount() const;
 
-		Iterator<T> end() override;
+		[[nodiscard]] size_t GetCount() const;
+		[[nodiscard]] Iterator<T> end() override;
 
 	private:
 		size_t _count = 0;
 
-		T& _Add(T& value);
+		[[nodiscard]] T& _Add(T& value);
 	};
 
 	template <typename T, size_t S>

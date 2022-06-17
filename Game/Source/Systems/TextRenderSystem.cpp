@@ -39,9 +39,9 @@ namespace game
 		return info;
 	}
 
-	void TextRenderSystem::Allocate(const EngineOutData& outData, SystemChain& chain)
+	void TextRenderSystem::Allocate(const EngineData& EngineData, SystemChain& chain)
 	{
 		IncreaseRequestedLength(TEXT_RENDER_CHAR_CAPACITY);
-		RenderSystem<CharRenderTask>::Allocate(outData, chain);
+		RenderSystem<CharRenderTask>::Allocate(EngineData, chain);
 	}
 }

@@ -17,11 +17,11 @@ namespace game
 		InputHandler::UpdateAxis(direction.y, GLFW_KEY_W, GLFW_KEY_S, key, action);
 	}
 
-	void PlayerArchetype::Allocate(const EngineOutData& outData, SystemChain& chain)
+	void PlayerArchetype::Allocate(const EngineData& EngineData, SystemChain& chain)
 	{
 		IncreaseRequestedLength(1);
 
-		Archetype<Player, PlayerUpdateInfo>::Allocate(outData, chain);
+		Archetype<Player, PlayerUpdateInfo>::Allocate(EngineData, chain);
 
 		const size_t length = GetLength();
 
@@ -30,24 +30,24 @@ namespace game
 		chain.Get<MovementSystem>()->IncreaseRequestedLength(length);
 	}
 
-	void PlayerArchetype::Free(const EngineOutData& outData, SystemChain& chain)
+	void PlayerArchetype::Free(const EngineData& EngineData, SystemChain& chain)
 	{
-		Archetype<Player, PlayerUpdateInfo>::Free(outData, chain);
+		Archetype<Player, PlayerUpdateInfo>::Free(EngineData, chain);
 	}
 
-	void PlayerArchetype::Awake(const EngineOutData& outData, SystemChain& chain)
+	void PlayerArchetype::Awake(const EngineData& EngineData, SystemChain& chain)
 	{
 		const auto& texture = chain.Get<EntityRenderSystem>()->GetTexture();
 		const auto coords = texture::IndexToCoordinates(texture, renderConventions::ENTITY_SIZE, renderConventions::Player);
 		_bodyVisuals = HumanoidBodySystem::CreateVisualsFromSubTexture(texture, coords);
 	}
 
-	PlayerUpdateInfo PlayerArchetype::OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain)
+	PlayerUpdateInfo PlayerArchetype::OnPreEntityUpdate(const EngineData& EngineData, SystemChain& chain)
 	{
 		PlayerUpdateInfo info{};
 		info.entityRenderSystem = chain.Get<EntityRenderSystem>();
 		info.movementSystem = chain.Get<MovementSystem>();
-		info.mousePosition = outData.mousePos;
+		info.mousePosition = EngineData.mousePos;
 		return info;
 	}
 

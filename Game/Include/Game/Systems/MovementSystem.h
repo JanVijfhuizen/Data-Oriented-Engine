@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "TaskSystem.h"
-#include "Utils/Math.h"
 #include "Graphics/RenderConventions.h"
+#include "JlbMath.h"
 
 namespace game
 {
@@ -9,7 +9,7 @@ namespace game
 	{
 		glm::ivec2 dir{};
 		float moveSpeed = 0.005f * renderConventions::ENTITY_SIZE;
-		float rotationSpeed = math::PI / 200;
+		float rotationSpeed = jlb::math::PI / 200;
 
 		struct Collider* collider = nullptr;
 		struct Transform* transform = nullptr;
@@ -18,6 +18,6 @@ namespace game
 	class MovementSystem final : public TaskSystem<MovementTask>
 	{
 	protected:
-		void Update(const EngineOutData& outData, SystemChain& chain) override;
+		void Update(const EngineData& EngineData, SystemChain& chain) override;
 	};
 }

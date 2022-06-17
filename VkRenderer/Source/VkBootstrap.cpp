@@ -6,6 +6,7 @@
 #include "Heap.h"
 #include "HashMap.h"
 #include "StackVector.h"
+#include "ArrayUtils.h"
 
 namespace vk
 {
@@ -175,7 +176,7 @@ namespace vk
 			extensions.Allocate(allocator, size);
 
 			auto winExtensions = info.windowHandler->GetRequiredExtensions(allocator);
-			extensions.Copy(0, winExtensionsCount, winExtensions.GetData());
+			jlb::Copy(extensions.GetView(), 0, winExtensionsCount, winExtensions.GetData());
 			winExtensions.Free(allocator);
 
 #ifdef _DEBUG
@@ -476,7 +477,7 @@ namespace vk
 
 			jlb::Array<jlb::StringView> deviceExtensions{};
 			deviceExtensions.Allocate(tempAllocator, info.deviceExtensions.GetLength() + 1);
-			deviceExtensions.Copy(0, info.deviceExtensions.GetLength(), info.deviceExtensions.GetData());
+			jlb::Copy(deviceExtensions.GetView(), 0, info.deviceExtensions.GetLength(), info.deviceExtensions.GetData());
 			deviceExtensions[deviceExtensions.GetLength() - 1] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 			info.deviceExtensions = deviceExtensions;
 

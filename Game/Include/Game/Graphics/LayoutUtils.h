@@ -15,5 +15,5 @@ namespace game::layout
 		jlb::ArrayView<Binding> bindings{};
 	};
 
-	[[nodiscard]] VkDescriptorSetLayout Create(const EngineOutData& outData, Info& info);
+	[[nodiscard]] VkDescriptorSetLayout Create(const EngineData& EngineData, Info& info);
 }

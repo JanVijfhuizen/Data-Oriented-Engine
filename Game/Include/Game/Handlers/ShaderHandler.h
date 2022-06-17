@@ -12,7 +12,7 @@ namespace game
 	class ShaderHandler final
 	{
 	public:
-		[[nodiscard]] static Shader Create(const EngineOutData& outData, jlb::StringView vertPath, jlb::StringView fragPath);
-		static void Destroy(const EngineOutData& outData, const Shader& shader);
+		[[nodiscard]] static Shader Create(const EngineData& EngineData, jlb::StringView vertPath, jlb::StringView fragPath);
+		static void Destroy(const EngineData& EngineData, const Shader& shader);
 	};
 }

@@ -27,6 +27,12 @@
     <ClCompile Include="Source\StackAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Allocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Array.h">
@@ -41,9 +47,6 @@
     <ClInclude Include="Include\StringView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Stack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\HashMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,9 +54,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Heap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Tuple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\JlbMath.h">
@@ -71,10 +71,28 @@
     <ClInclude Include="Include\FileLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\IndexSequence.h">
+    <ClInclude Include="Include\StackAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\StackAllocator.h">
+    <ClInclude Include="Include\Allocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ArrayUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\SystemManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

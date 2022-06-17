@@ -161,7 +161,6 @@
   <ItemGroup>
     <ClInclude Include="Include\Game\Archetype.h" />
     <ClInclude Include="Include\Game\Archetypes\CameraArchetype.h" />
-    <ClInclude Include="Include\Game\Archetypes\CursorArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\WallArchetype.h" />
     <ClInclude Include="Include\Game\Components\Animator.h" />
     <ClInclude Include="Include\Game\Components\Character.h" />
@@ -201,10 +200,8 @@
     <ClInclude Include="Include\Game\Handlers\InputHandler.h" />
     <ClInclude Include="Include\Game\SystemChain.h" />
     <ClInclude Include="Include\Game\TaskSystem.h" />
-    <ClInclude Include="Include\Game\Utils\Math.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Utils\Math.cpp" />
     <ClCompile Include="Source\Systems\HumanoidBodySystem.cpp" />
     <ClCompile Include="Source\Archetypes\CameraArchetype.cpp" />
     <ClCompile Include="Include\Game\Handlers\ShaderHandler.cpp" />
@@ -215,7 +212,6 @@
     <ClCompile Include="Source\SystemChain.cpp" />
     <ClCompile Include="Source\Systems\CollisionSystem.cpp" />
     <ClCompile Include="Source\Systems\MovementSystem.cpp" />
-    <ClCompile Include="Source\Archetypes\CursorArchetype.cpp" />
     <ClCompile Include="Source\Graphics\SubTexture.cpp" />
     <ClCompile Include="Source\Handlers\InputHandler.cpp" />
     <ClCompile Include="Source\Systems\AnimationSystem.cpp" />

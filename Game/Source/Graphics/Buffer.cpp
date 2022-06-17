@@ -5,9 +5,9 @@
 
 namespace game
 {
-	void FreeBuffer(const EngineOutData& outData, Buffer& buffer)
+	void FreeBuffer(const EngineData& EngineData, Buffer& buffer)
 	{
-		vkDestroyBuffer(outData.app->logicalDevice, buffer.buffer, nullptr);
-		outData.vkAllocator->FreeBlock(buffer.memBlock);
+		vkDestroyBuffer(EngineData.app->logicalDevice, buffer.buffer, nullptr);
+		EngineData.vkAllocator->FreeBlock(buffer.memBlock);
 	}
 }

@@ -9,31 +9,65 @@ namespace game
 	/// </summary>
 	/// <typeparam name="Task">Package of all the data needed to execute a task.</typeparam>
 	template <typename Task>
-	class TaskSystem : public jlb::Vector<Task>, public ISystemChainable
+	class TaskSystem : public ISystemChainable
 	{
 	public:
+		[[nodiscard]] Task& operator[](size_t index);
+
+		virtual Task& Add(const Task& task = {});
+		virtual void RemoveAt(size_t index);
+		void SetCount(size_t count);
+
 		// Increase the size that the system will be allocated with.
 		// Call this before actually allocating it.
 		void IncreaseRequestedLength(size_t size);
 		[[nodiscard]] size_t GetRequestedLength() const;
 
+		[[nodiscard]] jlb::Vector<Task>& GetInstances();
+		[[nodiscard]] Task* GetData() const;
+		[[nodiscard]] size_t GetLength() const;
+		[[nodiscard]] size_t GetCount() const;
+
+		[[nodiscard]] jlb::Iterator<Task> begin();
+		[[nodiscard]] jlb::Iterator<Task> end();
+
 	protected:
-		void Allocate(const EngineOutData& outData, SystemChain& chain) override;
-		void Free(const EngineOutData& outData, SystemChain& chain) override;
+		void Allocate(const EngineData& EngineData, SystemChain& chain) override;
+		void Free(const EngineData& EngineData, SystemChain& chain) override;
 
 	private:
-		using jlb::Vector<Task>::Allocate;
-		using jlb::Vector<Task>::AllocateAndCopy;
-		using jlb::Vector<Task>::Free;
-		using jlb::Vector<Task>::RemoveAt;
-
+		jlb::Vector<Task> _tasks{};
 		size_t _requestedLength = 0;
 	};
 
 	template <typename Task>
+	Task& TaskSystem<Task>::operator[](const size_t index)
+	{
+		return _tasks[index];
+	}
+
+	template <typename Task>
+	Task& TaskSystem<Task>::Add(const Task& task)
+	{
+		return _tasks.Add(task);
+	}
+
+	template <typename Task>
+	void TaskSystem<Task>::RemoveAt(const size_t index)
+	{
+		_tasks.RemoveAt(index);
+	}
+
+	template <typename Task>
+	void TaskSystem<Task>::SetCount(const size_t count)
+	{
+		_tasks.SetCount(count);
+	}
+
+	template <typename Task>
 	void TaskSystem<Task>::IncreaseRequestedLength(const size_t size)
 	{
-		assert(!jlb::Vector<Task>::GetData());
+		assert(!_tasks.GetData());
 		_requestedLength += size;
 	}
 
@@ -44,14 +78,50 @@ namespace game
 	}
 
 	template <typename Task>
-	void TaskSystem<Task>::Allocate(const EngineOutData& outData, SystemChain& chain)
+	jlb::Iterator<Task> TaskSystem<Task>::begin()
 	{
-		jlb::Vector<Task>::Allocate(*outData.allocator, _requestedLength);
+		return _tasks.begin();
 	}
 
 	template <typename Task>
-	void TaskSystem<Task>::Free(const EngineOutData& outData, SystemChain& chain)
+	jlb::Iterator<Task> TaskSystem<Task>::end()
 	{
-		jlb::Vector<Task>::Free(*outData.allocator);
+		return _tasks.end();
+	}
+
+	template <typename Task>
+	jlb::Vector<Task>& TaskSystem<Task>::GetInstances()
+	{
+		return _tasks;
+	}
+
+	template <typename Task>
+	Task* TaskSystem<Task>::GetData() const
+	{
+		return _tasks.GetData();
+	}
+
+	template <typename Task>
+	size_t TaskSystem<Task>::GetLength() const
+	{
+		return _tasks.GetLength();
+	}
+
+	template <typename Task>
+	size_t TaskSystem<Task>::GetCount() const
+	{
+		return _tasks.GetCount();
+	}
+
+	template <typename Task>
+	void TaskSystem<Task>::Allocate(const EngineData& EngineData, SystemChain& chain)
+	{
+		_tasks.Allocate(*EngineData.allocator, _requestedLength);
+	}
+
+	template <typename Task>
+	void TaskSystem<Task>::Free(const EngineData& EngineData, SystemChain& chain)
+	{
+		_tasks.Free(*EngineData.allocator);
 	}
 }

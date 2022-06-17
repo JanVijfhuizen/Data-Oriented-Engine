@@ -25,9 +25,23 @@ vec2 CalculateTextureCoordinates(in SubTexture subTexture, in vec2 texCoords)
     return subTexture.lTop + (subTexture.rBot - subTexture.lTop) * texCoords;
 }
 
+float GetAspectRatio(in vec2 resolution)
+{
+    return resolution.y / resolution.x;
+}
+
+vec4 CalculatePoint(in vec2 vertPosition, in vec2 camPosition, in vec2 resolution, in float pixelSize)
+{
+    float aspectFix = GetAspectRatio(resolution);
+    vec2 worldPos = (vertPosition - camPosition) * pixelSize;
+    vec4 pos = vec4(worldPos, 1, 1);
+    pos.x *= aspectFix;
+    return pos;
+}
+
 vec4 CalculatePosition(in Transform transform, in vec2 camPosition, in vec2 vertPosition, in vec2 resolution, in float pixelSize)
 {
-    float aspectFix = resolution.y / resolution.x;
+    float aspectFix = GetAspectRatio(resolution);
     vec2 localPos = vertPosition * transform.scale;
     vec2 worldPos = (transform.position - camPosition + Rotate(localPos, transform.rotation)) * pixelSize;
     vec4 pos = vec4(worldPos, 1, 1);

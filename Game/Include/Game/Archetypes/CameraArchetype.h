@@ -18,7 +18,7 @@ namespace game
 	class CameraArchetype final : public Archetype<Camera, CameraUpdateInfo>
 	{
 	private:
-		[[nodiscard]] CameraUpdateInfo OnPreEntityUpdate(const EngineOutData& outData, SystemChain& chain) override;
+		[[nodiscard]] CameraUpdateInfo OnPreEntityUpdate(const EngineData& EngineData, SystemChain& chain) override;
 		void OnEntityUpdate(Camera& entity, CameraUpdateInfo& info) override;
 	};
 }

@@ -6,21 +6,16 @@
 #include "Game/EngineData.h"
 #include <chrono>
 #include "VkRenderer/VkStackAllocator.h"
+#include "SystemManager.h"
 
 namespace vke
 {
-	// Path for the version data used for checking/storing memory requirements.
-	const char* VERSION_PATH = 
-#ifdef _DEBUG
-	"version-debug.txt";
-#else
-	"version.txt";
-#endif
-	// Used in release mode to check if the version data needs to be refreshed.
-	constexpr size_t ENGINE_VERSION = 1;
-
 	int Engine::Run()
 	{
+		// Create them here so that other objects can reference them.
+		game::EngineData outData{};
+		jlb::SystemManager<game::EngineData> systemManager;
+
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};
 		allocator.Allocate();
@@ -32,8 +27,10 @@ namespace vke
 		// Set up the window handler.
 		WindowHandler windowHandler{};
 		{
-			const WindowHandler::Info windowCreateInfo{};
-			windowHandler.Construct(windowCreateInfo);
+			WindowHandler::Info windowCreateInfo{};
+			windowCreateInfo.systemManager = &systemManager;
+			windowCreateInfo.engineData = &outData;
+			windowHandler.Allocate(windowCreateInfo);
 		}
 
 		// Set up the vulkan application.
@@ -53,8 +50,14 @@ namespace vke
 		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(app);
 
+		// Set up the systme manager.
+		
+		auto systems = systemManager.CreateProxy(allocator, tempAllocator, outData);
+		game::DefineSystems(systems);
+		systemManager.Allocate(allocator, tempAllocator);
+
 		// Prepare data to be forwarded to the game.
-		game::EngineOutData outData{};
+		
 		outData.allocator = &allocator;
 		outData.tempAllocator = &tempAllocator;
 		outData.vkAllocator = &vkAllocator;
@@ -62,6 +65,7 @@ namespace vke
 		outData.resolution = swapChain.GetResolution();
 		outData.swapChainRenderPass = swapChain.GetRenderPass();
 		outData.swapChainImageCount = swapChain.GetLength();
+		outData.systems = &systems;
 
 		// Set up a clock.
 		using ms = std::chrono::duration<float, std::milli>;
@@ -70,8 +74,10 @@ namespace vke
 		// Delete the allocations made during the setup step, and make sure everything is properly deallocated.
 		assert(setupAllocator.IsEmpty());
 		setupAllocator.Free();
+
 		// Start the game.
-		game::Start(outData);
+		systemManager.Awake(outData);
+		systemManager.Start(outData);
 
 		bool quit = false;
 		while (!quit)
@@ -93,7 +99,7 @@ namespace vke
 			{
 				double x;
 				double y;
-				glfwGetCursorPos(windowHandler.GetGLFWWIndow(), &x, &y);
+				glfwGetCursorPos(windowHandler.GetGLFWWindow(), &x, &y);
 				x /= outData.resolution.x;
 				y /= outData.resolution.y;
 				outData.mousePos.x = x;
@@ -101,10 +107,10 @@ namespace vke
 			}
 
 			// Update the game.
-			auto inData = game::Update(outData);
+			systemManager.Update(outData);
 
 			// Submit for presentation to the screen.
-			const auto presentResult = swapChain.EndFrame(allocator, app, inData.swapChainWaitSemaphores);
+			const auto presentResult = swapChain.EndFrame(allocator, app);
 			// Recreate the swapchain if the swapchain is inadequate/outdated, or if we're in a testrun.
 			if (presentResult)
 			{
@@ -112,7 +118,7 @@ namespace vke
 				outData.resolution = swapChain.GetResolution();
 				outData.swapChainRenderPass = swapChain.GetRenderPass();
 				// Let the game know we have recreated the swapchain.
-				game::OnRecreateSwapChainAssets(outData);
+				systemManager.OnRecreateSwapChainAssets(outData);
 			}
 		}
 
@@ -121,7 +127,10 @@ namespace vke
 		assert(!idleResult);
 
 		// Let the game know we're quitting.
-		game::Exit(outData);
+		// Free all the systems.
+		systemManager.Exit(outData);
+		systemManager.Free(allocator, outData);
+
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
 
@@ -133,7 +142,7 @@ namespace vke
 		// Destroy the Vulkan app.
 		vk::boots::DestroyApp(app);
 		// Destroy the window.
-		windowHandler.Cleanup();
+		windowHandler.Free();
 
 		// Make sure everyting is properly deallocated.
 		assert(tempAllocator.IsEmpty());

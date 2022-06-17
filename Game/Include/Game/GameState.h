@@ -3,8 +3,10 @@
 
 namespace game
 {
-	inline struct GameState final
+	// Outdated.
+	inline class GameState final
 	{
+	public:
 		SystemChain chain{};
 	} gameState;
 }

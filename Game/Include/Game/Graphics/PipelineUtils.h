@@ -28,5 +28,5 @@ namespace game::pipeline
 		VkPrimitiveTopology topologyType = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	};
 
-	void Create(const EngineOutData& outData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline);
+	void Create(const EngineData& EngineData, const Info& info, VkPipelineLayout& outLayout, VkPipeline& outPipeline);
 }

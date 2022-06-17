@@ -9,5 +9,5 @@ namespace game
 		vk::MemBlock memBlock;
 	};
 
-	void FreeBuffer(const EngineOutData& outData, Buffer& buffer);
+	void FreeBuffer(const EngineData& EngineData, Buffer& buffer);
 }

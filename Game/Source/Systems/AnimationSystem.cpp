@@ -12,12 +12,12 @@ namespace game
 		return task;
 	}
 
-	void AnimationSystem::Update(const EngineOutData& outData, SystemChain& chain)
+	void AnimationSystem::Update(const EngineData& EngineData, SystemChain& chain)
 	{
-		const bool newFrame = abs(outData.time - _frame) > frameDuration;
+		const bool newFrame = abs(EngineData.time - _frame) > frameDuration;
 		if (newFrame)
 		{
-			_frame = outData.time;
+			_frame = EngineData.time;
 
 			for (auto& task : *this)
 			{
