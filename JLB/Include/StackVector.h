@@ -14,6 +14,8 @@ namespace jlb
 		[[nodiscard]] size_t GetCount() const;
 		[[nodiscard]] Iterator<T> end() override;
 
+		[[nodiscard]] operator ArrayView<T>();
+
 	private:
 		size_t _count = 0;
 
@@ -59,5 +61,14 @@ namespace jlb
 		it.index = _count;
 		it.length = _count;
 		return it;
+	}
+
+	template <typename T, size_t S>
+	StackVector<T, S>::operator ArrayView<T>()
+	{
+		ArrayView<T> view{};
+		view.data = StackArray<T, S>::GetData();
+		view.length = _count;
+		return view;
 	}
 }
