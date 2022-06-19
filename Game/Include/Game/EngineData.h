@@ -49,4 +49,6 @@ namespace game
 		// Mouse position.
 		glm::vec2 mousePos;
 	};
+
+	using GameSystem = jlb::System<EngineData>;
 }
