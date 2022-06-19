@@ -50,11 +50,14 @@ namespace vke
 		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(app);
 
-		// Set up the systme manager.
-		
-		auto systems = systemManager.CreateProxy(allocator, tempAllocator, outData);
-		game::DefineSystems(systems);
+		// Set up the systems.
+		{
+			const auto systemsInitializer = systemManager.CreateInitializer(allocator, tempAllocator, outData);
+			game::DefineSystems(systemsInitializer);
+		}
+
 		systemManager.Allocate(allocator, tempAllocator);
+		const jlb::Systems<game::EngineData> systems = systemManager;
 
 		// Prepare data to be forwarded to the game.
 		
@@ -65,7 +68,7 @@ namespace vke
 		outData.resolution = swapChain.GetResolution();
 		outData.swapChainRenderPass = swapChain.GetRenderPass();
 		outData.swapChainImageCount = swapChain.GetLength();
-		outData.systems = &systems;
+		outData.systems = systems;
 
 		// Set up a clock.
 		using ms = std::chrono::duration<float, std::milli>;

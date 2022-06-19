@@ -40,7 +40,7 @@ namespace game
 		uint8_t swapChainImageCount;
 
 		// Manages all the engine's systems.
-		jlb::Systems<EngineData>* systems;
+		jlb::Systems<EngineData> systems;
 
 		// Amount of time passed since the start of the game. In milliseconds.
 		float time = 0;

@@ -3,7 +3,7 @@
 
 namespace game
 {
-	void DefineSystems(jlb::Systems<EngineData>& systems)
+	void DefineSystems(const jlb::SystemsInitializer<EngineData>& initializer)
 	{
 		
 	}

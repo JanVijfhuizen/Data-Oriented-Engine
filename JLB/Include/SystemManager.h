@@ -10,15 +10,13 @@ namespace jlb
 	class SystemManager;
 
 	template <typename T>
-	class Systems final
+	class SystemsInitializer final
 	{
 		friend SystemManager<T>;
+
 	public:
 		template <typename U>
-		void DefineSystem();
-
-		template <typename U>
-		[[nodiscard]] U* GetSystem();
+		void DefineSystem() const;
 
 	private:
 		SystemManager<T>* _src = nullptr;
@@ -27,16 +25,30 @@ namespace jlb
 		T const* _data = nullptr;
 	};
 
+	template <typename T>
+	class Systems final
+	{
+		friend SystemManager<T>;
+
+	public:
+		template <typename U>
+		[[nodiscard]] U* GetSystem();
+
+	private:
+		SystemManager<T>* _src = nullptr;
+	};
+
 	/// <summary>
 	/// Manages all systems that can interact with the engine.
 	/// </summary>
 	template <typename T>
 	class SystemManager final
 	{
+		friend SystemsInitializer<T>;
 		friend Systems<T>;
-	public:
 
-		[[nodiscard]] Systems<T> CreateProxy(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data);
+	public:
+		[[nodiscard]] SystemsInitializer<T> CreateInitializer(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data);
 
 		void Allocate(StackAllocator& allocator, StackAllocator& tempAllocator);
 		void Free(StackAllocator& allocator, const T& data);
@@ -48,6 +60,8 @@ namespace jlb
 		void OnKeyInput(const T& data, int key, int action);
 		void OnMouseInput(const T& data, int key, int action);
 		void Exit(const T& data);
+
+		[[nodiscard]]operator Systems<T>();
 
 	private:
 		struct TempSystemData final
@@ -68,6 +82,18 @@ namespace jlb
 		template <typename U>
 		[[nodiscard]] U* GetSystem();
 	};
+
+	template <typename T>
+	SystemsInitializer<T> SystemManager<T>::CreateInitializer(StackAllocator& allocator, StackAllocator& tempAllocator,
+		const T& data)
+	{
+		SystemsInitializer<T> systems{};
+		systems._src = this;
+		systems._allocator = &allocator;
+		systems._tempAllocator = &tempAllocator;
+		systems._data = &data;
+		return systems;
+	}
 
 	template <typename T>
 	void SystemManager<T>::Allocate(StackAllocator& allocator, StackAllocator& tempAllocator)
@@ -154,8 +180,16 @@ namespace jlb
 	}
 
 	template <typename T>
+	SystemManager<T>::operator Systems<T>()
+	{
+		Systems<T> systems{};
+		systems._src = this;
+		return systems;
+	}
+
+	template <typename T>
 	template <typename U>
-	void Systems<T>::DefineSystem()
+	void SystemsInitializer<T>::DefineSystem() const
 	{
 		return _src->DefineSystem(*_allocator, *_tempAllocator, *_data);
 	}
@@ -166,17 +200,6 @@ namespace jlb
 	{
 		assert(_src->_allocated);
 		return _src->template GetSystem<U>();
-	}
-
-	template <typename T>
-	Systems<T> SystemManager<T>::CreateProxy(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data)
-	{
-		Systems<T> systems{};
-		systems._src = this;
-		systems._allocator = &allocator;
-		systems._tempAllocator = &tempAllocator;
-		systems._data = &data;
-		return systems;
 	}
 
 	template <typename T>
