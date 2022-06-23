@@ -119,7 +119,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Game/Include;$(SolutionDir)VkRenderer/Include;$(ProjectDir)Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/imgui;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,7 +139,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Ext/imgui;$(SolutionDir)Game/Include;$(SolutionDir)VkRenderer/Include;$(ProjectDir)Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,25 +152,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Engine.cpp" />
-    <ClCompile Include="Source\ImguiImpl.cpp" />
-    <ClCompile Include="Source\imgui\imgui.cpp" />
-    <ClCompile Include="Source\imgui\imgui_demo.cpp" />
-    <ClCompile Include="Source\imgui\imgui_draw.cpp" />
-    <ClCompile Include="Source\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="Source\imgui\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="Source\imgui\imgui_tables.cpp" />
-    <ClCompile Include="Source\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\precomp.cpp">
+    <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Source\WindowHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Engine.h" />
-    <ClInclude Include="Include\ImguiImpl.h" />
-    <ClInclude Include="Include\precomp.h" />
+    <ClInclude Include="Include\pch.h" />
     <ClInclude Include="Include\WindowHandler.h" />
   </ItemGroup>
   <ItemGroup>
