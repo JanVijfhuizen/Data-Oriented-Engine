@@ -56,6 +56,4 @@ namespace vke
 		// Mouse position.
 		glm::vec2 mousePos;
 	};
-
-	using GameSystem = jlb::System<EngineData>;
 }
