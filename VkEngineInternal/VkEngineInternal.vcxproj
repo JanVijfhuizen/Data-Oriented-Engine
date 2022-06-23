@@ -117,7 +117,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Game/Include;$(SolutionDir)VkRenderer/Include;$(ProjectDir)Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/imgui;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)VkEngine/Include;$(SolutionDir)Game/Include;$(SolutionDir)VkRenderer/Include;$(ProjectDir)Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -137,7 +137,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Ext/imgui;$(SolutionDir)Game/Include;$(SolutionDir)VkRenderer/Include;$(ProjectDir)Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)VkEngine/Include;$(SolutionDir)Game/Include;$(SolutionDir)VkRenderer/Include;$(ProjectDir)Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>

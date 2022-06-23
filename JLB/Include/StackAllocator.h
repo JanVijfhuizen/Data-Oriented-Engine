@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <cassert>
+#include <new.h>
 #include "Allocation.h"
 
 namespace jlb

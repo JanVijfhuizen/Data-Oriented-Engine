@@ -21,10 +21,10 @@
     <ClInclude Include="Include\Game\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\EngineData.h">
+    <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h">
+    <ClInclude Include="Include\Game\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

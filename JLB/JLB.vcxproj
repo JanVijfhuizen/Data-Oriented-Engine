@@ -168,9 +168,9 @@
     <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />
-    <ClInclude Include="Include\Vector.h" />
     <ClInclude Include="Include\System.h" />
     <ClInclude Include="Include\SystemManager.h" />
+    <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

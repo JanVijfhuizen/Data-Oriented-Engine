@@ -124,7 +124,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include\VkEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include\VkEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -142,7 +142,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include\VkEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include\VkEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -155,13 +155,14 @@
   <ItemGroup>
     <ClInclude Include="Include\VkEngineIntermediate\framework.h" />
     <ClInclude Include="Include\VkEngineIntermediate\pch.h" />
+    <ClInclude Include="Include\VkEngine\EngineData.h" />
+    <ClInclude Include="Include\VkEngine\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\VkEngineIntermediate.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

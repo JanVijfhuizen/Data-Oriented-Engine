@@ -1,5 +1,4 @@
 #pragma once
-#include "SystemManager.h"
 
 namespace jlb
 {
@@ -12,7 +11,7 @@ namespace vk
 	class StackAllocator;
 }
 
-namespace game
+namespace vke
 {
 	struct EngineSwapChainData final
 	{

@@ -3,7 +3,6 @@
 #include "WindowHandler.h"
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkSwapChain.h"
-#include "Game/EngineData.h"
 #include <chrono>
 #include "VkRenderer/VkStackAllocator.h"
 #include "SystemManager.h"
@@ -13,8 +12,8 @@ namespace vke
 	int Engine::Run()
 	{
 		// Create them here so that other objects can reference them.
-		game::EngineData outData{};
-		jlb::SystemManager<game::EngineData> systemManager;
+		EngineData outData{};
+		jlb::SystemManager<EngineData> systemManager;
 
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};
@@ -57,10 +56,10 @@ namespace vke
 		}
 
 		systemManager.Allocate(allocator, tempAllocator);
-		const jlb::Systems<game::EngineData> systems = systemManager;
+		const jlb::Systems<EngineData> systems = systemManager;
 
 		// Prepare data to be forwarded to the game.
-		game::EngineSwapChainData engineSwapChainData{};
+		EngineSwapChainData engineSwapChainData{};
 		engineSwapChainData.resolution = swapChain.GetResolution();
 		engineSwapChainData.renderPass = swapChain.GetRenderPass();
 		engineSwapChainData.imageCount = swapChain.GetLength();

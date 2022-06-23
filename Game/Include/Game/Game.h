@@ -6,10 +6,10 @@
 #define GAME_API __declspec(dllimport)
 #endif
 
-#include "EngineData.h"
+#include "VkEngine/EngineData.h"
 #include "SystemManager.h"
 
 namespace game
 {
-	extern "C" GAME_API void DefineSystems(const jlb::SystemsInitializer<EngineData>& initializer);
+	extern "C" GAME_API void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer);
 }

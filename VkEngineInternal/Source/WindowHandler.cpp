@@ -140,12 +140,12 @@ namespace vke
 		return _window;
 	}
 
-	jlb::SystemManager<game::EngineData>& WindowHandler::GetSystemManager() const
+	jlb::SystemManager<EngineData>& WindowHandler::GetSystemManager() const
 	{
 		return *_systemManager;
 	}
 
-	const game::EngineData& WindowHandler::GetOutData() const
+	const EngineData& WindowHandler::GetOutData() const
 	{
 		return *_outData;
 	}
