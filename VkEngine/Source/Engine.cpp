@@ -60,14 +60,16 @@ namespace vke
 		const jlb::Systems<game::EngineData> systems = systemManager;
 
 		// Prepare data to be forwarded to the game.
-		
+		game::EngineSwapChainData engineSwapChainData{};
+		engineSwapChainData.resolution = swapChain.GetResolution();
+		engineSwapChainData.renderPass = swapChain.GetRenderPass();
+		engineSwapChainData.imageCount = swapChain.GetLength();
+
 		outData.allocator = &allocator;
 		outData.tempAllocator = &tempAllocator;
 		outData.vkAllocator = &vkAllocator;
 		outData.app = &app;
-		outData.resolution = swapChain.GetResolution();
-		outData.swapChainRenderPass = swapChain.GetRenderPass();
-		outData.swapChainImageCount = swapChain.GetLength();
+		outData.swapChainData = &engineSwapChainData;
 		outData.systems = systems;
 
 		// Set up a clock.
@@ -90,8 +92,8 @@ namespace vke
 			const auto cmdBuffer = swapChain.BeginFrame(app);
 
 			// Update swap chain information.
-			outData.swapChainCommandBuffer = cmdBuffer;
-			outData.swapChainImageIndex = swapChain.GetCurrentImageIndex();
+			engineSwapChainData.commandBuffer = cmdBuffer;
+			engineSwapChainData.imageIndex = swapChain.GetCurrentImageIndex();
 
 			// Update (delta)time.
 			auto newTime = std::chrono::high_resolution_clock::now();
@@ -103,8 +105,8 @@ namespace vke
 				double x;
 				double y;
 				glfwGetCursorPos(windowHandler.GetGLFWWindow(), &x, &y);
-				x /= outData.resolution.x;
-				y /= outData.resolution.y;
+				x /= engineSwapChainData.resolution.x;
+				y /= engineSwapChainData.resolution.y;
 				outData.mousePos.x = x;
 				outData.mousePos.y = y;
 			}
@@ -118,8 +120,8 @@ namespace vke
 			if (presentResult)
 			{
 				swapChain.Recreate(allocator, app, windowHandler);
-				outData.resolution = swapChain.GetResolution();
-				outData.swapChainRenderPass = swapChain.GetRenderPass();
+				engineSwapChainData.resolution = swapChain.GetResolution();
+				engineSwapChainData.renderPass = swapChain.GetRenderPass();
 				// Let the game know we have recreated the swapchain.
 				systemManager.OnRecreateSwapChainAssets(outData);
 			}
