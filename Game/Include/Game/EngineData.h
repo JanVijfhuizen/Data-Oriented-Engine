@@ -14,6 +14,25 @@ namespace vk
 
 namespace game
 {
+	struct EngineSwapChainData final
+	{
+		// Command buffer that is currently recording.
+		VkCommandBuffer commandBuffer;
+		// Render pass used by the swap chain.
+		VkRenderPass renderPass;
+		// Resolution of the swap chain.
+		glm::ivec2 resolution;
+		// Image index for the active swap chain image.
+		uint8_t imageIndex;
+		// Amount of swap chain images.
+		uint8_t imageCount;
+	};
+
+	struct EngineInputData final
+	{
+
+	};
+
 	/// <summary>
 	/// Data passed from the engine to the game systems.<br>
 	/// </summary>
@@ -27,17 +46,8 @@ namespace game
 		vk::StackAllocator* vkAllocator;
 		// App containing all relevant Vulkan data.
 		vk::App* app;
-
-		// Command buffer that is currently recording.
-		VkCommandBuffer swapChainCommandBuffer;
-		// Render pass used by the swap chain.
-		VkRenderPass swapChainRenderPass;
-		// Resolution of the application.
-		glm::ivec2 resolution;
-		// Image index for the active Vulkan swapchain image.
-		uint8_t swapChainImageIndex;
-		// Amount of Vulkan swapchain images.
-		uint8_t swapChainImageCount;
+		// All swap chain related data.
+		EngineSwapChainData* swapChainData;
 
 		// Manages all the engine's systems.
 		jlb::Systems<EngineData> systems;
@@ -49,4 +59,6 @@ namespace game
 		// Mouse position.
 		glm::vec2 mousePos;
 	};
+
+	using GameSystem = jlb::System<EngineData>;
 }
