@@ -13,6 +13,9 @@ namespace vk
 
 namespace vke
 {
+	/// <summary>
+	/// Swap chain data passed from the engine to the game systems.<br>
+	/// </summary>
 	struct EngineSwapChainData final
 	{
 		// Command buffer that is currently recording.
@@ -25,11 +28,6 @@ namespace vke
 		uint8_t imageIndex;
 		// Amount of swap chain images.
 		uint8_t imageCount;
-	};
-
-	struct EngineInputData final
-	{
-
 	};
 
 	/// <summary>
