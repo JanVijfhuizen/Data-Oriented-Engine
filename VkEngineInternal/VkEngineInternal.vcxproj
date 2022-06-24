@@ -167,6 +167,12 @@
     <ClInclude Include="Include\WindowHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JLB\JLB.vcxproj">
+      <Project>{5e4baad2-38ac-4c2f-8397-b484865d6b05}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\VkEngine\VkEngine.vcxproj">
+      <Project>{5dfd0332-206e-4906-91ae-db5a5f5f1a6f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\VkRenderer\VkRenderer.vcxproj">
       <Project>{19ef4ac1-ea8d-47d5-9a59-f9c52514f0ea}</Project>
     </ProjectReference>

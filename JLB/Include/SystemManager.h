@@ -32,7 +32,7 @@ namespace jlb
 
 	public:
 		template <typename U>
-		[[nodiscard]] U* GetSystem();
+		[[nodiscard]] U* GetSystem() const;
 
 		[[nodiscard]] Iterator<System<T>*> begin() const;
 		[[nodiscard]] Iterator<System<T>*> end() const;
@@ -83,7 +83,7 @@ namespace jlb
 		template <typename U>
 		void DefineSystem(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data);
 		template <typename U>
-		[[nodiscard]] U* GetSystem();
+		[[nodiscard]] U* GetSystem() const;
 	};
 
 	template <typename T>
@@ -210,7 +210,7 @@ namespace jlb
 
 	template <typename T>
 	template <typename U>
-	U* Systems<T>::GetSystem()
+	U* Systems<T>::GetSystem() const
 	{
 		assert(_src->_allocated);
 		return _src->template GetSystem<U>();
@@ -247,7 +247,7 @@ namespace jlb
 
 	template <typename T>
 	template <typename U>
-	U* SystemManager<T>::GetSystem()
+	U* SystemManager<T>::GetSystem() const
 	{
 		System<T>** ptr = _map.Contains(typeid(U).hash_code());
 		return static_cast<U*>(*ptr);

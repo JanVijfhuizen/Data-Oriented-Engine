@@ -18,5 +18,13 @@ namespace jlb
 	{
 		T* ptr = nullptr;
 		AllocationID id{};
+
+		[[nodiscard]] operator bool() const;
 	};
+
+	template <typename T>
+	Allocation<T>::operator bool() const
+	{
+		return id;
+	}
 }
