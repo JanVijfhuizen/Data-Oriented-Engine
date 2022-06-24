@@ -8,6 +8,7 @@ namespace vke
 	void GLFWKeyCallback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
 	{
 		const auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));
+		auto& outData = self->GetOutData();
 
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS && GLFWwindowMouseState == GLFW_CURSOR_DISABLED)
 		{
@@ -15,15 +16,17 @@ namespace vke
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			glfwSetCursorPos(window, resolution.x * .5f, resolution.y * 0.5f);
 			GLFWwindowMouseState = GLFW_CURSOR_NORMAL;
+			outData.mouseAvailable = false;
+			outData.mousePos = .5f * glm::vec2(resolution);
 		}
 
-		auto& outData = self->GetOutData();
 		self->GetSystemManager().OnKeyInput(outData, key, action);
 	}
 
 	void GLFWMouseKeyCallback(GLFWwindow* window, const int button, const int action, const int mods)
 	{
 		const auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));
+		auto& outData = self->GetOutData();
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && GLFWwindowMouseState == GLFW_CURSOR_NORMAL)
 		{
@@ -31,9 +34,10 @@ namespace vke
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			glfwSetCursorPos(window, resolution.x * .5f, resolution.y * 0.5f);
 			GLFWwindowMouseState = GLFW_CURSOR_DISABLED;
+			outData.mouseAvailable = true;
+			outData.mousePos = .5f * glm::vec2(resolution);
 		}
-
-		auto& outData = self->GetOutData();
+		
 		self->GetSystemManager().OnMouseInput(outData, button, action);
 	}
 
@@ -145,7 +149,7 @@ namespace vke
 		return *_systemManager;
 	}
 
-	const EngineData& WindowHandler::GetOutData() const
+	EngineData& WindowHandler::GetOutData() const
 	{
 		return *_outData;
 	}

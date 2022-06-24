@@ -55,5 +55,7 @@ namespace vke
 		float deltaTime = 0;
 		// Mouse position.
 		glm::vec2 mousePos;
+		// Whether or not the mouse is locked to the screen.
+		bool mouseAvailable = true;
 	};
 }

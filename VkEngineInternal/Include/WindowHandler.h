@@ -66,7 +66,7 @@ namespace vke
 		/// <summary>
 		/// Returns the engine's OutData. Needed for free function callbacks.
 		/// </summary>
-		[[nodiscard]] const EngineData& GetOutData() const;
+		[[nodiscard]] EngineData& GetOutData() const;
 
 	private:
 		GLFWwindow* _window = nullptr;
