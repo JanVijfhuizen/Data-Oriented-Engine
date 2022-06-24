@@ -1,0 +1,87 @@
+﻿#pragma once
+#include "GameSystem.h"
+
+namespace vke
+{
+	template <typename T>
+	class TaskSystem;
+
+	template <typename T>
+	class ITaskSystemSubscriber
+	{
+		friend TaskSystem<T>;
+
+	protected:
+		[[nodiscard]] virtual size_t DefineUsage() = 0;
+	};
+
+	template <typename T>
+	class TaskSystem : public GameSystem
+	{
+	public:
+		[[nodiscard]] bool TryAdd(const T&& task);
+
+	protected:
+		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void Free(const EngineData& info, jlb::Systems<EngineData> systems) override;
+
+		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info, jlb::Systems<EngineData> systems);
+
+		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks) = 0;
+		[[nodiscard]] virtual bool ValidateOnTryAdd(const T&& task);
+
+	private:
+		jlb::Vector<T> _tasks{};
+
+		void Update(const EngineData& info, jlb::Systems<EngineData> systems) final override;
+	};
+
+	template <typename T>
+	bool TaskSystem<T>::TryAdd(const T&& task)
+	{
+		if (_tasks.GetLength() == _tasks.GetCount())
+			return false;
+		if (!ValidateOnTryAdd(task))
+			return false;
+		_tasks.Add(task);
+		return true;
+	}
+
+	template <typename T>
+	void TaskSystem<T>::Allocate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		size_t usage = DefineMinimalUsage(info, systems);
+
+		for (const auto& system : systems)
+			if(const auto user = reinterpret_cast<ITaskSystemSubscriber<T>*>(system))
+				usage += user->DefineUsage();
+
+		_tasks.Allocate(*info.allocator, usage);
+	}
+
+	template <typename T>
+	void TaskSystem<T>::Free(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		_tasks.Free(*info.allocator);
+	}
+
+	template <typename T>
+	size_t TaskSystem<T>::DefineMinimalUsage(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		return 0;
+	}
+
+	template <typename T>
+	bool TaskSystem<T>::ValidateOnTryAdd(const T&& task)
+	{
+		return true;
+	}
+
+	template <typename T>
+	void TaskSystem<T>::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		GameSystem::Update(info, systems);
+		OnUpdate(info, systems, _tasks);
+		_tasks.SetCount(0);
+	}
+}
