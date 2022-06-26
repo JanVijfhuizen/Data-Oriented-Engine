@@ -32,4 +32,9 @@ namespace game
 	{
 		systems.GetSystem<vke::SceneSystem>()->PopScene(info, systems);
 	}
+
+	size_t DemoGame::DefineUsage(const vke::EntityRenderTask&)
+	{
+		return 32;
+	}
 }

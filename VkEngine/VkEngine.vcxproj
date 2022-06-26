@@ -157,14 +157,17 @@
   <ItemGroup>
     <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
     <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\InstancingUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\LayoutUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Mesh.h" />
     <ClInclude Include="Include\VkEngine\Graphics\MeshUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\PipelineUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\RenderConventions.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Shader.h" />
     <ClInclude Include="Include\VkEngine\Graphics\ShaderLoader.h" />
     <ClInclude Include="Include\VkEngineIntermediate\framework.h" />
     <ClInclude Include="Include\VkEngineIntermediate\pch.h" />
-    <ClInclude Include="Include\VkEngine\Components\Camera.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Camera.h" />
     <ClInclude Include="Include\VkEngine\Components\Transform.h" />
     <ClInclude Include="Include\VkEngine\EngineData.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Texture.h" />
@@ -177,6 +180,8 @@
     <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />
+    <ClCompile Include="Source\Graphics\PipelineUtils.cpp" />
     <ClCompile Include="Source\Graphics\TextureUtils.cpp" />
     <ClCompile Include="Source\Graphics\MeshUtils.cpp" />
     <ClCompile Include="Source\Graphics\BufferUtils.cpp" />

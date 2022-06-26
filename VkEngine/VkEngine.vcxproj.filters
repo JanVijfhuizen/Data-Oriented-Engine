@@ -45,7 +45,7 @@
     <ClInclude Include="Include\VkEngine\Graphics\RenderConventions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\Components\Camera.h">
+    <ClInclude Include="Include\VkEngine\Graphics\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\VkEngine\Graphics\ShaderLoader.h">
@@ -75,6 +75,15 @@
     <ClInclude Include="Include\VkEngine\Graphics\TextureUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\VkEngine\Graphics\InstancingUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VkEngine\Graphics\LayoutUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VkEngine\Graphics\PipelineUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -99,6 +108,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\TextureUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\LayoutUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\PipelineUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

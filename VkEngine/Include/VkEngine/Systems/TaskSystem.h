@@ -12,7 +12,7 @@ namespace vke
 		friend TaskSystem<T>;
 
 	protected:
-		[[nodiscard]] virtual size_t DefineUsage() = 0;
+		[[nodiscard]] virtual size_t DefineUsage(const T & = {}) = 0;
 	};
 
 	template <typename T>
@@ -20,6 +20,8 @@ namespace vke
 	{
 	public:
 		[[nodiscard]] bool TryAdd(const T&& task);
+		[[nodiscard]] size_t GetCount();
+		[[nodiscard]] size_t GetLength();
 
 	protected:
 		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
@@ -45,6 +47,18 @@ namespace vke
 			return false;
 		_tasks.Add(task);
 		return true;
+	}
+
+	template <typename T>
+	size_t TaskSystem<T>::GetCount()
+	{
+		return _tasks.GetCount();
+	}
+
+	template <typename T>
+	size_t TaskSystem<T>::GetLength()
+	{
+		return _tasks.GetLength();
 	}
 
 	template <typename T>
