@@ -167,6 +167,8 @@
     <ClInclude Include="Include\VkEngine\Components\Camera.h" />
     <ClInclude Include="Include\VkEngine\Components\Transform.h" />
     <ClInclude Include="Include\VkEngine\EngineData.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Texture.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\TextureUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Vertex.h" />
     <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\GameSystem.h" />
@@ -175,6 +177,7 @@
     <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\TextureUtils.cpp" />
     <ClCompile Include="Source\Graphics\MeshUtils.cpp" />
     <ClCompile Include="Source\Graphics\BufferUtils.cpp" />
     <ClCompile Include="Source\Graphics\ShaderLoader.cpp" />

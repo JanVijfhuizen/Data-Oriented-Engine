@@ -4,6 +4,7 @@
 #include "VkEngine/Components/Camera.h"
 #include "VkEngine/Graphics/Shader.h"
 #include "VkEngine/Graphics/Mesh.h"
+#include "VkEngine/Graphics/Texture.h"
 
 namespace vke
 {
@@ -20,8 +21,16 @@ namespace vke
 			Camera camera;
 		};
 
-		Shader _shader{};
+		struct TextureAtlas final
+		{
+			Texture texture;
+			VkImageView imageView;
+			VkSampler sampler;
+		};
+
+		Shader _shader;
 		Mesh _mesh;
+		TextureAtlas _textureAtlas;
 
 		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Free(const EngineData& info, jlb::Systems<EngineData> systems) override;
