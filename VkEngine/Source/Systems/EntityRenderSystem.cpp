@@ -53,10 +53,22 @@ namespace vke
 		const auto samplerCreateInfo = vk::sampler::CreateDefaultInfo(app);
 		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_textureAtlas.sampler);
 		assert(!result);
+
+		if (GetLength() == 0)
+			return;
+
+		CreateShaderAssets(info);
+		CreateSwapChainAssets(info);
 	}
 
 	void EntityRenderSystem::Free(const EngineData& info)
 	{
+		if (GetLength() > 0)
+		{
+			DestroySwapChainAssets(info);
+			DestroyShaderAssets(info);
+		}
+
 		auto& logicalDevice = info.app->logicalDevice;
 
 		vkDestroySampler(logicalDevice, _textureAtlas.sampler, nullptr);
@@ -69,27 +81,6 @@ namespace vke
 		TaskSystem<EntityRenderTask>::Free(info);
 	}
 
-	void EntityRenderSystem::Awake(const EngineData& info, const jlb::Systems<EngineData> systems)
-	{
-		TaskSystem<EntityRenderTask>::Awake(info, systems);
-
-		if (GetLength() == 0)
-			return;
-
-		CreateShaderAssets(info);
-		CreateSwapChainAssets(info);
-	}
-
-	void EntityRenderSystem::Exit(const EngineData& info, const jlb::Systems<EngineData> systems)
-	{
-		TaskSystem<EntityRenderTask>::Exit(info, systems);
-
-		if (GetLength() == 0)
-			return;
-
-		DestroySwapChainAssets(info);
-		DestroyShaderAssets(info);
-	}
 
 	void EntityRenderSystem::OnRecreateSwapChainAssets(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
