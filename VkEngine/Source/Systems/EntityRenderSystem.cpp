@@ -17,6 +17,8 @@ namespace vke
 {
 	void EntityRenderSystem::Allocate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
+		TaskSystem<EntityRenderTask>::Allocate(info, systems);
+
 		auto& app = *info.app;
 		auto& logicalDevice = app.logicalDevice;
 
@@ -63,10 +65,14 @@ namespace vke
 		mesh::Destroy(info, _mesh);
 		DestroySwapChainAssets(info);
 		shader::Unload(info, _shader);
+
+		TaskSystem<EntityRenderTask>::Free(info, systems);
 	}
 
 	void EntityRenderSystem::Awake(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
+		TaskSystem<EntityRenderTask>::Awake(info, systems);
+
 		if (GetLength() == 0)
 			return;
 
@@ -76,6 +82,8 @@ namespace vke
 
 	void EntityRenderSystem::Exit(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
+		TaskSystem<EntityRenderTask>::Exit(info, systems);
+
 		if (GetLength() == 0)
 			return;
 
@@ -85,7 +93,7 @@ namespace vke
 
 	void EntityRenderSystem::OnRecreateSwapChainAssets(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
-		GameSystem::OnRecreateSwapChainAssets(info, systems);
+		TaskSystem<EntityRenderTask>::OnRecreateSwapChainAssets(info, systems);
 		DestroySwapChainAssets(info);
 		CreateSwapChainAssets(info);
 	}

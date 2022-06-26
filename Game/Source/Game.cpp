@@ -8,8 +8,8 @@ namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
-		initializer.DefineSystem<DemoGame>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
+		initializer.DefineSystem<DemoGame>();
 	}
 }

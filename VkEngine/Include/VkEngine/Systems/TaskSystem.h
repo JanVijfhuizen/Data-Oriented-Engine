@@ -67,7 +67,7 @@ namespace vke
 		size_t usage = DefineMinimalUsage(info, systems);
 
 		for (const auto& system : systems)
-			if(const auto user = reinterpret_cast<ITaskSystemSubscriber<T>*>(system))
+			if(const auto user = dynamic_cast<ITaskSystemSubscriber<T>*>(system))
 				usage += user->DefineUsage();
 
 		_tasks.Allocate(*info.allocator, usage);

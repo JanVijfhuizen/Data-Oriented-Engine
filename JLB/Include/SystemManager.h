@@ -219,12 +219,14 @@ namespace jlb
 	template <typename T>
 	Iterator<System<T>*> Systems<T>::begin() const
 	{
+		assert(_src->_allocated);
 		return _src->_vector.begin();
 	}
 
 	template <typename T>
 	Iterator<System<T>*> Systems<T>::end() const
 	{
+		assert(_src->_allocated);
 		return _src->_vector.end();
 	}
 
