@@ -3,6 +3,7 @@
 #include "VkEngine/Components/Transform.h"
 #include "VkEngine/Components/Camera.h"
 #include "VkEngine/Graphics/Shader.h"
+#include "VkEngine/Graphics/Mesh.h"
 
 namespace vke
 {
@@ -20,6 +21,7 @@ namespace vke
 		};
 
 		Shader _shader{};
+		Mesh _mesh;
 
 		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Free(const EngineData& info, jlb::Systems<EngineData> systems) override;

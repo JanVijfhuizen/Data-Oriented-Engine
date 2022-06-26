@@ -125,6 +125,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>VkEngine/pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -143,6 +144,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>VkEngine/pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -156,6 +158,7 @@
     <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
     <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Mesh.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\MeshUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\RenderConventions.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Shader.h" />
     <ClInclude Include="Include\VkEngine\Graphics\ShaderLoader.h" />
@@ -164,6 +167,7 @@
     <ClInclude Include="Include\VkEngine\Components\Camera.h" />
     <ClInclude Include="Include\VkEngine\Components\Transform.h" />
     <ClInclude Include="Include\VkEngine\EngineData.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Vertex.h" />
     <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\GameSystem.h" />
     <ClInclude Include="Include\VkEngine\pch.h" />
@@ -171,8 +175,10 @@
     <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Include\VkEngine\Graphics\BufferUtils.cpp" />
+    <ClCompile Include="Source\Graphics\MeshUtils.cpp" />
+    <ClCompile Include="Source\Graphics\BufferUtils.cpp" />
     <ClCompile Include="Source\Graphics\ShaderLoader.cpp" />
+    <ClCompile Include="Source\Graphics\Vertex.cpp" />
     <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />
     <ClCompile Include="Source\Systems\SceneSystem.cpp" />
     <ClCompile Include="Source\pch.cpp">

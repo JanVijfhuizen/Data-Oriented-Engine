@@ -63,6 +63,12 @@
     <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\VkEngine\Graphics\MeshUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VkEngine\Graphics\Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -77,7 +83,13 @@
     <ClCompile Include="Source\Graphics\ShaderLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Include\VkEngine\Graphics\BufferUtils.cpp">
+    <ClCompile Include="Source\Graphics\BufferUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\MeshUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

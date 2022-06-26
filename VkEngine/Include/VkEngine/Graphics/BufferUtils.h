@@ -6,6 +6,6 @@ namespace vke
 
 	namespace buffer
 	{
-		void Free(const EngineData& info, Buffer buffer);
+		void Free(const EngineData& info, const Buffer& buffer);
 	}
 }
