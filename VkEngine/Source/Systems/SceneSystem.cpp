@@ -14,11 +14,11 @@ namespace vke
 		info.allocator->MFree(allocationId);
 	}
 
-	void SceneSystem::Allocate(const EngineData& info, jlb::Systems<EngineData> systems)
+	void SceneSystem::Allocate(const EngineData& info)
 	{
 	}
 
-	void SceneSystem::Free(const EngineData& info, jlb::Systems<EngineData> systems)
+	void SceneSystem::Free(const EngineData& info)
 	{
 	}
 

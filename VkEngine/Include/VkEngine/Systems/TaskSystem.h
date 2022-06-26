@@ -4,18 +4,6 @@
 namespace vke
 {
 	template <typename T>
-	class TaskSystem;
-
-	template <typename T>
-	class ITaskSystemSubscriber
-	{
-		friend TaskSystem<T>;
-
-	protected:
-		[[nodiscard]] virtual size_t DefineUsage(const T & = {}) = 0;
-	};
-
-	template <typename T>
 	class TaskSystem : public GameSystem
 	{
 	public:
@@ -24,10 +12,10 @@ namespace vke
 		[[nodiscard]] size_t GetLength();
 
 	protected:
-		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void Free(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void Allocate(const EngineData& info) override;
+		void Free(const EngineData& info) override;
 
-		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info, jlb::Systems<EngineData> systems);
+		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info);
 
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks) = 0;
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T&& task);
@@ -62,25 +50,20 @@ namespace vke
 	}
 
 	template <typename T>
-	void TaskSystem<T>::Allocate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void TaskSystem<T>::Allocate(const EngineData& info)
 	{
-		size_t usage = DefineMinimalUsage(info, systems);
-
-		for (const auto& system : systems)
-			if(const auto user = dynamic_cast<ITaskSystemSubscriber<T>*>(system))
-				usage += user->DefineUsage();
-
+		size_t usage = DefineMinimalUsage(info);
 		_tasks.Allocate(*info.allocator, usage);
 	}
 
 	template <typename T>
-	void TaskSystem<T>::Free(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void TaskSystem<T>::Free(const EngineData& info)
 	{
 		_tasks.Free(*info.allocator);
 	}
 
 	template <typename T>
-	size_t TaskSystem<T>::DefineMinimalUsage(const EngineData& info, const jlb::Systems<EngineData> systems)
+	size_t TaskSystem<T>::DefineMinimalUsage(const EngineData& info)
 	{
 		return 0;
 	}

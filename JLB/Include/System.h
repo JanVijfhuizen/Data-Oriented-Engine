@@ -14,8 +14,8 @@ namespace jlb
 		friend SystemManager<T>;
 
 	protected:
-		virtual void Allocate(const T& info, Systems<T> systems) = 0;
-		virtual void Free(const T& info, Systems<T> systems) = 0;
+		virtual void Allocate(const T& info) = 0;
+		virtual void Free(const T& info) = 0;
 
 		// Called at the start of the game. Allocate data here that is not dependent on other systems.
 		virtual void Awake(const T& info, const Systems<T> systems) {}

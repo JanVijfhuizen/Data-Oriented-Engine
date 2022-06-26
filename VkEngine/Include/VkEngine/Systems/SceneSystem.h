@@ -26,8 +26,8 @@ namespace vke
 	private:
 		Scene* _latestScene = nullptr;
 
-		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void Free(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void Allocate(const EngineData& info) override;
+		void Free(const EngineData& info) override;
 		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
 	};
 

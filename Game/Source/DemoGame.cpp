@@ -15,11 +15,11 @@ namespace game
 	{
 	}
 
-	void DemoGame::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void DemoGame::Allocate(const vke::EngineData& info)
 	{
 	}
 
-	void DemoGame::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void DemoGame::Free(const vke::EngineData& info)
 	{
 	}
 
@@ -31,10 +31,5 @@ namespace game
 	void DemoGame::Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		systems.GetSystem<vke::SceneSystem>()->PopScene(info, systems);
-	}
-
-	size_t DemoGame::DefineUsage(const vke::EntityRenderTask&)
-	{
-		return 32;
 	}
 }

@@ -15,9 +15,9 @@
 
 namespace vke
 {
-	void EntityRenderSystem::Allocate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void EntityRenderSystem::Allocate(const EngineData& info)
 	{
-		TaskSystem<EntityRenderTask>::Allocate(info, systems);
+		TaskSystem<EntityRenderTask>::Allocate(info);
 
 		auto& app = *info.app;
 		auto& logicalDevice = app.logicalDevice;
@@ -55,7 +55,7 @@ namespace vke
 		assert(!result);
 	}
 
-	void EntityRenderSystem::Free(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void EntityRenderSystem::Free(const EngineData& info)
 	{
 		auto& logicalDevice = info.app->logicalDevice;
 
@@ -66,7 +66,7 @@ namespace vke
 		DestroySwapChainAssets(info);
 		shader::Unload(info, _shader);
 
-		TaskSystem<EntityRenderTask>::Free(info, systems);
+		TaskSystem<EntityRenderTask>::Free(info);
 	}
 
 	void EntityRenderSystem::Awake(const EngineData& info, const jlb::Systems<EngineData> systems)

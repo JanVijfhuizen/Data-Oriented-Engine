@@ -137,7 +137,7 @@ namespace jlb
 
 		for (int32_t i = systemsCpy.GetLength() - 1; i >= 0; --i)
 		{
-			systemsCpy[i]->Free(data, *this);
+			systemsCpy[i]->Free(data);
 			allocator.MFree(_allocations[i]);
 		}
 
@@ -238,7 +238,7 @@ namespace jlb
 
 		auto allocation = allocator.New<U>();
 		System<T>* basePtr = allocation.ptr;
-		basePtr->Allocate(data, *this);
+		basePtr->Allocate(data);
 
 		TempSystemData tempSystemData{};
 		tempSystemData.allocation = allocation.id;

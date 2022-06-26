@@ -43,10 +43,10 @@ namespace vke
 		VkPipeline _pipeline;
 		VkPipelineLayout _pipelineLayout;
 
-		void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void Free(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void Awake(const EngineData& info, const jlb::Systems<EngineData> systems) override;
-		void Exit(const EngineData& info, const jlb::Systems<EngineData> systems) override;
+		void Allocate(const EngineData& info) override;
+		void Free(const EngineData& info) override;
+		void Awake(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
 			const jlb::Vector<EntityRenderTask>& tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
