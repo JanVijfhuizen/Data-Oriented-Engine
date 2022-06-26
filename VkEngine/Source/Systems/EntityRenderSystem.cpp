@@ -75,7 +75,6 @@ namespace vke
 		vkDestroyImageView(logicalDevice, _textureAtlas.imageView, nullptr);
 		texture::Free(info, _textureAtlas.texture);
 		mesh::Destroy(info, _mesh);
-		DestroySwapChainAssets(info);
 		shader::Unload(info, _shader);
 
 		TaskSystem<EntityRenderTask>::Free(info);
@@ -87,6 +86,11 @@ namespace vke
 		TaskSystem<EntityRenderTask>::OnRecreateSwapChainAssets(info, systems);
 		DestroySwapChainAssets(info);
 		CreateSwapChainAssets(info);
+	}
+
+	size_t EntityRenderSystem::DefineMinimalUsage(const EngineData& info)
+	{
+		return 8192;
 	}
 
 	void EntityRenderSystem::CreateShaderAssets(const EngineData& info)

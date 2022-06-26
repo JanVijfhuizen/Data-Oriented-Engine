@@ -5,12 +5,14 @@
 #include "VkEngine/Graphics/Shader.h"
 #include "VkEngine/Graphics/Mesh.h"
 #include "VkEngine/Graphics/Texture.h"
+#include "VkEngine/Graphics/SubTexture.h"
 
 namespace vke
 {
 	struct EntityRenderTask final
 	{
 		Transform transform{};
+		SubTexture subTexture{};
 	};
 
 	class EntityRenderSystem final : public TaskSystem<EntityRenderTask>
@@ -48,6 +50,8 @@ namespace vke
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
 			const jlb::Vector<EntityRenderTask>& tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
+
+		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
 
 		void CreateShaderAssets(const EngineData& info);
 		void DestroyShaderAssets(const EngineData& info);

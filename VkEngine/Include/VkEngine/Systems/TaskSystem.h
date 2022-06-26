@@ -7,7 +7,7 @@ namespace vke
 	class TaskSystem : public GameSystem
 	{
 	public:
-		[[nodiscard]] bool TryAdd(const T&& task);
+		[[nodiscard]] bool TryAdd(const T& task);
 		[[nodiscard]] size_t GetCount();
 		[[nodiscard]] size_t GetLength();
 
@@ -18,7 +18,7 @@ namespace vke
 		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info);
 
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks) = 0;
-		[[nodiscard]] virtual bool ValidateOnTryAdd(const T&& task);
+		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
 	private:
 		jlb::Vector<T> _tasks{};
@@ -27,7 +27,7 @@ namespace vke
 	};
 
 	template <typename T>
-	bool TaskSystem<T>::TryAdd(const T&& task)
+	bool TaskSystem<T>::TryAdd(const T& task)
 	{
 		if (_tasks.GetLength() == _tasks.GetCount())
 			return false;
@@ -69,7 +69,7 @@ namespace vke
 	}
 
 	template <typename T>
-	bool TaskSystem<T>::ValidateOnTryAdd(const T&& task)
+	bool TaskSystem<T>::ValidateOnTryAdd(const T& task)
 	{
 		return true;
 	}
