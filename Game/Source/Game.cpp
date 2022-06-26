@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Game.h"
 #include "DemoGame.h"
-#include "VkEngine/EntityRenderSystem.h"
-#include "VkEngine/SceneSystem.h"
+#include "VkEngine/Systems/EntityRenderSystem.h"
+#include "VkEngine/Systems/SceneSystem.h"
 
 namespace game
 {

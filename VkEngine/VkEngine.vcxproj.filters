@@ -27,16 +27,16 @@
     <ClInclude Include="Include\VkEngine\EngineData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\GameSystem.h">
+    <ClInclude Include="Include\VkEngine\Systems\GameSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\TaskSystem.h">
+    <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\EntityRenderSystem.h">
+    <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\SceneSystem.h">
+    <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,10 +44,10 @@
     <ClCompile Include="Source\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Include\VkEngine\EntityRenderSystem.cpp">
+    <ClCompile Include="Source\Systems\EntityRenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneSystem.cpp">
+    <ClCompile Include="Source\Systems\SceneSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 #include "System.h"
-#include "EngineData.h"
+#include "VkEngine/EngineData.h"
 
 namespace vke
 {

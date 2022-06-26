@@ -1,5 +1,5 @@
-﻿#include "pch.h"
-#include "SceneSystem.h"
+﻿#include "VkEngine/pch.h"
+#include "VkEngine/Systems/SceneSystem.h"
 
 namespace vke
 {
