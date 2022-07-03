@@ -164,8 +164,10 @@
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
+    <ClInclude Include="Include\Game\TurnSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\TurnSystem.cpp" />
     <ClCompile Include="Source\DemoGame.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />
     <ClCompile Include="Source\Game.cpp" />
