@@ -27,10 +27,13 @@
     <ClInclude Include="Include\Game\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\DemoGame.h">
+    <ClInclude Include="Include\Game\Systems\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\TurnSystem.h">
+    <ClInclude Include="Include\Game\Systems\TurnSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Game\Scenes\DemoScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,10 +47,13 @@
     <ClCompile Include="Source\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\DemoGame.cpp">
+    <ClCompile Include="Source\Systems\GameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\TurnSystem.cpp">
+    <ClCompile Include="Source\Systems\TurnSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\DemoScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

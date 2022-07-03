@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "Game.h"
-#include "DemoGame.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
-#include "TurnSystem.h"
+#include "Systems/TurnSystem.h"
+#include "Systems/GameState.h"
 
 namespace game
 {
@@ -12,6 +12,6 @@ namespace game
 		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
-		initializer.DefineSystem<DemoGame>();
+		initializer.DefineSystem<GameState>();
 	}
 }
