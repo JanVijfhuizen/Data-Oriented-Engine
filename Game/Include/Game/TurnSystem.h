@@ -6,19 +6,23 @@ namespace game
 	class TurnSystem final : public vke::GameSystem
 	{
 	public:
-		float ticksPerSecond = 4;
-		float timeMultiplier = 1;
-
 		[[nodiscard]] bool GetIfTickEvent() const;
 		[[nodiscard]] float GetTimeLerp() const;
 
 	private:
-		float _lastTickEventTime = 0;
+		bool _paused = false;
+		size_t _ticksPerSecond = 4;
+		size_t _previousTicksPerSecond = 4;
+
+		float _time = 0;
+		float _timePreviousTick = 0;
+		bool _tickCalled = false;
+
 		float _lerp = 0;
-		bool _tickEventCalled = false;
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;
 		void Update(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};
 }
