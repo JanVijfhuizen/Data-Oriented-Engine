@@ -3,16 +3,21 @@
 #include "VkEngine/Components/Transform.h"
 #include "VkEngine/Graphics/SubTexture.h"
 
-namespace game
+namespace vke
 {
 	struct UIRenderTask final
 	{
-		vke::Transform transform{};
-		vke::SubTexture subTexture{};
+		Transform transform{};
+		SubTexture subTexture{};
 	};
 
-	class UIRenderSystem final : public vke::RenderSystem<UIRenderTask>
+	class UIRenderSystem final : public RenderSystem<UIRenderTask>
 	{
+	public:
+		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const Camera& camera);
+		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const Camera& camera);
+
+	private:
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;

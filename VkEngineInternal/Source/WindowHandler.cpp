@@ -14,10 +14,10 @@ namespace vke
 		{
 			const auto resolution = self->GetResolution();
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			glfwSetCursorPos(window, resolution.x * .5f, resolution.y * 0.5f);
+			glfwSetCursorPos(window, resolution.x * .5f, resolution.y * .5f);
 			GLFWwindowMouseState = GLFW_CURSOR_NORMAL;
 			outData.mouseAvailable = false;
-			outData.mousePos = .5f * glm::vec2(resolution);
+			outData.mousePos = glm::vec2(resolution) * .5f;
 		}
 
 		self->GetSystemManager().OnKeyInput(outData, key, action);
@@ -30,12 +30,11 @@ namespace vke
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && GLFWwindowMouseState == GLFW_CURSOR_NORMAL)
 		{
-			const auto resolution = self->GetResolution();
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			glfwSetCursorPos(window, resolution.x * .5f, resolution.y * 0.5f);
+			glfwSetCursorPos(window, 0, 0);
 			GLFWwindowMouseState = GLFW_CURSOR_DISABLED;
 			outData.mouseAvailable = true;
-			outData.mousePos = .5f * glm::vec2(resolution);
+			outData.mousePos = glm::vec2(0);
 		}
 		
 		self->GetSystemManager().OnMouseInput(outData, button, action);
@@ -66,6 +65,8 @@ namespace vke
 		glfwSetMouseButtonCallback(_window, GLFWMouseKeyCallback);
 		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		GLFWwindowMouseState = GLFW_CURSOR_DISABLED;
+
+		glfwSetCursorPos(_window, 0, 0);
 	}
 
 	void WindowHandler::Free() const
