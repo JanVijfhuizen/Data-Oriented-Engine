@@ -4,16 +4,10 @@
 
 namespace game::demo
 {
-	void DemoScene::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
-	{
-	}
-
-	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
-	{
-	}
-
 	void DemoScene::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		GameScene::Update(info, systems);
+
 		const auto sys = systems.GetSystem<vke::EntityRenderSystem>();
 
 		for (size_t y = 0; y < 32; ++y)
