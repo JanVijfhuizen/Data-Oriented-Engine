@@ -116,6 +116,6 @@ namespace jlb
 		}
 
 		++_count;
-		return GetView()[_count - 1] = value;
+		return Array<T>::GetData()[_count - 1] = value;
 	}
 }

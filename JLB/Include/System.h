@@ -26,9 +26,9 @@ namespace jlb
 		// Called when the screen has been resized/minimized.
 		virtual void OnRecreateSwapChainAssets(const T& info, const Systems<T> systems) {}
 		// Called when a key has been pressed.
-		void OnKeyInput(const T& info, const Systems<T> systems, int key, int action){}
+		virtual void OnKeyInput(const T& info, const Systems<T> systems, int key, int action){}
 		// Called when the mouse has moved / mousekey has been pressed.
-		void OnMouseInput(const T& info, const Systems<T> systems, int key, int action){}
+		virtual void OnMouseInput(const T& info, const Systems<T> systems, int key, int action){}
 		// Called at the end of the game.
 		virtual void Exit(const T& info, const Systems<T> systems){}
 	};

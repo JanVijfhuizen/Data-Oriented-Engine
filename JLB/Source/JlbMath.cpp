@@ -38,10 +38,4 @@ namespace jlb::math
 	{
 		return v.x == 0 && v.y == 0;
 	}
-
-	float Clamp(float clampable, float min, float max)
-	{
-		assert(min < max);
-		return clampable > max ? max : clampable < min ? min : clampable;
-	}
 }

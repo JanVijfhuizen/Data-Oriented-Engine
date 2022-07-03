@@ -23,7 +23,8 @@ namespace jlb::math
 	[[nodiscard]] bool IsZero(const glm::ivec2& v);
 
 	// Clamp a value between a minimum and a maximum number.
-	[[nodiscard]] float Clamp(float clampable, float min, float max);
+	template <typename T>
+	[[nodiscard]] T Clamp(T clampable, T min, T max);
 
 	// Returns the highest of the two values.
 	template <typename T>
@@ -32,6 +33,13 @@ namespace jlb::math
 	// Returns the lowest of the two values.
 	template <typename T>
 	[[nodiscard]] T Min(T a, T b);
+
+	template <typename T>
+	[[nodiscard]] T Clamp(const T clampable, const T min, const T max)
+	{
+		assert(min < max);
+		return clampable > max ? max : clampable < min ? min : clampable;
+	}
 
 	template <typename T>
 	T Max(const T a, const T b)
