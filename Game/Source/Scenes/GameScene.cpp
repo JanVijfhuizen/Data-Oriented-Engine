@@ -23,12 +23,26 @@ namespace game
 
 	size_t GameScene::DefineLevelSize(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) const
 	{
-		return 64;
+		return 16;
 	}
 
 	jlb::ArrayView<Tile> GameScene::GetGrid() const
 	{
 		return _grid;
+	}
+
+	size_t GameScene::ToGridIndex(const glm::vec2 pos) const
+	{
+		const size_t size = sqrt(_grid.GetLength());
+		auto index = static_cast<size_t>(round(pos.x) + round(pos.y) * size);
+		index = index < _grid.GetLength() ? index : SIZE_MAX;
+		return index;
+	}
+
+	glm::vec2 GameScene::ToWorldPos(const size_t index) const
+	{
+		const size_t size = sqrt(_grid.GetLength());
+		return glm::vec2(index % size, index / size);
 	}
 
 	void GameScene::RenderLevel(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) const

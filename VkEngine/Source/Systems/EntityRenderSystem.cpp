@@ -17,4 +17,9 @@ namespace vke
 	{
 		return "Shaders/vert.spv";
 	}
+
+	size_t EntityRenderSystem::DefineMinimalUsage(const EngineData& info)
+	{
+		return 1024;
+	}
 }

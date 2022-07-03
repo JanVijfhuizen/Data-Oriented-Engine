@@ -16,5 +16,6 @@ namespace vke
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
+		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
 	};
 }
