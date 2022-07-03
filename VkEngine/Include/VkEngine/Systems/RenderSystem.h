@@ -26,6 +26,11 @@ namespace vke
 	public:
 		Camera camera{};
 
+	protected:
+		[[nodiscard]] virtual jlb::StringView GetTextureAtlasFilePath() const = 0;
+		[[nodiscard]] virtual jlb::StringView GetFragmentShaderPath() const = 0;
+		[[nodiscard]] virtual jlb::StringView GetVertexShaderPath() const = 0;
+
 	private:
 		struct PushConstants final
 		{
@@ -74,7 +79,7 @@ namespace vke
 		auto& app = *info.app;
 		auto& logicalDevice = app.logicalDevice;
 
-		_shader = shader::Load(info, "Shaders/vert.spv", "Shaders/frag.spv");
+		_shader = shader::Load(info, GetVertexShaderPath(), GetFragmentShaderPath());
 
 		// Load mesh.
 		jlb::StackArray<Vertex, 4> vertices{};
@@ -98,7 +103,7 @@ namespace vke
 		_mesh = mesh::CreateIndexed<Vertex, Vertex::Index>(info, vertices, indices);
 
 		// Load texture.
-		_textureAtlas.texture = texture::Load(info, "Textures/Atlas.png");
+		_textureAtlas.texture = texture::Load(info, GetTextureAtlasFilePath());
 		const auto viewCreateInfo = vk::image::CreateViewDefaultInfo(_textureAtlas.texture.image, texture::DEFAULT_FORMAT);
 		auto result = vkCreateImageView(logicalDevice, &viewCreateInfo, nullptr, &_textureAtlas.imageView);
 		assert(!result);

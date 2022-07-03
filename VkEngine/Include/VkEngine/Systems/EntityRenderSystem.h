@@ -1,10 +1,5 @@
 ﻿#pragma once
-#include "TaskSystem.h"
 #include "VkEngine/Components/Transform.h"
-#include "VkEngine/Graphics/Camera.h"
-#include "VkEngine/Graphics/Shader.h"
-#include "VkEngine/Graphics/Mesh.h"
-#include "VkEngine/Graphics/Texture.h"
 #include "VkEngine/Graphics/SubTexture.h"
 #include "RenderSystem.h"
 
@@ -18,6 +13,8 @@ namespace vke
 
 	class EntityRenderSystem final : public RenderSystem<EntityRenderTask>
 	{
-		
+		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
+		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
+		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
 	};
 }

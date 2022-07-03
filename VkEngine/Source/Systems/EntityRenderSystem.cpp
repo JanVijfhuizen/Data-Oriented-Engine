@@ -3,5 +3,18 @@
 
 namespace vke
 {
-	
+	jlb::StringView EntityRenderSystem::GetTextureAtlasFilePath() const
+	{
+		return "Textures/Atlas.png";
+	}
+
+	jlb::StringView EntityRenderSystem::GetFragmentShaderPath() const
+	{
+		return "Shaders/frag.spv";
+	}
+
+	jlb::StringView EntityRenderSystem::GetVertexShaderPath() const
+	{
+		return "Shaders/vert.spv";
+	}
 }

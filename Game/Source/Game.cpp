@@ -4,6 +4,7 @@
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/GameState.h"
+#include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
@@ -12,6 +13,7 @@ namespace game
 		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
+		initializer.DefineSystem<UIRenderSystem>();
 		initializer.DefineSystem<GameState>();
 	}
 }
