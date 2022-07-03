@@ -32,7 +32,10 @@ namespace jlb
 
 	public:
 		template <typename U>
-		[[nodiscard]] U* GetSystem();
+		[[nodiscard]] U* GetSystem() const;
+
+		[[nodiscard]] Iterator<System<T>*> begin() const;
+		[[nodiscard]] Iterator<System<T>*> end() const;
 
 	private:
 		SystemManager<T>* _src = nullptr;
@@ -51,7 +54,7 @@ namespace jlb
 		[[nodiscard]] SystemsInitializer<T> CreateInitializer(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data);
 
 		void Allocate(StackAllocator& allocator, StackAllocator& tempAllocator);
-		void Free(StackAllocator& allocator, const T& data);
+		void Free(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data);
 
 		void Awake(const T& data);
 		void Start(const T& data);
@@ -61,7 +64,7 @@ namespace jlb
 		void OnMouseInput(const T& data, int key, int action);
 		void Exit(const T& data);
 
-		[[nodiscard]]operator Systems<T>();
+		[[nodiscard]] operator Systems<T>();
 
 	private:
 		struct TempSystemData final
@@ -80,13 +83,17 @@ namespace jlb
 		template <typename U>
 		void DefineSystem(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data);
 		template <typename U>
-		[[nodiscard]] U* GetSystem();
+		[[nodiscard]] U* GetSystem() const;
 	};
 
 	template <typename T>
 	SystemsInitializer<T> SystemManager<T>::CreateInitializer(StackAllocator& allocator, StackAllocator& tempAllocator,
 		const T& data)
 	{
+		assert(!_allocated);
+		assert(!_tempSystemData);
+		_tempSystemData.Allocate(tempAllocator, 16);
+
 		SystemsInitializer<T> systems{};
 		systems._src = this;
 		systems._allocator = &allocator;
@@ -116,18 +123,25 @@ namespace jlb
 	}
 
 	template <typename T>
-	void SystemManager<T>::Free(StackAllocator& allocator, const T& data)
+	void SystemManager<T>::Free(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data)
 	{
 		_allocated = false;
-		for (int32_t i = _vector.GetCount() - 1; i >= 0; --i)
-		{
-			_vector[i]->Free(data, *this);
-			allocator.MFree(_allocations[i]);
-		}
+
+		Array<System<T>*> systemsCpy{};
+		systemsCpy.Allocate(tempAllocator, _vector.GetCount());
+		Copy(systemsCpy.GetView(), 0, systemsCpy.GetLength(), _vector.GetData());
 
 		_vector.Free(allocator);
 		_map.Free(allocator);
 		_allocations.Free(allocator);
+
+		for (int32_t i = systemsCpy.GetLength() - 1; i >= 0; --i)
+		{
+			systemsCpy[i]->Free(data);
+			allocator.MFree(_allocations[i]);
+		}
+
+		systemsCpy.Free(tempAllocator);
 	}
 
 	template <typename T>
@@ -191,15 +205,29 @@ namespace jlb
 	template <typename U>
 	void SystemsInitializer<T>::DefineSystem() const
 	{
-		return _src->DefineSystem(*_allocator, *_tempAllocator, *_data);
+		return _src->template DefineSystem<U>(*_allocator, *_tempAllocator, *_data);
 	}
 
 	template <typename T>
 	template <typename U>
-	U* Systems<T>::GetSystem()
+	U* Systems<T>::GetSystem() const
 	{
 		assert(_src->_allocated);
 		return _src->template GetSystem<U>();
+	}
+
+	template <typename T>
+	Iterator<System<T>*> Systems<T>::begin() const
+	{
+		assert(_src->_allocated);
+		return _src->_vector.begin();
+	}
+
+	template <typename T>
+	Iterator<System<T>*> Systems<T>::end() const
+	{
+		assert(_src->_allocated);
+		return _src->_vector.end();
 	}
 
 	template <typename T>
@@ -207,21 +235,21 @@ namespace jlb
 	void SystemManager<T>::DefineSystem(StackAllocator& allocator, StackAllocator& tempAllocator, const T& data)
 	{
 		assert(!_allocated);
-		assert(_allocations.GetCount() < _allocations.GetLength());
 
 		auto allocation = allocator.New<U>();
-		allocation.ptr.Allocate(data, *this);
+		System<T>* basePtr = allocation.ptr;
+		basePtr->Allocate(data);
 
 		TempSystemData tempSystemData{};
 		tempSystemData.allocation = allocation.id;
 		tempSystemData.ptr = allocation.ptr;
 		tempSystemData.hashCode = typeid(U).hash_code();
-		_tempSystemData.Add(tempSystemData, tempAllocator, allocator);
+		_tempSystemData.Add(tempSystemData, &tempAllocator, &allocator);
 	}
 
 	template <typename T>
 	template <typename U>
-	U* SystemManager<T>::GetSystem()
+	U* SystemManager<T>::GetSystem() const
 	{
 		System<T>** ptr = _map.Contains(typeid(U).hash_code());
 		return static_cast<U*>(*ptr);

@@ -11,7 +11,7 @@ namespace jlb
 	class Array
 	{
 	public:
-		virtual T& operator[](size_t index);
+		virtual T& operator[](size_t index) const;
 
 		virtual void Allocate(StackAllocator& allocator, size_t size, const T& fillValue = {});
 		virtual void Free(StackAllocator& allocator);
@@ -34,7 +34,7 @@ namespace jlb
 	};
 
 	template <typename T>
-	T& Array<T>::operator[](const size_t index)
+	T& Array<T>::operator[](const size_t index) const
 	{
 		return _view[index];
 	}

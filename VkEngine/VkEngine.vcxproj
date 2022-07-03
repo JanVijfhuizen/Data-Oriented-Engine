@@ -123,8 +123,9 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include\VkEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>VkEngine/pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -141,8 +142,9 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include\VkEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>VkEngine/pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)VkRenderer/Include;$(SolutionDir)Ext/glfw-3.3.4\glfw-3.3.4.bin.WIN64\include;$(SolutionDir)Ext/vulkan-1.2.189.0/Include;$(SolutionDir)JLB/Include;$(SolutionDir)Ext;$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -153,17 +155,55 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\InstancingUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\LayoutUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Mesh.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\MeshUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\PipelineUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\RenderConventions.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Shader.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\ShaderLoader.h" />
     <ClInclude Include="Include\VkEngineIntermediate\framework.h" />
     <ClInclude Include="Include\VkEngineIntermediate\pch.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Camera.h" />
+    <ClInclude Include="Include\VkEngine\Components\Transform.h" />
     <ClInclude Include="Include\VkEngine\EngineData.h" />
-    <ClInclude Include="Include\VkEngine\GameSystem.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\SubTexture.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Texture.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\TextureUtils.h" />
+    <ClInclude Include="Include\VkEngine\Graphics\Vertex.h" />
+    <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h" />
+    <ClInclude Include="Include\VkEngine\Systems\GameSystem.h" />
     <ClInclude Include="Include\VkEngine\pch.h" />
+    <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h" />
+    <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />
+    <ClCompile Include="Source\Graphics\PipelineUtils.cpp" />
+    <ClCompile Include="Source\Graphics\TextureUtils.cpp" />
+    <ClCompile Include="Source\Graphics\MeshUtils.cpp" />
+    <ClCompile Include="Source\Graphics\BufferUtils.cpp" />
+    <ClCompile Include="Source\Graphics\ShaderLoader.cpp" />
+    <ClCompile Include="Source\Graphics\Vertex.cpp" />
+    <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />
+    <ClCompile Include="Source\Systems\SceneSystem.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VkEngine/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VkEngine/pch.h</PrecompiledHeaderFile>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JLB\JLB.vcxproj">
+      <Project>{5e4baad2-38ac-4c2f-8397-b484865d6b05}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\VkRenderer\VkRenderer.vcxproj">
+      <Project>{19ef4ac1-ea8d-47d5-9a59-f9c52514f0ea}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

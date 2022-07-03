@@ -17,12 +17,12 @@ namespace jlb
 		// Duplicates are not inserted.
 		void Insert(T&& value, size_t key);
 
-		[[nodiscard]] T* Contains(size_t key);
+		[[nodiscard]] T* Contains(size_t key) const;
 		void Erase(T& value);
 		[[nodiscard]] size_t GetCount() const;
 
 	protected:
-		[[nodiscard]] size_t GetHash(size_t key);
+		[[nodiscard]] size_t GetHash(size_t key) const;
 		void _Insert(T& value, size_t key);
 
 	private:
@@ -86,7 +86,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	T* Map<T>::Contains(const size_t key)
+	T* Map<T>::Contains(const size_t key) const
 	{
 		const size_t length = _array.GetLength();
 		assert(_count < length);
@@ -114,7 +114,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	size_t Map<T>::GetHash(const size_t key)
+	size_t Map<T>::GetHash(const size_t key) const
 	{
 		return key % _array.GetLength();
 	}

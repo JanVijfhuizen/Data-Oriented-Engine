@@ -49,13 +49,6 @@ namespace vke
 		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(app);
 
-		// Set up the systems.
-		{
-			const auto systemsInitializer = systemManager.CreateInitializer(allocator, tempAllocator, outData);
-			game::DefineSystems(systemsInitializer);
-		}
-
-		systemManager.Allocate(allocator, tempAllocator);
 		const jlb::Systems<EngineData> systems = systemManager;
 
 		// Prepare data to be forwarded to the game.
@@ -63,13 +56,19 @@ namespace vke
 		engineSwapChainData.resolution = swapChain.GetResolution();
 		engineSwapChainData.renderPass = swapChain.GetRenderPass();
 		engineSwapChainData.imageCount = swapChain.GetLength();
-
 		outData.allocator = &allocator;
 		outData.tempAllocator = &tempAllocator;
 		outData.vkAllocator = &vkAllocator;
 		outData.app = &app;
 		outData.swapChainData = &engineSwapChainData;
 		outData.systems = systems;
+
+		// Set up the systems.
+		{
+			const auto systemsInitializer = systemManager.CreateInitializer(allocator, tempAllocator, outData);
+			game::DefineSystems(systemsInitializer);
+		}
+		systemManager.Allocate(allocator, tempAllocator);
 
 		// Set up a clock.
 		using ms = std::chrono::duration<float, std::milli>;
@@ -133,7 +132,7 @@ namespace vke
 		// Let the game know we're quitting.
 		// Free all the systems.
 		systemManager.Exit(outData);
-		systemManager.Free(allocator, outData);
+		systemManager.Free(allocator, tempAllocator, outData);
 
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
