@@ -110,8 +110,9 @@ namespace vke::texture
 		return texture;
 	}
 
-	Texture LoadAsAtlas(const EngineData& info, const jlb::ArrayView<TextureAtlasPartition> partitions,
-		const jlb::ArrayView<SubTexture> outSubTextures, const size_t nodeResolution, const size_t atlasWidth)
+	void GenerateAtlas(const EngineData& info, const jlb::StringView path, 
+		const jlb::ArrayView<TextureAtlasPartition> partitions,
+		const size_t nodeResolution, const size_t atlasWidth)
 	{
 		// Check if atlas width is power of 2.
 		assert((atlasWidth & (atlasWidth - 1)) == 0);
@@ -241,12 +242,11 @@ namespace vke::texture
 			//break;
 		}
 
-		stbi_write_jpg("atlas_test.jpg", atlasWidth * nodeResolution, 
+		stbi_write_jpg(path, atlasWidth * nodeResolution,
 			atlasWidth * nodeResolution, 4, atlasPixels.GetData(), 100);
 
 		atlasPixels.Free(*info.tempAllocator);
 		filledNodes.Free(*info.tempAllocator);
-		return {};
 	}
 
 	Texture Load(const EngineData& info, const jlb::StringView path)

@@ -14,17 +14,17 @@ namespace game::demo
 		partitions[0].path = "Textures/Atlas.png";
 		partitions[0].width = 2;
 		partitions[1].path = "Textures/Atlas-ui.png";
-		partitions[1].width = 2;
+		partitions[1].width = 3;
 		partitions[2].path = "Textures/Red.png";
 		partitions[3].path = "Textures/Atlas.png";
 		partitions[3].width = 2;
 		partitions[4].path = "Textures/Atlas-ui.png";
-		partitions[4].width = 2;
+		partitions[4].width = 3;
 		partitions[5].path = "Textures/Red.png";
 		partitions[6].path = "Textures/Red.png";
 		partitions[7].path = "Textures/Red.png";
-		jlb::StackArray<vke::SubTexture, 7> outSubTextures{};
-		vke::texture::LoadAsAtlas(info, partitions, outSubTextures, 16, 4);
+
+		vke::texture::GenerateAtlas(info, "Textures/FullAtlas.png", partitions, 16, 4);
 	}
 
 	void DemoScene::GenerateLevel(const jlb::ArrayView<Tile> level, const vke::EngineData& info,
