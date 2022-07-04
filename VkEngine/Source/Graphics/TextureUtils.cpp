@@ -30,7 +30,7 @@ namespace vke::texture
 		*/
 
 	Texture LoadAsAtlas(const EngineData& info, const jlb::ArrayView<TextureAtlasPartition> partitions,
-		const jlb::ArrayView<SubTexture> outSubTextures, const glm::ivec2 nodeResolution, const size_t atlasWidth)
+		const jlb::ArrayView<SubTexture> outSubTextures, const size_t nodeResolution, const size_t atlasWidth)
 	{
 		// Check if atlas width is power of 2.
 		assert((atlasWidth & (atlasWidth - 1)) == 0);
@@ -137,9 +137,39 @@ namespace vke::texture
 			std::cout << filled_node.coordinates.x << " " << filled_node.coordinates.y << std::endl;
 			std::cout << filled_node.partition.path << std::endl;
 		}
-		
-		filledNodes.Free(*info.tempAllocator);
 
+		jlb::Array<stbi_uc> atlasPixels{};
+		atlasPixels.Allocate(*info.tempAllocator, atlasWidth * atlasWidth * 4);
+		/*
+		const size_t yStepSize = atlasWidth * nodeResolution;
+
+		for (const auto& node : filledNodes)
+		{
+			// Load pixels.
+			int texWidth, texHeight, texChannels;
+			stbi_uc* pixels = stbi_load(node.partition.path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+			const VkDeviceSize imageSize = texWidth * texHeight * 4;
+			assert(pixels);
+
+			const auto& coordinates = node.coordinates;
+			const size_t width = node.partition.width * nodeResolution;
+			const size_t startIndex = (coordinates.x + coordinates.y * atlasWidth) * nodeResolution;
+
+			for (size_t y = 0; y < nodeResolution; ++y)
+			{
+				const size_t yStartIndex = startIndex + y * yStepSize;
+
+				jlb::Copy(atlasPixels.GetView(), yStartIndex, yStartIndex + width, &pixels[y * width]);
+			}
+
+			// Free pixels.
+			stbi_image_free(pixels);
+		}
+
+		stbi_write_jpg("atlas_test.jpg", atlasWidth, atlasWidth, 4, atlasPixels.GetData(), 100);
+		*/
+		atlasPixels.Free(*info.tempAllocator);
+		filledNodes.Free(*info.tempAllocator);
 		return {};
 	}
 

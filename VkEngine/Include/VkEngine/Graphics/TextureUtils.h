@@ -19,7 +19,7 @@ namespace vke
 
 		[[nodiscard]] Texture LoadAsAtlas(const EngineData& info, 
 			jlb::ArrayView<TextureAtlasPartition> partitions, jlb::ArrayView<SubTexture> outSubTextures, 
-			glm::ivec2 nodeResolution, size_t atlasWidth);
+			size_t nodeResolution, size_t atlasWidth);
 		[[nodiscard]] Texture Load(const EngineData& info, jlb::StringView path);
 		void Free(const EngineData& info, const Texture& texture);
 	}

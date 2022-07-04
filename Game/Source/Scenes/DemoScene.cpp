@@ -17,7 +17,7 @@ namespace game::demo
 		partitions[1].width = 2;
 		partitions[2].path = "Textures/Red.png";
 		jlb::StackArray<vke::SubTexture, 3> outSubTextures{};
-		vke::texture::LoadAsAtlas(info, partitions, outSubTextures, glm::ivec2(16), 4);
+		vke::texture::LoadAsAtlas(info, partitions, outSubTextures, 16, 4);
 	}
 
 	void DemoScene::GenerateLevel(const jlb::ArrayView<Tile> level, const vke::EngineData& info,
