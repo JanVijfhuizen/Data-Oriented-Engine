@@ -26,6 +26,7 @@ namespace jlb
 
 		void Clear();
 		[[nodiscard]] size_t GetCount() const;
+		[[nodiscard]] size_t GetLength() const;
 
 	private:
 		size_t _count = 0;
@@ -108,6 +109,12 @@ namespace jlb
 	}
 
 	template <typename T>
+	size_t Heap<T>::GetLength() const
+	{
+		return _array.GetLength();
+	}
+
+	template <typename T>
 	void Heap<T>::HeapifyBottomToTop(const uint32_t index)
 	{
 		// Tree root found.
@@ -135,7 +142,7 @@ namespace jlb
 		if (_count < left)
 			return;
 
-		const auto data = Array<KeyPair<T>>::GetData();
+		const auto data = _array.GetData();
 		// Is the left node smaller than index.
 		const bool lDiff = data[index].key > data[left].key;
 		// Is the right node smaller than index.
@@ -146,7 +153,7 @@ namespace jlb
 		if (lDiff || rDiff)
 		{
 			const uint32_t newIndex = left + dir;
-			Swap(_array, newIndex, index);
+			Swap(_array.GetView(), newIndex, index);
 			HeapifyTopToBottom(newIndex);
 		}
 	}

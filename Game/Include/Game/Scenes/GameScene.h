@@ -15,6 +15,9 @@ namespace game
 		virtual void GenerateLevel(jlb::ArrayView<Tile> level, const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) const = 0;
 
 		[[nodiscard]] jlb::ArrayView<Tile> GetGrid() const;
+		// Returns SIZE_MAX if out of bounds.
+		[[nodiscard]] size_t ToGridIndex(glm::vec2 pos) const;
+		[[nodiscard]] glm::vec2 ToWorldPos(size_t index) const;
 
 	private:
 		jlb::Array<Tile> _grid{};

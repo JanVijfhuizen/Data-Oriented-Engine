@@ -177,10 +177,13 @@
     <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\GameSystem.h" />
     <ClInclude Include="Include\VkEngine\pch.h" />
+    <ClInclude Include="Include\VkEngine\Systems\RenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
+    <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\UIRenderSystem.cpp" />
     <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />
     <ClCompile Include="Source\Graphics\PipelineUtils.cpp" />
     <ClCompile Include="Source\Graphics\TextureUtils.cpp" />
