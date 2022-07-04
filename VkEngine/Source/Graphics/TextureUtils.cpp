@@ -13,6 +13,7 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+#include <fstream>
 
 namespace vke::texture
 {
@@ -110,8 +111,10 @@ namespace vke::texture
 		return texture;
 	}
 
-	Texture LoadAsAtlas(const EngineData& info, const jlb::ArrayView<TextureAtlasPartition> partitions,
-		const jlb::ArrayView<SubTexture> outSubTextures, const size_t nodeResolution, const size_t atlasWidth)
+	void GenerateAtlas(const EngineData& info, 
+		const jlb::StringView texturePath, const jlb::StringView subtexturePath,
+		const jlb::ArrayView<TextureAtlasPartition> partitions,
+		const size_t nodeResolution, const size_t atlasWidth)
 	{
 		// Check if atlas width is power of 2.
 		assert((atlasWidth & (atlasWidth - 1)) == 0);
@@ -121,6 +124,7 @@ namespace vke::texture
 		{
 			glm::ivec2 coordinates{};
 			TextureAtlasPartition partition{};
+			size_t index;
 		};
 
 		jlb::Vector<FilledNode> filledNodes{};
@@ -133,6 +137,12 @@ namespace vke::texture
 				size_t width{};
 			};
 
+			struct Content final
+			{
+				TextureAtlasPartition partition{};
+				size_t index{};
+			};
+
 			jlb::Heap<Node> open{};
 			open.Allocate(*info.tempAllocator, partitions.length + 1);
 
@@ -143,12 +153,20 @@ namespace vke::texture
 				open.Insert(start, start.width);
 			}
 
-			jlb::Heap<TextureAtlasPartition> heap{};
+			jlb::Heap<Content> heap{};
 			heap.Allocate(*info.tempAllocator, partitions.length);
 
 			// Sort partitions from largest to smallest.
-			for (auto& partition : partitions)
-				heap.Insert(partition, SIZE_MAX - partition.width);
+			{
+				size_t index = 0;
+				for (auto& partition : partitions)
+				{
+					Content content{};
+					content.partition = partition;
+					content.index = index++;
+					heap.Insert(content, SIZE_MAX - partition.width);
+				}
+			}
 
 			jlb::Vector<Node> ignored{};
 			ignored.Allocate(*info.tempAllocator, open.GetLength());
@@ -158,7 +176,8 @@ namespace vke::texture
 			// While there are still sub textures to partition.
 			while (heap.GetCount())
 			{
-				const auto partition = heap.Pop();
+				const auto content = heap.Pop();
+				const auto& partition = content.partition;
 
 				// While there is still space left.
 				bool found = false;
@@ -171,6 +190,7 @@ namespace vke::texture
 						FilledNode filledNode{};
 						filledNode.coordinates = node.coordinates;
 						filledNode.partition = partition;
+						filledNode.index = content.index;
 						filledNodes.Add(filledNode);
 
 						// Add the new smaller node if it still exists.
@@ -197,6 +217,7 @@ namespace vke::texture
 					FilledNode filledNode{};
 					filledNode.coordinates.y = layersUsed;
 					filledNode.partition = partition;
+					filledNode.index = content.index;
 					filledNodes.Add(filledNode);
 				}
 
@@ -238,15 +259,71 @@ namespace vke::texture
 
 			// Free pixels.
 			stbi_image_free(pixels);
-			//break;
 		}
 
-		stbi_write_jpg("atlas_test.jpg", atlasWidth * nodeResolution, 
+		stbi_write_jpg(texturePath, atlasWidth * nodeResolution,
 			atlasWidth * nodeResolution, 4, atlasPixels.GetData(), 100);
 
 		atlasPixels.Free(*info.tempAllocator);
+
+		jlb::Heap<SubTexture> subTextures{};
+		subTextures.Allocate(*info.tempAllocator, filledNodes.GetLength());
+
+		for (auto& filledNode : filledNodes)
+		{
+			SubTexture subTexture{};
+			subTexture.lTop = filledNode.coordinates;
+			subTexture.rBot = filledNode.coordinates + glm::ivec2(filledNode.partition.width, 0);
+			subTexture.lTop = glm::vec2(1) / subTexture.lTop;
+			subTexture.rBot = glm::vec2(1) / subTexture.rBot;
+			subTextures.Insert(subTexture, filledNode.index);
+		}
+
+		std::ofstream outfile;
+		outfile.open(subtexturePath);
+
+		while(subTextures.GetCount())
+		{
+			const auto subTexture = subTextures.Pop();
+			outfile << subTexture.lTop.x << std::endl;
+			outfile << subTexture.lTop.y << std::endl;
+			outfile << subTexture.rBot.x << std::endl;
+			outfile << subTexture.rBot.y << std::endl;
+		}
+
+		outfile.close();
+
+		subTextures.Free(*info.tempAllocator);
 		filledNodes.Free(*info.tempAllocator);
-		return {};
+	}
+
+	void LoadAtlasSubTextures(const jlb::StringView coordsPath, const jlb::ArrayView<SubTexture> outSubTextures)
+	{
+		std::ifstream infile;
+		infile.open(coordsPath);
+
+		for (size_t i = 0; i < outSubTextures.length; ++i)
+		{
+			auto& coord = outSubTextures[i];
+			infile >> coord.lTop.x;
+			infile >> coord.lTop.y;
+			infile >> coord.rBot.x;
+			infile >> coord.rBot.y;
+		}
+
+		infile.close();
+	}
+
+	void Subdivide(const SubTexture subTexture, const size_t amount, const jlb::ArrayView<SubTexture> outSubTextures)
+	{
+		const float partitionSize = subTexture.rBot.x - subTexture.lTop.x;
+		for (size_t i = 0; i < amount; ++i)
+		{
+			auto& newSubTexture = outSubTextures[i];
+			newSubTexture = subTexture;
+			newSubTexture.lTop.x = partitionSize * i;
+			newSubTexture.rBot.x = partitionSize * (i + 1);
+		}
 	}
 
 	Texture Load(const EngineData& info, const jlb::StringView path)

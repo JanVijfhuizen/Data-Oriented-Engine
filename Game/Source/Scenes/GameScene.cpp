@@ -50,11 +50,6 @@ namespace game
 		const auto sys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto posMul = static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 
-		vke::SubTexture walkable{};
-		walkable.rBot = { 0.5f, 1 };
-		vke::SubTexture unwalkable{};
-		unwalkable.lTop = { 0.5f, 0 };
-
 		vke::EntityRenderTask task{};
 
 		const size_t size = sqrt(_grid.GetLength());
@@ -68,8 +63,8 @@ namespace game
 				const size_t index = column + x;
 				const auto& tile = _grid[index];
 
-				task.subTexture = tile.walkable ? walkable : unwalkable;
-					task.transform.position = glm::vec2(x, y) * posMul;
+				task.subTexture = tile.subTexture;
+				task.transform.position = glm::vec2(x, y) * posMul;
 				const auto result = sys->TryAdd(task);
 				assert(result);
 			}
