@@ -6,6 +6,21 @@
 
 namespace game::demo
 {
+	void DemoScene::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		GameScene::Allocate(info, systems);
+
+		jlb::StackArray<vke::texture::TextureAtlasPartition, 3> partitions{};
+		partitions[0].path = "Textures/Atlas.png";
+		partitions[0].resolution = glm::ivec2{ 32, 16 };
+		partitions[1].path = "Textures/Atlas-ui.png";
+		partitions[1].resolution = glm::ivec2{ 32, 16 };
+		partitions[2].path = "Textures/Red.png";
+		partitions[2].resolution = glm::ivec2{ 16, 16 };
+		jlb::StackArray<vke::SubTexture, 3> outSubTextures{};
+		vke::texture::LoadAsAtlas(info, partitions, outSubTextures);
+	}
+
 	void DemoScene::GenerateLevel(const jlb::ArrayView<Tile> level, const vke::EngineData& info,
 		jlb::Systems<vke::EngineData> systems) const
 	{

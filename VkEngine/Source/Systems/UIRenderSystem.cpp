@@ -10,7 +10,7 @@ namespace vke
 
 	glm::vec2 UIRenderSystem::WorldToScreenPos(const glm::vec2 pos, const Camera& camera)
 	{
-		return ((pos * static_cast<float>(PIXEL_SIZE_ENTITY)) - camera.position) * camera.pixelSize;
+		return (pos * static_cast<float>(PIXEL_SIZE_ENTITY) - camera.position) * camera.pixelSize;
 	}
 
 	jlb::StringView UIRenderSystem::GetTextureAtlasFilePath() const

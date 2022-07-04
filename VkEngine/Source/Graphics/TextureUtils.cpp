@@ -7,11 +7,29 @@
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkSyncUtils.h"
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image.h>
+#include <stb_image_write.h>
 #include "StringView.h"
 
 namespace vke::texture
 {
+	Texture LoadAsAtlas(const EngineData& info, 
+		const jlb::ArrayView<TextureAtlasPartition> partitions,
+		const jlb::ArrayView<SubTexture> outSubTextures)
+	{
+		// Load pixels.
+		int texWidth, texHeight, texChannels;
+		stbi_uc* pixels = stbi_load(partitions[0].path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+		const VkDeviceSize imageSize = texWidth * texHeight * 4;
+		assert(pixels);
+
+		stbi_write_jpg("atlas_test.jpg", texWidth, texHeight, 4, pixels, 100);
+
+		stbi_image_free(pixels);
+		return {};
+	}
+
 	Texture Load(const EngineData& info, const jlb::StringView path)
 	{
 		auto& app = *info.app;
