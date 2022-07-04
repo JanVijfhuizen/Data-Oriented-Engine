@@ -142,7 +142,7 @@ namespace jlb
 		if (_count < left)
 			return;
 
-		const auto data = Array<KeyPair<T>>::GetData();
+		const auto data = _array.GetData();
 		// Is the left node smaller than index.
 		const bool lDiff = data[index].key > data[left].key;
 		// Is the right node smaller than index.
@@ -153,7 +153,7 @@ namespace jlb
 		if (lDiff || rDiff)
 		{
 			const uint32_t newIndex = left + dir;
-			Swap(_array, newIndex, index);
+			Swap(_array.GetView(), newIndex, index);
 			HeapifyTopToBottom(newIndex);
 		}
 	}

@@ -12,6 +12,7 @@
 #include <stb_image_write.h>
 #include "StringView.h"
 #include "Heap.h"
+#include <iostream>
 
 namespace vke::texture
 {
@@ -31,6 +32,10 @@ namespace vke::texture
 	Texture LoadAsAtlas(const EngineData& info, const jlb::ArrayView<TextureAtlasPartition> partitions,
 		const jlb::ArrayView<SubTexture> outSubTextures, const glm::ivec2 nodeResolution, const size_t atlasWidth)
 	{
+		// Check if atlas width is power of 2.
+		assert((atlasWidth & (atlasWidth - 1)) == 0);
+		assert(atlasWidth != 0);
+
 		struct FilledNode final
 		{
 			glm::ivec2 coordinates{};
@@ -62,15 +67,20 @@ namespace vke::texture
 
 			// Sort partitions from largest to smallest.
 			for (auto& partition : partitions)
-				heap.Insert(partition, partition.width);
+				heap.Insert(partition, SIZE_MAX - partition.width);
 
 			jlb::Vector<Node> ignored{};
 			ignored.Allocate(*info.tempAllocator, open.GetLength());
 
+			size_t layersUsed = 0;
+
+			// While there are still sub textures to partition.
 			while (heap.GetCount())
 			{
 				const auto partition = heap.Pop();
 
+				// While there is still space left.
+				bool found = false;
 				while (open.GetCount())
 				{
 					auto node = open.Pop();
@@ -82,20 +92,52 @@ namespace vke::texture
 						filledNode.partition = partition;
 						filledNodes.Add(filledNode);
 
+						// Add the new smaller node if it still exists.
+						node.coordinates.x += partition.width;
 						node.width -= partition.width;
 						if(node.width > 0)
 							open.Insert(node, node.width);
+						found = true;
 						break;
 					}
 
 					ignored.Add(node);
 				}
+
+				// If no more space is present in the current layer.
+				if(!found)
+				{
+					Node newLayerStart{};
+					newLayerStart.coordinates.x = partition.width;
+					newLayerStart.coordinates.y = ++layersUsed;
+					newLayerStart.width = atlasWidth - partition.width;
+					open.Insert(newLayerStart, newLayerStart.width);
+
+					FilledNode filledNode{};
+					filledNode.coordinates.y = layersUsed;
+					filledNode.partition = partition;
+					filledNodes.Add(filledNode);
+				}
+
+				// Add the ignored back into the heap.
+				for (auto& node : ignored)
+					open.Insert(node, node.width);
+				ignored.SetCount(0);
 			}
 
+			ignored.Free(*info.tempAllocator);
 			heap.Free(*info.tempAllocator);
 			open.Free(*info.tempAllocator);
+
+			assert(atlasWidth >= layersUsed);
 		}
 
+		for (auto& filled_node : filledNodes)
+		{
+			std::cout << filled_node.coordinates.x << " " << filled_node.coordinates.y << std::endl;
+			std::cout << filled_node.partition.path << std::endl;
+		}
+		
 		filledNodes.Free(*info.tempAllocator);
 
 		return {};
