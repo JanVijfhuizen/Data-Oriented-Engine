@@ -26,6 +26,7 @@ namespace jlb
 
 		void Clear();
 		[[nodiscard]] size_t GetCount() const;
+		[[nodiscard]] size_t GetLength() const;
 
 	private:
 		size_t _count = 0;
@@ -105,6 +106,12 @@ namespace jlb
 	size_t Heap<T>::GetCount() const
 	{
 		return _count;
+	}
+
+	template <typename T>
+	size_t Heap<T>::GetLength() const
+	{
+		return _array.GetLength();
 	}
 
 	template <typename T>

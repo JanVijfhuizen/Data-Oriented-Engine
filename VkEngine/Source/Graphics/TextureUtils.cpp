@@ -11,13 +11,12 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include "StringView.h"
+#include "Heap.h"
 
 namespace vke::texture
 {
-	Texture LoadAsAtlas(const EngineData& info, 
-		const jlb::ArrayView<TextureAtlasPartition> partitions,
-		const jlb::ArrayView<SubTexture> outSubTextures)
-	{
+	// Testing.
+		/*
 		// Load pixels.
 		int texWidth, texHeight, texChannels;
 		stbi_uc* pixels = stbi_load(partitions[0].path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
@@ -27,6 +26,78 @@ namespace vke::texture
 		stbi_write_jpg("atlas_test.jpg", texWidth, texHeight, 4, pixels, 100);
 
 		stbi_image_free(pixels);
+		*/
+
+	Texture LoadAsAtlas(const EngineData& info, const jlb::ArrayView<TextureAtlasPartition> partitions,
+		const jlb::ArrayView<SubTexture> outSubTextures, const glm::ivec2 nodeResolution, const size_t atlasWidth)
+	{
+		struct FilledNode final
+		{
+			glm::ivec2 coordinates{};
+			TextureAtlasPartition partition{};
+		};
+
+		jlb::Vector<FilledNode> filledNodes{};
+		filledNodes.Allocate(*info.tempAllocator, partitions.length);
+
+		{
+			struct Node final
+			{
+				glm::ivec2 coordinates{};
+				size_t width{};
+			};
+
+			jlb::Heap<Node> open{};
+			open.Allocate(*info.tempAllocator, partitions.length + 1);
+
+			// Add full grid as starting point.
+			{
+				Node start{};
+				start.width = atlasWidth;
+				open.Insert(start, start.width);
+			}
+
+			jlb::Heap<TextureAtlasPartition> heap{};
+			heap.Allocate(*info.tempAllocator, partitions.length);
+
+			// Sort partitions from largest to smallest.
+			for (auto& partition : partitions)
+				heap.Insert(partition, partition.width);
+
+			jlb::Vector<Node> ignored{};
+			ignored.Allocate(*info.tempAllocator, open.GetLength());
+
+			while (heap.GetCount())
+			{
+				const auto partition = heap.Pop();
+
+				while (open.GetCount())
+				{
+					auto node = open.Pop();
+					if (node.width >= partition.width)
+					{
+						// Found a place to put it in.
+						FilledNode filledNode{};
+						filledNode.coordinates = node.coordinates;
+						filledNode.partition = partition;
+						filledNodes.Add(filledNode);
+
+						node.width -= partition.width;
+						if(node.width > 0)
+							open.Insert(node, node.width);
+						break;
+					}
+
+					ignored.Add(node);
+				}
+			}
+
+			heap.Free(*info.tempAllocator);
+			open.Free(*info.tempAllocator);
+		}
+
+		filledNodes.Free(*info.tempAllocator);
+
 		return {};
 	}
 

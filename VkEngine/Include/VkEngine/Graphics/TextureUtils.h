@@ -10,7 +10,7 @@ namespace vke
 	{
 		struct TextureAtlasPartition final
 		{
-			glm::ivec2 resolution{};
+			size_t width = 1;
 			jlb::StringView path{};
 		};
 
@@ -18,7 +18,8 @@ namespace vke
 		constexpr VkImageLayout DEFAULT_LAYOUT = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		[[nodiscard]] Texture LoadAsAtlas(const EngineData& info, 
-			jlb::ArrayView<TextureAtlasPartition> partitions, jlb::ArrayView<SubTexture> outSubTextures);
+			jlb::ArrayView<TextureAtlasPartition> partitions, jlb::ArrayView<SubTexture> outSubTextures, 
+			glm::ivec2 nodeResolution, size_t atlasWidth);
 		[[nodiscard]] Texture Load(const EngineData& info, jlb::StringView path);
 		void Free(const EngineData& info, const Texture& texture);
 	}
