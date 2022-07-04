@@ -10,13 +10,20 @@ namespace game::demo
 	{
 		GameScene::Allocate(info, systems);
 
-		jlb::StackArray<vke::texture::TextureAtlasPartition, 3> partitions{};
+		jlb::StackArray<vke::texture::TextureAtlasPartition, 7> partitions{};
 		partitions[0].path = "Textures/Atlas.png";
 		partitions[0].width = 2;
 		partitions[1].path = "Textures/Atlas-ui.png";
 		partitions[1].width = 2;
 		partitions[2].path = "Textures/Red.png";
-		jlb::StackArray<vke::SubTexture, 3> outSubTextures{};
+		partitions[3].path = "Textures/Atlas.png";
+		partitions[3].width = 2;
+		partitions[4].path = "Textures/Atlas-ui.png";
+		partitions[4].width = 2;
+		partitions[5].path = "Textures/Red.png";
+		partitions[6].path = "Textures/Red.png";
+		partitions[7].path = "Textures/Red.png";
+		jlb::StackArray<vke::SubTexture, 7> outSubTextures{};
 		vke::texture::LoadAsAtlas(info, partitions, outSubTextures, 16, 4);
 	}
 

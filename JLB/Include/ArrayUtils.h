@@ -21,6 +21,7 @@ namespace jlb
 	template <typename T>
 	void Copy(const ArrayView<T> view, const size_t begin, const size_t end, T* src)
 	{
+		assert(end <= view.length && begin < view.length);
 		memcpy(&view.data[begin], src, (end - begin) * sizeof(T));
 	}
 }

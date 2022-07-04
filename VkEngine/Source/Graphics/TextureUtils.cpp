@@ -139,21 +139,20 @@ namespace vke::texture
 		}
 
 		jlb::Array<stbi_uc> atlasPixels{};
-		atlasPixels.Allocate(*info.tempAllocator, atlasWidth * atlasWidth * 4);
-		/*
-		const size_t yStepSize = atlasWidth * nodeResolution;
+		atlasPixels.Allocate(*info.tempAllocator, pow(atlasWidth* nodeResolution, 2) * 4);
+
+		const size_t yStepSize = atlasWidth * nodeResolution * 4;
 
 		for (const auto& node : filledNodes)
 		{
 			// Load pixels.
 			int texWidth, texHeight, texChannels;
 			stbi_uc* pixels = stbi_load(node.partition.path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-			const VkDeviceSize imageSize = texWidth * texHeight * 4;
 			assert(pixels);
 
 			const auto& coordinates = node.coordinates;
-			const size_t width = node.partition.width * nodeResolution;
-			const size_t startIndex = (coordinates.x + coordinates.y * atlasWidth) * nodeResolution;
+			const size_t width = node.partition.width * nodeResolution * 4;
+			const size_t startIndex = (coordinates.x * 4 + coordinates.y * yStepSize) * nodeResolution;
 
 			for (size_t y = 0; y < nodeResolution; ++y)
 			{
@@ -164,10 +163,14 @@ namespace vke::texture
 
 			// Free pixels.
 			stbi_image_free(pixels);
+			//break;
 		}
 
-		stbi_write_jpg("atlas_test.jpg", atlasWidth, atlasWidth, 4, atlasPixels.GetData(), 100);
-		*/
+#ifdef _DEBUG
+		stbi_write_jpg("atlas_test.jpg", atlasWidth * nodeResolution, 
+			atlasWidth * nodeResolution, 4, atlasPixels.GetData(), 100);
+#endif
+
 		atlasPixels.Free(*info.tempAllocator);
 		filledNodes.Free(*info.tempAllocator);
 		return {};
