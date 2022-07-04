@@ -6,12 +6,14 @@
 #include "Systems/GameState.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/ResourceManager.h"
 
 namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
 		// Core engine systems.
+		initializer.DefineSystem<ResourceManager>();
 		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();

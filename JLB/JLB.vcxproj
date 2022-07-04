@@ -144,7 +144,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Allocation.cpp" />
-    <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\StackAllocator.cpp" />
     <ClCompile Include="Source\FileLoader.cpp" />
     <ClCompile Include="Source\JlbMath.cpp" />
@@ -154,8 +153,6 @@
     <ClInclude Include="Include\Allocation.h" />
     <ClInclude Include="Include\ArrayUtils.h" />
     <ClInclude Include="Include\Map.h" />
-    <ClInclude Include="Include\Resource.h" />
-    <ClInclude Include="Include\ResourceManager.h" />
     <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />
