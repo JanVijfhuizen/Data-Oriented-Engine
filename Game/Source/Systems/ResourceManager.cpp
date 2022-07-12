@@ -17,23 +17,42 @@ namespace game
 
 	void ResourceManager::Allocate(const vke::EngineData& info)
 	{
-		constexpr auto SUB_TEXTURE_PATH = "Textures/SubTextures.dat";
+		constexpr auto SUB_TEXTURE_PATH = "Textures/subTextures.dat";
+		constexpr auto SUB_TEXTURE_PATH_UI = "Textures/subTextures-ui.dat";
 
-		// Testing.
-		jlb::StackArray<vke::texture::TextureAtlasPartition, 3> partitions{};
-		partitions[0].path = "Textures/mouse.png";
-		partitions[1].path = "Textures/humanoid.png";
-		partitions[1].width = 2;
-		partitions[2].path = "Textures/tile.png";
+		constexpr auto ATLAS_LENGTH = 3;
+		constexpr auto ATLAS_LENGTH_UI = 1;
 
-		vke::texture::GenerateAtlas(info, "Textures/Atlas.png", SUB_TEXTURE_PATH, partitions, 8, 4);
+#ifdef _DEBUG
+		// Entity Render System.
+		{
+			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH> partitions{};
+			partitions[0].path = "Textures/mouse.png";
+			partitions[1].path = "Textures/humanoid.png";
+			partitions[1].width = 2;
+			partitions[2].path = "Textures/tile.png";
 
-		_entitySubTextures.Allocate(*info.allocator, partitions.GetLength());
+			vke::texture::GenerateAtlas(info, "Textures/atlas.png", SUB_TEXTURE_PATH, partitions, 8, 4);	
+		}
+
+		// UI Render System.
+		{
+			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_UI> partitions{};
+			partitions[0].path = "Textures/alphabet.png";
+
+			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 6, 4);
+		}
+#endif
+
+		_entitySubTextures.Allocate(*info.allocator, ATLAS_LENGTH);
+		_uiSubTextures.Allocate(*info.allocator, ATLAS_LENGTH_UI);
 		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH, _entitySubTextures);
+		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH_UI, _uiSubTextures);
 	}
 
 	void ResourceManager::Free(const vke::EngineData& info)
 	{
+		_uiSubTextures.Free(*info.allocator);
 		_entitySubTextures.Free(*info.allocator);
 	}
 }

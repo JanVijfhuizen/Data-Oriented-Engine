@@ -15,7 +15,7 @@ namespace vke
 
 	jlb::StringView UIRenderSystem::GetTextureAtlasFilePath() const
 	{
-		return "Textures/Atlas.png";
+		return "Textures/atlas.png";
 	}
 
 	jlb::StringView UIRenderSystem::GetFragmentShaderPath() const

@@ -5,7 +5,7 @@ namespace vke
 {
 	jlb::StringView EntityRenderSystem::GetTextureAtlasFilePath() const
 	{
-		return "Textures/Atlas.png";
+		return "Textures/atlas.png";
 	}
 
 	jlb::StringView EntityRenderSystem::GetFragmentShaderPath() const
