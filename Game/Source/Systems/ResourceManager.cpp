@@ -21,13 +21,12 @@ namespace game
 
 		// Testing.
 		jlb::StackArray<vke::texture::TextureAtlasPartition, 3> partitions{};
-		partitions[0].path = "Textures/Green.png";
-		partitions[0].width = 2;
-		partitions[1].path = "Textures/Atlas-ui.png";
-		partitions[1].width = 3;
-		partitions[2].path = "Textures/Red.png";
+		partitions[0].path = "Textures/mouse.png";
+		partitions[1].path = "Textures/humanoid.png";
+		partitions[1].width = 2;
+		partitions[2].path = "Textures/tile.png";
 
-		vke::texture::GenerateAtlas(info, "Textures/Atlas.png", SUB_TEXTURE_PATH, partitions, 16, 4);
+		vke::texture::GenerateAtlas(info, "Textures/Atlas.png", SUB_TEXTURE_PATH, partitions, 8, 4);
 
 		_entitySubTextures.Allocate(*info.allocator, partitions.GetLength());
 		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH, _entitySubTextures);

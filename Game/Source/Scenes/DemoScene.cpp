@@ -14,7 +14,7 @@ namespace game::demo
 		jlb::Systems<vke::EngineData> systems) const
 	{
 		const auto sys = systems.GetSystem<ResourceManager>();
-		const auto subTexture = sys->GetSubTexture(ResourceManager::EntitySubTextures::green);
+		const auto subTexture = sys->GetSubTexture(ResourceManager::EntitySubTextures::tile);
 
 		for (size_t i = 0; i < level.length; ++i)
 		{

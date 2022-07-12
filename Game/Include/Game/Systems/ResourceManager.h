@@ -10,9 +10,9 @@ namespace game
 	public:
 		enum class EntitySubTextures
 		{
-			green,
-			ui,
-			red
+			mouse,
+			humanoid,
+			tile
 		};
 
 		enum class UISubTextures

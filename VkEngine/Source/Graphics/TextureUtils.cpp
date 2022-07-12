@@ -235,7 +235,7 @@ namespace vke::texture
 		}
 
 		jlb::Array<stbi_uc> atlasPixels{};
-		atlasPixels.Allocate(*info.tempAllocator, pow(atlasWidth* nodeResolution, 2) * 4);
+		atlasPixels.Allocate(*info.tempAllocator, pow(atlasWidth * nodeResolution, 2) * 4);
 
 		const size_t yStepSize = atlasWidth * nodeResolution * 4;
 
@@ -245,6 +245,7 @@ namespace vke::texture
 			int texWidth, texHeight, texChannels;
 			stbi_uc* pixels = stbi_load(node.partition.path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 			assert(pixels);
+			assert(texChannels == 4);
 
 			const auto& coordinates = node.coordinates;
 			const size_t width = node.partition.width * nodeResolution * 4;
@@ -253,7 +254,6 @@ namespace vke::texture
 			for (size_t y = 0; y < nodeResolution; ++y)
 			{
 				const size_t yStartIndex = startIndex + y * yStepSize;
-
 				jlb::Copy(atlasPixels.GetView(), yStartIndex, yStartIndex + width, &pixels[y * width]);
 			}
 
@@ -261,8 +261,8 @@ namespace vke::texture
 			stbi_image_free(pixels);
 		}
 
-		stbi_write_jpg(texturePath, atlasWidth * nodeResolution,
-			atlasWidth * nodeResolution, 4, atlasPixels.GetData(), 100);
+		stbi_write_png(texturePath, atlasWidth * nodeResolution,
+			atlasWidth * nodeResolution, 4, atlasPixels.GetData(), 0);
 
 		atlasPixels.Free(*info.tempAllocator);
 
