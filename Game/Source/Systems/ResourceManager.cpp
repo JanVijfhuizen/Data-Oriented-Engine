@@ -39,8 +39,9 @@ namespace game
 		{
 			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_UI> partitions{};
 			partitions[0].path = "Textures/alphabet.png";
+			partitions[0].width = 26;
 
-			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 6, 4);
+			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 6, 32);
 		}
 #endif
 

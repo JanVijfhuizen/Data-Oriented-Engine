@@ -30,6 +30,8 @@ namespace vke
 		[[nodiscard]] virtual jlb::StringView GetTextureAtlasFilePath() const = 0;
 		[[nodiscard]] virtual jlb::StringView GetFragmentShaderPath() const = 0;
 		[[nodiscard]] virtual jlb::StringView GetVertexShaderPath() const = 0;
+		virtual void DefineMeshShape(size_t& outVerticesLength, size_t& outIndicesLength);
+		virtual void DefineMesh(jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Vertex::Index> indices);
 
 	private:
 		struct PushConstants final
@@ -71,6 +73,34 @@ namespace vke
 		void DestroySwapChainAssets(const EngineData& info) const;
 	};
 
+	template<typename Task>
+	void RenderSystem<Task>::DefineMeshShape(size_t& outVerticesLength, size_t& outIndicesLength)
+	{
+		outVerticesLength = 4;
+		outIndicesLength = 6;
+	}
+
+	template<typename Task>
+	void RenderSystem<Task>::DefineMesh(jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Vertex::Index> indices)
+	{
+		vertices[0].position = { -1, -1 };
+		vertices[1].position = { -1, 1 };
+		vertices[2].position = { 1, 1 };
+		vertices[3].position = { 1, -1 };
+
+		vertices[0].textureCoordinates = { 0, 0 };
+		vertices[1].textureCoordinates = { 0, 1 };
+		vertices[2].textureCoordinates = { 1, 1 };
+		vertices[3].textureCoordinates = { 1, 0 };
+
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+		indices[3] = 0;
+		indices[4] = 2;
+		indices[5] = 3;
+	}
+
 	template <typename Task>
 	void RenderSystem<Task>::Allocate(const EngineData& info)
 	{
@@ -82,25 +112,25 @@ namespace vke
 		_shader = shader::Load(info, GetVertexShaderPath(), GetFragmentShaderPath());
 
 		// Load mesh.
-		jlb::StackArray<Vertex, 4> vertices{};
-		vertices[0].position = { -1, -1 };
-		vertices[1].position = { -1, 1 };
-		vertices[2].position = { 1, 1 };
-		vertices[3].position = { 1, -1 };
-		vertices[0].textureCoordinates = { 0, 0 };
-		vertices[1].textureCoordinates = { 0, 1 };
-		vertices[2].textureCoordinates = { 1, 1 };
-		vertices[3].textureCoordinates = { 1, 0 };
-		jlb::StackArray<Vertex::Index, 6> indices{};
-		indices[0] = 0;
-		indices[1] = 1;
-		indices[2] = 2;
-		indices[3] = 0;
-		indices[4] = 2;
-		indices[5] = 3;
+		jlb::Array<Vertex> vertices{};
+		jlb::Array<Vertex::Index> indices{};
+
+		{
+			size_t verticesLength;
+			size_t indicesLength;
+
+			DefineMeshShape(verticesLength, indicesLength);
+			vertices.Allocate(*info.tempAllocator, verticesLength);
+			indices.Allocate(*info.tempAllocator, indicesLength);
+			DefineMesh(vertices, indices);
+		}
+		
 		for (auto& vertex : vertices)
 			vertex.position /= 2;
 		_mesh = mesh::CreateIndexed<Vertex, Vertex::Index>(info, vertices, indices);
+
+		indices.Free(*info.tempAllocator);
+		vertices.Free(*info.tempAllocator);
 
 		// Load texture.
 		_textureAtlas.texture = texture::Load(info, GetTextureAtlasFilePath());
