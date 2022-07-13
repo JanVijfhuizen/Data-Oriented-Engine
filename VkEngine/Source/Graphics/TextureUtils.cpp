@@ -273,7 +273,7 @@ namespace vke::texture
 		{
 			SubTexture subTexture{};
 			subTexture.lTop = filledNode.coordinates;
-			subTexture.rBot = filledNode.coordinates + glm::ivec2(filledNode.partition.width, 0);
+			subTexture.rBot = filledNode.coordinates + glm::ivec2(filledNode.partition.width, 1);
 			subTexture.lTop /= atlasWidth;
 			subTexture.rBot /= atlasWidth;
 			subTextures.Insert(subTexture, filledNode.index);
