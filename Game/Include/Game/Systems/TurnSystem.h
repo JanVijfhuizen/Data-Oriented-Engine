@@ -6,6 +6,13 @@ namespace game
 	class TurnSystem final : public vke::GameSystem
 	{
 	public:
+		struct VisualLayout final
+		{
+			float screenSpaceWidth = .5f;
+			float screenYCoordinates = .8f;
+			float imageSize =  0.1f;
+		} visualLayout{};
+
 		[[nodiscard]] bool GetIfTickEvent() const;
 		[[nodiscard]] float GetTimeLerp() const;
 

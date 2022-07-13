@@ -316,14 +316,28 @@ namespace vke::texture
 
 	void Subdivide(const SubTexture subTexture, const size_t amount, const jlb::ArrayView<SubTexture> outSubTextures)
 	{
-		const float partitionSize = subTexture.rBot.x - subTexture.lTop.x;
+		const float partitionSize = (subTexture.rBot.x - subTexture.lTop.x) / amount;
 		for (size_t i = 0; i < amount; ++i)
 		{
 			auto& newSubTexture = outSubTextures[i];
 			newSubTexture = subTexture;
-			newSubTexture.lTop.x = partitionSize * i;
-			newSubTexture.rBot.x = partitionSize * (i + 1);
+			newSubTexture.rBot.x = newSubTexture.lTop.x;
+			newSubTexture.lTop.x += partitionSize * i;
+			newSubTexture.rBot.x += partitionSize * (i + 1);
 		}
+	}
+
+	glm::vec2 GetCenter(const SubTexture subTexture)
+	{
+		return subTexture.lTop + (subTexture.rBot - subTexture.lTop) * .5f;
+	}
+
+	SubTexture MirrorHorizontally(const SubTexture subTexture)
+	{
+		SubTexture ret = subTexture;
+		ret.lTop.x = subTexture.rBot.x;
+		ret.rBot.x = subTexture.lTop.x;
+		return ret;
 	}
 
 	Texture Load(const EngineData& info, const jlb::StringView path)

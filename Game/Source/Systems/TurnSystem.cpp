@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "Systems/TurnSystem.h"
 #include "JlbMath.h"
+#include "Systems/ResourceManager.h"
+#include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
@@ -26,6 +28,38 @@ namespace game
 
 	void TurnSystem::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
+
+		const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
+
+		jlb::StackArray<vke::SubTexture, 4> textureDivided{};
+		vke::texture::Subdivide(timelineSubTexture, 4, textureDivided);
+
+		jlb::StackArray<vke::SubTexture, 4> coordinatesDivided{};
+		vke::SubTexture screenSpaceCoordinates{};
+		screenSpaceCoordinates.lTop = glm::vec2(-visualLayout.screenSpaceWidth *.5f, visualLayout.screenYCoordinates);
+		screenSpaceCoordinates.rBot = screenSpaceCoordinates.lTop;
+		screenSpaceCoordinates.rBot.x *= -1;
+		vke::texture::Subdivide(screenSpaceCoordinates, 4, coordinatesDivided);
+
+		jlb::StackArray<vke::SubTexture, 4> targetTextures{};
+		targetTextures[0] = textureDivided[0];
+		targetTextures[1] = _paused ? textureDivided[1] : textureDivided[2];
+		targetTextures[2] = vke::texture::MirrorHorizontally(textureDivided[0]);
+		targetTextures[3] = textureDivided[3];
+
+		// Draw the UI for the textures.
+		for (size_t i = 0; i < 4; ++i)
+		{
+			vke::UIRenderTask renderTask{};
+			renderTask.subTexture = targetTextures[i];
+			renderTask.transform.position = vke::texture::GetCenter(coordinatesDivided[i]);
+			renderTask.transform.scale = visualLayout.imageSize;
+			const auto result = uiSys->TryAdd(renderTask);
+			assert(result);
+		}
+
 		if (_paused)
 			return;
 
