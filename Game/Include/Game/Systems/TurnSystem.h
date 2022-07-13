@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "StackArray.h"
 #include "VkEngine/Systems/GameSystem.h"
 
 namespace game
@@ -6,17 +7,22 @@ namespace game
 	class TurnSystem final : public vke::GameSystem
 	{
 	public:
-		struct VisualLayout final
+		struct Visuals final
 		{
 			float screenSpaceWidth = .5f;
 			float screenYCoordinates = .8f;
 			float imageSize =  0.1f;
-		} visualLayout{};
+			float onPressedMaxVerticalOffset = .05f;
+			// In milliseconds.
+			float onPressedAnimDuration = 100;
+		} visuals{};
 
 		[[nodiscard]] bool GetIfTickEvent() const;
 		[[nodiscard]] float GetTimeLerp() const;
 
 	private:
+		jlb::StackArray<float, 4> _keyVerticalLerps{1};
+
 		bool _paused = false;
 		size_t _ticksPerSecond = 4;
 		size_t _previousTicksPerSecond = 4;
