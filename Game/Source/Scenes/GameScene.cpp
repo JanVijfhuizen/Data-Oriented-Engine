@@ -42,7 +42,7 @@ namespace game
 	glm::vec2 GameScene::ToWorldPos(const size_t index) const
 	{
 		const size_t size = sqrt(_grid.GetLength());
-		return glm::vec2(index % size, index / size);
+		return {index % size, index / size};
 	}
 
 	void GameScene::RenderLevel(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) const

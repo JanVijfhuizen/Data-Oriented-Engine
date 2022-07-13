@@ -17,7 +17,9 @@ namespace game
 
 		enum class UISubTextures
 		{
-			alphabet
+			alphabet,
+			mouse,
+			timeline
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;

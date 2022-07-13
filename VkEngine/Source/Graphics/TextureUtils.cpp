@@ -48,7 +48,7 @@ namespace vke::texture
 		// Copy pixels to staging buffer.
 		void* data;
 		vkMapMemory(logicalDevice, stagingMemBlock.memory, stagingMemBlock.offset, imageSize, 0, &data);
-		memcpy(data, pixels.data, static_cast<size_t>(imageSize));
+		memcpy(data, pixels.data, imageSize);
 		vkUnmapMemory(logicalDevice, stagingMemBlock.memory);
 
 		// Create image.

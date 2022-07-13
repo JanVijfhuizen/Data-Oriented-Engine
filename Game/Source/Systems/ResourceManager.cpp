@@ -21,7 +21,7 @@ namespace game
 		constexpr auto SUB_TEXTURE_PATH_UI = "Textures/subTextures-ui.dat";
 
 		constexpr auto ATLAS_LENGTH = 3;
-		constexpr auto ATLAS_LENGTH_UI = 1;
+		constexpr auto ATLAS_LENGTH_UI = 3;
 
 #ifdef _DEBUG
 		// Entity Render System.
@@ -40,8 +40,11 @@ namespace game
 			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_UI> partitions{};
 			partitions[0].path = "Textures/alphabet.png";
 			partitions[0].width = 26;
+			partitions[1].path = "Textures/mouse.png";
+			partitions[2].path = "Textures/timeline.png";
+			partitions[2].width = 4;
 
-			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 6, 32);
+			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 8, 32);
 		}
 #endif
 
