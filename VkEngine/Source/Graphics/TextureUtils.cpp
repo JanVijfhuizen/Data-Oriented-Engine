@@ -327,12 +327,17 @@ namespace vke::texture
 		}
 	}
 
-	glm::vec2 GetCenter(const SubTexture subTexture)
+	float GetChunkSize(const SubTexture& subTexture, const size_t amount)
+	{
+		return (subTexture.rBot.x - subTexture.lTop.x) / amount;
+	}
+
+	glm::vec2 GetCenter(const SubTexture& subTexture)
 	{
 		return subTexture.lTop + (subTexture.rBot - subTexture.lTop) * .5f;
 	}
 
-	SubTexture MirrorHorizontally(const SubTexture subTexture)
+	SubTexture MirrorHorizontally(const SubTexture& subTexture)
 	{
 		SubTexture ret = subTexture;
 		ret.lTop.x = subTexture.rBot.x;

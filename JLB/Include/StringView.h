@@ -17,11 +17,13 @@ namespace jlb
 		/// Returns the pointer to the string literal.
 		/// </summary>
 		[[nodiscard]] const char* GetData() const;
+		// Get the length of the string.
+		[[nodiscard]] size_t GetLength() const;
 
-		bool operator==(StringView& other);
-		bool operator==(const char* other);
-		bool operator!=(StringView& other);
-		bool operator!=(const char* other);
+		bool operator==(const StringView& other) const;
+		bool operator==(const char* other) const;
+		bool operator!=(const StringView& other) const;
+		bool operator!=(const char* other) const;
 
 		operator const char* () const;
 

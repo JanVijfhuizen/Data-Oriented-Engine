@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Game.h"
+
+#include "TextRenderHandler.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
@@ -12,6 +14,9 @@ namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
+		// Core dependent systems.
+		initializer.DefineSystem<TextRenderHandler>();
+
 		// Core engine systems.
 		initializer.DefineSystem<ResourceManager>();
 		initializer.DefineSystem<vke::SceneSystem>();

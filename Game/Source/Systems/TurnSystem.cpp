@@ -3,6 +3,7 @@
 #include "Curve.h"
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
+#include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -30,6 +31,7 @@ namespace game
 	void TurnSystem::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 
 		const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
@@ -63,6 +65,8 @@ namespace game
 
 		auto curveOvershoot = jlb::CreateCurveOvershooting();
 		auto curveDecelerate = jlb::CreateCurveDecelerate();
+
+		const float scale = entitySys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 		
 		// Draw the UI for the textures.
 		for (size_t i = 0; i < 4; ++i)
@@ -70,7 +74,7 @@ namespace game
 			vke::UIRenderTask renderTask{};
 			renderTask.subTexture = targetTextures[i];
 			renderTask.transform.position = vke::texture::GetCenter(coordinatesDivided[i]);
-			renderTask.transform.scale = visuals.imageSize;
+			renderTask.transform.scale = scale;
 			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
 			renderTask.transform.position.y -=  eval * visuals.onPressedMaxVerticalOffset;
 			const auto result = uiSys->TryAdd(renderTask);

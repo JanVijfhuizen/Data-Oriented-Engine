@@ -11,7 +11,6 @@ namespace game
 		{
 			float screenSpaceWidth = .5f;
 			float screenYCoordinates = .8f;
-			float imageSize =  0.1f;
 			float onPressedMaxVerticalOffset = .05f;
 			// In milliseconds.
 			float onPressedAnimDuration = 100;
