@@ -48,7 +48,7 @@ namespace game
 		targetTextures[1] = _paused ? textureDivided[1] : textureDivided[2];
 		targetTextures[2] = vke::texture::MirrorHorizontally(textureDivided[0]);
 		targetTextures[3] = textureDivided[3];
-
+		
 		// Draw the UI for the textures.
 		for (size_t i = 0; i < 4; ++i)
 		{
@@ -84,8 +84,11 @@ namespace game
 		vke::GameSystem::OnKeyInput(info, systems, key, action);
 
 		// Adjust is paused.
-		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 			_paused = !_paused;
+		// Go to the next tick.
+		if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+			_timePreviousTick = 0;
 
 		// Adjust turn speed.
 		if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)

@@ -14,12 +14,12 @@ namespace game
 	{
 		// Core engine systems.
 		initializer.DefineSystem<ResourceManager>();
-		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// Game systems.
+		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<MouseSystem>();
 
 		// High level game manager.
