@@ -9,13 +9,11 @@ namespace jlb::math
 
 	float SmoothAngle(const float a, const float b, const float delta)
 	{
+		const bool dir = fmodf(b - a + 2 * PI, 2 * PI) < PI;
+
 		const float diff = abs(a - b);
-		const bool diffMoreThanPI = diff > PI;
-
-		const float nA = a + (diffMoreThanPI ? (b > a ? PI * 2 : 0) : 0);
-		const float nB = b + (diffMoreThanPI ? (a > b ? PI * 2 : 0) : 0);
-
-		return WrapAngle(Lerp(nA, nB, delta));
+		const float angle = a + diff * delta * (dir ? 1 : -1);
+		return WrapAngle(angle);
 	}
 
 	float WrapAngle(const float f)

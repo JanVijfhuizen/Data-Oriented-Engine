@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Systems/MovementSystem.h"
-
 #include "Curve.h"
 #include "JlbMath.h"
 #include "Systems/TurnSystem.h"
@@ -35,14 +34,22 @@ namespace game
 			const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(output.remaining) / durationF;
 			output.position = jlb::math::LerpPct(component.from, component.to, pct);
 
+			const bool finished = isTickEvent && output.remaining == 0;
+
 			// Perfectly set the position once the tick event has been reached if the remaining turns is zero.
-			output.position = isTickEvent && output.remaining == 0 ? component.to : output.position;
+			output.position = finished ? component.to : output.position;
 
 			// Bobbing.
 			const float bobbingPct = fmodf(pct * component.bobbingAmount, 1);
 			const float eval = jlb::DoubleCurveEvaluate(bobbingPct, curveOvershoot, curveOvershoot);
 			output.scaleMultiplier = 1.f + eval * bobbingScaling;
 
+			// Movement rotation.
+			const float toAngle = jlb::math::GetAngle(component.from, component.to);
+			const float pctRotation = jlb::math::Min<float>(pct / rotationDuration, 1);
+
+			output.rotation = jlb::math::SmoothAngle(task.component.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
+			output.rotation = finished ? toAngle : output.rotation;
 			taskOutputs.Add(output);
 		}
 	}

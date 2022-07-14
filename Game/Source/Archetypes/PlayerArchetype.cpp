@@ -36,9 +36,14 @@ namespace game
 			// Testing.
 			if(isTickEvent && entity.movementComponent.remaining == 0)
 			{
+				auto randDir = glm::ivec2(rand() % 2 - 1);
+				randDir.y = randDir.x == 0 ? rand() % 2 * 2 - 1 : 0;
+				const auto finalDir = glm::vec2(randDir) * static_cast<float>(vke::PIXEL_SIZE_ENTITY);
+
 				entity.movementComponent.from = entity.transform.position;
-				entity.movementComponent.to = entity.movementComponent.from + glm::vec2(vke::PIXEL_SIZE_ENTITY);
+				entity.movementComponent.to = entity.movementComponent.from + finalDir;
 				entity.movementComponent.remaining = movementTask.duration;
+				entity.movementComponent.rotation = entity.transform.rotation;
 			}
 
 			renderTask.transform = entity.transform;
@@ -68,6 +73,7 @@ namespace game
 			const auto& movementOutput = movementOutputs[entity.movementTaskId];
 			MovementSystem::UpdateComponent(entity.movementComponent, movementOutput);
 			entity.transform.position = movementOutput.position;
+			entity.transform.rotation = movementOutput.rotation;
 		}
 	}
 }

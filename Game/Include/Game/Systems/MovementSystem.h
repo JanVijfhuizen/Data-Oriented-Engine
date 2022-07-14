@@ -15,6 +15,7 @@ namespace game
 	{
 		size_t remaining = 0;
 		glm::vec2 position{};
+		float rotation = 0;
 		float scaleMultiplier = 0;
 	};
 
@@ -22,6 +23,7 @@ namespace game
 	{
 	public:
 		float bobbingScaling = 0.1f;
+		float rotationDuration = .25f;
 
 		static void UpdateComponent(MovementComponent& component, const MovementTaskOutput& output);
 
