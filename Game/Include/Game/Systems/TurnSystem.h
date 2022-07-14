@@ -12,10 +12,10 @@ namespace game
 			// Padding between the keys.
 			size_t padding = 4;
 			float screenYCoordinates = .8f;
-			float onPressedMaxVerticalOffset = .05f;
+			float onPressedSizeMultiplier = 1.5f;
 			// In milliseconds.
 			float onPressedAnimDuration = 100;
-			float timeVerticalOffsetMultiplier = 2;
+			float onPressedTimeVerticalOffsetMultiplier = .1f;
 		} visuals{};
 
 		[[nodiscard]] bool GetIfTickEvent() const;

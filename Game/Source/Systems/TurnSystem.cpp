@@ -74,7 +74,7 @@ namespace game
 			const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 
 			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[4], curveOvershoot, curveDecelerate);
-			const float offset = -eval * visuals.onPressedMaxVerticalOffset * visuals.timeVerticalOffsetMultiplier;
+			const float offset = -eval * visuals.onPressedTimeVerticalOffsetMultiplier;
 
 			TextRenderTask textRenderTask{};
 			textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
@@ -112,7 +112,7 @@ namespace game
 			renderTask.transform.position = vke::texture::GetCenter(coordinatesDivided[i]);
 			renderTask.transform.scale = scale;
 			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
-			renderTask.transform.position.y -=  eval * visuals.onPressedMaxVerticalOffset;
+			renderTask.transform.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
 			const auto result = uiSys->TryAdd(renderTask);
 			assert(result != SIZE_MAX);
 		}
