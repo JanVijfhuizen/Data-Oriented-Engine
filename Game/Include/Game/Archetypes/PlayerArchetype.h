@@ -9,7 +9,7 @@ namespace game
 	public:
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			jlb::ArrayView<Player> entities) override;
-		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
+		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			jlb::ArrayView<Player> entities) override;
 	};
 }

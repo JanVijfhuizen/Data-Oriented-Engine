@@ -163,9 +163,7 @@
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Components\MovementComponent.h" />
     <ClInclude Include="Include\Game\Entities\Player.h" />
-    <ClInclude Include="Include\Game\Entities\Tile.h" />
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
-    <ClInclude Include="Include\Game\Scenes\GameScene.h" />
     <ClInclude Include="Include\Game\Systems\GameState.h" />
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
@@ -181,7 +179,6 @@
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\Systems\ResourceManager.cpp" />
     <ClCompile Include="Source\Systems\MouseSystem.cpp" />
-    <ClCompile Include="Source\Scenes\GameScene.cpp" />
     <ClCompile Include="Source\Scenes\DemoScene.cpp" />
     <ClCompile Include="Source\Systems\TurnSystem.cpp" />
     <ClCompile Include="Source\Systems\GameState.cpp" />

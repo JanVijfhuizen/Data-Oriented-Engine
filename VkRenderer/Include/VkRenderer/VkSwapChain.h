@@ -20,7 +20,7 @@ namespace vk
 	{
 	public:
 		// Window background color.
-		VkClearValue clearColor = { 0, 0, 0, 1 };
+		VkClearValue clearColor = { 1, 1, 1, 1 };
 
 		void Allocate(jlb::StackAllocator& allocator, App& app, IWindowHandler& windowHandler);
 		void Free(jlb::StackAllocator& allocator, App& app);
