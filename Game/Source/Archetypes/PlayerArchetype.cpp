@@ -27,7 +27,7 @@ namespace game
 		renderTask.subTexture = subTexturesDivided[0];
 
 		MovementTask movementTask{};
-		movementTask.duration = 32;
+		movementTask.duration = 4;
 
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 

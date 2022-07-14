@@ -1,8 +1,5 @@
 ﻿#include "pch.h"
 #include "Systems/MovementSystem.h"
-
-#include <iostream>
-
 #include "JlbMath.h"
 #include "Systems/TurnSystem.h"
 
@@ -30,14 +27,12 @@ namespace game
 			output.remaining = component.remaining - isTickEvent;
 
 			const auto durationF = static_cast<float>(task.duration);
-			const float pct = tickLerp / durationF + 1.f -
-				static_cast<float>(component.remaining) / durationF;
+			// 
+			const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(output.remaining) / durationF;
 			output.position = jlb::math::LerpPct(component.from, component.to, pct);
 
-			// TEMP
-			if (isTickEvent)
-				std::cout << std::endl;
-			std::cout << pct << std::endl;
+			// Perfectly set the position once the tick event has been reached if the remaining turns is zero.
+			output.position = isTickEvent && output.remaining == 0 ? component.to : output.position;
 
 			taskOutputs.Add(output);
 		}

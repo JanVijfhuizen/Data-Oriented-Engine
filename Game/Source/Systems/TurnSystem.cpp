@@ -122,7 +122,7 @@ namespace game
 		const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
 		_previousTicksPerSecond = _ticksPerSecond;
 
-		_time += _paused ? 0 : info.deltaTime * 0.01f;
+		_time += _paused ? 0 : info.deltaTime * 0.001f;
 		_lerp = fmodf(_time, dTicksPerSecond) / dTicksPerSecond;
 		
 		if (_time > dTicksPerSecond)
