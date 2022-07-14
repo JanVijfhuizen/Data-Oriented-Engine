@@ -1,14 +1,13 @@
 ﻿#include "JlbMath.h"
-#include <cassert>
 
 namespace jlb::math
 {
 	float GetAngle(const glm::vec2& a, const glm::vec2& b)
 	{
-		return atan2(a.y - b.y, a.x - b.x) + PI / 2;
+		return atan2f(a.y - b.y, a.x - b.x) + PI / 2;
 	}
 
-	float SmoothAngle(float a, float b, const float delta)
+	float SmoothAngle(const float a, const float b, const float delta)
 	{
 		const float diff = abs(a - b);
 		const bool diffMoreThanPI = diff > PI;
@@ -21,7 +20,7 @@ namespace jlb::math
 
 	float WrapAngle(const float f)
 	{
-		return fmod(f, PI * 2);
+		return fmodf(f, PI * 2);
 	}
 
 	float Lerp(const float a, const float b, const float delta)
@@ -32,6 +31,15 @@ namespace jlb::math
 	float LerpPct(const float a, const float b, const float pct)
 	{
 		return a + (b - a) * pct;
+	}
+
+	glm::vec2 LerpPct(const glm::vec2& a, const glm::vec2& b, const float pct)
+	{
+		return
+		{
+			LerpPct(a.x, b.x, pct),
+			LerpPct(a.y, b.y, pct),
+		};
 	}
 
 	bool IsZero(const glm::ivec2& v)

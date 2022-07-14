@@ -14,7 +14,7 @@ namespace game
 		return _tickCalled;
 	}
 
-	float TurnSystem::GetTimeLerp() const
+	float TurnSystem::GetTickLerp() const
 	{
 		return _lerp;
 	}

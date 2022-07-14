@@ -19,7 +19,7 @@ namespace game
 		} visuals{};
 
 		[[nodiscard]] bool GetIfTickEvent() const;
-		[[nodiscard]] float GetTimeLerp() const;
+		[[nodiscard]] float GetTickLerp() const;
 
 	private:
 		jlb::StackArray<float, 5> _keyVerticalLerps{1};

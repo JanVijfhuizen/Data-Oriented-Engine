@@ -3,7 +3,7 @@
 
 namespace jlb::math
 {
-	constexpr auto PI = 3.14159265358979323846;
+	constexpr float PI = 3.14159265358979323846;
 
 	// Get the angle between two points.
 	[[nodiscard]] float GetAngle(const glm::vec2& a, const glm::vec2& b);
@@ -18,6 +18,9 @@ namespace jlb::math
 	[[nodiscard]] float Lerp(float a, float b, float delta);
 	// Linearly interpolates between to values from 0 to 1.
 	[[nodiscard]] float LerpPct(float a, float b, float pct);
+
+	// Linearly interpolates between to vectors from 0 to 1.
+	[[nodiscard]] glm::vec2 LerpPct(const glm::vec2& a, const glm::vec2& b, float pct);
 
 	// Checks if the length of the vector is zero.
 	[[nodiscard]] bool IsZero(const glm::ivec2& v);

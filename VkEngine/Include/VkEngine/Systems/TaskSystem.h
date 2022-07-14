@@ -24,7 +24,7 @@ namespace vke
 	private:
 		jlb::Vector<T> _tasks{};
 
-		void Update(const EngineData& info, jlb::Systems<EngineData> systems) final override;
+		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
 	};
 
 	template <typename T>
