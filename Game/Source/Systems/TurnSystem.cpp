@@ -120,7 +120,6 @@ namespace game
 		}
 
 		const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
-		_previousTicksPerSecond = _ticksPerSecond;
 
 		_time += _paused ? 0 : info.deltaTime * 0.001f;
 		_lerp = fmodf(_time, dTicksPerSecond) / dTicksPerSecond;
@@ -129,6 +128,7 @@ namespace game
 		{
 			_time = fmodf(_time, dTicksPerSecond);
 			_tickCalled = true;
+			_previousTicksPerSecond = _ticksPerSecond;
 		}
 	}
 
@@ -147,9 +147,8 @@ namespace game
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 		{
-			_time = 0;
+			_time = 1.f / static_cast<float>(_ticksPerSecond) + 1e-5f;
 			_keyVerticalLerps[3] = 0;
-			_tickCalled = true;
 		}
 
 		// Adjust turn speed.
