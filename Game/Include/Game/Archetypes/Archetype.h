@@ -7,7 +7,6 @@ namespace game
 	{
 	public:
 		virtual void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::ArrayView<Entity> entities){}
-		virtual void Update(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::ArrayView<Entity> entities){}
 		virtual void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::ArrayView<Entity> entities) {}
 	};
 }

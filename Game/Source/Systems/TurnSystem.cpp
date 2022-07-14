@@ -29,6 +29,8 @@ namespace game
 
 	void TurnSystem::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		_tickCalled = false;
+
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
@@ -117,22 +119,17 @@ namespace game
 			assert(result != SIZE_MAX);
 		}
 
-		if (_paused)
-			return;
+		const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
+		_previousTicksPerSecond = _ticksPerSecond;
 
-		const float dTicksPerSecond = 1.f / _previousTicksPerSecond;
-
-		_time += info.deltaTime * 0.01f;
-		_tickCalled = false;
-
-		while (_timePreviousTick + dTicksPerSecond < _time)
+		_time += _paused ? 0 : info.deltaTime * 0.01f;
+		_lerp = fmodf(_time, dTicksPerSecond) / dTicksPerSecond;
+		
+		if (_time > dTicksPerSecond)
 		{
-			_timePreviousTick += dTicksPerSecond;
+			_time = fmodf(_time, dTicksPerSecond);
 			_tickCalled = true;
 		}
-
-		_lerp = fmod(_time, dTicksPerSecond) / dTicksPerSecond;
-		_previousTicksPerSecond = _ticksPerSecond;
 	}
 
 	void TurnSystem::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
@@ -150,8 +147,9 @@ namespace game
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 		{
-			_timePreviousTick = 0;
+			_time = 0;
 			_keyVerticalLerps[3] = 0;
+			_tickCalled = true;
 		}
 
 		// Adjust turn speed.

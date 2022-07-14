@@ -6,6 +6,6 @@ namespace game
 	{
 		glm::vec2 from{};
 		glm::vec2 to{};
-		size_t remaining = 1;
+		size_t remaining = 0;
 	};
 }

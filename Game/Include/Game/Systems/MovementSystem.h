@@ -8,7 +8,7 @@ namespace game
 	struct MovementTask final
 	{
 		MovementComponent component{};
-		size_t speed = 1;
+		size_t duration = 1;
 	};
 
 	struct MovementTaskOutput final
@@ -24,5 +24,8 @@ namespace game
 
 		void OnUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			const jlb::Vector<MovementTask>& tasks, jlb::Vector<MovementTaskOutput>& taskOutputs) override;
+
+	private:
+		[[nodiscard]] size_t DefineMinimalUsage(const vke::EngineData& info) override;
 	};
 }

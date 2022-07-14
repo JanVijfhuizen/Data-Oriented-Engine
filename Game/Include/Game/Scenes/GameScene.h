@@ -9,7 +9,7 @@ namespace game
 	protected:
 		void Allocate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void Free(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
-		void Update(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 
 		[[nodiscard]] virtual size_t DefineLevelSize(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) const;
 		virtual void GenerateLevel(jlb::ArrayView<Tile> level, const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) const = 0;

@@ -22,12 +22,24 @@ namespace vke
 	{
 	}
 
-	void SceneSystem::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void SceneSystem::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
+		System<EngineData>::PreUpdate(info, systems);
 		Scene* current = _latestScene;
-		while(current)
+		while (current)
 		{
-			current->Update(info, systems);
+			current->PreUpdate(info, systems);
+			current = current->_next;
+		}
+	}
+
+	void SceneSystem::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		System<EngineData>::PostUpdate(info, systems);
+		Scene* current = _latestScene;
+		while (current)
+		{
+			current->PostUpdate(info, systems);
 			current = current->_next;
 		}
 	}

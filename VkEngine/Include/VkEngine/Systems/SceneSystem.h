@@ -7,13 +7,15 @@ namespace vke
 	{
 		friend class SceneSystem;
 
+	protected:
+		virtual void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
+		virtual void Free(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
+		virtual void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) {}
+		virtual void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) {}
+
 	private:
 		Scene* _next = nullptr;
 		jlb::AllocationID _allocationId{};
-
-		virtual void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
-		virtual void Free(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
-		virtual void Update(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
 	};
 
 	class SceneSystem final : public GameSystem
@@ -28,7 +30,8 @@ namespace vke
 
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
-		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 	};
 
 	template <typename T>

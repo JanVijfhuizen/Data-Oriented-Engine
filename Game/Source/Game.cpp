@@ -8,6 +8,7 @@
 #include "Systems/GameState.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 
 namespace game
@@ -22,6 +23,7 @@ namespace game
 
 		// Game systems.
 		initializer.DefineSystem<TurnSystem>();
+		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 

@@ -20,22 +20,25 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
+		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
+		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
 
 		vke::EntityRenderTask renderTask{};
-		renderTask.subTexture = subTexture;
+		renderTask.subTexture = subTexturesDivided[0];
 
 		MovementTask movementTask{};
-		movementTask.speed = 2;
+		movementTask.duration = 32;
 
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 
 		for (auto& entity : entities)
 		{
 			// Testing.
-			if(isTickEvent)
+			if(isTickEvent && entity.movementComponent.remaining == 0)
 			{
 				entity.movementComponent.from = entity.transform.position;
-				entity.movementComponent.to = entity.movementComponent.from + glm::vec2(vke::PIXEL_SIZE_ENTITY, 0);
+				entity.movementComponent.to = entity.movementComponent.from + glm::vec2(vke::PIXEL_SIZE_ENTITY);
+				entity.movementComponent.remaining = movementTask.duration;
 			}
 
 			renderTask.transform = entity.transform;
