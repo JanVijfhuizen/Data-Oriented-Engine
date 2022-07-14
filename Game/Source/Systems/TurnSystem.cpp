@@ -78,7 +78,7 @@ namespace game
 			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
 			renderTask.transform.position.y -=  eval * visuals.onPressedMaxVerticalOffset;
 			const auto result = uiSys->TryAdd(renderTask);
-			assert(result);
+			assert(result != SIZE_MAX);
 		}
 
 		if (_paused)

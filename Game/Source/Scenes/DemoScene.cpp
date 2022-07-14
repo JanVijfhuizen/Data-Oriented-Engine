@@ -32,6 +32,6 @@ namespace game::demo
 		TextRenderTask task{};
 		task.text = "test 1";
 		const auto result = textRenderHandler->TryAdd(task);
-		assert(result);
+		assert(result != SIZE_MAX);
 	}
 }

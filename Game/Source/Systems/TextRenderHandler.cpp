@@ -57,7 +57,7 @@ namespace game
 				uiRenderTask.subTexture = charSubTexture;
 
 				const auto result = uiSys->TryAdd(uiRenderTask);
-				assert(result);
+				assert(result != SIZE_MAX);
 			}
 		}
 	}
