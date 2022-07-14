@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Game.h"
+
+#include "TextRenderHandler.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
@@ -14,12 +16,13 @@ namespace game
 	{
 		// Core engine systems.
 		initializer.DefineSystem<ResourceManager>();
-		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// Game systems.
+		initializer.DefineSystem<TurnSystem>();
+		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 
 		// High level game manager.

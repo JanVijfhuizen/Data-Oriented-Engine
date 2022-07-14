@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
+
+#include "TextRenderHandler.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "Systems/ResourceManager.h"
 
@@ -22,8 +24,18 @@ namespace game::demo
 		}
 	}
 
-	void DemoScene::Update(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
+	void DemoScene::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		GameScene::Update(info, systems);
+
+		const auto textRenderHandler = systems.GetSystem<TextRenderHandler>();
+		TextRenderTask task{};
+		task.text = "test 1";
+		auto result = textRenderHandler->TryAdd(task);
+		assert(result != SIZE_MAX);
+
+		task.appendIndex = result;
+		result = textRenderHandler->TryAdd(task);
+		assert(result != SIZE_MAX);
 	}
 }

@@ -53,6 +53,7 @@ namespace jlb
 	template <typename T, size_t S>
 	T& StackArray<T, S>::operator[](const size_t index)
 	{
+		assert(index < S);
 		return _memory[index];
 	}
 

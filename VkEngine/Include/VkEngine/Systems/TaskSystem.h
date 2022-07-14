@@ -7,7 +7,8 @@ namespace vke
 	class TaskSystem : public GameSystem
 	{
 	public:
-		[[nodiscard]] bool TryAdd(const T& task);
+		// Returns MAX value if it couldn't add the task.
+		[[nodiscard]] size_t TryAdd(const T& task);
 		[[nodiscard]] size_t GetCount();
 		[[nodiscard]] size_t GetLength();
 
@@ -27,14 +28,14 @@ namespace vke
 	};
 
 	template <typename T>
-	bool TaskSystem<T>::TryAdd(const T& task)
+	size_t TaskSystem<T>::TryAdd(const T& task)
 	{
 		if (_tasks.GetLength() == _tasks.GetCount())
-			return false;
+			return SIZE_MAX;
 		if (!ValidateOnTryAdd(task))
-			return false;
+			return SIZE_MAX;
 		_tasks.Add(task);
-		return true;
+		return _tasks.GetCount() - 1;
 	}
 
 	template <typename T>

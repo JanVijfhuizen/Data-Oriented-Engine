@@ -170,6 +170,7 @@
     <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
     <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
+    <ClInclude Include="Include\Game\TextRenderHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Systems\ResourceManager.cpp" />
@@ -186,6 +187,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Systems\TextRenderHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JLB\JLB.vcxproj">

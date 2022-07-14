@@ -19,6 +19,7 @@ namespace game
 		{
 			alphabet,
 			mouse,
+			numbers,
 			timeline
 		};
 

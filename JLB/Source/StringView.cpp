@@ -12,22 +12,31 @@ namespace jlb
 		return _strLit;
 	}
 
-	bool StringView::operator==(StringView& other)
+	size_t StringView::GetLength() const
+	{
+		size_t counter = 0;
+		const char* c = _strLit;
+		for (; *c != 0; ++c) 
+			++counter;
+		return counter;
+	}
+
+	bool StringView::operator==(const StringView& other) const
 	{
 		return _strLit == other._strLit;
 	}
 
-	bool StringView::operator==(const char* other)
+	bool StringView::operator==(const char* other) const
 	{
 		return _strLit == other;
 	}
 
-	bool StringView::operator!=(StringView& other)
+	bool StringView::operator!=(const StringView& other) const
 	{
 		return !operator==(other);
 	}
 
-	bool StringView::operator!=(const char* other)
+	bool StringView::operator!=(const char* other) const
 	{
 		return !operator==(other);
 	}

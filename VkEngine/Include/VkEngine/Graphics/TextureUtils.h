@@ -35,6 +35,10 @@ namespace vke
 		void LoadAtlasSubTextures(jlb::StringView coordsPath, jlb::ArrayView<SubTexture> outSubTextures);
 		// Divide a sub texture into multiple parts, useful for things like animations.
 		void Subdivide(SubTexture subTexture, size_t amount, jlb::ArrayView<SubTexture> outSubTextures);
+		[[nodiscard]] float GetChunkSize(const SubTexture& subTexture, size_t amount);
+		// Returns the center of the sub texture.
+		[[nodiscard]] glm::vec2 GetCenter(const SubTexture& subTexture);
+		[[nodiscard]] SubTexture MirrorHorizontally(const SubTexture& subTexture);
 
 		[[nodiscard]] Texture Load(const EngineData& info, jlb::StringView path);
 		void Free(const EngineData& info, const Texture& texture);

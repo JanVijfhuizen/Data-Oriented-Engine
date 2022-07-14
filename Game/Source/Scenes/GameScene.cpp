@@ -66,7 +66,7 @@ namespace game
 				task.subTexture = tile.subTexture;
 				task.transform.position = glm::vec2(x, y) * posMul;
 				const auto result = sys->TryAdd(task);
-				assert(result);
+				assert(result != SIZE_MAX);
 			}
 		}
 	}

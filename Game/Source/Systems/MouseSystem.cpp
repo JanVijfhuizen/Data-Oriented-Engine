@@ -31,6 +31,6 @@ namespace game
 		task.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::mouse);
 
 		const auto result = uiSys->TryAdd(task);
-		assert(result);
+		assert(result != SIZE_MAX);
 	}
 }
