@@ -14,6 +14,8 @@ namespace game
 		size_t lengthOverride = SIZE_MAX;
 		// Ignores origin value to place it after the text of target task.
 		size_t appendIndex = SIZE_MAX;
+		// Space between characters. Can be negative.
+		int32_t padding = -2;
 	};
 
 	class TextRenderHandler final : public vke::TaskSystem<TextRenderTask>

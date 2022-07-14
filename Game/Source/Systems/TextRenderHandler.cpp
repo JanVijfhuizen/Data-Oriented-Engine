@@ -28,21 +28,24 @@ namespace game
 			assert(task.lengthOverride == SIZE_MAX ? true : task.lengthOverride <= task.text.GetLength());
 
 			glm::vec2 origin = task.origin;
-			origin.x -= fontSize;
+			
 
 			// If the task is appending on another task.
 			if (task.appendIndex != SIZE_MAX)
 			{
 				const auto& otherTask = tasks[task.appendIndex];
 				const size_t otherLength = otherTask.lengthOverride == SIZE_MAX ? otherTask.text.GetLength() : otherTask.lengthOverride;
-				const float additionalOffset = fontSize * (otherLength - 1);
+				const float additionalOffset = (fontSize + entitySys->camera.pixelSize * static_cast<float>(otherTask.padding)) * otherLength;
 				origin = otherTask.origin;
 				origin.x += additionalOffset;
 			}
 
+			const float paddedFontSize = fontSize + entitySys->camera.pixelSize * static_cast<float>(task.padding);
+			origin.x -= paddedFontSize;
+
 			for (size_t i = 0; i < length; ++i)
 			{
-				origin.x += fontSize;
+				origin.x += paddedFontSize;
 
 				const auto& c = task.text[i];
 

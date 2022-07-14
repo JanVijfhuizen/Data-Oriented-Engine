@@ -9,22 +9,25 @@ namespace game
 	public:
 		struct Visuals final
 		{
-			float screenSpaceWidth = .5f;
+			// Padding between the keys.
+			size_t padding = 4;
 			float screenYCoordinates = .8f;
 			float onPressedMaxVerticalOffset = .05f;
 			// In milliseconds.
 			float onPressedAnimDuration = 100;
+			float timeVerticalOffsetMultiplier = 2;
 		} visuals{};
 
 		[[nodiscard]] bool GetIfTickEvent() const;
 		[[nodiscard]] float GetTimeLerp() const;
 
 	private:
-		jlb::StackArray<float, 4> _keyVerticalLerps{1};
+		jlb::StackArray<float, 5> _keyVerticalLerps{1};
 
 		bool _paused = false;
 		size_t _ticksPerSecond = 4;
 		size_t _previousTicksPerSecond = 4;
+		const size_t _maxTicksPerSecond = 16;
 
 		float _time = 0;
 		float _timePreviousTick = 0;
