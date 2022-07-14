@@ -15,8 +15,12 @@ namespace game
 		const auto resourceSys = systems.GetSystem<game::ResourceManager>();
 
 		const float fontSize = entitySys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
-		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::alphabet);
-		const float chunkSize = vke::texture::GetChunkSize(subTexture, 26);
+
+		const auto alphabetTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::alphabet);
+		const float alphabetChunkSize = vke::texture::GetChunkSize(alphabetTexture, 26);
+
+		const auto numbersTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::numbers);
+		const float numbersChunkSize = vke::texture::GetChunkSize(numbersTexture, 10);
 
 		for (const auto& task : tasks)
 		{
@@ -29,9 +33,21 @@ namespace game
 			{
 				origin.x += fontSize;
 
-				const size_t position = task.text[i] - 'a';
+				const auto& c = task.text[i];
 
-				vke::SubTexture charSubTexture = subTexture;
+				// If this is a space.
+				if (c == 32)
+					continue;
+
+				const bool isInteger = c < 'a';
+				// Assert if it's a valid character.
+				assert(isInteger ? c >= '0' && c <= '9' : c >= 'a' && c <= 'z');
+
+				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : 'a'));
+
+				const float chunkSize = isInteger ? numbersChunkSize : alphabetChunkSize;
+
+				vke::SubTexture charSubTexture = isInteger ? numbersTexture : alphabetTexture;
 				charSubTexture.lTop.x = chunkSize * position;
 				charSubTexture.rBot.x = charSubTexture.lTop.x + chunkSize;
 

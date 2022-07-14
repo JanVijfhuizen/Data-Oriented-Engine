@@ -14,9 +14,6 @@ namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
-		// Core dependent systems.
-		initializer.DefineSystem<TextRenderHandler>();
-
 		// Core engine systems.
 		initializer.DefineSystem<ResourceManager>();
 		initializer.DefineSystem<vke::SceneSystem>();
@@ -25,6 +22,7 @@ namespace game
 
 		// Game systems.
 		initializer.DefineSystem<TurnSystem>();
+		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 
 		// High level game manager.
