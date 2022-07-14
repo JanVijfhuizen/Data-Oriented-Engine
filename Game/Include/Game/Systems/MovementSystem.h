@@ -15,12 +15,15 @@ namespace game
 	{
 		size_t remaining = 0;
 		glm::vec2 position{};
+		float scaleMultiplier = 0;
 	};
 
 	class MovementSystem final : public vke::TaskSystemWithOutput<MovementTask, MovementTaskOutput>
 	{
 	public:
-		static void UpdateEntity(MovementComponent& component, const MovementTaskOutput& output, glm::vec2& outPosition);
+		float bobbingScaling = 0.1f;
+
+		static void UpdateComponent(MovementComponent& component, const MovementTaskOutput& output);
 
 		void OnUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			const jlb::Vector<MovementTask>& tasks, jlb::Vector<MovementTaskOutput>& taskOutputs) override;

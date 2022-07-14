@@ -1,14 +1,16 @@
 ﻿#include "pch.h"
 #include "Systems/MovementSystem.h"
+
+#include "Curve.h"
 #include "JlbMath.h"
 #include "Systems/TurnSystem.h"
 
 namespace game
 {
-	void MovementSystem::UpdateEntity(MovementComponent& component, const MovementTaskOutput& output, glm::vec2& outPosition)
+	void MovementSystem::UpdateComponent(MovementComponent& component, const MovementTaskOutput& output)
 	{
 		component.remaining = output.remaining;
-		outPosition = output.position;
+		component.scaleMultiplier = output.scaleMultiplier;
 	}
 
 	void MovementSystem::OnUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
@@ -18,6 +20,8 @@ namespace game
 
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 		const float tickLerp = turnSys->GetTickLerp();
+
+		auto curveOvershoot = jlb::CreateCurveOvershooting();
 		
 		for (const auto& task : tasks)
 		{
@@ -27,12 +31,17 @@ namespace game
 			output.remaining = component.remaining - isTickEvent;
 
 			const auto durationF = static_cast<float>(task.duration);
-			// 
+			// Smoothly move between grid positions.
 			const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(output.remaining) / durationF;
 			output.position = jlb::math::LerpPct(component.from, component.to, pct);
 
 			// Perfectly set the position once the tick event has been reached if the remaining turns is zero.
 			output.position = isTickEvent && output.remaining == 0 ? component.to : output.position;
+
+			// Bobbing.
+			const float bobbingPct = fmodf(pct * component.bobbingAmount, 1);
+			const float eval = jlb::DoubleCurveEvaluate(bobbingPct, curveOvershoot, curveOvershoot);
+			output.scaleMultiplier = 1.f + eval * bobbingScaling;
 
 			taskOutputs.Add(output);
 		}

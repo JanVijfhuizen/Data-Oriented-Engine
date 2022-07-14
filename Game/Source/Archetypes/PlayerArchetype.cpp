@@ -42,6 +42,8 @@ namespace game
 			}
 
 			renderTask.transform = entity.transform;
+			renderTask.transform.scale *= entity.movementComponent.scaleMultiplier;
+
 			const auto result = entityRenderSys->TryAdd(renderTask);
 			assert(result != SIZE_MAX);
 
@@ -64,7 +66,8 @@ namespace game
 		for (auto& entity : entities)
 		{
 			const auto& movementOutput = movementOutputs[entity.movementTaskId];
-			MovementSystem::UpdateEntity(entity.movementComponent, movementOutput, entity.transform.position);
+			MovementSystem::UpdateComponent(entity.movementComponent, movementOutput);
+			entity.transform.position = movementOutput.position;
 		}
 	}
 }
