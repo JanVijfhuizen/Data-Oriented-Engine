@@ -31,7 +31,11 @@ namespace game::demo
 		const auto textRenderHandler = systems.GetSystem<TextRenderHandler>();
 		TextRenderTask task{};
 		task.text = "test 1";
-		const auto result = textRenderHandler->TryAdd(task);
+		auto result = textRenderHandler->TryAdd(task);
+		assert(result != SIZE_MAX);
+
+		task.appendIndex = result;
+		result = textRenderHandler->TryAdd(task);
 		assert(result != SIZE_MAX);
 	}
 }
