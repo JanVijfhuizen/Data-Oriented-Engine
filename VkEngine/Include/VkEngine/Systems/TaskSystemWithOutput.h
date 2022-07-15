@@ -12,12 +12,13 @@ namespace vke
 	protected:
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
+
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
 			const jlb::Vector<Task>& tasks, jlb::Vector<Output>& taskOutputs) = 0;
 		
 	private:
 		jlb::Vector<Output> _output{};
-
+		
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
 			const jlb::Vector<Task>& tasks) override;
 	};

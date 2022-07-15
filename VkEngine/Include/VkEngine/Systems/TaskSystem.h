@@ -11,6 +11,7 @@ namespace vke
 		[[nodiscard]] size_t TryAdd(const T& task);
 		[[nodiscard]] size_t GetCount();
 		[[nodiscard]] size_t GetLength();
+		[[nodiscard]] T* GetData() const;
 
 	protected:
 		void Allocate(const EngineData& info) override;
@@ -52,6 +53,12 @@ namespace vke
 	size_t TaskSystem<T>::GetLength()
 	{
 		return _tasks.GetLength();
+	}
+
+	template <typename T>
+	T* TaskSystem<T>::GetData() const
+	{
+		return _tasks.GetData();
 	}
 
 	template <typename T>
