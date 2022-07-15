@@ -7,13 +7,17 @@ namespace jlb::math
 		return atan2f(a.y - b.y, a.x - b.x) + PI / 2;
 	}
 
-	float SmoothAngle(const float a, const float b, const float delta)
+	float SmoothAngle(float a, float b, const float delta)
 	{
-		const bool dir = fmodf(b - a + 2 * PI, 2 * PI) < PI;
+		const float diff = abs(b - a);
+		const bool diffMoreThanPi = diff > PI;
+		const bool bMoreThanA = b > a;
 
-		const float diff = abs(a - b);
-		const float angle = a + diff * delta * (dir ? 1 : -1);
-		return WrapAngle(angle);
+		a += diffMoreThanPi && bMoreThanA ? PI * 2 : 0;
+		b += diffMoreThanPi && !bMoreThanA ? PI * 2 : 0;
+
+		const float value = a + (b - a) * delta;
+		return WrapAngle(value);
 	}
 
 	float WrapAngle(const float f)
