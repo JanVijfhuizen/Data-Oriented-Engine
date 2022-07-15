@@ -10,22 +10,26 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
+#include "VkEngine/Systems/ThreadPoolSystem.h"
 
 namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
-		// Core engine systems.
+		// Core engine pre update.
+		initializer.DefineSystem<vke::ThreadPoolSystem>();
 		initializer.DefineSystem<ResourceManager>();
 		initializer.DefineSystem<vke::SceneSystem>();
-		initializer.DefineSystem<vke::EntityRenderSystem>();
-		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// Game systems.
 		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
+
+		// Core engine Post update.
+		initializer.DefineSystem<vke::EntityRenderSystem>();
+		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// High level game manager.
 		initializer.DefineSystem<GameManager>();

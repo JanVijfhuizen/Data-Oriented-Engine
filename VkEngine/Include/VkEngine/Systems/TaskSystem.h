@@ -11,6 +11,7 @@ namespace vke
 		[[nodiscard]] size_t TryAdd(const T& task);
 		[[nodiscard]] size_t GetCount();
 		[[nodiscard]] size_t GetLength();
+		[[nodiscard]] jlb::ArrayView<T> GetTasks() const;
 
 	protected:
 		void Allocate(const EngineData& info) override;
@@ -79,6 +80,12 @@ namespace vke
 	bool TaskSystem<T>::ValidateOnTryAdd(const T& task)
 	{
 		return true;
+	}
+
+	template <typename T>
+	jlb::ArrayView<T> TaskSystem<T>::GetTasks() const
+	{
+		return _tasks;
 	}
 
 	template <typename T>

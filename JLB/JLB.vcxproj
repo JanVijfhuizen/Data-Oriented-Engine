@@ -155,6 +155,7 @@
     <ClInclude Include="Include\ArrayUtils.h" />
     <ClInclude Include="Include\Curve.h" />
     <ClInclude Include="Include\Map.h" />
+    <ClInclude Include="Include\StackQueue.h" />
     <ClInclude Include="Include\StackAllocator.h" />
     <ClInclude Include="Include\Array.h" />
     <ClInclude Include="Include\ArrayView.h" />

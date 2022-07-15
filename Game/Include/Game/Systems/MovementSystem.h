@@ -39,7 +39,7 @@ namespace game
 		[[nodiscard]] size_t DefineMinimalUsage(const vke::EngineData& info) override;
 		[[nodiscard]] bool ValidateOnTryAdd(const MovementTask& task) override;
 
-		void OnUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::Vector<MovementTask>& tasks, jlb::Vector<MovementTaskOutput>& taskOutputs) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+			const jlb::Vector<MovementTask>& tasks) override;
 	};
 }
