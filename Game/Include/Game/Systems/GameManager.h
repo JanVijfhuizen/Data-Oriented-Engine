@@ -3,7 +3,7 @@
 
 namespace game
 {
-	class GameState final : public vke::GameSystem
+	class GameManager final : public vke::GameSystem
 	{
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;

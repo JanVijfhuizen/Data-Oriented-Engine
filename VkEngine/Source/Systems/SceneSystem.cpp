@@ -22,12 +22,46 @@ namespace vke
 	{
 	}
 
-	void SceneSystem::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void SceneSystem::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
+		System<EngineData>::PreUpdate(info, systems);
 		Scene* current = _latestScene;
-		while(current)
+		while (current)
 		{
-			current->Update(info, systems);
+			current->PreUpdate(info, systems);
+			current = current->_next;
+		}
+	}
+
+	void SceneSystem::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		System<EngineData>::PostUpdate(info, systems);
+		Scene* current = _latestScene;
+		while (current)
+		{
+			current->PostUpdate(info, systems);
+			current = current->_next;
+		}
+	}
+
+	void SceneSystem::OnKeyInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action)
+	{
+		System<EngineData>::OnKeyInput(info, systems, key, action);
+		Scene* current = _latestScene;
+		while (current)
+		{
+			current->OnKeyInput(info, systems, key, action);
+			current = current->_next;
+		}
+	}
+
+	void SceneSystem::OnMouseInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action)
+	{
+		System<EngineData>::OnMouseInput(info, systems, key, action);
+		Scene* current = _latestScene;
+		while (current)
+		{
+			current->OnMouseInput(info, systems, key, action);
 			current = current->_next;
 		}
 	}

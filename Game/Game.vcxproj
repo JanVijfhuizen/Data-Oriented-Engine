@@ -159,26 +159,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Game\Entities\Tile.h" />
+    <ClInclude Include="Include\Game\Archetypes\Archetype.h" />
+    <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
+    <ClInclude Include="Include\Game\Components\MovementComponent.h" />
+    <ClInclude Include="Include\Game\Entities\Player.h" />
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
-    <ClInclude Include="Include\Game\Scenes\GameScene.h" />
-    <ClInclude Include="Include\Game\Systems\GameState.h" />
+    <ClInclude Include="Include\Game\Systems\GameManager.h" />
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
-    <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
+    <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
     <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
-    <ClInclude Include="Include\Game\TextRenderHandler.h" />
+    <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\MovementSystem.cpp" />
+    <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\Systems\ResourceManager.cpp" />
     <ClCompile Include="Source\Systems\MouseSystem.cpp" />
-    <ClCompile Include="Source\Scenes\GameScene.cpp" />
     <ClCompile Include="Source\Scenes\DemoScene.cpp" />
     <ClCompile Include="Source\Systems\TurnSystem.cpp" />
-    <ClCompile Include="Source\Systems\GameState.cpp" />
+    <ClCompile Include="Source\Systems\GameManager.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\pch.cpp">

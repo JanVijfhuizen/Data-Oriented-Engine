@@ -180,6 +180,7 @@
     <ClInclude Include="Include\VkEngine\Systems\RenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
+    <ClInclude Include="Include\VkEngine\Systems\TaskSystemWithOutput.h" />
     <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h" />
   </ItemGroup>
   <ItemGroup>

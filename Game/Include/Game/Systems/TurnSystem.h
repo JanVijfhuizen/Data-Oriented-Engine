@@ -19,19 +19,18 @@ namespace game
 		} visuals{};
 
 		[[nodiscard]] bool GetIfTickEvent() const;
-		[[nodiscard]] float GetTimeLerp() const;
+		[[nodiscard]] float GetTickLerp() const;
 
 	private:
 		jlb::StackArray<float, 5> _keyVerticalLerps{1};
 
 		bool _paused = false;
-		size_t _ticksPerSecond = 4;
-		size_t _previousTicksPerSecond = 4;
+		size_t _ticksPerSecond = 1;
+		size_t _previousTicksPerSecond = 1;
 		const size_t _maxTicksPerSecond = 16;
 
 		float _time = 0;
-		float _timePreviousTick = 0;
-		bool _tickCalled = false;
+		bool _tickCalled = true;
 
 		float _lerp = 0;
 

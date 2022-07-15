@@ -137,7 +137,7 @@ namespace vke
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
 
-		// Delete the Vulkan mmeory pools.
+		// Delete the Vulkan memory pools.
 		vkAllocator.Free(app);
 
 		// Clean up the Vulkan swapchain.
@@ -147,7 +147,7 @@ namespace vke
 		// Destroy the window.
 		windowHandler.Free();
 
-		// Make sure everyting is properly deallocated.
+		// Make sure everything is properly deallocated.
 		assert(tempAllocator.IsEmpty());
 		assert(allocator.IsEmpty());
 

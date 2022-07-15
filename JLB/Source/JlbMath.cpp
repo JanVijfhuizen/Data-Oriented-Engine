@@ -1,27 +1,28 @@
 ﻿#include "JlbMath.h"
-#include <cassert>
 
 namespace jlb::math
 {
 	float GetAngle(const glm::vec2& a, const glm::vec2& b)
 	{
-		return atan2(a.y - b.y, a.x - b.x) + PI / 2;
+		return atan2f(a.y - b.y, a.x - b.x) + PI / 2;
 	}
 
 	float SmoothAngle(float a, float b, const float delta)
 	{
-		const float diff = abs(a - b);
-		const bool diffMoreThanPI = diff > PI;
+		const float diff = abs(b - a);
+		const bool diffMoreThanPi = diff > PI;
+		const bool bMoreThanA = b > a;
 
-		const float nA = a + (diffMoreThanPI ? (b > a ? PI * 2 : 0) : 0);
-		const float nB = b + (diffMoreThanPI ? (a > b ? PI * 2 : 0) : 0);
+		a += diffMoreThanPi && bMoreThanA ? PI * 2 : 0;
+		b += diffMoreThanPi && !bMoreThanA ? PI * 2 : 0;
 
-		return WrapAngle(Lerp(nA, nB, delta));
+		const float value = a + (b - a) * delta;
+		return WrapAngle(value);
 	}
 
 	float WrapAngle(const float f)
 	{
-		return fmod(f, PI * 2);
+		return fmodf(f, PI * 2);
 	}
 
 	float Lerp(const float a, const float b, const float delta)
@@ -32,6 +33,15 @@ namespace jlb::math
 	float LerpPct(const float a, const float b, const float pct)
 	{
 		return a + (b - a) * pct;
+	}
+
+	glm::vec2 LerpPct(const glm::vec2& a, const glm::vec2& b, const float pct)
+	{
+		return
+		{
+			LerpPct(a.x, b.x, pct),
+			LerpPct(a.y, b.y, pct),
+		};
 	}
 
 	bool IsZero(const glm::ivec2& v)

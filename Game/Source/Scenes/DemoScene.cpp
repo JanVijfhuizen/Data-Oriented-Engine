@@ -1,41 +1,41 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
-
-#include "TextRenderHandler.h"
-#include "VkEngine/Systems/EntityRenderSystem.h"
 #include "Systems/ResourceManager.h"
 
 namespace game::demo
 {
 	void DemoScene::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		GameScene::Allocate(info, systems);
+		
 	}
 
-	void DemoScene::GenerateLevel(const jlb::ArrayView<Tile> level, const vke::EngineData& info,
-		jlb::Systems<vke::EngineData> systems) const
+	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		const auto sys = systems.GetSystem<ResourceManager>();
-		const auto subTexture = sys->GetSubTexture(ResourceManager::EntitySubTextures::tile);
-
-		for (size_t i = 0; i < level.length; ++i)
-		{
-			level[i].subTexture = subTexture;
-		}
 	}
 
-	void DemoScene::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void DemoScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		GameScene::Update(info, systems);
+		Scene::PreUpdate(info, systems);
+		_playerArchetype.PreUpdate(info, systems, _player);
+	}
 
-		const auto textRenderHandler = systems.GetSystem<TextRenderHandler>();
-		TextRenderTask task{};
-		task.text = "test 1";
-		auto result = textRenderHandler->TryAdd(task);
-		assert(result != SIZE_MAX);
+	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		Scene::PostUpdate(info, systems);
+		_playerArchetype.PostUpdate(info, systems, _player);
+	}
 
-		task.appendIndex = result;
-		result = textRenderHandler->TryAdd(task);
-		assert(result != SIZE_MAX);
+	void DemoScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, const int key,
+		const int action)
+	{
+		Scene::OnKeyInput(info, systems, key, action);
+		_playerArchetype.OnKeyInput(info, systems, key, action);
+	}
+
+	void DemoScene::OnMouseInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems,
+		const int key, const int action)
+	{
+		Scene::OnMouseInput(info, systems, key, action);
+		_playerArchetype.OnMouseInput(info, systems, key, action);
 	}
 }
