@@ -2,18 +2,25 @@
 
 namespace game
 {
+	// Component related to the movement system.
 	struct MovementComponent final
 	{
-		// Settings.
-		float scaleMultiplier = 1;
-		float bobbingAmount = 8;
+		struct Settings final
+		{
+			float bobbingAmount = 8;
+		} settings;
 
-		// Set at start of tick.
-		float rotation;
-		glm::vec2 from{};
-		glm::vec2 to{};
-
-		// System data.
-		size_t remaining = 0;
+		struct UserDefinedOnTick final
+		{
+			glm::vec2 from{};
+			glm::vec2 to{};
+			float rotation;
+			size_t remaining = 0;
+		} userDefined;
+		
+		struct SystemDefined final
+		{
+			float scaleMultiplier = 1;
+		} systemDefined;
 	};
 }

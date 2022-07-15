@@ -18,13 +18,17 @@ namespace vke
 
 		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info);
 
-		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks) = 0;
+		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
+		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
+		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
 	private:
 		jlb::Vector<T> _tasks{};
 
+		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 	};
 
 	template <typename T>
@@ -76,10 +80,24 @@ namespace vke
 	}
 
 	template <typename T>
+	void TaskSystem<T>::PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems)
+	{
+		System<EngineData>::PreUpdate(info, systems);
+		OnPreUpdate(info, systems, _tasks);
+	}
+
+	template <typename T>
 	void TaskSystem<T>::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		GameSystem::Update(info, systems);
 		OnUpdate(info, systems, _tasks);
+	}
+
+	template <typename T>
+	void TaskSystem<T>::PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems)
+	{
+		System<EngineData>::PostUpdate(info, systems);
+		OnPostUpdate(info, systems, _tasks);
 		_tasks.SetCount(0);
 	}
 }

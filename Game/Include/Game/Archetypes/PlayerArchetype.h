@@ -4,6 +4,7 @@
 
 namespace game
 {
+	// Handles player character behaviour and input.
 	class PlayerArchetype final : public Archetype<Player>
 	{
 	public:

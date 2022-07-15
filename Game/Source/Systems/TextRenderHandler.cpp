@@ -6,7 +6,7 @@
 
 namespace game
 {
-	void TextRenderHandler::OnUpdate(const vke::EngineData& info, 
+	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::Vector<TextRenderTask>& tasks)
 	{

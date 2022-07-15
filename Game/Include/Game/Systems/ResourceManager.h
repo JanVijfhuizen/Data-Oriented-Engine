@@ -8,6 +8,7 @@ namespace game
 	class ResourceManager final : public vke::GameSystem
 	{
 	public:
+		// Subtextures available for the entity renderer.
 		enum class EntitySubTextures
 		{
 			mouse,
@@ -15,6 +16,7 @@ namespace game
 			tile
 		};
 
+		// Subtextures available for the UI renderer.
 		enum class UISubTextures
 		{
 			alphabet,
