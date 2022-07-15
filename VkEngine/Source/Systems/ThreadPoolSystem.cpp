@@ -1,10 +1,13 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
-
 #include <iostream>
-
 #include "JlbMath.h"
-//#include <synchapi.h>
+
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace vke
 {
@@ -14,8 +17,8 @@ namespace vke
 
 		while(true)
 		{
-			//while (sys->_tasksRemaining == 0 && !sys->_stopThreads)
-				//Sleep(0);
+			while (sys->_tasksRemaining == 0 && !sys->_stopThreads)
+				Sleep(0);
 			if (sys->_stopThreads)
 				break;
 
@@ -36,16 +39,13 @@ namespace vke
 	{
 		TaskSystem<ThreadPoolTask>::Allocate(info);
 
-		const auto processorCount = jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
-
-		_threads.Allocate(*info.allocator, processorCount);
-		for (auto& thread : _threads)
-			thread = std::thread(ThreadObj(), this);
+		const size_t threadCount = GetThreadCount();
+		_threads = info.allocator->New<std::thread>(threadCount, ThreadObj(), this);
 	}
 
 	void ThreadPoolSystem::Free(const EngineData& info)
 	{
-		_threads.Free(*info.allocator);
+		info.allocator->MFree(_threads.id);
 		TaskSystem<ThreadPoolTask>::Free(info);
 	}
 
@@ -68,19 +68,26 @@ namespace vke
 		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
 
 		// Wait for the threads to finish.
-		//while (_tasksRemaining > 0)
-			//Sleep(0);
+		while (_tasksRemaining > 0)
+			Sleep(0);
 	}
 
 	void ThreadPoolSystem::Exit(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
-		for (auto& thread : _threads)
-			thread.join();
+		_stopThreads = true;
+		const size_t threadCount = GetThreadCount();
+		for (int i = 0; i < threadCount; ++i)
+			_threads.ptr[i].join();
 		TaskSystem<ThreadPoolTask>::Exit(info, systems);
 	}
 
 	size_t ThreadPoolSystem::DefineMinimalUsage(const EngineData& info)
 	{
 		return 8;
+	}
+
+	size_t ThreadPoolSystem::GetThreadCount() const
+	{
+		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
 	}
 }

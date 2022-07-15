@@ -10,6 +10,7 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
+#include "VkEngine/Systems/ThreadPoolSystem.h"
 
 namespace game
 {
@@ -26,6 +27,9 @@ namespace game
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
+
+		// Final system for threading reasons.
+		initializer.DefineSystem<vke::ThreadPoolSystem>();
 
 		// High level game manager.
 		initializer.DefineSystem<GameManager>();

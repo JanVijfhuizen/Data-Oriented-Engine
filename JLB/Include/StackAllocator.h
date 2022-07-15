@@ -30,8 +30,8 @@ namespace jlb
 		void MFreeUnsafe(size_t* src);
 
 		// Malloc but simplified for allocating types.
-		template <typename T>
-		[[nodiscard]] Allocation<T> New(size_t count = 1);
+		template <typename T, typename ...Args>
+		[[nodiscard]] Allocation<T> New(size_t count = 1, Args... args);
 		[[nodiscard]] bool IsEmpty() const;
 		// Get the amount of sub allocators made during it's runtime.
 		[[nodiscard]] size_t GetDepth() const;
@@ -48,8 +48,8 @@ namespace jlb
 		[[nodiscard]] static size_t ToChunkSize(size_t size);
 	};
 
-	template <typename T>
-	Allocation<T> StackAllocator::New(const size_t count)
+	template <typename T, typename ...Args>
+	Allocation<T> StackAllocator::New(const size_t count, Args... args)
 	{
 		const auto alloc = Malloc(sizeof(T) * count);
 		Allocation<T> allocation{};
@@ -57,7 +57,7 @@ namespace jlb
 		allocation.id = alloc.id;
 
 		for (size_t i = 0; i < count; ++i)
-			new(&allocation.ptr[i]) T();
+			new(&allocation.ptr[i]) T(args...);
 		return allocation;
 	}
 }

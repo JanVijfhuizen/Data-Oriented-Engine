@@ -20,7 +20,7 @@ namespace vke
 			void operator()(ThreadPoolSystem* sys) const;
 		};
 
-		jlb::Array<std::thread> _threads{};
+		jlb::Allocation<std::thread> _threads{};
 		std::atomic<bool> _stopThreads = false;
 		std::atomic<size_t> _tasksRemaining = 0;
 		std::mutex _getNextTaskMutex{};
@@ -40,5 +40,6 @@ namespace vke
 		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 
 		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
+		[[nodiscard]] size_t GetThreadCount() const;
 	};
 }
