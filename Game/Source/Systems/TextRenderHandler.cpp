@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "TextRenderHandler.h"
+#include "Systems/TextRenderHandler.h"
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -28,7 +28,6 @@ namespace game
 			assert(task.lengthOverride == SIZE_MAX ? true : task.lengthOverride <= task.text.GetLength());
 
 			glm::vec2 origin = task.origin;
-			
 
 			// If the task is appending on another task.
 			if (task.appendIndex != SIZE_MAX)

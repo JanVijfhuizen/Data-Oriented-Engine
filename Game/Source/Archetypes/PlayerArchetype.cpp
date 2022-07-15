@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
-
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
@@ -33,28 +32,37 @@ namespace game
 
 		for (auto& entity : entities)
 		{
-			// Testing.
-			if(isTickEvent && entity.movementComponent.remaining == 0)
-			{
-				auto randDir = glm::ivec2(rand() % 2 - 1);
-				randDir.y = randDir.x == 0 ? rand() % 2 * 2 - 1 : 0;
-				const auto finalDir = glm::vec2(randDir) * static_cast<float>(vke::PIXEL_SIZE_ENTITY);
-
-				entity.movementComponent.from = entity.transform.position;
-				entity.movementComponent.to = entity.movementComponent.from + finalDir;
-				entity.movementComponent.remaining = movementTask.duration;
-				entity.movementComponent.rotation = entity.transform.rotation;
-			}
+			auto& movementComponent = entity.movementComponent;
+			entity.movementTaskId = SIZE_MAX;
 
 			renderTask.transform = entity.transform;
-			renderTask.transform.scale *= entity.movementComponent.scaleMultiplier;
+			renderTask.transform.scale *= movementComponent.scaleMultiplier;
 
 			const auto result = entityRenderSys->TryAdd(renderTask);
 			assert(result != SIZE_MAX);
 
-			movementTask.component = entity.movementComponent;
+			// Testing.
+			if(isTickEvent && entity.movementComponent.remaining == 0)
+			{
+				glm::ivec2 dir{};
+				dir.x = static_cast<int32_t>(_wasdKeysInput[3]) - _wasdKeysInput[1];
+				dir.y = dir.x == 0 ? static_cast<int32_t>(_wasdKeysInput[2]) - _wasdKeysInput[0] : 0;
+
+				if (dir.x == 0 && dir.y == 0)
+					continue;
+
+				// Round the from position.
+				const glm::vec2 from = glm::vec2(glm::ivec2(entity.transform.position));
+				const glm::vec2 delta = glm::vec2(dir) * static_cast<float>(vke::PIXEL_SIZE_ENTITY);
+
+				movementComponent.from = from;
+				movementComponent.to = from + delta;
+				movementComponent.remaining = movementTask.duration;
+				movementComponent.rotation = entity.transform.rotation;
+			}
+
+			movementTask.component = movementComponent;
 			entity.movementTaskId = movementSys->TryAdd(movementTask);
-			assert(entity.movementTaskId != SIZE_MAX);
 		}
 	}
 
@@ -70,10 +78,40 @@ namespace game
 
 		for (auto& entity : entities)
 		{
+			if (entity.movementTaskId == SIZE_MAX)
+				continue;
+
 			const auto& movementOutput = movementOutputs[entity.movementTaskId];
 			MovementSystem::UpdateComponent(entity.movementComponent, movementOutput);
 			entity.transform.position = movementOutput.position;
 			entity.transform.rotation = movementOutput.rotation;
 		}
+	}
+
+	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
+	{
+		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _wasdKeysInput[0]);
+		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _wasdKeysInput[1]);
+		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _wasdKeysInput[2]);
+		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _wasdKeysInput[3]);
+	}
+
+	void PlayerArchetype::OnMouseInput(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
+	{
+	}
+
+	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, bool& keyPressed)
+	{
+		if (targetKey != activatedKey)
+			return;
+		if (action == GLFW_PRESS)
+		{
+			keyPressed = true;
+			return;
+		}
+		if (action == GLFW_RELEASE)
+			keyPressed = false;
 	}
 }

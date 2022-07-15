@@ -43,4 +43,26 @@ namespace vke
 			current = current->_next;
 		}
 	}
+
+	void SceneSystem::OnKeyInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action)
+	{
+		System<EngineData>::OnKeyInput(info, systems, key, action);
+		Scene* current = _latestScene;
+		while (current)
+		{
+			current->OnKeyInput(info, systems, key, action);
+			current = current->_next;
+		}
+	}
+
+	void SceneSystem::OnMouseInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action)
+	{
+		System<EngineData>::OnMouseInput(info, systems, key, action);
+		Scene* current = _latestScene;
+		while (current)
+		{
+			current->OnMouseInput(info, systems, key, action);
+			current = current->_next;
+		}
+	}
 }

@@ -24,7 +24,7 @@
     <ClInclude Include="Include\Game\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Systems\GameState.h">
+    <ClInclude Include="Include\Game\Systems\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Systems\TurnSystem.h">
@@ -39,7 +39,7 @@
     <ClInclude Include="Include\Game\Systems\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\TextRenderHandler.h">
+    <ClInclude Include="Include\Game\Systems\TextRenderHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Entities\Player.h">
@@ -68,7 +68,7 @@
     <ClCompile Include="Source\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Systems\GameState.cpp">
+    <ClCompile Include="Source\Systems\GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\TurnSystem.cpp">

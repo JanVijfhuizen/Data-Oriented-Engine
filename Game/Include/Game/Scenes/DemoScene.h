@@ -14,5 +14,10 @@ namespace game::demo
 
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+
+		void OnKeyInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key,
+			int action) override;
+		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key,
+			int action) override;
 	};
 }

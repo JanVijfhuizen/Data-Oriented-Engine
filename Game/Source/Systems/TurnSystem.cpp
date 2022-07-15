@@ -2,8 +2,8 @@
 #include "Systems/TurnSystem.h"
 #include "Curve.h"
 #include "JlbMath.h"
-#include "TextRenderHandler.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/TextRenderHandler.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 

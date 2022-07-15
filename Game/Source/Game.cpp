@@ -1,15 +1,15 @@
 #include "pch.h"
 #include "Game.h"
 
-#include "TextRenderHandler.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
-#include "Systems/GameState.h"
+#include "Systems/GameManager.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/TextRenderHandler.h"
 
 namespace game
 {
@@ -28,6 +28,6 @@ namespace game
 		initializer.DefineSystem<MouseSystem>();
 
 		// High level game manager.
-		initializer.DefineSystem<GameState>();
+		initializer.DefineSystem<GameManager>();
 	}
 }

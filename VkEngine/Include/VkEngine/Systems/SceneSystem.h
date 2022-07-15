@@ -10,8 +10,10 @@ namespace vke
 	protected:
 		virtual void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
 		virtual void Free(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
-		virtual void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) {}
-		virtual void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) {}
+		virtual void PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems) {}
+		virtual void PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems) {}
+		virtual void OnKeyInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action){}
+		virtual void OnMouseInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action){}
 
 	private:
 		Scene* _next = nullptr;
@@ -32,6 +34,9 @@ namespace vke
 		void Free(const EngineData& info) override;
 		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
+
+		void OnKeyInput(const EngineData& info, const jlb::Systems<EngineData> systems, int key, int action) override;
+		void OnMouseInput(const EngineData& info, const jlb::Systems<EngineData> systems, int key, int action) override;
 	};
 
 	template <typename T>

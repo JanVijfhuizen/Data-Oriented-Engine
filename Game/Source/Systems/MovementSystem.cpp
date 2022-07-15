@@ -58,4 +58,9 @@ namespace game
 	{
 		return 64;
 	}
+
+	bool MovementSystem::ValidateOnTryAdd(const MovementTask& task)
+	{
+		return task.component.remaining == 0 ? false : TaskSystemWithOutput<MovementTask, MovementTaskOutput>::ValidateOnTryAdd(task);
+	}
 }

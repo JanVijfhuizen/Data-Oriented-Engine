@@ -32,5 +32,6 @@ namespace game
 
 	private:
 		[[nodiscard]] size_t DefineMinimalUsage(const vke::EngineData& info) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const MovementTask& task) override;
 	};
 }
