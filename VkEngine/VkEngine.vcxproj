@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\VkEngine\Systems\ThreadPoolSystem.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
     <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\InstancingUtils.h" />
@@ -200,6 +201,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VkEngine/pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VkEngine/pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Source\Systems\ThreadPoolSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JLB\JLB.vcxproj">

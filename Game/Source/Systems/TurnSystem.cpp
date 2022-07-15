@@ -19,14 +19,6 @@ namespace game
 		return _lerp;
 	}
 
-	void TurnSystem::Allocate(const vke::EngineData& info)
-	{
-	}
-
-	void TurnSystem::Free(const vke::EngineData& info)
-	{
-	}
-
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_tickCalled = false;

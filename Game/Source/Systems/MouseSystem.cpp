@@ -1,20 +1,11 @@
 ﻿#include "pch.h"
 #include "Systems/MouseSystem.h"
-
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 
 namespace game
 {
-	void MouseSystem::Allocate(const vke::EngineData& info)
-	{
-	}
-
-	void MouseSystem::Free(const vke::EngineData& info)
-	{
-	}
-
 	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		if (!info.mouseAvailable)

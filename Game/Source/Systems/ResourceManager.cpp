@@ -17,6 +17,8 @@ namespace game
 
 	void ResourceManager::Allocate(const vke::EngineData& info)
 	{
+		vke::GameSystem::Allocate(info);
+
 		constexpr auto SUB_TEXTURE_PATH = "Textures/subTextures.dat";
 		constexpr auto SUB_TEXTURE_PATH_UI = "Textures/subTextures-ui.dat";
 
@@ -60,5 +62,6 @@ namespace game
 	{
 		_uiSubTextures.Free(*info.allocator);
 		_entitySubTextures.Free(*info.allocator);
+		vke::GameSystem::Free(info);
 	}
 }

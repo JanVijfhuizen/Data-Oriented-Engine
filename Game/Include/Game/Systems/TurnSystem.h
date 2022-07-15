@@ -41,11 +41,8 @@ namespace game
 
 		float _time = 0;
 		bool _tickCalled = true;
-
 		float _lerp = 0;
-
-		void Allocate(const vke::EngineData& info) override;
-		void Free(const vke::EngineData& info) override;
+		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};

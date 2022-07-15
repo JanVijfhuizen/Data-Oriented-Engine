@@ -8,8 +8,8 @@ namespace vke
 		friend class SceneSystem;
 
 	protected:
-		virtual void Allocate(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
-		virtual void Free(const EngineData& info, jlb::Systems<EngineData> systems) = 0;
+		virtual void Allocate(const EngineData& info, jlb::Systems<EngineData> systems){}
+		virtual void Free(const EngineData& info, jlb::Systems<EngineData> systems){}
 		virtual void PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems) {}
 		virtual void PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems) {}
 		virtual void OnKeyInput(const EngineData& info, const jlb::Systems<EngineData> systems, const int key, const int action){}

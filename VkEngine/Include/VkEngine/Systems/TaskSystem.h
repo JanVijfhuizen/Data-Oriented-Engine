@@ -57,6 +57,7 @@ namespace vke
 	template <typename T>
 	void TaskSystem<T>::Allocate(const EngineData& info)
 	{
+		System<EngineData>::Allocate(info);
 		size_t usage = DefineMinimalUsage(info);
 		_tasks.Allocate(*info.allocator, usage);
 	}
@@ -65,6 +66,7 @@ namespace vke
 	void TaskSystem<T>::Free(const EngineData& info)
 	{
 		_tasks.Free(*info.allocator);
+		System<EngineData>::Free(info);
 	}
 
 	template <typename T>

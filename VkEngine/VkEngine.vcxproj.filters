@@ -96,6 +96,9 @@
     <ClInclude Include="Include\VkEngine\Systems\TaskSystemWithOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\VkEngine\Systems\ThreadPoolSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\UIRenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Systems\ThreadPoolSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
