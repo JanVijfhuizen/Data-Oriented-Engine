@@ -8,10 +8,11 @@ namespace vke
 {
 	struct ThreadPoolTask final
 	{
-		void (*func)(const EngineData& info, jlb::Systems<EngineData> systems);
+		void (*func)(const EngineData& info, jlb::Systems<EngineData> systems, void* userPtr);
+		void* userPtr = nullptr;
 	};
 
-	class ThreadPoolSystem final : public TaskSystem<ThreadPoolTask>
+	class ThreadPoolSystem : public TaskSystem<ThreadPoolTask>
 	{
 		friend struct ThreadObj;
 
@@ -23,6 +24,7 @@ namespace vke
 		jlb::Allocation<std::thread> _threads{};
 		std::atomic<bool> _stopThreads = false;
 		std::atomic<size_t> _tasksRemaining = 0;
+		std::atomic<size_t> _tasksUnfinished = 0;
 		std::mutex _getNextTaskMutex{};
 
 		struct ThreadSharedInfo final
@@ -33,9 +35,9 @@ namespace vke
 
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
-		void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, 
+		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, 
 			const jlb::Vector<ThreadPoolTask>& tasks) override;
-		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
+		void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
 			const jlb::Vector<ThreadPoolTask>& tasks) override;
 		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 

@@ -14,7 +14,9 @@ namespace vke
 		void Free(const EngineData& info) override;
 
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::Vector<Task>& tasks, jlb::Vector<Output>& taskOutputs) = 0;
+			const jlb::Vector<Task>& tasks, jlb::Vector<Output>& taskOutputs){}
+
+		[[nodiscard]] jlb::Vector<Output>& GetOutputVector();
 		
 	private:
 		jlb::Vector<Output> _output{};
@@ -41,6 +43,12 @@ namespace vke
 	{
 		_output.Free(*info.allocator);
 		TaskSystem<Task>::Free(info);
+	}
+
+	template <typename Task, typename Output>
+	jlb::Vector<Output>& TaskSystemWithOutput<Task, Output>::GetOutputVector()
+	{
+		return _output;
 	}
 
 	template <typename Task, typename Output>

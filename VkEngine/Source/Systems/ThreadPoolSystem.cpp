@@ -1,6 +1,5 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
-#include <iostream>
 #include "JlbMath.h"
 
 #ifdef _WIN32
@@ -9,11 +8,14 @@
 #include <unistd.h>
 #endif
 
+// TEMP
+#include <iostream>
+
 namespace vke
 {
 	void ThreadPoolSystem::ThreadObj::operator()(ThreadPoolSystem* sys) const
 	{
-		const auto data = sys->GetData();
+		const auto data = sys->GetTasks().data;
 
 		while(true)
 		{
@@ -23,15 +25,18 @@ namespace vke
 				break;
 
 			// Get task.
-			ThreadPoolTask task{};
+			sys->_getNextTaskMutex.lock();
+			// When another thread has stolen the task already.
+			if(sys->_tasksRemaining == 0)
 			{
-				std::lock_guard guard{ sys->_getNextTaskMutex };
-				task = data[--sys->_tasksRemaining];
-				std::cout << "Fetching task" << std::endl;
+				sys->_getNextTaskMutex.unlock();
+				continue;
 			}
+			const auto task = data[--sys->_tasksRemaining];
+			sys->_getNextTaskMutex.unlock();
 
-			task.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems);
-			--sys->_tasksRemaining;
+			task.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems, task.userPtr);
+			--sys->_tasksUnfinished;
 		}
 	}
 
@@ -49,7 +54,7 @@ namespace vke
 		TaskSystem<ThreadPoolTask>::Free(info);
 	}
 
-	void ThreadPoolSystem::OnPreUpdate(const EngineData& info, 
+	void ThreadPoolSystem::OnUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
 		const jlb::Vector<ThreadPoolTask>& tasks)
 	{
@@ -58,17 +63,17 @@ namespace vke
 		// Continue the threads.
 		_threadSharedInfo.info = &info;
 		_threadSharedInfo.systems = systems;
-		_tasksRemaining = GetCount();
+		_tasksRemaining = _tasksUnfinished = GetCount();
 	}
 
-	void ThreadPoolSystem::OnUpdate(const EngineData& info, 
+	void ThreadPoolSystem::OnPostUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
 		const jlb::Vector<ThreadPoolTask>& tasks)
 	{
 		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
 
 		// Wait for the threads to finish.
-		while (_tasksRemaining > 0)
+		while (_tasksUnfinished > 0)
 			Sleep(0);
 	}
 

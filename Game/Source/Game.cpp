@@ -16,11 +16,10 @@ namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
-		// Core engine systems.
+		// Core engine pre update.
+		initializer.DefineSystem<vke::ThreadPoolSystem>();
 		initializer.DefineSystem<ResourceManager>();
 		initializer.DefineSystem<vke::SceneSystem>();
-		initializer.DefineSystem<vke::EntityRenderSystem>();
-		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// Game systems.
 		initializer.DefineSystem<TurnSystem>();
@@ -28,8 +27,9 @@ namespace game
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 
-		// Final system for threading reasons.
-		initializer.DefineSystem<vke::ThreadPoolSystem>();
+		// Core engine Post update.
+		initializer.DefineSystem<vke::EntityRenderSystem>();
+		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// High level game manager.
 		initializer.DefineSystem<GameManager>();
