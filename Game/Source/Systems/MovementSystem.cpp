@@ -27,7 +27,6 @@ namespace game
 			const auto& component = task.component;
 			const auto& settings = component.settings;
 			const auto& userDefined = component.userDefined;
-			const auto& systemDefined = component.systemDefined;
 
 			assert(userDefined.remaining > 0);
 			MovementTaskOutput output{};
