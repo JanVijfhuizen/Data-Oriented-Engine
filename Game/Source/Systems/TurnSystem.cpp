@@ -27,7 +27,7 @@ namespace game
 	{
 	}
 
-	void TurnSystem::Update(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_tickCalled = false;
 

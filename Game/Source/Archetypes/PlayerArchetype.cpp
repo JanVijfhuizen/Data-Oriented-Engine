@@ -36,13 +36,15 @@ namespace game
 			entity.movementTaskId = SIZE_MAX;
 
 			renderTask.transform = entity.transform;
-			renderTask.transform.scale *= movementComponent.scaleMultiplier;
+			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
 
 			const auto result = entityRenderSys->TryAdd(renderTask);
 			assert(result != SIZE_MAX);
 
+			auto& movementUserDefined = movementComponent.userDefined;
+
 			// Testing.
-			if(isTickEvent && entity.movementComponent.remaining == 0)
+			if(isTickEvent && movementUserDefined.remaining == 0)
 			{
 				glm::ivec2 dir{};
 				dir.x = static_cast<int32_t>(_wasdKeysInput[3]) - _wasdKeysInput[1];
@@ -55,10 +57,10 @@ namespace game
 				const glm::vec2 from = glm::vec2(glm::ivec2(entity.transform.position));
 				const glm::vec2 delta = glm::vec2(dir * static_cast<int32_t>(vke::PIXEL_SIZE_ENTITY));
 
-				movementComponent.from = from;
-				movementComponent.to = from + delta;
-				movementComponent.remaining = movementTask.duration;
-				movementComponent.rotation = entity.transform.rotation;
+				movementUserDefined.from = from;
+				movementUserDefined.to = from + delta;
+				movementUserDefined.remaining = movementTask.duration;
+				movementUserDefined.rotation = entity.transform.rotation;
 			}
 
 			movementTask.component = movementComponent;

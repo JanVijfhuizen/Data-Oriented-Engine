@@ -18,9 +18,12 @@ namespace game
 		int32_t padding = -2;
 	};
 
+	/*
+	Forwards created tasks to the UIRenderSystem as UIRenderTasks.
+	*/
 	class TextRenderHandler final : public vke::TaskSystem<TextRenderTask>
 	{
-		void OnUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			const jlb::Vector<TextRenderTask>& tasks) override;
 		[[nodiscard]] size_t DefineMinimalUsage(const vke::EngineData& info) override;
 	};

@@ -4,6 +4,7 @@
 
 namespace game::demo
 {
+	// Silly little scene I use to prototype and test.
 	class DemoScene final : public vke::Scene
 	{
 		Player _player{};

@@ -6,7 +6,7 @@
 
 namespace game
 {
-	void TextRenderHandler::OnUpdate(const vke::EngineData& info, 
+	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::Vector<TextRenderTask>& tasks)
 	{
@@ -57,7 +57,6 @@ namespace game
 				assert(isInteger ? c >= '0' && c <= '9' : c >= 'a' && c <= 'z');
 
 				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : 'a'));
-
 				const float chunkSize = isInteger ? numbersChunkSize : alphabetChunkSize;
 
 				vke::SubTexture charSubTexture = isInteger ? numbersTexture : alphabetTexture;

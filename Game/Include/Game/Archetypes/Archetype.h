@@ -2,6 +2,11 @@
 
 namespace game
 {
+	/*
+	Archetypes are used to execute behaviour for entities.
+	While entities are stored in numerous ways (arrays, vectors, singles etc.),
+	you can throw them through these archetypes to execute some sort of behaviour.
+	*/
 	template <typename Entity>
 	class Archetype
 	{
