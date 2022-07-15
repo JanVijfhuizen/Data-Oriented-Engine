@@ -145,9 +145,9 @@ namespace game
 		}
 			
 		// Go to the next tick.
-		if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
 		{
-			_time = 1.f / static_cast<float>(_ticksPerSecond) + 1e-5f;
+			_time = 2.f / static_cast<float>(_ticksPerSecond) - 1e-5f;
 			_keyVerticalLerps[3] = 0;
 		}
 

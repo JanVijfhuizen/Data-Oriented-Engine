@@ -1,8 +1,5 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
-
-#include <iostream>
-
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
@@ -76,7 +73,6 @@ namespace game
 		Archetype<Player>::PostUpdate(info, systems, entities);
 
 		const auto movementSys = systems.GetSystem<MovementSystem>();
-
 		const auto& movementOutputs = movementSys->GetOutput();
 
 		for (auto& entity : entities)
@@ -107,14 +103,6 @@ namespace game
 
 	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, bool& keyPressed)
 	{
-		if (targetKey != activatedKey)
-			return;
-		if (action == GLFW_PRESS)
-		{
-			keyPressed = true;
-			return;
-		}
-		if (action == GLFW_RELEASE)
-			keyPressed = false;
+		keyPressed = targetKey != activatedKey ? keyPressed : action == GLFW_PRESS ? true : action == GLFW_RELEASE ? false : keyPressed;
 	}
 }

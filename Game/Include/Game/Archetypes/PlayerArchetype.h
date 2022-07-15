@@ -17,6 +17,6 @@ namespace game
 	private:
 		bool _wasdKeysInput[4]{};
 
-		[[nodiscard]] static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, bool& keyPressed);
+		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, bool& keyPressed);
 	};
 }
