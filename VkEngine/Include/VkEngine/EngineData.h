@@ -39,6 +39,8 @@ namespace vke
 		jlb::StackAllocator* allocator;
 		// Used for temporary allocations.
 		jlb::StackAllocator* tempAllocator;
+		// Used for temporary allocations. Automatically cleared at the end of frame.
+		jlb::StackAllocator* dumpAllocator;
 		// Used for Vulkan allocations.
 		vk::StackAllocator* vkAllocator;
 		// App containing all relevant Vulkan data.

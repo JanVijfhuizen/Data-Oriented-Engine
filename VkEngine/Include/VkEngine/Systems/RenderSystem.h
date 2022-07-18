@@ -34,6 +34,8 @@ namespace vke
 		virtual void DefineMesh(jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Vertex::Index> indices);
 
 	private:
+		using TaskSystem<Task>::DefineNestedChunkSize;
+
 		struct PushConstants final
 		{
 			glm::vec2 resolution;

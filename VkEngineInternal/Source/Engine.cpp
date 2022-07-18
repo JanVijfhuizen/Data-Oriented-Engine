@@ -20,6 +20,8 @@ namespace vke
 		allocator.Allocate();
 		jlb::StackAllocator tempAllocator{};
 		tempAllocator.Allocate();
+		jlb::StackAllocator dumpAllocator{};
+		dumpAllocator.Allocate();
 		jlb::StackAllocator setupAllocator{};
 		setupAllocator.Allocate();
 
@@ -58,6 +60,7 @@ namespace vke
 		engineSwapChainData.imageCount = swapChain.GetLength();
 		outData.allocator = &allocator;
 		outData.tempAllocator = &tempAllocator;
+		outData.dumpAllocator = &dumpAllocator;
 		outData.vkAllocator = &vkAllocator;
 		outData.app = &app;
 		outData.swapChainData = &engineSwapChainData;
@@ -123,8 +126,8 @@ namespace vke
 				// Let the game know we have recreated the swapchain.
 				systemManager.OnRecreateSwapChainAssets(outData);
 			}
-
-			tempAllocator.Clear();
+			
+			dumpAllocator.Clear();
 		}
 
 		// Make sure all the graphics related operations are finished before stopping the application.
@@ -154,6 +157,7 @@ namespace vke
 		assert(allocator.IsEmpty());
 
 		// Free memory allocations.
+		dumpAllocator.Free();
 		tempAllocator.Free();
 		allocator.Free();
 

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "GameSystem.h"
+#include "NestableVector.h"
 
 namespace vke
 {
@@ -18,7 +19,9 @@ namespace vke
 		void Free(const EngineData& info) override;
 
 		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info);
+		[[nodiscard]] virtual size_t DefineNestedChunkSize(const EngineData& info);
 
+		void BeginFrame(const EngineData& info, const jlb::Systems<EngineData> systems) override;
 		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
 		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
@@ -26,6 +29,7 @@ namespace vke
 
 	private:
 		jlb::Vector<T> _tasks{};
+		jlb::NestableVector<T> _overflowingTasks{};
 
 		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
@@ -59,8 +63,7 @@ namespace vke
 	void TaskSystem<T>::Allocate(const EngineData& info)
 	{
 		System<EngineData>::Allocate(info);
-		size_t usage = DefineMinimalUsage(info);
-		_tasks.Allocate(*info.allocator, usage);
+		_tasks.Allocate(*info.allocator, DefineMinimalUsage(info));
 	}
 
 	template <typename T>
@@ -77,6 +80,20 @@ namespace vke
 	}
 
 	template <typename T>
+	size_t TaskSystem<T>::DefineNestedChunkSize(const EngineData& info)
+	{
+		return 0;
+	}
+
+	template <typename T>
+	void TaskSystem<T>::BeginFrame(const EngineData& info, const jlb::Systems<EngineData> systems)
+	{
+		System<EngineData>::BeginFrame(info, systems);
+		_overflowingTasks = {};
+		_overflowingTasks.Allocate(*info.dumpAllocator, DefineNestedChunkSize(info));
+	}
+
+	template <typename T>
 	bool TaskSystem<T>::ValidateOnTryAdd(const T& task)
 	{
 		return true;
@@ -89,7 +106,7 @@ namespace vke
 	}
 
 	template <typename T>
-	void TaskSystem<T>::PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems)
+	void TaskSystem<T>::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PreUpdate(info, systems);
 		OnPreUpdate(info, systems, _tasks);
@@ -103,7 +120,7 @@ namespace vke
 	}
 
 	template <typename T>
-	void TaskSystem<T>::PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems)
+	void TaskSystem<T>::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PostUpdate(info, systems);
 		OnPostUpdate(info, systems, _tasks);
