@@ -30,8 +30,9 @@ namespace game
 
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
 
-			const auto tasks = self->GetTasks();
-			auto& tasksOutput = self->GetOutputVector();
+			const auto& tasks = self->GetTasks();
+			auto& tasksOutput = self->GetOutputEditable();
+			auto& dumpAllocator = *info.dumpAllocator;
 
 			for (const auto& task : tasks)
 			{
@@ -64,7 +65,7 @@ namespace game
 
 				output.rotation = jlb::math::SmoothAngle(userDefined.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
 				output.rotation = finished ? toAngle : output.rotation;
-				tasksOutput.Add(output);
+				tasksOutput.Add(dumpAllocator, output);
 			}
 		};
 		threadTask.userPtr = this;
