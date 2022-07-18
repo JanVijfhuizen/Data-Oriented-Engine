@@ -331,34 +331,30 @@ namespace vke
 		const jlb::Systems<EngineData> systems,
 		const jlb::NestableVector<Task>& tasks)
 	{
-		for (const auto& vector : tasks)
-		{
-			if (vector.GetCount() == 0)
-				continue;
+		const auto& root = tasks.GetRoot();
 
-			const auto& cmd = info.swapChainData->commandBuffer;
+		const auto& cmd = info.swapChainData->commandBuffer;
 
-			const auto& logicalDevice = info.app->logicalDevice;
-			const auto& memBlock = _instanceBuffers[info.swapChainData->imageIndex].memBlock;
-			void* instanceData;
-			const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
-			assert(!result);
-			memcpy(instanceData, static_cast<const void*>(vector.GetData()), sizeof(Task) * vector.GetCount());
-			vkUnmapMemory(logicalDevice, memBlock.memory);
+		const auto& logicalDevice = info.app->logicalDevice;
+		const auto& memBlock = _instanceBuffers[info.swapChainData->imageIndex].memBlock;
+		void* instanceData;
+		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
+		assert(!result);
+		memcpy(instanceData, static_cast<const void*>(root.GetData()), sizeof(Task) * root.GetCount());
+		vkUnmapMemory(logicalDevice, memBlock.memory);
 
-			VkDeviceSize offset = 0;
-			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-				0, 1, &_descriptorSets[info.swapChainData->imageIndex], 0, nullptr);
-			vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
-			vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+		VkDeviceSize offset = 0;
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+			0, 1, &_descriptorSets[info.swapChainData->imageIndex], 0, nullptr);
+		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
+		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-			PushConstants pushConstant{};
-			pushConstant.resolution = info.swapChainData->resolution;
-			pushConstant.camera = camera;
+		PushConstants pushConstant{};
+		pushConstant.resolution = info.swapChainData->resolution;
+		pushConstant.camera = camera;
 
-			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
-			vkCmdDrawIndexed(cmd, _mesh.indexCount, vector.GetCount(), 0, 0, 0);
-		}
+		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
+		vkCmdDrawIndexed(cmd, _mesh.indexCount, root.GetCount(), 0, 0, 0);
 	}
 }

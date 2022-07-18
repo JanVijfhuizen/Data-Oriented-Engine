@@ -28,8 +28,7 @@ namespace game::demo
 		}
 
 		for (const auto& vector : tasks)
-			for (const auto& task : vector)
-				task.func(info, systems, nullptr);
+			task.func(info, systems, nullptr);
 
 		/*
 		for (int i = 0; i < 29; ++i)

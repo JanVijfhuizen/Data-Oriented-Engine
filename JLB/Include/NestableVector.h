@@ -19,9 +19,10 @@ namespace jlb
 		{
 			// Start of iteration.
 			Node const* src = nullptr;
+			size_t index;
 
-			const Node& operator*() const;
-			const Node& operator->() const;
+			[[nodiscard]] T& operator*() const;
+			[[nodiscard]] T& operator->() const;
 
 			const Iterator& operator++();
 			Iterator operator++(int);
@@ -36,6 +37,8 @@ namespace jlb
 				return !(a == b);
 			}
 		};
+
+		[[nodiscard]] T& operator [](size_t index) const;
 		
 		void Allocate(StackAllocator& allocator, size_t size, size_t nestableCapacity, const T& fillValue = {});
 		void Free(StackAllocator& allocator);
@@ -57,40 +60,63 @@ namespace jlb
 		[[nodiscard]] Iterator end() const;
 
 	private:
-		Allocation<Node> _top{};
+		Allocation<Node> _root{};
 		size_t _nestableCapacity = 0;
-		Node* _root = nullptr;
 
 		[[nodiscard]] T& IntAdd(StackAllocator& allocator, const T& value);
 	};
 
 	template <typename T>
-	const typename NestableVector<T>::Node& NestableVector<T>::Iterator::operator*() const
+	T& NestableVector<T>::Iterator::operator*() const
 	{
 		assert(src);
-		return *src;
+		return src->operator[](index);
 	}
 
 	template <typename T>
-	const typename NestableVector<T>::Node& NestableVector<T>::Iterator::operator->() const
+	T& NestableVector<T>::Iterator::operator->() const
 	{
 		assert(src);
-		return *src;
+		return src->operator[](index);
 	}
 
 	template <typename T>
 	const typename NestableVector<T>::Iterator& NestableVector<T>::Iterator::operator++()
 	{
-		src = src->_next;
+		++index;
+		const bool next = index >= src->GetCount();
+		src = next ? src->_next : src;
+		index = next ? 0 : index;
 		return *this;
 	}
 
 	template <typename T>
 	typename NestableVector<T>::Iterator NestableVector<T>::Iterator::operator++(int)
 	{
-		Iterator temp(src);
-		temp.src = temp.src->_next;
+		Iterator temp(src, index);
+		++index;
+		const bool next = index >= src->GetCount();
+		src = next ? src->_next : src;
+		index = next ? 0 : index;
 		return temp;
+	}
+
+	template <typename T>
+	T& NestableVector<T>::operator[](size_t index) const
+	{
+		Node* node = _root;
+		while (node)
+		{
+			const size_t length = node->GetLength();
+
+			if (index < length)
+				return node->operator[](index);
+			index -= length;
+			
+			node = node->_next;
+		}
+
+		assert(false);
 	}
 
 	template <typename T>
@@ -98,9 +124,9 @@ namespace jlb
 		const size_t size, const size_t nestableCapacity,
 		const T& fillValue)
 	{
-		assert(!_top);
-		_top = allocator.New<Node>();
-		_top.ptr->Allocate(allocator, size, fillValue);
+		assert(!_root);
+		_root = allocator.New<Node>();
+		_root.ptr->Allocate(allocator, size, fillValue);
 		_nestableCapacity = nestableCapacity;
 	}
 
@@ -108,14 +134,14 @@ namespace jlb
 	void NestableVector<T>::Free(StackAllocator& allocator)
 	{
 		RemoveNested(allocator);
-		allocator.MFree(_top.id);
-		_top = {};
+		allocator.MFree(_root.id);
+		_root = {};
 	}
 
 	template <typename T>
 	void NestableVector<T>::RemoveNested(StackAllocator& allocator)
 	{
-		Node* nested = _top.ptr->_next;
+		Node* nested = _root.ptr->_next;
 		while(nested)
 		{
 			Node* next = nested->_next;
@@ -127,7 +153,7 @@ namespace jlb
 	template <typename T>
 	void NestableVector<T>::Clear()
 	{
-		Node* node = _top;
+		Node* node = _root;
 		while (node)
 		{
 			node->SetCount(0);
@@ -157,7 +183,7 @@ namespace jlb
 	size_t NestableVector<T>::GetVectorCount() const
 	{
 		size_t count = 0;
-		Node* node = _top;
+		Node* node = _root;
 		while (node)
 		{
 			++count;
@@ -171,7 +197,7 @@ namespace jlb
 	size_t NestableVector<T>::GetCount() const
 	{
 		size_t count = 0;
-		Node* node = _top;
+		Node* node = _root;
 		while (node)
 		{
 			count += node->GetCount();
@@ -185,7 +211,7 @@ namespace jlb
 	size_t NestableVector<T>::GetLength() const
 	{
 		size_t count = 0;
-		Node* node = _top;
+		Node* node = _root;
 		while (node)
 		{
 			count += node->GetLength();
@@ -199,7 +225,7 @@ namespace jlb
 	typename NestableVector<T>::Iterator NestableVector<T>::begin() const
 	{
 		Iterator iterator{};
-		iterator.src = _top;
+		iterator.src = _root;
 		return iterator;
 	}
 
@@ -214,7 +240,7 @@ namespace jlb
 	template <typename T>
 	T& NestableVector<T>::IntAdd(StackAllocator& allocator, const T& value)
 	{
-		Node* node = _top;
+		Node* node = _root;
 		while (node)
 		{
 			const size_t length = node->GetLength();
@@ -225,11 +251,9 @@ namespace jlb
 				if(!node->_next)
 				{
 					assert(_nestableCapacity > 0);
-					const auto oldRoot = _top;
-					_top = allocator.New<Node>();
-					_top.ptr->Allocate(allocator, _nestableCapacity);
-					_top.ptr->_next = oldRoot;
-					return _top.ptr->Add(value);
+					auto newNode = node->_next = allocator.New<Node>();
+					newNode.ptr->Allocate(allocator, _nestableCapacity);
+					return newNode.ptr->Add(value);
 				}
 
 				node = node->_next;
