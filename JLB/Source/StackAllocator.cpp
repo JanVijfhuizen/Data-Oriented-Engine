@@ -80,6 +80,14 @@ namespace jlb
 		return _next ? _next->IsOnTop(allocation) : false;
 	}
 
+	void StackAllocator::Clear()
+	{
+		_current = 0;
+		_id = 0;
+		if(_next)
+			_next->Clear();
+	}
+
 	size_t StackAllocator::ToChunkSize(const size_t size)
 	{
 		return size / sizeof(size_t) + (size % sizeof(size_t) > 0);
