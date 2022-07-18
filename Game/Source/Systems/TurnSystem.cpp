@@ -19,6 +19,11 @@ namespace game
 		return _lerp;
 	}
 
+	void TurnSystem::PauseAtEndOfTick()
+	{
+		_pauseAtEndOfTick = true;
+	}
+
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_tickCalled = false;
@@ -118,18 +123,27 @@ namespace game
 		
 		if (_time > dTicksPerSecond)
 		{
-			if(_skippingToNextTick)
+			if (_pauseAtEndOfTick && !_forwardToNextTick)
 			{
 				_paused = true;
-				_skippingToNextTick = false;
+				_pauseAtEndOfTick = false;
 				_lerp = 1;
 				_time = dTicksPerSecond + 1e-5f;
 				return;
 			}
 
-			_time = fmodf(_time, dTicksPerSecond);
-			_tickCalled = true;
-			_previousTicksPerSecond = _ticksPerSecond;
+			if (!_paused || _forwardToNextTick)
+			{
+				_time = fmodf(_time, dTicksPerSecond);
+				_tickCalled = true;
+				_previousTicksPerSecond = _ticksPerSecond;
+				_forwardToNextTick = false;
+			}
+			else
+			{
+				_lerp = 1;
+				_time = dTicksPerSecond + 1e-5f;
+			}
 		}
 	}
 
@@ -138,7 +152,7 @@ namespace game
 	{
 		vke::GameSystem::OnKeyInput(info, systems, key, action);
 
-		if (_skippingToNextTick)
+		if (_pauseAtEndOfTick)
 			return;
 
 		// Adjust is paused.
@@ -151,7 +165,10 @@ namespace game
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
 		{
-			_skippingToNextTick = true;
+			const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
+			if (_time > dTicksPerSecond)
+				_forwardToNextTick = true;
+			_pauseAtEndOfTick = true;
 			_paused = false;
 		}
 

@@ -49,7 +49,6 @@ namespace game
 				glm::ivec2 dir{};
 				dir.x = static_cast<int32_t>(_wasdKeysInput[3]) - _wasdKeysInput[1];
 				dir.y = dir.x == 0 ? static_cast<int32_t>(_wasdKeysInput[2]) - _wasdKeysInput[0] : 0;
-
 				if (dir.x == 0 && dir.y == 0)
 					continue;
 				

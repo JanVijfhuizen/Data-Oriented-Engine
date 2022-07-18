@@ -31,6 +31,8 @@ namespace game
 		// The linear interpolation between 0 and 1 of the time between turns.
 		[[nodiscard]] float GetTickLerp() const;
 
+		void PauseAtEndOfTick();
+
 	private:
 		jlb::StackArray<float, 5> _keyVerticalLerps{1};
 
@@ -42,7 +44,8 @@ namespace game
 		float _time = 0;
 		bool _tickCalled = true;
 		float _lerp = 0;
-		bool _skippingToNextTick = false;
+		bool _pauseAtEndOfTick = false;
+		bool _forwardToNextTick = false;
 		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
