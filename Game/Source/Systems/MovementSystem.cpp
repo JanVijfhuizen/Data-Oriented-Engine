@@ -15,7 +15,7 @@ namespace game
 
 	void MovementSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::Vector<MovementTask>& tasks)
+		const jlb::ArrayView<MovementTask> tasks)
 	{
 		TaskSystemWithOutput<MovementTask, MovementTaskOutput>::OnPreUpdate(info, systems, tasks);
 
@@ -70,7 +70,7 @@ namespace game
 		threadTask.userPtr = this;
 
 		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
-		const auto result = threadSys->TryAdd(threadTask);
+		const auto result = threadSys->TryAdd(info, threadTask);
 		assert(result != SIZE_MAX);
 	}
 

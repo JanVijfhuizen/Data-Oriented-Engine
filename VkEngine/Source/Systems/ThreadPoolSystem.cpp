@@ -53,7 +53,7 @@ namespace vke
 
 	void ThreadPoolSystem::OnUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::Vector<ThreadPoolTask>& tasks)
+		const jlb::ArrayView<ThreadPoolTask> tasks)
 	{
 		TaskSystem<ThreadPoolTask>::OnPreUpdate(info, systems, tasks);
 
@@ -65,7 +65,7 @@ namespace vke
 
 	void ThreadPoolSystem::OnPostUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::Vector<ThreadPoolTask>& tasks)
+		const jlb::ArrayView<ThreadPoolTask> tasks)
 	{
 		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
 		

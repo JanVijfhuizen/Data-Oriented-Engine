@@ -34,8 +34,6 @@ namespace vke
 		virtual void DefineMesh(jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Vertex::Index> indices);
 
 	private:
-		using TaskSystem<Task>::DefineNestedChunkSize;
-
 		struct PushConstants final
 		{
 			glm::vec2 resolution;
@@ -63,7 +61,7 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::Vector<Task>& tasks) override;
+			jlb::ArrayView<Task> tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		
 		void CreateShaderAssets(const EngineData& info);
@@ -71,6 +69,8 @@ namespace vke
 
 		void CreateSwapChainAssets(const EngineData& info);
 		void DestroySwapChainAssets(const EngineData& info) const;
+
+		[[nodiscard]] size_t DefineNestedChunkSize(const EngineData& info) override;
 	};
 
 	template<typename Task>
@@ -106,8 +106,8 @@ namespace vke
 	{
 		TaskSystem<Task>::Allocate(info);
 
-		auto& app = *info.app;
-		auto& logicalDevice = app.logicalDevice;
+		const auto& app = *info.app;
+		const auto& logicalDevice = app.logicalDevice;
 
 		_shader = shader::Load(info, GetVertexShaderPath(), GetFragmentShaderPath());
 
@@ -157,7 +157,7 @@ namespace vke
 			DestroyShaderAssets(info);
 		}
 
-		auto& logicalDevice = info.app->logicalDevice;
+		const auto& logicalDevice = info.app->logicalDevice;
 
 		vkDestroySampler(logicalDevice, _textureAtlas.sampler, nullptr);
 		vkDestroyImageView(logicalDevice, _textureAtlas.imageView, nullptr);
@@ -179,10 +179,10 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::CreateShaderAssets(const EngineData& info)
 	{
-		auto& app = *info.app;
+		const auto& app = *info.app;
 		auto& allocator = *info.allocator;
 		auto& tempAllocator = *info.tempAllocator;
-		auto& logicalDevice = app.logicalDevice;
+		const auto& logicalDevice = app.logicalDevice;
 		const size_t swapChainImageCount = info.swapChainData->imageCount;
 
 		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, TaskSystem<Task>::GetLength());
@@ -272,8 +272,8 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::DestroyShaderAssets(const EngineData& info)
 	{
-		auto& app = *info.app;
-		auto& logicalDevice = app.logicalDevice;
+		const auto& app = *info.app;
+		const auto& logicalDevice = app.logicalDevice;
 		auto& allocator = *info.allocator;
 
 		vkDestroyDescriptorPool(logicalDevice, _descriptorPool, nullptr);
@@ -314,28 +314,34 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::DestroySwapChainAssets(const EngineData& info) const
 	{
-		auto& logicalDevice = info.app->logicalDevice;
+		const auto& logicalDevice = info.app->logicalDevice;
 
 		vkDestroyPipeline(logicalDevice, _pipeline, nullptr);
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
 	}
 
 	template <typename Task>
+	size_t RenderSystem<Task>::DefineNestedChunkSize(const EngineData& info)
+	{
+		return 0;
+	}
+
+	template <typename Task>
 	void RenderSystem<Task>::OnUpdate(const EngineData& info,
 		const jlb::Systems<EngineData> systems,
-		const jlb::Vector<Task>& tasks)
+		jlb::ArrayView<Task> tasks)
 	{
 		if (TaskSystem<Task>::GetCount() == 0)
 			return;
 
-		auto& cmd = info.swapChainData->commandBuffer;
+		const auto& cmd = info.swapChainData->commandBuffer;
 
-		auto& logicalDevice = info.app->logicalDevice;
-		auto& memBlock = _instanceBuffers[info.swapChainData->imageIndex].memBlock;
+		const auto& logicalDevice = info.app->logicalDevice;
+		const auto& memBlock = _instanceBuffers[info.swapChainData->imageIndex].memBlock;
 		void* instanceData;
 		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
 		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(tasks.GetData()), sizeof(Task) * tasks.GetCount());
+		memcpy(instanceData, static_cast<const void*>(tasks.data), sizeof(Task) * tasks.length);
 		vkUnmapMemory(logicalDevice, memBlock.memory);
 
 		VkDeviceSize offset = 0;
@@ -350,6 +356,6 @@ namespace vke
 		pushConstant.camera = camera;
 
 		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
-		vkCmdDrawIndexed(cmd, _mesh.indexCount, tasks.GetCount(), 0, 0, 0);
+		vkCmdDrawIndexed(cmd, _mesh.indexCount, tasks.length, 0, 0, 0);
 	}
 }

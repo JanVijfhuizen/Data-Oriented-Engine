@@ -14,9 +14,9 @@ namespace vke
 		void Free(const EngineData& info) override;
 
 		void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::Vector<Task>& tasks) override;
+			jlb::ArrayView<Task> tasks) override;
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::Vector<Task>& tasks, jlb::Vector<Output>& taskOutputs){}
+			const jlb::ArrayView<Task> tasks, jlb::Vector<Output>& taskOutputs){}
 
 		[[nodiscard]] jlb::Vector<Output>& GetOutputVector();
 		
@@ -24,7 +24,7 @@ namespace vke
 		jlb::Vector<Output> _outputs{};
 
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::Vector<Task>& tasks) override;
+			jlb::ArrayView<Task> tasks) override;
 	};
 
 	template <typename Task, typename Output>
@@ -55,7 +55,7 @@ namespace vke
 
 	template <typename Task, typename Output>
 	void TaskSystemWithOutput<Task, Output>::OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-		const jlb::Vector<Task>& tasks)
+		const jlb::ArrayView<Task> tasks)
 	{
 		_outputs.SetCount(0);
 		TaskSystem<Task>::OnPreUpdate(info, systems, tasks);
@@ -63,7 +63,7 @@ namespace vke
 
 	template <typename Task, typename Output>
 	void TaskSystemWithOutput<Task, Output>::OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-		const jlb::Vector<Task>& tasks)
+		const jlb::ArrayView<Task> tasks)
 	{
 		TaskSystem<Task>::OnUpdate(info, systems, tasks);
 		OnUpdate(info, systems, tasks, _outputs);

@@ -40,6 +40,6 @@ namespace game
 		[[nodiscard]] bool ValidateOnTryAdd(const MovementTask& task) override;
 
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::Vector<MovementTask>& tasks) override;
+			jlb::ArrayView<MovementTask> tasks) override;
 	};
 }

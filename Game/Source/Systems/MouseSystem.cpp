@@ -21,7 +21,7 @@ namespace game
 		task.transform.scale = entitySys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 		task.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::mouse);
 
-		const auto result = uiSys->TryAdd(task);
+		const auto result = uiSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
 	}
 }

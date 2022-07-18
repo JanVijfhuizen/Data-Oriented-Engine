@@ -9,7 +9,7 @@ namespace vke
 	{
 	public:
 		// Returns MAX value if it couldn't add the task.
-		[[nodiscard]] size_t TryAdd(const T& task);
+		[[nodiscard]] size_t TryAdd(const EngineData& info, const T& task);
 		[[nodiscard]] size_t GetCount();
 		[[nodiscard]] size_t GetLength();
 		[[nodiscard]] jlb::ArrayView<T> GetTasks() const;
@@ -21,10 +21,10 @@ namespace vke
 		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info);
 		[[nodiscard]] virtual size_t DefineNestedChunkSize(const EngineData& info);
 
-		void BeginFrame(const EngineData& info, const jlb::Systems<EngineData> systems) override;
-		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
-		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
-		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
+		void BeginFrame(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, jlb::ArrayView<T> tasks){}
+		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, jlb::ArrayView<T> tasks){}
+		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, jlb::ArrayView<T> tasks){}
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
 	private:
@@ -37,13 +37,19 @@ namespace vke
 	};
 
 	template <typename T>
-	size_t TaskSystem<T>::TryAdd(const T& task)
+	size_t TaskSystem<T>::TryAdd(const EngineData& info, const T& task)
 	{
-		if (_tasks.GetLength() == _tasks.GetCount())
+		const bool overflow = _tasks.GetLength() == _tasks.GetCount();
+		if (overflow && _overflowingTasks.GetLength() == 0)
 			return SIZE_MAX;
 		if (!ValidateOnTryAdd(task))
 			return SIZE_MAX;
-		_tasks.Add(task);
+
+		if (overflow)
+			_overflowingTasks.Add(*info.dumpAllocator, task);
+		else
+			_tasks.Add(task);
+
 		return _tasks.GetCount() - 1;
 	}
 
@@ -82,7 +88,7 @@ namespace vke
 	template <typename T>
 	size_t TaskSystem<T>::DefineNestedChunkSize(const EngineData& info)
 	{
-		return 0;
+		return 8;
 	}
 
 	template <typename T>

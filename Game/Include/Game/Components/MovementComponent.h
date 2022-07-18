@@ -7,7 +7,7 @@ namespace game
 	{
 		struct Settings final
 		{
-			float bobbingAmount = 8;
+			float bobbingAmount = 2;
 		} settings;
 
 		struct UserDefinedOnTick final
