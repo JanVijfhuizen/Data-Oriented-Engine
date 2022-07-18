@@ -20,6 +20,6 @@ namespace vke
 
 	size_t EntityRenderSystem::DefineMinimalUsage(const EngineData& info)
 	{
-		return 1024;
+		return ENTITY_RENDER_SYSTEM_CAPACITY;
 	}
 }

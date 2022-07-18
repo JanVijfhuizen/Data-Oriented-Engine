@@ -63,9 +63,7 @@ namespace vke
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
 			const jlb::Vector<Task>& tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
-
-		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
-
+		
 		void CreateShaderAssets(const EngineData& info);
 		void DestroyShaderAssets(const EngineData& info);
 
@@ -174,12 +172,6 @@ namespace vke
 		TaskSystem<Task>::OnRecreateSwapChainAssets(info, systems);
 		DestroySwapChainAssets(info);
 		CreateSwapChainAssets(info);
-	}
-
-	template <typename Task>
-	size_t RenderSystem<Task>::DefineMinimalUsage(const EngineData& info)
-	{
-		return 8192;
 	}
 
 	template <typename Task>

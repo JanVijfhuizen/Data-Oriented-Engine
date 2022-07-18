@@ -85,7 +85,7 @@ namespace vke
 
 	size_t ThreadPoolSystem::DefineMinimalUsage(const EngineData& info)
 	{
-		return 8;
+		return THREAD_POOL_SYSTEM_CAPACITY;
 	}
 
 	size_t ThreadPoolSystem::GetThreadCount() const

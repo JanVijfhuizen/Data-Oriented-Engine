@@ -6,6 +6,10 @@
 
 namespace vke
 {
+#ifndef THREAD_POOL_SYSTEM_CAPACITY
+#define THREAD_POOL_SYSTEM_CAPACITY 8
+#endif
+
 	struct ThreadPoolTask final
 	{
 		void (*func)(const EngineData& info, jlb::Systems<EngineData> systems, void* userPtr);

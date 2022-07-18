@@ -30,6 +30,6 @@ namespace vke
 
 	size_t UIRenderSystem::DefineMinimalUsage(const EngineData& info)
 	{
-		return 1024;
+		return UI_RENDER_SYSTEM_CAPACITY;
 	}
 }

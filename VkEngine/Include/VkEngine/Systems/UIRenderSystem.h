@@ -5,6 +5,10 @@
 
 namespace vke
 {
+#ifndef UI_RENDER_SYSTEM_CAPACITY
+#define UI_RENDER_SYSTEM_CAPACITY 1024
+#endif
+
 	struct UIRenderTask final
 	{
 		Transform transform{};
