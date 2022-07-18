@@ -2,7 +2,6 @@
 #include <cassert>
 #include "StackAllocator.h"
 #include "ArrayView.h"
-#include <cstring>
 
 namespace jlb
 {

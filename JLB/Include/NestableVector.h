@@ -37,19 +37,31 @@ namespace jlb
 		T& operator[](size_t index) const override;
 
 		void Free(StackAllocator& allocator) override;
-		void RemoveNested(StackAllocator* allocator);
+		// Free all the nested vectors.
+		void RemoveNested(StackAllocator& allocator);
+		// Sets the count to 0, as well as for all the nested vectors.
+		void Clear();
+
+		T& Add(StackAllocator& allocator, T& value);
+		T& Add(StackAllocator& allocator, const T& value = {});
 
 		[[nodiscard]] size_t GetLength() const override;
+		[[nodiscard]] size_t GetCount() const override;
 
-	protected:
-		bool TryExpand(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator) override;
+		[[nodiscard]] Iterator begin();
+		[[nodiscard]] Iterator end();
 
 	private:
+		using Vector<T>::Add;
+		using Vector<T>::RemoveAt;
 		using Vector<T>::GetView;
 		using Vector<T>::begin;
 		using Vector<T>::end;
+		using Vector<T>::SetCount;
 
-		Allocation<NestableVector<T>> _next = nullptr;
+		Allocation<NestableVector<T>> _next{};
+
+		[[nodiscard]] T& IntAdd(StackAllocator& allocator, const T& value);
 	};
 
 	template <typename T>
@@ -57,7 +69,7 @@ namespace jlb
 	{
 		assert(src);
 		assert(index <= length);
-		return src[index];
+		return src->operator[](index);
 	}
 
 	template <typename T>
@@ -65,7 +77,7 @@ namespace jlb
 	{
 		assert(src);
 		assert(index <= length);
-		return src[index];
+		return src->operator[](index);
 	}
 
 	template <typename T>
@@ -87,9 +99,13 @@ namespace jlb
 	T& NestableVector<T>::operator[](const size_t index) const
 	{
 		const size_t length = Vector<T>::GetLength();
-		auto target = index >= length ? _next : this;
-		assert(target);
-		return target->operator[](index - length);
+		if(index >= length)
+		{
+			assert(_next);
+			return _next.ptr->operator[](index - length);
+		}
+
+		return Vector<T>::operator[](index);
 	}
 
 	template <typename T>
@@ -100,13 +116,33 @@ namespace jlb
 	}
 
 	template <typename T>
-	void NestableVector<T>::RemoveNested(StackAllocator* allocator)
+	void NestableVector<T>::RemoveNested(StackAllocator& allocator)
 	{
 		if (!_next)
 			return;
 		_next.ptr->RemoveNested(allocator);
-		allocator->MFree(_next);
-		_next = nullptr;
+		allocator.MFree(_next.id);
+		_next = {};
+	}
+
+	template <typename T>
+	void NestableVector<T>::Clear()
+	{
+		SetCount(0);
+		if (_next)
+			_next.ptr->Clear();
+	}
+
+	template <typename T>
+	T& NestableVector<T>::Add(StackAllocator& allocator, T& value)
+	{
+		return IntAdd(allocator, value);
+	}
+
+	template <typename T>
+	T& NestableVector<T>::Add(StackAllocator& allocator, const T& value)
+	{
+		return IntAdd(allocator, value);
 	}
 
 	template <typename T>
@@ -116,15 +152,45 @@ namespace jlb
 	}
 
 	template <typename T>
-	bool NestableVector<T>::TryExpand(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
+	size_t NestableVector<T>::GetCount() const
 	{
-		if(!_next)
+		return Vector<T>::GetCount() + (_next ? _next.ptr->GetCount() : 0);
+	}
+
+	template <typename T>
+	typename NestableVector<T>::Iterator NestableVector<T>::begin()
+	{
+		Iterator iterator{};
+		iterator.src = this;
+		iterator.length = GetLength();
+		iterator.index = 0;
+		return iterator;
+	}
+
+	template <typename T>
+	typename NestableVector<T>::Iterator NestableVector<T>::end()
+	{
+		Iterator iterator{};
+		iterator.src = this;
+		iterator.length = GetLength();
+		iterator.index = GetLength();
+		return iterator;
+	}
+
+	template <typename T>
+	T& NestableVector<T>::IntAdd(StackAllocator& allocator, const T& value)
+	{
+		const size_t length = Vector<T>::GetLength();
+		const size_t count = Vector<T>::GetCount();
+
+		if(count >= length)
 		{
-			assert(Vector<T>::GetLength() > 0);
-			_next = allocator->New<NestableVector<T>>();
+			assert(length > 0);
+			_next = allocator.New<NestableVector<T>>();
 			_next.ptr->Allocate(allocator, Vector<T>::GetLength());
+			return _next.ptr->IntAdd(allocator, value);
 		}
-		_next->_Add(value, allocator, tempAllocator);
-		return true;
+
+		return Vector<T>::Add(value);
 	}
 }

@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
-#include "Systems/ResourceManager.h"
+
+#include <iostream>
+#include "NestableVector.h"
 
 namespace game::demo
 {
@@ -8,6 +10,27 @@ namespace game::demo
 	{
 		Scene::PreUpdate(info, systems);
 		_playerArchetype.PreUpdate(info, systems, _player);
+
+		jlb::NestableVector<float> nestable{};
+		nestable.Allocate(*info.tempAllocator, 4);
+
+		for (int i = 0; i < 9; ++i)
+		{
+			nestable.Add(*info.tempAllocator, i);
+		}
+		std::cout << std::endl;
+		for (int i = 0; i < 9; ++i)
+		{
+			std::cout << nestable[i] << std::endl;
+		}
+		std::cout << std::endl;
+
+		for (float& a : nestable)
+		{
+			std::cout << a << std::endl;
+		}
+
+		std::cout << std::endl;
 	}
 
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
