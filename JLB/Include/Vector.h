@@ -25,6 +25,9 @@ namespace jlb
 
 		[[nodiscard]] ArrayView<T> GetView() const override;
 
+	protected:
+		virtual bool TryExpand(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator);
+
 	private:
 		// The amount of values in this vector.
 		size_t _count = 0;
@@ -81,6 +84,34 @@ namespace jlb
 	}
 
 	template <typename T>
+	bool Vector<T>::TryExpand(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
+	{
+		const size_t length = Array<T>::GetLength();
+		assert(allocator && tempAllocator);
+		assert(allocator->IsOnTop(Array<T>::GetAllocationId()));
+
+		// Create temporary array to store vector data in.
+		Array<T> tempArray{};
+		tempArray.Allocate(*tempAllocator, length);
+		Copy(tempArray.GetView(), 0, length, Array<T>::GetData());
+
+		// Calculate new length with the power of 8.
+		size_t newLength = 8;
+		while (newLength <= length)
+			newLength *= 2;
+
+		// Free data and copy temporary array's values back in.
+		Free(*allocator);
+		Array<T>::Allocate(*allocator, newLength);
+		SetCount(length + 1);
+		Copy(GetView(), 0, length, tempArray.GetData());
+
+		// Delete temporary array.
+		tempArray.Free(*tempAllocator);
+		return true;
+	}
+
+	template <typename T>
 	size_t Vector<T>::GetCount() const
 	{
 		return _count;
@@ -92,27 +123,8 @@ namespace jlb
 		const size_t length = Array<T>::GetLength();
 		if(_count + 1 > length)
 		{
-			assert(allocator && tempAllocator);
-			assert(allocator->IsOnTop(Array<T>::GetAllocationId()));
-
-			// Create temporary array to store vector data in.
-			Array<T> tempArray{};
-			tempArray.Allocate(*tempAllocator, length);
-			Copy(tempArray.GetView(), 0, length, Array<T>::GetData());
-
-			// Calculate new length with the power of 8.
-			size_t newLength = 8;
-			while (newLength <= length)
-				newLength *= 2;
-
-			// Free data and copy temporary array's values back in.
-			Free(*allocator);
-			Array<T>::Allocate(*allocator, newLength);
-			SetCount(length + 1);
-			Copy(GetView(), 0, length, tempArray.GetData());
-
-			// Delete temporary array.
-			tempArray.Free(*tempAllocator);
+			const bool result = TryExpand(value, allocator, tempAllocator);
+			assert(result);
 		}
 
 		++_count;
