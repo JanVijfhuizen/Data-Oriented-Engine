@@ -162,7 +162,7 @@ namespace jlb
 	{
 		Iterator iterator{};
 		iterator.src = this;
-		iterator.length = GetLength();
+		iterator.length = GetCount();
 		iterator.index = 0;
 		return iterator;
 	}
@@ -172,8 +172,8 @@ namespace jlb
 	{
 		Iterator iterator{};
 		iterator.src = this;
-		iterator.length = GetLength();
-		iterator.index = GetLength();
+		iterator.length = GetCount();
+		iterator.index = GetCount();
 		return iterator;
 	}
 
@@ -185,9 +185,12 @@ namespace jlb
 
 		if(count >= length)
 		{
-			assert(length > 0);
-			_next = allocator.New<NestableVector<T>>();
-			_next.ptr->Allocate(allocator, Vector<T>::GetLength());
+			if (!_next)
+			{
+				assert(length > 0);
+				_next = allocator.New<NestableVector<T>>();
+				_next.ptr->Allocate(allocator, Vector<T>::GetLength());
+			}
 			return _next.ptr->IntAdd(allocator, value);
 		}
 
