@@ -123,6 +123,8 @@ namespace vke
 				// Let the game know we have recreated the swapchain.
 				systemManager.OnRecreateSwapChainAssets(outData);
 			}
+
+			tempAllocator.Clear();
 		}
 
 		// Make sure all the graphics related operations are finished before stopping the application.

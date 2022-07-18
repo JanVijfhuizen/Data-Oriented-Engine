@@ -37,6 +37,8 @@ namespace jlb
 		[[nodiscard]] size_t GetDepth() const;
 		// Check if this allocation is on top of one of the (sub) stack allocators.
 		[[nodiscard]] bool IsOnTop(const AllocationID& allocation) const;
+		// After calling this, the allocator will be considered empty. Nesting allocators will still remain.
+		void Clear();
 
 	private:
 		StackAllocator* _next = nullptr;

@@ -165,9 +165,7 @@ namespace game
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
 		{
-			const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
-			if (_time > dTicksPerSecond)
-				_forwardToNextTick = true;
+			_forwardToNextTick = true;
 			_pauseAtEndOfTick = true;
 			_paused = false;
 		}
