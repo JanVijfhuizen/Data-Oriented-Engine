@@ -22,7 +22,7 @@ namespace game::demo
 
 		jlb::NestableVector<vke::ThreadPoolTask> tasks{};
 		tasks.Allocate(*info.dumpAllocator, 4, 2);
-		for (int i = 0; i < 29; ++i)
+		for (int i = 0; i < 7; ++i)
 		{
 			tasks.Add(*info.dumpAllocator, task);
 		}

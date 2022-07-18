@@ -19,7 +19,7 @@ namespace jlb
 		{
 			// Start of iteration.
 			Node const* src = nullptr;
-			size_t index;
+			size_t index = 0;
 
 			[[nodiscard]] T& operator*() const;
 			[[nodiscard]] T& operator->() const;
@@ -29,7 +29,7 @@ namespace jlb
 
 			friend bool operator==(const Iterator& a, const Iterator& b)
 			{
-				return a.src == b.src;
+				return a.src == b.src && a.index == b.index;
 			}
 
 			friend bool operator!= (const Iterator& a, const Iterator& b)
@@ -64,6 +64,7 @@ namespace jlb
 		size_t _nestableCapacity = 0;
 
 		[[nodiscard]] T& IntAdd(StackAllocator& allocator, const T& value);
+		void FreeNestedInstance(StackAllocator& allocator, Allocation<Node>& allocation);
 	};
 
 	template <typename T>
@@ -141,13 +142,7 @@ namespace jlb
 	template <typename T>
 	void NestableVector<T>::RemoveNested(StackAllocator& allocator)
 	{
-		Node* nested = _root.ptr->_next;
-		while(nested)
-		{
-			Node* next = nested->_next;
-			nested->Free(allocator);
-			nested = next;
-		}
+		FreeNestedInstance(allocator, _root);
 	}
 
 	template <typename T>
@@ -233,7 +228,22 @@ namespace jlb
 	typename NestableVector<T>::Iterator NestableVector<T>::end() const
 	{
 		Iterator iterator{};
-		iterator.src = nullptr;
+
+		Node* node = _root;
+		while (node)
+		{
+			const size_t count = node->GetCount();
+			const bool full = count == node->GetLength();
+			if(!full)
+			{
+				iterator.index = count;
+				break;
+			}
+
+			node = node->_next;
+		}
+
+		iterator.src = node;
 		return iterator;
 	}
 
@@ -264,5 +274,14 @@ namespace jlb
 		}
 
 		assert(false);
+	}
+
+	template <typename T>
+	void NestableVector<T>::FreeNestedInstance(StackAllocator& allocator, Allocation<Node>& allocation)
+	{
+		if (allocation.ptr->_next)
+			FreeNestedInstance(allocator, allocation.ptr->_next);
+		allocation.ptr->Free(allocator);
+		allocator.MFree(allocation.id);
 	}
 }
