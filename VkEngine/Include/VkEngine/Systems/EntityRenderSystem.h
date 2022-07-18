@@ -5,6 +5,10 @@
 
 namespace vke
 {
+#ifndef ENTITY_RENDER_SYSTEM_CAPACITY
+#define ENTITY_RENDER_SYSTEM_CAPACITY 1024
+#endif
+
 	struct EntityRenderTask final
 	{
 		Transform transform{};
@@ -16,6 +20,6 @@ namespace vke
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
-		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
+		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
 	};
 }

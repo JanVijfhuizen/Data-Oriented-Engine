@@ -6,6 +6,6 @@ namespace vk
 
 	namespace sampler
 	{
-		[[nodiscard]] VkSamplerCreateInfo CreateDefaultInfo(App& app);
+		[[nodiscard]] VkSamplerCreateInfo CreateDefaultInfo(const App& app);
 	}
 }

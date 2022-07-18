@@ -24,7 +24,7 @@ namespace game
 	class TextRenderHandler final : public vke::TaskSystem<TextRenderTask>
 	{
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::Vector<TextRenderTask>& tasks) override;
-		[[nodiscard]] size_t DefineMinimalUsage(const vke::EngineData& info) override;
+			const jlb::NestedVector<TextRenderTask>& tasks) override;
+		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 	};
 }

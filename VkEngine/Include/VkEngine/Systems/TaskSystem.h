@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "GameSystem.h"
+#include "NestedVector.h"
 
 namespace vke
 {
@@ -8,24 +9,26 @@ namespace vke
 	{
 	public:
 		// Returns MAX value if it couldn't add the task.
-		[[nodiscard]] size_t TryAdd(const T& task);
-		[[nodiscard]] size_t GetCount();
-		[[nodiscard]] size_t GetLength();
-		[[nodiscard]] jlb::ArrayView<T> GetTasks() const;
+		[[nodiscard]] size_t TryAdd(const EngineData& info, const T& task);
+		[[nodiscard]] const jlb::NestedVector<T>& GetTasks() const;
 
 	protected:
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 
-		[[nodiscard]] virtual size_t DefineMinimalUsage(const EngineData& info);
-
-		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
-		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
-		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::Vector<T>& tasks){}
+		[[nodiscard]] virtual size_t DefineCapacity(const EngineData& info);
+		[[nodiscard]] virtual size_t DefineNestedCapacity(const EngineData& info);
+		
+		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
+		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
+		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
+		[[nodiscard]] size_t GetLength() const;
+		[[nodiscard]] size_t GetCount() const;
+
 	private:
-		jlb::Vector<T> _tasks{};
+		jlb::NestedVector<T> _tasks{};
 
 		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
@@ -33,47 +36,39 @@ namespace vke
 	};
 
 	template <typename T>
-	size_t TaskSystem<T>::TryAdd(const T& task)
+	size_t TaskSystem<T>::TryAdd(const EngineData& info, const T& task)
 	{
-		if (_tasks.GetLength() == _tasks.GetCount())
-			return SIZE_MAX;
 		if (!ValidateOnTryAdd(task))
 			return SIZE_MAX;
-		_tasks.Add(task);
+		_tasks.Add(*info.dumpAllocator, task);
 		return _tasks.GetCount() - 1;
-	}
-
-	template <typename T>
-	size_t TaskSystem<T>::GetCount()
-	{
-		return _tasks.GetCount();
-	}
-
-	template <typename T>
-	size_t TaskSystem<T>::GetLength()
-	{
-		return _tasks.GetLength();
 	}
 
 	template <typename T>
 	void TaskSystem<T>::Allocate(const EngineData& info)
 	{
 		System<EngineData>::Allocate(info);
-		size_t usage = DefineMinimalUsage(info);
-		_tasks.Allocate(*info.allocator, usage);
+		_tasks.Allocate(*info.allocator, DefineCapacity(info), DefineNestedCapacity(info));
 	}
 
 	template <typename T>
 	void TaskSystem<T>::Free(const EngineData& info)
 	{
+		_tasks.RemoveNested(*info.dumpAllocator);
 		_tasks.Free(*info.allocator);
 		System<EngineData>::Free(info);
 	}
 
 	template <typename T>
-	size_t TaskSystem<T>::DefineMinimalUsage(const EngineData& info)
+	size_t TaskSystem<T>::DefineCapacity(const EngineData& info)
 	{
 		return 0;
+	}
+
+	template <typename T>
+	size_t TaskSystem<T>::DefineNestedCapacity(const EngineData& info)
+	{
+		return 8;
 	}
 
 	template <typename T>
@@ -83,13 +78,25 @@ namespace vke
 	}
 
 	template <typename T>
-	jlb::ArrayView<T> TaskSystem<T>::GetTasks() const
+	size_t TaskSystem<T>::GetLength() const
+	{
+		return _tasks.GetLength();
+	}
+
+	template <typename T>
+	size_t TaskSystem<T>::GetCount() const
+	{
+		return _tasks.GetCount();
+	}
+
+	template <typename T>
+	const jlb::NestedVector<T>& TaskSystem<T>::GetTasks() const
 	{
 		return _tasks;
 	}
 
 	template <typename T>
-	void TaskSystem<T>::PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems)
+	void TaskSystem<T>::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PreUpdate(info, systems);
 		OnPreUpdate(info, systems, _tasks);
@@ -103,10 +110,11 @@ namespace vke
 	}
 
 	template <typename T>
-	void TaskSystem<T>::PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems)
+	void TaskSystem<T>::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PostUpdate(info, systems);
 		OnPostUpdate(info, systems, _tasks);
-		_tasks.SetCount(0);
+		_tasks.DetachNested();
+		_tasks.Clear();
 	}
 }

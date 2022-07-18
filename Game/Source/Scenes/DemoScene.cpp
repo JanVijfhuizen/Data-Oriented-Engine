@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/GameManager.h"
 
 namespace game::demo
 {

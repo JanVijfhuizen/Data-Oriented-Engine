@@ -20,11 +20,18 @@ namespace jlb
 		AllocationID id{};
 
 		[[nodiscard]] operator bool() const;
+		[[nodiscard]] operator T*() const;
 	};
 
 	template <typename T>
 	Allocation<T>::operator bool() const
 	{
 		return id;
+	}
+
+	template <typename T>
+	Allocation<T>::operator T*() const
+	{
+		return ptr;
 	}
 }

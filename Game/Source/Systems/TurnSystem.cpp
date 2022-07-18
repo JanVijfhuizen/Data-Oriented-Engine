@@ -26,6 +26,8 @@ namespace game
 
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		vke::GameSystem::PreUpdate(info, systems);
+
 		_tickCalled = false;
 
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
@@ -79,7 +81,7 @@ namespace game
 			textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
 			textRenderTask.origin.y += offset;
 			textRenderTask.text = "x";
-			auto result = textRenderSys->TryAdd(textRenderTask);
+			auto result = textRenderSys->TryAdd(info, textRenderTask);
 			assert(result != SIZE_MAX);
 
 			const char* stringLiterals[]
@@ -99,7 +101,7 @@ namespace game
 			assert(index < sizeof stringLiterals / sizeof(const char*));
 			textRenderTask.text = stringLiterals[index];
 			textRenderTask.appendIndex = result;
-			result = textRenderSys->TryAdd(textRenderTask);
+			result = textRenderSys->TryAdd(info, textRenderTask);
 			assert(result != SIZE_MAX);
 		}
 		
@@ -112,7 +114,7 @@ namespace game
 			renderTask.transform.scale = scale;
 			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
 			renderTask.transform.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
-			const auto result = uiSys->TryAdd(renderTask);
+			const auto result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 		}
 
@@ -165,9 +167,7 @@ namespace game
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
 		{
-			const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
-			if (_time > dTicksPerSecond)
-				_forwardToNextTick = true;
+			_forwardToNextTick = true;
 			_pauseAtEndOfTick = true;
 			_paused = false;
 		}

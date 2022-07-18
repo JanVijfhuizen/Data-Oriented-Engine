@@ -26,7 +26,6 @@ namespace game
 		renderTask.subTexture = subTexturesDivided[0];
 
 		MovementTask movementTask{};
-		movementTask.duration = 4;
 
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 
@@ -38,7 +37,7 @@ namespace game
 			renderTask.transform = entity.transform;
 			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
 
-			const auto result = entityRenderSys->TryAdd(renderTask);
+			const auto result = entityRenderSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 
 			auto& movementUserDefined = movementComponent.userDefined;
@@ -63,7 +62,7 @@ namespace game
 			}
 
 			movementTask.component = movementComponent;
-			entity.movementTaskId = movementSys->TryAdd(movementTask);
+			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
 		}
 	}
 

@@ -19,7 +19,7 @@ namespace jlb
 		virtual T& Add(const T&& value = {}, StackAllocator* allocator = nullptr, StackAllocator* tempAllocator = nullptr);
 		virtual void RemoveAt(size_t index);
 
-		[[nodiscard]] size_t GetCount() const;
+		[[nodiscard]] virtual size_t GetCount() const;
 		// Cannot exceed the capacity of the managed memory.
 		void SetCount(size_t count);
 
@@ -29,7 +29,7 @@ namespace jlb
 		// The amount of values in this vector.
 		size_t _count = 0;
 
-		[[nodiscard]] T& _Add(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator);
+		[[nodiscard]] T& IntAdd(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator);
 	};
 
 	template <typename T>
@@ -48,13 +48,13 @@ namespace jlb
 	template <typename T>
 	T& Vector<T>::Add(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
 	{
-		return _Add(value, allocator, tempAllocator);
+		return IntAdd(value, allocator, tempAllocator);
 	}
 
 	template <typename T>
 	T& Vector<T>::Add(const T&& value, StackAllocator* allocator, StackAllocator* tempAllocator)
 	{
-		return _Add(value, allocator, tempAllocator);
+		return IntAdd(value, allocator, tempAllocator);
 	}
 
 	template <typename T>
@@ -87,7 +87,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& Vector<T>::_Add(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
+	T& Vector<T>::IntAdd(const T& value, StackAllocator* allocator, StackAllocator* tempAllocator)
 	{
 		const size_t length = Array<T>::GetLength();
 		if(_count + 1 > length)

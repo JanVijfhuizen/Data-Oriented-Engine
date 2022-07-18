@@ -2,7 +2,6 @@
 #include <cassert>
 #include "StackAllocator.h"
 #include "ArrayView.h"
-#include <cstring>
 
 namespace jlb
 {
@@ -21,7 +20,7 @@ namespace jlb
 		[[nodiscard]] operator ArrayView<T>() const;
 
 		[[nodiscard]] T* GetData() const;
-		[[nodiscard]] size_t GetLength() const;
+		[[nodiscard]] virtual size_t GetLength() const;
 
 		[[nodiscard]] virtual Iterator<T> begin() const;
 		[[nodiscard]] virtual Iterator<T> end() const;

@@ -4,7 +4,7 @@
 
 namespace vk::sampler
 {
-	VkSamplerCreateInfo CreateDefaultInfo(App& app)
+	VkSamplerCreateInfo CreateDefaultInfo(const App& app)
 	{
 		VkPhysicalDeviceProperties properties{};
 		vkGetPhysicalDeviceProperties(app.physicalDevice, &properties);

@@ -5,6 +5,10 @@
 
 namespace vke
 {
+#ifndef UI_RENDER_SYSTEM_CAPACITY
+#define UI_RENDER_SYSTEM_CAPACITY 1024
+#endif
+
 	struct UIRenderTask final
 	{
 		Transform transform{};
@@ -21,6 +25,6 @@ namespace vke
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
-		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
+		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
 	};
 }

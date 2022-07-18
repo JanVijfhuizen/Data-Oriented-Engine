@@ -36,10 +36,10 @@ namespace game
 		static void UpdateComponent(MovementComponent& component, const MovementTaskOutput& output);
 
 	private:
-		[[nodiscard]] size_t DefineMinimalUsage(const vke::EngineData& info) override;
+		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 		[[nodiscard]] bool ValidateOnTryAdd(const MovementTask& task) override;
 
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::Vector<MovementTask>& tasks) override;
+			const jlb::NestedVector<MovementTask>& tasks) override;
 	};
 }

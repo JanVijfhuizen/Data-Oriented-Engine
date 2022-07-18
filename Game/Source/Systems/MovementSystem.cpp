@@ -15,7 +15,7 @@ namespace game
 
 	void MovementSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::Vector<MovementTask>& tasks)
+		const jlb::NestedVector<MovementTask>& tasks)
 	{
 		TaskSystemWithOutput<MovementTask, MovementTaskOutput>::OnPreUpdate(info, systems, tasks);
 
@@ -30,8 +30,9 @@ namespace game
 
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
 
-			const auto tasks = self->GetTasks();
-			auto& tasksOutput = self->GetOutputVector();
+			const auto& tasks = self->GetTasks();
+			auto& tasksOutput = self->GetOutputEditable();
+			auto& dumpAllocator = *info.dumpAllocator;
 
 			for (const auto& task : tasks)
 			{
@@ -64,17 +65,17 @@ namespace game
 
 				output.rotation = jlb::math::SmoothAngle(userDefined.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
 				output.rotation = finished ? toAngle : output.rotation;
-				tasksOutput.Add(output);
+				tasksOutput.Add(dumpAllocator, output);
 			}
 		};
 		threadTask.userPtr = this;
 
 		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
-		const auto result = threadSys->TryAdd(threadTask);
+		const auto result = threadSys->TryAdd(info, threadTask);
 		assert(result != SIZE_MAX);
 	}
 
-	size_t MovementSystem::DefineMinimalUsage(const vke::EngineData& info)
+	size_t MovementSystem::DefineCapacity(const vke::EngineData& info)
 	{
 		return 64;
 	}

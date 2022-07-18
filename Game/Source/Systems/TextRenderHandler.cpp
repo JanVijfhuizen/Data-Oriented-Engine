@@ -8,8 +8,10 @@ namespace game
 {
 	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::Vector<TextRenderTask>& tasks)
+		const jlb::NestedVector<TextRenderTask>& tasks)
 	{
+		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
+
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto resourceSys = systems.GetSystem<game::ResourceManager>();
@@ -68,13 +70,13 @@ namespace game
 				uiRenderTask.transform.scale = fontSize;
 				uiRenderTask.subTexture = charSubTexture;
 
-				const auto result = uiSys->TryAdd(uiRenderTask);
+				const auto result = uiSys->TryAdd(info, uiRenderTask);
 				assert(result != SIZE_MAX);
 			}
 		}
 	}
 
-	size_t TextRenderHandler::DefineMinimalUsage(const vke::EngineData& info)
+	size_t TextRenderHandler::DefineCapacity(const vke::EngineData& info)
 	{
 		return 48;
 	}

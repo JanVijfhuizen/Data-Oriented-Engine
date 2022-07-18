@@ -8,6 +8,8 @@ namespace game
 {
 	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		vke::GameSystem::PreUpdate(info, systems);
+
 		if (!info.mouseAvailable)
 			return;
 
@@ -21,7 +23,7 @@ namespace game
 		task.transform.scale = entitySys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 		task.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::mouse);
 
-		const auto result = uiSys->TryAdd(task);
+		const auto result = uiSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
 	}
 }
