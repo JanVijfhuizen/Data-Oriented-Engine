@@ -10,6 +10,10 @@ namespace vke
 #define THREAD_POOL_SYSTEM_CAPACITY 8
 #endif
 
+#ifndef THREAD_POOL_SYSTEM_NESTED_CAPACITY
+#define THREAD_POOL_SYSTEM_NESTED_CAPACITY 8
+#endif
+
 	struct ThreadPoolTask final
 	{
 		void (*func)(const EngineData& info, jlb::Systems<EngineData> systems, void* userPtr);
@@ -40,12 +44,13 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, 
-			jlb::ArrayView<ThreadPoolTask> tasks) override;
+			const jlb::NestableVector<ThreadPoolTask>& tasks) override;
 		void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			jlb::ArrayView<ThreadPoolTask> tasks) override;
+			const jlb::NestableVector<ThreadPoolTask>& tasks) override;
 		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 
-		[[nodiscard]] size_t DefineMinimalUsage(const EngineData& info) override;
+		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
+		size_t DefineNestedCapacity(const EngineData& info) override;
 		[[nodiscard]] size_t GetThreadCount() const;
 	};
 }

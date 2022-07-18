@@ -28,7 +28,7 @@ namespace vke
 		return "Shaders/vert-ui.spv";
 	}
 
-	size_t UIRenderSystem::DefineMinimalUsage(const EngineData& info)
+	size_t UIRenderSystem::DefineCapacity(const EngineData& info)
 	{
 		return UI_RENDER_SYSTEM_CAPACITY;
 	}

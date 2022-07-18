@@ -15,7 +15,7 @@ namespace game
 
 	void MovementSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::ArrayView<MovementTask> tasks)
+		const jlb::NestableVector<MovementTask>& tasks)
 	{
 		TaskSystemWithOutput<MovementTask, MovementTaskOutput>::OnPreUpdate(info, systems, tasks);
 
@@ -33,39 +33,40 @@ namespace game
 			const auto tasks = self->GetTasks();
 			auto& tasksOutput = self->GetOutputVector();
 
-			for (const auto& task : tasks)
-			{
-				const auto& component = task.component;
-				const auto& settings = component.settings;
-				const auto& userDefined = component.userDefined;
+			for (const auto& vector : tasks)
+				for (const auto& task : vector)
+				{
+					const auto& component = task.component;
+					const auto& settings = component.settings;
+					const auto& userDefined = component.userDefined;
 
-				assert(userDefined.remaining > 0);
-				MovementTaskOutput output{};
-				output.remaining = userDefined.remaining - isTickEvent;
+					assert(userDefined.remaining > 0);
+					MovementTaskOutput output{};
+					output.remaining = userDefined.remaining - isTickEvent;
 
-				const auto durationF = static_cast<float>(task.duration);
-				// Smoothly move between grid positions.
-				const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(output.remaining) / durationF;
-				output.position = jlb::math::LerpPct(userDefined.from, userDefined.to, pct);
+					const auto durationF = static_cast<float>(task.duration);
+					// Smoothly move between grid positions.
+					const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(output.remaining) / durationF;
+					output.position = jlb::math::LerpPct(userDefined.from, userDefined.to, pct);
 
-				const bool finished = isTickEvent && output.remaining == 0;
+					const bool finished = isTickEvent && output.remaining == 0;
 
-				// Perfectly set the position once the tick event has been reached if the remaining turns is zero.
-				output.position = finished ? userDefined.to : output.position;
+					// Perfectly set the position once the tick event has been reached if the remaining turns is zero.
+					output.position = finished ? userDefined.to : output.position;
 
-				// Bobbing.
-				const float bobbingPct = fmodf(pct * settings.bobbingAmount, 1);
-				const float eval = jlb::DoubleCurveEvaluate(bobbingPct, curveOvershoot, curveOvershoot);
-				output.scaleMultiplier = 1.f + eval * self->bobbingScaling;
+					// Bobbing.
+					const float bobbingPct = fmodf(pct * settings.bobbingAmount, 1);
+					const float eval = jlb::DoubleCurveEvaluate(bobbingPct, curveOvershoot, curveOvershoot);
+					output.scaleMultiplier = 1.f + eval * self->bobbingScaling;
 
-				// Movement rotation.
-				const float toAngle = jlb::math::GetAngle(userDefined.from, userDefined.to);
-				const float pctRotation = jlb::math::Min<float>(pct / self->rotationDuration, 1);
+					// Movement rotation.
+					const float toAngle = jlb::math::GetAngle(userDefined.from, userDefined.to);
+					const float pctRotation = jlb::math::Min<float>(pct / self->rotationDuration, 1);
 
-				output.rotation = jlb::math::SmoothAngle(userDefined.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
-				output.rotation = finished ? toAngle : output.rotation;
-				tasksOutput.Add(output);
-			}
+					output.rotation = jlb::math::SmoothAngle(userDefined.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
+					output.rotation = finished ? toAngle : output.rotation;
+					tasksOutput.Add(output);
+				}
 		};
 		threadTask.userPtr = this;
 
@@ -74,7 +75,7 @@ namespace game
 		assert(result != SIZE_MAX);
 	}
 
-	size_t MovementSystem::DefineMinimalUsage(const vke::EngineData& info)
+	size_t MovementSystem::DefineCapacity(const vke::EngineData& info)
 	{
 		return 64;
 	}

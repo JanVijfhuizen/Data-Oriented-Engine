@@ -6,7 +6,6 @@
 #include "VkEngine/Graphics/Texture.h"
 #include "VkEngine/Graphics/ShaderLoader.h"
 #include "StackArray.h"
-#include "Vector.h"
 #include "VkEngine/Graphics/Vertex.h"
 #include "VkEngine/Graphics/MeshUtils.h"
 #include "VkEngine/Graphics/TextureUtils.h"
@@ -61,7 +60,7 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			jlb::ArrayView<Task> tasks) override;
+			const jlb::NestableVector<Task>& tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		
 		void CreateShaderAssets(const EngineData& info);
@@ -70,7 +69,7 @@ namespace vke
 		void CreateSwapChainAssets(const EngineData& info);
 		void DestroySwapChainAssets(const EngineData& info) const;
 
-		[[nodiscard]] size_t DefineNestedChunkSize(const EngineData& info) override;
+		[[nodiscard]] size_t DefineNestedCapacity(const EngineData& info) override;
 	};
 
 	template<typename Task>
@@ -141,7 +140,7 @@ namespace vke
 		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_textureAtlas.sampler);
 		assert(!result);
 
-		if (TaskSystem<Task>::GetLength() == 0)
+		if (TaskSystem<Task>::DefineCapacity(info) == 0)
 			return;
 
 		CreateShaderAssets(info);
@@ -151,7 +150,7 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::Free(const EngineData& info)
 	{
-		if (TaskSystem<Task>::GetLength() > 0)
+		if (TaskSystem<Task>::DefineCapacity(info) == 0)
 		{
 			DestroySwapChainAssets(info);
 			DestroyShaderAssets(info);
@@ -185,12 +184,13 @@ namespace vke
 		const auto& logicalDevice = app.logicalDevice;
 		const size_t swapChainImageCount = info.swapChainData->imageCount;
 
-		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, TaskSystem<Task>::GetLength());
+		const size_t capacity = TaskSystem<Task>::DefineCapacity(info);
+		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, capacity);
 
 		// Create descriptor layout.
 		jlb::StackArray<layout::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(Task) * TaskSystem<Task>::GetLength();
+		bindings[0].size = sizeof(Task) * capacity;
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -239,7 +239,7 @@ namespace vke
 			VkDescriptorBufferInfo instanceInfo{};
 			instanceInfo.buffer = _instanceBuffers[i].buffer;
 			instanceInfo.offset = 0;
-			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
+			instanceInfo.range = sizeof(Task) * capacity;
 
 			auto& instanceWrite = writes[0];
 			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -321,7 +321,7 @@ namespace vke
 	}
 
 	template <typename Task>
-	size_t RenderSystem<Task>::DefineNestedChunkSize(const EngineData& info)
+	size_t RenderSystem<Task>::DefineNestedCapacity(const EngineData& info)
 	{
 		return 0;
 	}
@@ -329,33 +329,36 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::OnUpdate(const EngineData& info,
 		const jlb::Systems<EngineData> systems,
-		jlb::ArrayView<Task> tasks)
+		const jlb::NestableVector<Task>& tasks)
 	{
-		if (TaskSystem<Task>::GetCount() == 0)
-			return;
+		for (const auto& vector : tasks)
+		{
+			if (vector.GetCount() == 0)
+				continue;
 
-		const auto& cmd = info.swapChainData->commandBuffer;
+			const auto& cmd = info.swapChainData->commandBuffer;
 
-		const auto& logicalDevice = info.app->logicalDevice;
-		const auto& memBlock = _instanceBuffers[info.swapChainData->imageIndex].memBlock;
-		void* instanceData;
-		const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
-		assert(!result);
-		memcpy(instanceData, static_cast<const void*>(tasks.data), sizeof(Task) * tasks.length);
-		vkUnmapMemory(logicalDevice, memBlock.memory);
+			const auto& logicalDevice = info.app->logicalDevice;
+			const auto& memBlock = _instanceBuffers[info.swapChainData->imageIndex].memBlock;
+			void* instanceData;
+			const auto result = vkMapMemory(logicalDevice, memBlock.memory, memBlock.offset, memBlock.size, 0, &instanceData);
+			assert(!result);
+			memcpy(instanceData, static_cast<const void*>(vector.GetData()), sizeof(Task) * vector.GetCount());
+			vkUnmapMemory(logicalDevice, memBlock.memory);
 
-		VkDeviceSize offset = 0;
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
-		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
-			0, 1, &_descriptorSets[info.swapChainData->imageIndex], 0, nullptr);
-		vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
-		vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+			VkDeviceSize offset = 0;
+			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout,
+				0, 1, &_descriptorSets[info.swapChainData->imageIndex], 0, nullptr);
+			vkCmdBindVertexBuffers(cmd, 0, 1, &_mesh.vertexBuffer.buffer, &offset);
+			vkCmdBindIndexBuffer(cmd, _mesh.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-		PushConstants pushConstant{};
-		pushConstant.resolution = info.swapChainData->resolution;
-		pushConstant.camera = camera;
+			PushConstants pushConstant{};
+			pushConstant.resolution = info.swapChainData->resolution;
+			pushConstant.camera = camera;
 
-		vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
-		vkCmdDrawIndexed(cmd, _mesh.indexCount, tasks.length, 0, 0, 0);
+			vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pushConstant);
+			vkCmdDrawIndexed(cmd, _mesh.indexCount, vector.GetCount(), 0, 0, 0);
+		}
 	}
 }

@@ -12,7 +12,7 @@ namespace vke
 {
 	void ThreadPoolSystem::ThreadObj::operator()(ThreadPoolSystem* sys) const
 	{
-		const auto data = sys->GetTasks().data;
+		auto& tasks = sys->GetTasks();
 
 		while(true)
 		{
@@ -29,7 +29,7 @@ namespace vke
 				sys->_getNextTaskMutex.unlock();
 				continue;
 			}
-			const auto task = data[--sys->_tasksRemaining];
+			const auto task = tasks[--sys->_tasksRemaining];
 			sys->_getNextTaskMutex.unlock();
 
 			task.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems, task.userPtr);
@@ -53,19 +53,19 @@ namespace vke
 
 	void ThreadPoolSystem::OnUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::ArrayView<ThreadPoolTask> tasks)
+		const jlb::NestableVector<ThreadPoolTask>& tasks)
 	{
 		TaskSystem<ThreadPoolTask>::OnPreUpdate(info, systems, tasks);
 
 		// Continue the threads.
 		_threadSharedInfo.info = &info;
 		_threadSharedInfo.systems = systems;
-		_tasksRemaining = _tasksUnfinished = GetCount();
+		_tasksRemaining = _tasksUnfinished = tasks.GetCount();
 	}
 
 	void ThreadPoolSystem::OnPostUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::ArrayView<ThreadPoolTask> tasks)
+		const jlb::NestableVector<ThreadPoolTask>& tasks)
 	{
 		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
 		
@@ -83,9 +83,14 @@ namespace vke
 		TaskSystem<ThreadPoolTask>::Exit(info, systems);
 	}
 
-	size_t ThreadPoolSystem::DefineMinimalUsage(const EngineData& info)
+	size_t ThreadPoolSystem::DefineCapacity(const EngineData& info)
 	{
 		return THREAD_POOL_SYSTEM_CAPACITY;
+	}
+
+	size_t ThreadPoolSystem::DefineNestedCapacity(const EngineData& info)
+	{
+		return THREAD_POOL_SYSTEM_NESTED_CAPACITY;
 	}
 
 	size_t ThreadPoolSystem::GetThreadCount() const
