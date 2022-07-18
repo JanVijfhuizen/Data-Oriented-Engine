@@ -26,6 +26,8 @@ namespace game
 
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		vke::GameSystem::PreUpdate(info, systems);
+
 		_tickCalled = false;
 
 		const auto resourceSys = systems.GetSystem<ResourceManager>();

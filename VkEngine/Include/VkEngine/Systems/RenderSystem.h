@@ -150,7 +150,7 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::Free(const EngineData& info)
 	{
-		if (TaskSystem<Task>::GetLength() == 0)
+		if (TaskSystem<Task>::GetLength() > 0)
 		{
 			DestroySwapChainAssets(info);
 			DestroyShaderAssets(info);

@@ -8,6 +8,8 @@ namespace game
 {
 	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
+		vke::GameSystem::PreUpdate(info, systems);
+
 		if (!info.mouseAvailable)
 			return;
 

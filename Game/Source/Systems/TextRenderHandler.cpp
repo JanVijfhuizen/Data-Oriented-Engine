@@ -10,6 +10,8 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<TextRenderTask>& tasks)
 	{
+		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
+
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto resourceSys = systems.GetSystem<game::ResourceManager>();

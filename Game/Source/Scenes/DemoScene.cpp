@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
-#include "VkEngine/Systems/ThreadPoolSystem.h"
+#include "Systems/GameManager.h"
 
 namespace game::demo
 {
