@@ -8,9 +8,6 @@
 #include <unistd.h>
 #endif
 
-// TEMP
-#include <iostream>
-
 namespace vke
 {
 	void ThreadPoolSystem::ThreadObj::operator()(ThreadPoolSystem* sys) const
@@ -71,7 +68,7 @@ namespace vke
 		const jlb::Vector<ThreadPoolTask>& tasks)
 	{
 		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
-
+		
 		// Wait for the threads to finish.
 		while (_tasksUnfinished > 0)
 			Sleep(0);

@@ -52,7 +52,7 @@ namespace game
 
 				if (dir.x == 0 && dir.y == 0)
 					continue;
-
+				
 				// Round the from position.
 				const glm::vec2 from = glm::vec2(glm::ivec2(entity.transform.position));
 				const glm::vec2 delta = glm::vec2(dir * static_cast<int32_t>(vke::PIXEL_SIZE_ENTITY));
@@ -76,7 +76,7 @@ namespace game
 
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto& movementOutputs = movementSys->GetOutput();
-
+		
 		for (auto& entity : entities)
 		{
 			if (entity.movementTaskId == SIZE_MAX)

@@ -17,6 +17,8 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::Vector<MovementTask>& tasks)
 	{
+		TaskSystemWithOutput<MovementTask, MovementTaskOutput>::OnPreUpdate(info, systems, tasks);
+
 		vke::ThreadPoolTask threadTask{};
 		threadTask.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
@@ -30,7 +32,7 @@ namespace game
 
 			const auto tasks = self->GetTasks();
 			auto& tasksOutput = self->GetOutputVector();
-			
+
 			for (const auto& task : tasks)
 			{
 				const auto& component = task.component;

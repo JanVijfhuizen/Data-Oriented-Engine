@@ -118,6 +118,15 @@ namespace game
 		
 		if (_time > dTicksPerSecond)
 		{
+			if(_skippingToNextTick)
+			{
+				_paused = true;
+				_skippingToNextTick = false;
+				_lerp = 1;
+				_time = dTicksPerSecond + 1e-5f;
+				return;
+			}
+
 			_time = fmodf(_time, dTicksPerSecond);
 			_tickCalled = true;
 			_previousTicksPerSecond = _ticksPerSecond;
@@ -129,6 +138,9 @@ namespace game
 	{
 		vke::GameSystem::OnKeyInput(info, systems, key, action);
 
+		if (_skippingToNextTick)
+			return;
+
 		// Adjust is paused.
 		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 		{
@@ -139,8 +151,8 @@ namespace game
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
 		{
-			_time = 2.f / static_cast<float>(_ticksPerSecond) - 1e-5f;
-			_keyVerticalLerps[3] = 0;
+			_skippingToNextTick = true;
+			_paused = false;
 		}
 
 		// Adjust turn speed.
