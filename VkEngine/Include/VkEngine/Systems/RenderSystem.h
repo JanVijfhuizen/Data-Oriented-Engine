@@ -60,7 +60,7 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestableVector<Task>& tasks) override;
+			const jlb::NestedVector<Task>& tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		
 		void CreateShaderAssets(const EngineData& info);
@@ -140,7 +140,7 @@ namespace vke
 		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_textureAtlas.sampler);
 		assert(!result);
 
-		if (TaskSystem<Task>::DefineCapacity(info) == 0)
+		if (TaskSystem<Task>::GetLength() == 0)
 			return;
 
 		CreateShaderAssets(info);
@@ -150,7 +150,7 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::Free(const EngineData& info)
 	{
-		if (TaskSystem<Task>::DefineCapacity(info) == 0)
+		if (TaskSystem<Task>::GetLength() == 0)
 		{
 			DestroySwapChainAssets(info);
 			DestroyShaderAssets(info);
@@ -184,13 +184,12 @@ namespace vke
 		const auto& logicalDevice = app.logicalDevice;
 		const size_t swapChainImageCount = info.swapChainData->imageCount;
 
-		const size_t capacity = TaskSystem<Task>::DefineCapacity(info);
-		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, capacity);
+		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, TaskSystem<Task>::GetLength());
 
 		// Create descriptor layout.
 		jlb::StackArray<layout::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(Task) * capacity;
+		bindings[0].size = sizeof(Task) * TaskSystem<Task>::GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -239,7 +238,7 @@ namespace vke
 			VkDescriptorBufferInfo instanceInfo{};
 			instanceInfo.buffer = _instanceBuffers[i].buffer;
 			instanceInfo.offset = 0;
-			instanceInfo.range = sizeof(Task) * capacity;
+			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
 
 			auto& instanceWrite = writes[0];
 			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -329,7 +328,7 @@ namespace vke
 	template <typename Task>
 	void RenderSystem<Task>::OnUpdate(const EngineData& info,
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestableVector<Task>& tasks)
+		const jlb::NestedVector<Task>& tasks)
 	{
 		const auto& root = tasks.GetRoot();
 

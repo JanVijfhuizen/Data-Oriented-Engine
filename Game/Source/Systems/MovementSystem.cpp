@@ -15,7 +15,7 @@ namespace game
 
 	void MovementSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestableVector<MovementTask>& tasks)
+		const jlb::NestedVector<MovementTask>& tasks)
 	{
 		TaskSystemWithOutput<MovementTask, MovementTaskOutput>::OnPreUpdate(info, systems, tasks);
 

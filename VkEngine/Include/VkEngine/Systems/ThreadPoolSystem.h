@@ -44,9 +44,9 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, 
-			const jlb::NestableVector<ThreadPoolTask>& tasks) override;
+			const jlb::NestedVector<ThreadPoolTask>& tasks) override;
 		void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestableVector<ThreadPoolTask>& tasks) override;
+			const jlb::NestedVector<ThreadPoolTask>& tasks) override;
 		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;

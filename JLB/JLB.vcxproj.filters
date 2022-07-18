@@ -95,7 +95,7 @@
     <ClInclude Include="Include\StackQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\NestableVector.h">
+    <ClInclude Include="Include\NestedVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,12 +5,12 @@ namespace jlb
 {
 	// Vector that will spawn internal nested vectors to store data in when the capacity has been exceeded.
 	template <typename T>
-	class NestableVector final
+	class NestedVector final
 	{
 	public:
 		class Node final : public Vector<T>
 		{
-			friend NestableVector;
+			friend NestedVector;
 			
 			Allocation<Node> _next{};
 		};
@@ -43,6 +43,8 @@ namespace jlb
 		void Allocate(StackAllocator& allocator, size_t size, size_t nestableCapacity, const T& fillValue = {});
 		void Free(StackAllocator& allocator);
 
+		// Detach nested without deallocating them.
+		void DetachNested();
 		// Free all the nested vectors.
 		void RemoveNested(StackAllocator& allocator);
 		// Sets the count to 0, as well as for all the nested vectors.
@@ -68,31 +70,34 @@ namespace jlb
 	};
 
 	template <typename T>
-	T& NestableVector<T>::Iterator::operator*() const
+	T& NestedVector<T>::Iterator::operator*() const
 	{
 		assert(src);
 		return src->operator[](index);
 	}
 
 	template <typename T>
-	T& NestableVector<T>::Iterator::operator->() const
+	T& NestedVector<T>::Iterator::operator->() const
 	{
 		assert(src);
 		return src->operator[](index);
 	}
 
 	template <typename T>
-	const typename NestableVector<T>::Iterator& NestableVector<T>::Iterator::operator++()
+	const typename NestedVector<T>::Iterator& NestedVector<T>::Iterator::operator++()
 	{
 		++index;
 		const bool next = index >= src->GetCount();
-		src = next ? src->_next : src;
-		index = next ? 0 : index;
+		if(next && src->_next)
+		{
+			src = src->_next;
+			index = 0;
+		}
 		return *this;
 	}
 
 	template <typename T>
-	typename NestableVector<T>::Iterator NestableVector<T>::Iterator::operator++(int)
+	typename NestedVector<T>::Iterator NestedVector<T>::Iterator::operator++(int)
 	{
 		Iterator temp(src, index);
 		++index;
@@ -103,7 +108,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& NestableVector<T>::operator[](size_t index) const
+	T& NestedVector<T>::operator[](size_t index) const
 	{
 		Node* node = _root;
 		while (node)
@@ -121,7 +126,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	void NestableVector<T>::Allocate(StackAllocator& allocator, 
+	void NestedVector<T>::Allocate(StackAllocator& allocator, 
 		const size_t size, const size_t nestableCapacity,
 		const T& fillValue)
 	{
@@ -132,21 +137,31 @@ namespace jlb
 	}
 
 	template <typename T>
-	void NestableVector<T>::Free(StackAllocator& allocator)
+	void NestedVector<T>::Free(StackAllocator& allocator)
 	{
 		RemoveNested(allocator);
+		_root.ptr->Free(allocator);
 		allocator.MFree(_root.id);
 		_root = {};
 	}
 
 	template <typename T>
-	void NestableVector<T>::RemoveNested(StackAllocator& allocator)
+	void NestedVector<T>::DetachNested()
 	{
-		FreeNestedInstance(allocator, _root);
+		_root.ptr->_next = {};
 	}
 
 	template <typename T>
-	void NestableVector<T>::Clear()
+	void NestedVector<T>::RemoveNested(StackAllocator& allocator)
+	{
+		auto& next = _root.ptr->_next;
+		if(next)
+			FreeNestedInstance(allocator, next);
+		next = {};
+	}
+
+	template <typename T>
+	void NestedVector<T>::Clear()
 	{
 		Node* node = _root;
 		while (node)
@@ -157,25 +172,25 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& NestableVector<T>::Add(StackAllocator& allocator, T& value)
+	T& NestedVector<T>::Add(StackAllocator& allocator, T& value)
 	{
 		return IntAdd(allocator, value);
 	}
 
 	template <typename T>
-	T& NestableVector<T>::Add(StackAllocator& allocator, const T& value)
+	T& NestedVector<T>::Add(StackAllocator& allocator, const T& value)
 	{
 		return IntAdd(allocator, value);
 	}
 
 	template <typename T>
-	const typename NestableVector<T>::Node& NestableVector<T>::GetRoot() const
+	const typename NestedVector<T>::Node& NestedVector<T>::GetRoot() const
 	{
 		return *_root;
 	}
 
 	template <typename T>
-	size_t NestableVector<T>::GetVectorCount() const
+	size_t NestedVector<T>::GetVectorCount() const
 	{
 		size_t count = 0;
 		Node* node = _root;
@@ -189,7 +204,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	size_t NestableVector<T>::GetCount() const
+	size_t NestedVector<T>::GetCount() const
 	{
 		size_t count = 0;
 		Node* node = _root;
@@ -203,7 +218,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	size_t NestableVector<T>::GetLength() const
+	size_t NestedVector<T>::GetLength() const
 	{
 		size_t count = 0;
 		Node* node = _root;
@@ -217,7 +232,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	typename NestableVector<T>::Iterator NestableVector<T>::begin() const
+	typename NestedVector<T>::Iterator NestedVector<T>::begin() const
 	{
 		Iterator iterator{};
 		iterator.src = _root;
@@ -225,7 +240,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	typename NestableVector<T>::Iterator NestableVector<T>::end() const
+	typename NestedVector<T>::Iterator NestedVector<T>::end() const
 	{
 		Iterator iterator{};
 
@@ -248,7 +263,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	T& NestableVector<T>::IntAdd(StackAllocator& allocator, const T& value)
+	T& NestedVector<T>::IntAdd(StackAllocator& allocator, const T& value)
 	{
 		Node* node = _root;
 		while (node)
@@ -277,7 +292,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	void NestableVector<T>::FreeNestedInstance(StackAllocator& allocator, Allocation<Node>& allocation)
+	void NestedVector<T>::FreeNestedInstance(StackAllocator& allocator, Allocation<Node>& allocation)
 	{
 		if (allocation.ptr->_next)
 			FreeNestedInstance(allocator, allocation.ptr->_next);

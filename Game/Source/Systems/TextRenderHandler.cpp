@@ -8,7 +8,7 @@ namespace game
 {
 	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestableVector<TextRenderTask>& tasks)
+		const jlb::NestedVector<TextRenderTask>& tasks)
 	{
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();

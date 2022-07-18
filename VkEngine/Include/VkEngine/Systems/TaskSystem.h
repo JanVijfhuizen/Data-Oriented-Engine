@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "GameSystem.h"
-#include "NestableVector.h"
+#include "NestedVector.h"
 
 namespace vke
 {
@@ -10,7 +10,7 @@ namespace vke
 	public:
 		// Returns MAX value if it couldn't add the task.
 		[[nodiscard]] size_t TryAdd(const EngineData& info, const T& task);
-		[[nodiscard]] const jlb::NestableVector<T>& GetTasks() const;
+		[[nodiscard]] const jlb::NestedVector<T>& GetTasks() const;
 
 	protected:
 		void Allocate(const EngineData& info) override;
@@ -19,16 +19,16 @@ namespace vke
 		[[nodiscard]] virtual size_t DefineCapacity(const EngineData& info);
 		[[nodiscard]] virtual size_t DefineNestedCapacity(const EngineData& info);
 		
-		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestableVector<T>& tasks){}
-		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestableVector<T>& tasks){}
-		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestableVector<T>& tasks){}
+		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
+		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
+		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
 		[[nodiscard]] size_t GetLength() const;
 		[[nodiscard]] size_t GetCount() const;
 
 	private:
-		jlb::NestableVector<T> _tasks{};
+		jlb::NestedVector<T> _tasks{};
 
 		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
@@ -90,7 +90,7 @@ namespace vke
 	}
 
 	template <typename T>
-	const jlb::NestableVector<T>& TaskSystem<T>::GetTasks() const
+	const jlb::NestedVector<T>& TaskSystem<T>::GetTasks() const
 	{
 		return _tasks;
 	}
@@ -114,6 +114,7 @@ namespace vke
 	{
 		System<EngineData>::PostUpdate(info, systems);
 		OnPostUpdate(info, systems, _tasks);
+		_tasks.DetachNested();
 		_tasks.Clear();
 	}
 }
