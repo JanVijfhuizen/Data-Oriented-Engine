@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Curve.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/GameSystem.h"
 
@@ -12,15 +13,19 @@ namespace game
 		{
 			glm::vec2 target{};
 			glm::vec2 position{};
+			float zoom = 0;
+
 			glm::vec2 bias{};
 			glm::vec2 deadZone{ vke::PIXEL_SIZE_ENTITY * 4 };
-			glm::vec2 moveZone{ vke::PIXEL_SIZE_ENTITY * 8 };
+			glm::vec2 moveZone{ vke::PIXEL_SIZE_ENTITY * 10 };
+			glm::vec2 zoomZone = deadZone;
+
 			float pixelSize = 0.008f;
-			float zoom = 1;
+			float zoomMultiplier = .15f;
 		} settings;
 
 	private:
-		void PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
-		void PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 	};
 }

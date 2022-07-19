@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/ResourceManager.h"
-#include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -13,10 +12,10 @@ namespace game
 		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
 
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto resourceSys = systems.GetSystem<game::ResourceManager>();
 
-		const float fontSize = entitySys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
+		const float pixelSize = uiSys->camera.pixelSize;
+		const float fontSize = pixelSize * vke::PIXEL_SIZE_ENTITY;
 
 		const auto alphabetTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::alphabet);
 		const float alphabetChunkSize = vke::texture::GetChunkSize(alphabetTexture, 26);
@@ -36,12 +35,12 @@ namespace game
 			{
 				const auto& otherTask = tasks[task.appendIndex];
 				const size_t otherLength = otherTask.lengthOverride == SIZE_MAX ? otherTask.text.GetLength() : otherTask.lengthOverride;
-				const float additionalOffset = (fontSize + entitySys->camera.pixelSize * static_cast<float>(otherTask.padding)) * otherLength;
+				const float additionalOffset = (fontSize + pixelSize * static_cast<float>(otherTask.padding)) * otherLength;
 				origin = otherTask.origin;
 				origin.x += additionalOffset;
 			}
 
-			const float paddedFontSize = fontSize + entitySys->camera.pixelSize * static_cast<float>(task.padding);
+			const float paddedFontSize = fontSize + pixelSize * static_cast<float>(task.padding);
 			origin.x -= paddedFontSize;
 
 			for (size_t i = 0; i < length; ++i)

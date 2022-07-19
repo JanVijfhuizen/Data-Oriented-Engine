@@ -4,7 +4,6 @@
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
-#include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -31,7 +30,6 @@ namespace game
 		_tickCalled = false;
 
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 
 		const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
@@ -40,7 +38,7 @@ namespace game
 		jlb::StackArray<vke::SubTexture, 4> textureDivided{};
 		vke::texture::Subdivide(timelineSubTexture, 4, textureDivided);
 
-		const auto& cameraPixelSize = entitySys->camera.pixelSize;
+		const auto& cameraPixelSize = uiSys->camera.pixelSize;
 
 		// Calculate screen space coordinates.
 		jlb::StackArray<vke::SubTexture, 5> coordinatesDivided{};

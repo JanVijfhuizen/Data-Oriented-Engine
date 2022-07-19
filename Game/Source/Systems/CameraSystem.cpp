@@ -23,11 +23,30 @@ namespace game
 			const glm::vec2 deadZone = settings.deadZone * .5f;
 			const glm::vec2 moveZone = settings.moveZone * .5f;
 
+			assert(deadZone.x > 0 && deadZone.y > 0);
+			assert(moveZone.x > 0 && moveZone.y > 0);
+
 			const glm::vec2 deadDelta = jlb::math::Threshold(offset, -deadZone, deadZone);
 			const glm::vec2 moveDelta = jlb::math::Threshold(offset, -moveZone, moveZone);
 
-			const glm::vec2 delta = glm::length(moveDelta) > 1e-3f ? moveDelta : deadDelta * info.deltaTime * 1e-2f;
-			sys->settings.position += delta;
+			// Calculate position.
+			{
+				const glm::vec2 delta = glm::length(moveDelta) > 1e-3f ? moveDelta : deadDelta * info.deltaTime * 1e-2f;
+				sys->settings.position += delta;
+			}
+
+			{
+				const glm::vec2 zoomZone = settings.zoomZone * .5f;
+				const glm::vec2 zoomDelta = jlb::math::Threshold(offset, -zoomZone, zoomZone);
+				const glm::vec2 maxZoomZone = moveZone - zoomZone;
+
+				assert(zoomZone.x > 0 && zoomZone.y > 0);
+				assert(zoomZone.x < moveZone.x && zoomZone.y < moveZone.y);
+
+				auto zoomCurve = jlb::CreateCurveDecelerate();
+				const float fOffsetPct = jlb::math::Max(abs(zoomDelta.x) / maxZoomZone.x, abs(zoomDelta.y) / maxZoomZone.y);
+				sys->settings.zoom = 1.f + zoomCurve.Evaluate(fOffsetPct) * sys->settings.zoomMultiplier;
+			}
 		};
 		task.userPtr = this;
 		const auto result = threadSys->TryAdd(info, task);

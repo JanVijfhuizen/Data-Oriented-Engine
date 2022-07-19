@@ -2,7 +2,6 @@
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
-#include "VkEngine/Systems/EntityRenderSystem.h"
 
 namespace game
 {
@@ -16,11 +15,10 @@ namespace game
 		const auto& mousePos = info.mousePos;
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
 
 		vke::UIRenderTask task{};
 		task.transform.position = mousePos;
-		task.transform.scale = entitySys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
+		task.transform.scale = uiSys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 		task.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::mouse);
 
 		const auto result = uiSys->TryAdd(info, task);

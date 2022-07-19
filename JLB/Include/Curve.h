@@ -20,6 +20,6 @@ namespace jlb
 
 	// Creates a curve that moves from 0 to 1 vertically, and slightly overshoots right before the end.
 	[[nodiscard]] Curve CreateCurveOvershooting();
-
+	// Creates a curve that quickly moves to the endpoint, and slows down at the end.
 	[[nodiscard]] Curve CreateCurveDecelerate();
 }
