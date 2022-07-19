@@ -15,7 +15,6 @@ namespace game
 			glm::vec2 bias{};
 			glm::vec2 deadZone{ vke::PIXEL_SIZE_ENTITY * 4 };
 			glm::vec2 moveZone{ vke::PIXEL_SIZE_ENTITY * 8 };
-			glm::vec2 teleportZone{ vke::PIXEL_SIZE_ENTITY * 12 };
 			float pixelSize = 0.008f;
 			float zoom = 1;
 		} settings;

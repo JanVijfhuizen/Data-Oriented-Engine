@@ -20,9 +20,13 @@ namespace game
 			const auto& target = settings.target;
 
 			const glm::vec2 offset = target - settings.position;
+			const glm::vec2 deadZone = settings.deadZone * .5f;
 			const glm::vec2 moveZone = settings.moveZone * .5f;
 
-			glm::vec2 delta = jlb::math::Threshold(offset, -moveZone, moveZone);
+			const glm::vec2 deadDelta = jlb::math::Threshold(offset, -deadZone, deadZone);
+			const glm::vec2 moveDelta = jlb::math::Threshold(offset, -moveZone, moveZone);
+
+			const glm::vec2 delta = glm::length(moveDelta) > 1e-3f ? moveDelta : deadDelta * info.deltaTime * 1e-2f;
 			sys->settings.position += delta;
 		};
 		task.userPtr = this;
