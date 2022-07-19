@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
 
+#include <iostream>
+
 #include "DistanceTree.h"
 #include "Systems/GameManager.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
@@ -19,12 +21,31 @@ namespace game::demo
 		const auto result = tileSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
 
+		jlb::StackArray<glm::vec2, 16> in{};
 		jlb::DistanceTree disTree{};
 		disTree.Allocate(*info.dumpAllocator, 16);
 
+		srand(time(NULL));
 		for (int i = 0; i < 16; ++i)
 		{
-			disTree.Add(glm::vec2(rand() % 100 - 50, rand() % 100 - 50));
+			glm::vec2 v = glm::vec2(rand() % 100 - 50, rand() % 100 - 50);
+			disTree.Add(v);
+			in[i] = v;
+		}
+
+		jlb::StackArray<size_t, 16> out{};
+		disTree.GetInstancesInRange(glm::vec2(0), 5, out);
+		for (size_t& size : out)
+		{
+			glm::vec2 vec = in[size];
+			std::cout << vec.x << " " << vec.y << std::endl;
+		}
+
+		std::cout << std::endl;
+
+		for (auto& vec : in)
+		{
+			std::cout << vec.x << " " << vec.y << std::endl;
 		}
 	}
 
