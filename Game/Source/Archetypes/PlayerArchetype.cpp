@@ -51,8 +51,15 @@ namespace game
 			if(isTickEvent && movementUserDefined.remaining == 0)
 			{
 				glm::ivec2 dir{};
-				dir.x = static_cast<int32_t>(_wasdKeysInput[3]) - _wasdKeysInput[1];
-				dir.y = dir.x == 0 ? static_cast<int32_t>(_wasdKeysInput[2]) - _wasdKeysInput[0] : 0;
+				dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
+				dir.y = dir.x == 0 ? static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid : 0;
+
+				for (auto& input : _movementInput)
+				{
+					input.pressedSinceStartOfFrame = input.pressed;
+					input.valid = input.pressed;
+				}
+
 				if (dir.x == 0 && dir.y == 0)
 					continue;
 				
@@ -98,10 +105,10 @@ namespace game
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
 	{
-		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _wasdKeysInput[0]);
-		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _wasdKeysInput[1]);
-		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _wasdKeysInput[2]);
-		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _wasdKeysInput[3]);
+		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _movementInput[0]);
+		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1]);
+		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2]);
+		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3]);
 	}
 
 	void PlayerArchetype::OnMouseInput(const vke::EngineData& info, 
@@ -109,8 +116,21 @@ namespace game
 	{
 	}
 
-	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, bool& keyPressed)
+	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input)
 	{
-		keyPressed = targetKey != activatedKey ? keyPressed : action == GLFW_PRESS ? true : action == GLFW_RELEASE ? false : keyPressed;
+		if (targetKey != activatedKey)
+			return;
+		if (action == GLFW_PRESS)
+		{
+			input.pressed = true;
+			input.valid = true;
+		}
+			
+		if (action == GLFW_RELEASE)
+		{
+			input.pressed = false;
+			if(input.pressedSinceStartOfFrame)
+				input.valid = false;
+		}
 	}
 }

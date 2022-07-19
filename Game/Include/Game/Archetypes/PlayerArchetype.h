@@ -16,8 +16,15 @@ namespace game
 		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action);
 
 	private:
-		bool _wasdKeysInput[4]{};
+		struct Input final
+		{
+			bool pressed = false;
+			bool pressedSinceStartOfFrame = false;
+			bool valid = false;
+		};
 
-		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, bool& keyPressed);
+		Input _movementInput[4]{};
+
+		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input);
 	};
 }
