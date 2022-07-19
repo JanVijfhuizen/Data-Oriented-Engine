@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
+#include "Systems/CameraSystem.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
@@ -13,6 +14,7 @@ namespace game
 	{
 		Archetype<Player>::PreUpdate(info, systems, entities);
 
+		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
@@ -29,6 +31,8 @@ namespace game
 
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 
+		glm::vec2 cameraCenter{};
+
 		for (auto& entity : entities)
 		{
 			auto& movementComponent = entity.movementComponent;
@@ -42,7 +46,8 @@ namespace game
 
 			auto& movementUserDefined = movementComponent.userDefined;
 
-			// Testing.
+			cameraCenter += entity.transform.position;
+
 			if(isTickEvent && movementUserDefined.remaining == 0)
 			{
 				glm::ivec2 dir{};
@@ -64,6 +69,9 @@ namespace game
 			movementTask.component = movementComponent;
 			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
 		}
+
+		cameraCenter /= entities.length;
+		cameraSys->settings.target = cameraCenter;
 	}
 
 	void PlayerArchetype::PostUpdate(const vke::EngineData& info, 
