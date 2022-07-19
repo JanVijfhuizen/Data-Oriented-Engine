@@ -34,10 +34,10 @@ namespace game::demo
 		}
 
 		jlb::StackArray<size_t, 16> out{};
-		disTree.GetInstancesInRange(glm::vec2(0), 5, out);
-		for (size_t& size : out)
+		size_t c = disTree.GetInstancesInRange(glm::vec2(0), 15, out);
+		for (int i = 0; i < c; ++i)
 		{
-			glm::vec2 vec = in[size];
+			glm::vec2 vec = in[out[i]];
 			std::cout << vec.x << " " << vec.y << std::endl;
 		}
 
