@@ -1,6 +1,9 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
+#include "VkEngine/Graphics/Camera.h"
+#include "VkEngine/Graphics/CameraUtils.h"
+
 namespace vke
 {
 	jlb::StringView TileRenderSystem::GetTextureAtlasFilePath() const
@@ -21,5 +24,11 @@ namespace vke
 	size_t TileRenderSystem::DefineCapacity(const EngineData& info)
 	{
 		return 1024;
+	}
+
+	bool TileRenderSystem::ValidateOnTryAdd(const TileRenderTask& task)
+	{
+		const bool culls = Culls(camera.position, camera.pixelSize, task.position, task.shape);
+		return culls ? false : RenderSystem<TileRenderTask, TileCamera>::ValidateOnTryAdd(task);
 	}
 }

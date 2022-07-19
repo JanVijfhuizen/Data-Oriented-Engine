@@ -14,7 +14,6 @@ namespace game::demo
 		vke::TileRenderTask task{};
 		task.shape = glm::ivec2(3, 5);
 		const auto result = tileSys->TryAdd(info, task);
-		assert(result != SIZE_MAX);
 	}
 
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)

@@ -2,6 +2,8 @@
 
 namespace vke
 {
+	struct Transform;
+
 	struct Camera final
 	{
 		glm::vec2 position{};
