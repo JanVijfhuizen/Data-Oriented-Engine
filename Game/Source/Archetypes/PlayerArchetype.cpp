@@ -120,6 +120,7 @@ namespace game
 	{
 		if (targetKey != activatedKey)
 			return;
+
 		if (action == GLFW_PRESS)
 		{
 			input.pressed = true;

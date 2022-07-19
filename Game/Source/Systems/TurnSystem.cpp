@@ -132,20 +132,19 @@ namespace game
 		// Draw the timer itself.
 		{
 			const auto timerSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timer);
-			const auto timerFillValueSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timerFillValue);
-
-			const auto timerScale = glm::vec2(scale * 8, scale);
+			const auto timerArrowSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timerArrow);
 
 			vke::UIRenderTask renderTask{};
-			renderTask.subTexture = timerFillValueSubTexture;
+			renderTask.subTexture = timerArrowSubTexture;
 			renderTask.position.y = visuals.screenYCoordinates + vke::PIXEL_SIZE_ENTITY * cameraPixelSize;
-			renderTask.scale = timerScale;
-			renderTask.scale.x *= 1.f - _lerp;
+			renderTask.position.x = scale * ((1.f - _lerp) * 8.f - 4.f);
+			renderTask.scale = glm::vec2(scale);
 			auto result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 
 			renderTask.subTexture = timerSubTexture;
-			renderTask.scale = timerScale;
+			renderTask.scale = glm::vec2(scale * 8, scale);
+			renderTask.position.x = 0;
 			result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 		}
