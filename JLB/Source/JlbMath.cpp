@@ -25,6 +25,20 @@ namespace jlb::math
 		return fmodf(f, PI * 2);
 	}
 
+	glm::vec2 Clamp(glm::vec2 clampable, const glm::vec2 min, const glm::vec2 max)
+	{
+		clampable.x = Clamp(clampable.x, min.x, max.x);
+		clampable.y = Clamp(clampable.y, min.y, max.y);
+		return clampable;
+	}
+
+	glm::vec2 Threshold(glm::vec2 clampable, const glm::vec2 min, const glm::vec2 max)
+	{
+		clampable.x = Threshold(clampable.x, min.x, max.x);
+		clampable.y = Threshold(clampable.y, min.y, max.y);
+		return clampable;
+	}
+
 	float Lerp(const float a, const float b, const float delta)
 	{
 		return a + delta * ((b > a) * 2 - 1);

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/CameraSystem.h"
-
+#include "JlbMath.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
 
@@ -16,7 +16,14 @@ namespace game
 		task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto sys = reinterpret_cast<CameraSystem*>(userPtr);
-			sys->settings.position = sys->settings.target;
+			const auto& settings = sys->settings;
+			const auto& target = settings.target;
+
+			const glm::vec2 offset = target - settings.position;
+			const glm::vec2 moveZone = settings.moveZone * .5f;
+
+			glm::vec2 delta = jlb::math::Threshold(offset, -moveZone, moveZone);
+			sys->settings.position += delta;
 		};
 		task.userPtr = this;
 		const auto result = threadSys->TryAdd(info, task);
