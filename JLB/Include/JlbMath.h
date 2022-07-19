@@ -14,6 +14,11 @@ namespace jlb::math
 	// Wraps an radians angle.
 	[[nodiscard]] float WrapAngle(float f);
 
+	// Clamps a vector inside other vectors.
+	[[nodiscard]] glm::vec2 Clamp(glm::vec2 clampable, glm::vec2 min, glm::vec2 max);
+	// Returns the distance from the threshold if outside of the given bounds.
+	[[nodiscard]] glm::vec2 Threshold(glm::vec2 clampable, glm::vec2 min, glm::vec2 max);
+
 	// Linearly interpolates between two values by a flat value.
 	[[nodiscard]] float Lerp(float a, float b, float delta);
 	// Linearly interpolates between to values from 0 to 1.
@@ -29,6 +34,10 @@ namespace jlb::math
 	template <typename T>
 	[[nodiscard]] T Clamp(T clampable, T min, T max);
 
+	// Returns the distance from the threshold if outside of the given bounds.
+	template <typename T>
+	[[nodiscard]] T Threshold(T clampable, T min, T max);
+
 	// Returns the highest of the two values.
 	template <typename T>
 	[[nodiscard]] T Max(T a, T b);
@@ -42,6 +51,13 @@ namespace jlb::math
 	{
 		assert(min < max);
 		return clampable > max ? max : clampable < min ? min : clampable;
+	}
+
+	template <typename T>
+	T Threshold(T clampable, T min, T max)
+	{
+		assert(min < max);
+		return clampable < min ? clampable - min : clampable > max ? clampable - max : 0;
 	}
 
 	template <typename T>

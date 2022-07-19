@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "Systems/CameraSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
@@ -26,6 +27,7 @@ namespace game
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
+		initializer.DefineSystem<CameraSystem>();
 
 		// Core engine Post update.
 		initializer.DefineSystem<vke::EntityRenderSystem>();
