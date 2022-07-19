@@ -235,7 +235,7 @@ namespace vke::texture
 		}
 
 		jlb::Array<stbi_uc> atlasPixels{};
-		atlasPixels.Allocate(*info.tempAllocator, pow(atlasWidth * nodeResolution, 2) * 4);
+		atlasPixels.Allocate(*info.tempAllocator, powf(atlasWidth * nodeResolution, 2) * 4);
 
 		const size_t yStepSize = atlasWidth * nodeResolution * 4;
 
