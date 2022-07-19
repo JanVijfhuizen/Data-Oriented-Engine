@@ -182,9 +182,11 @@
     <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\TaskSystemWithOutput.h" />
+    <ClInclude Include="Include\VkEngine\Systems\TileRenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\TileRenderSystem.cpp" />
     <ClCompile Include="Source\Systems\UIRenderSystem.cpp" />
     <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />
     <ClCompile Include="Source\Graphics\PipelineUtils.cpp" />
