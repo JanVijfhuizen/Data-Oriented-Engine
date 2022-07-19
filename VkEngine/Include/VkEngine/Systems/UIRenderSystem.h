@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "RenderSystem.h"
 #include "VkEngine/Components/Transform.h"
+#include "VkEngine/Graphics/Camera.h"
 #include "VkEngine/Graphics/SubTexture.h"
 
 namespace vke
@@ -15,7 +16,7 @@ namespace vke
 		SubTexture subTexture{};
 	};
 
-	class UIRenderSystem final : public RenderSystem<UIRenderTask>
+	class UIRenderSystem final : public RenderSystem<UIRenderTask, Camera>
 	{
 	public:
 		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const Camera& camera);

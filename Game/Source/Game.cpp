@@ -12,6 +12,7 @@
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
+#include "VkEngine/Systems/TileRenderSystem.h"
 
 namespace game
 {
@@ -30,6 +31,7 @@ namespace game
 		initializer.DefineSystem<CameraSystem>();
 
 		// Core engine Post update.
+		initializer.DefineSystem<vke::TileRenderSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::UIRenderSystem>();
 

@@ -2,6 +2,7 @@
 #include "VkEngine/Components/Transform.h"
 #include "VkEngine/Graphics/SubTexture.h"
 #include "RenderSystem.h"
+#include "VkEngine/Graphics/Camera.h"
 
 namespace vke
 {
@@ -15,7 +16,7 @@ namespace vke
 		SubTexture subTexture{};
 	};
 
-	class EntityRenderSystem final : public RenderSystem<EntityRenderTask>
+	class EntityRenderSystem final : public RenderSystem<EntityRenderTask, Camera>
 	{
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;

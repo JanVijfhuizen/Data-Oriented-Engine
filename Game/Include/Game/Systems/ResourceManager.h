@@ -12,7 +12,12 @@ namespace game
 		enum class EntitySubTextures
 		{
 			mouse,
-			humanoid,
+			humanoid
+		};
+
+		// Subtextures available for the tile renderer.
+		enum class TileSubTextures
+		{
 			tile
 		};
 
@@ -26,11 +31,13 @@ namespace game
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;
+		[[nodiscard]] vke::SubTexture GetSubTexture(TileSubTextures type) const;
 		[[nodiscard]] vke::SubTexture GetSubTexture(UISubTextures type) const;
 
 	private:
 		jlb::Array<vke::SubTexture> _entitySubTextures{};
-		jlb::Array < vke::SubTexture> _uiSubTextures{};
+		jlb::Array<vke::SubTexture> _tileSubTextures{};
+		jlb::Array<vke::SubTexture> _uiSubTextures{};
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;

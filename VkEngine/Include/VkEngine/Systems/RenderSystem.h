@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "TaskSystem.h"
-#include "VkEngine/Graphics/Camera.h"
 #include "VkEngine/Graphics/Shader.h"
 #include "VkEngine/Graphics/Mesh.h"
 #include "VkEngine/Graphics/Texture.h"
@@ -19,7 +18,7 @@
 
 namespace vke
 {
-	template <typename Task>
+	template <typename Task, typename Camera>
 	class RenderSystem : public TaskSystem<Task>
 	{
 	public:
@@ -72,15 +71,15 @@ namespace vke
 		[[nodiscard]] size_t DefineNestedCapacity(const EngineData& info) override;
 	};
 
-	template<typename Task>
-	void RenderSystem<Task>::DefineMeshShape(size_t& outVerticesLength, size_t& outIndicesLength)
+	template<typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::DefineMeshShape(size_t& outVerticesLength, size_t& outIndicesLength)
 	{
 		outVerticesLength = 4;
 		outIndicesLength = 6;
 	}
 
-	template<typename Task>
-	void RenderSystem<Task>::DefineMesh(jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Vertex::Index> indices)
+	template<typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::DefineMesh(jlb::ArrayView<Vertex> vertices, jlb::ArrayView<Vertex::Index> indices)
 	{
 		vertices[0].position = { -1, -1 };
 		vertices[1].position = { -1, 1 };
@@ -100,8 +99,8 @@ namespace vke
 		indices[5] = 3;
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::Allocate(const EngineData& info)
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::Allocate(const EngineData& info)
 	{
 		TaskSystem<Task>::Allocate(info);
 
@@ -147,8 +146,8 @@ namespace vke
 		CreateSwapChainAssets(info);
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::Free(const EngineData& info)
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::Free(const EngineData& info)
 	{
 		if (TaskSystem<Task>::GetLength() > 0)
 		{
@@ -167,16 +166,16 @@ namespace vke
 		TaskSystem<Task>::Free(info);
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::OnRecreateSwapChainAssets(const EngineData& info, const jlb::Systems<EngineData> systems)
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::OnRecreateSwapChainAssets(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		TaskSystem<Task>::OnRecreateSwapChainAssets(info, systems);
 		DestroySwapChainAssets(info);
 		CreateSwapChainAssets(info);
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::CreateShaderAssets(const EngineData& info)
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::CreateShaderAssets(const EngineData& info)
 	{
 		const auto& app = *info.app;
 		auto& allocator = *info.allocator;
@@ -268,8 +267,8 @@ namespace vke
 		}
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::DestroyShaderAssets(const EngineData& info)
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::DestroyShaderAssets(const EngineData& info)
 	{
 		const auto& app = *info.app;
 		const auto& logicalDevice = app.logicalDevice;
@@ -285,8 +284,8 @@ namespace vke
 		_instanceBuffers.Free(allocator);
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::CreateSwapChainAssets(const EngineData& info)
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::CreateSwapChainAssets(const EngineData& info)
 	{
 		jlb::StackArray<pipeline::Info::Module, 2> modules{};
 		modules[0].module = _shader.vert;
@@ -310,8 +309,8 @@ namespace vke
 		pipeline::Create(info, pipelineInfo, _pipelineLayout, _pipeline);
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::DestroySwapChainAssets(const EngineData& info) const
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::DestroySwapChainAssets(const EngineData& info) const
 	{
 		const auto& logicalDevice = info.app->logicalDevice;
 
@@ -319,19 +318,21 @@ namespace vke
 		vkDestroyPipelineLayout(logicalDevice, _pipelineLayout, nullptr);
 	}
 
-	template <typename Task>
-	size_t RenderSystem<Task>::DefineNestedCapacity(const EngineData& info)
+	template <typename Task, typename Camera>
+	size_t RenderSystem<Task, Camera>::DefineNestedCapacity(const EngineData& info)
 	{
 		return 0;
 	}
 
-	template <typename Task>
-	void RenderSystem<Task>::OnUpdate(const EngineData& info,
+	template <typename Task, typename Camera>
+	void RenderSystem<Task, Camera>::OnUpdate(const EngineData& info,
 		const jlb::Systems<EngineData> systems,
 		const jlb::NestedVector<Task>& tasks)
 	{
-		const auto& root = tasks.GetRoot();
+		if (tasks.GetLength() == 0)
+			return;
 
+		const auto& root = tasks.GetRoot();
 		const auto& cmd = info.swapChainData->commandBuffer;
 
 		const auto& logicalDevice = info.app->logicalDevice;
