@@ -31,8 +31,8 @@ namespace game
 		initializer.DefineSystem<CameraSystem>();
 
 		// Core engine Post update.
-		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::TileRenderSystem>();
+		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// High level game manager.

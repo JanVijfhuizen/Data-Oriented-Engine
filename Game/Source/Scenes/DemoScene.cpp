@@ -11,14 +11,10 @@ namespace game::demo
 		_playerArchetype.PreUpdate(info, systems, _player);
 
 		const auto tileSys = systems.GetSystem<vke::TileRenderSystem>();
-		for (int i = -10; i < 10; ++i)
-			for (int j = -10; j < 10; ++j)
-			{
-				vke::TileRenderTask task{};
-				task.position = glm::vec2(i, j) * static_cast<float>(vke::PIXEL_SIZE_ENTITY);
-				const auto result = tileSys->TryAdd(info, task);
-				assert(result != SIZE_MAX);
-			}
+		vke::TileRenderTask task{};
+		task.shape = glm::ivec2(4, 6);
+		const auto result = tileSys->TryAdd(info, task);
+		assert(result != SIZE_MAX);
 	}
 
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)

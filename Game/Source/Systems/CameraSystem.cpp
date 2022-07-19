@@ -3,6 +3,7 @@
 #include "JlbMath.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
+#include "VkEngine/Systems/TileRenderSystem.h"
 
 namespace game 
 {
@@ -57,9 +58,16 @@ namespace game
 	{
 		System<vke::EngineData>::PostUpdate(info, systems);
 
+		
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		auto& camera = entityRenderSys->camera;
-		camera.position = settings.position;
-		camera.pixelSize = settings.pixelSize * settings.zoom;
+		const auto tileRenderSys = systems.GetSystem<vke::TileRenderSystem>();
+
+		auto& entityCamera = entityRenderSys->camera;
+		entityCamera.position = settings.position;
+		entityCamera.pixelSize = settings.pixelSize * settings.zoom;
+
+		auto& tileCamera = tileRenderSys->camera;
+		tileCamera.position = settings.position;
+		tileCamera.pixelSize = settings.pixelSize * settings.zoom;
 	}
 }
