@@ -19,7 +19,7 @@ namespace game
 			const auto& settings = sys->settings;
 			const auto& target = settings.target;
 
-			const glm::vec2 offset = target - settings.position;
+			const glm::vec2 offset = target - settings.position - settings.bias;
 			const glm::vec2 deadZone = settings.deadZone * .5f;
 			const glm::vec2 moveZone = settings.moveZone * .5f;
 
