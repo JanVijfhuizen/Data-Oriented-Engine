@@ -12,7 +12,7 @@ namespace jlb
 	public:
 		void Allocate(StackAllocator& allocator, size_t size);
 		void Free(StackAllocator& allocator);
-		[[nodiscard]] size_t Add(const glm::vec2& position) const;
+		[[nodiscard]] size_t Add(const glm::vec2& position);
 		size_t GetInstancesInRange(const glm::vec2& position, float range, size_t* outArray);
 		[[nodiscard]] size_t GetLength() const;
 
@@ -22,6 +22,7 @@ namespace jlb
 			size_t index = SIZE_MAX;
 			glm::vec2 position{};
 			float range = 0;
+			size_t next = 0;
 		};
 
 		Array<Node> _nodes{};
@@ -41,7 +42,7 @@ namespace jlb
 		_nodes.Free(allocator);
 	}
 
-	inline size_t DistanceTree::Add(const glm::vec2& position) const
+	inline size_t DistanceTree::Add(const glm::vec2& position)
 	{
 		assert(_index < _nodes.GetLength());
 		
@@ -55,16 +56,18 @@ namespace jlb
 			auto& node = _nodes[current];
 			stop = node.index == SIZE_MAX;
 
-			// Change the index + position if this node is a leaf.
+			// Change the index + position + next if this node is a leaf.
 			node.index = stop ? _index : node.index;
 			node.position = stop ? position : node.position;
+			_index += stop;
+			node.next = stop ? _index : node.next;
 
 			// Updates range to equal that of the furthest most leaf branch.
 			node.range = stop ? node.range : math::Max(node.range, CalculateDistance(position, node));
 
 			// Get child node indexes.
-			const uint32_t left = (current + 1) * 2 - 1;
-			const uint32_t right = left + 1;
+			const size_t left = node.next;
+			const size_t right = left + 1;
 
 			const auto& leftNode = _nodes[left];
 			const auto& rightNode = _nodes[right];
@@ -103,20 +106,19 @@ namespace jlb
 		const float range, const size_t current,
 		size_t* outArray, size_t& arrayIndex)
 	{
-		// Get child node indexes.
-		const uint32_t left = (current + 1) * 2 - 1;
-		const uint32_t right = left + 1;
-
 		const auto& node = _nodes[current];
 		const bool stop = node.index == SIZE_MAX;
+
+		// Get child node indexes.
+		const size_t next = node.next;
 
 		// Add the current node and increment the array index.
 		outArray[arrayIndex] = node.index;
 		arrayIndex += !stop;
 
 		// Silly optimization to avoid branching.
-		stop ? nullptr : GetInstancesInRange(position, range, left, outArray, arrayIndex);
-		stop ? nullptr : GetInstancesInRange(position, range, right, outArray, arrayIndex);
+		stop ? nullptr : GetInstancesInRange(position, range, next, outArray, arrayIndex);
+		stop ? nullptr : GetInstancesInRange(position, range, next + 1, outArray, arrayIndex);
 		return nullptr;
 	}
 }

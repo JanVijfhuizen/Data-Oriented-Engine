@@ -24,7 +24,7 @@ namespace game::demo
 
 		for (int i = 0; i < 16; ++i)
 		{
-			//disTree.Add(glm::vec2(rand() % 100 - 50, rand() % 100 - 50));
+			disTree.Add(glm::vec2(rand() % 100 - 50, rand() % 100 - 50));
 		}
 	}
 
