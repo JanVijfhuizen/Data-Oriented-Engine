@@ -12,7 +12,7 @@ namespace game::demo
 
 		const auto tileSys = systems.GetSystem<vke::TileRenderSystem>();
 		vke::TileRenderTask task{};
-		task.shape = glm::ivec2(4, 6);
+		task.shape = glm::ivec2(3, 5);
 		const auto result = tileSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
 	}

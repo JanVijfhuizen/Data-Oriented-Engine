@@ -28,14 +28,18 @@ layout(push_constant) uniform PushConstants
 
 layout(location = 0) out Data
 {
-    vec2 fragTexCoord;
+    flat SubTexture subTexture;
+    vec2 fragTexCoords;
     vec2 fragPos;
+    vec2 shape;
 } outData;
 
 void HandleInstance(in InstanceData instance)
 {
-    outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, fract(inTexCoords / instance.shape));
+    outData.subTexture = instance.subTexture;
+    outData.fragTexCoords = inTexCoords;
     outData.fragPos = inPosition;
+    outData.shape = instance.shape;
 
     gl_Position = CalculatePosition(instance.position, instance.shape * pushConstants.entitySize, pushConstants.cameraPosition, inPosition, pushConstants.resolution, pushConstants.pixelSize);
 }
