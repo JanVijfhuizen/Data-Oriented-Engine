@@ -38,94 +38,108 @@ namespace game
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 
-		const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
+		const auto& cameraPixelSize = uiSys->camera.pixelSize;
+		const float scale = cameraPixelSize * vke::PIXEL_SIZE_ENTITY;
 
 		// Divide timeline texture.
-		jlb::StackArray<vke::SubTexture, 4> textureDivided{};
-		vke::texture::Subdivide(timelineSubTexture, 4, textureDivided);
-
-		const auto& cameraPixelSize = uiSys->camera.pixelSize;
-
-		// Calculate screen space coordinates.
-		jlb::StackArray<vke::SubTexture, 5> coordinatesDivided{};
-		vke::SubTexture screenSpaceCoordinates{};
-		screenSpaceCoordinates.lTop = glm::vec2(-cameraPixelSize * 
-			(vke::PIXEL_SIZE_ENTITY + visuals.padding) * 2.5f, visuals.screenYCoordinates);
-		screenSpaceCoordinates.rBot = screenSpaceCoordinates.lTop;
-		screenSpaceCoordinates.rBot.x *= -1;
-		vke::texture::Subdivide(screenSpaceCoordinates, 5, coordinatesDivided);
-
-		// Define textures used.
-		jlb::StackArray<vke::SubTexture, 4> targetTextures{};
-		targetTextures[0] = textureDivided[0];
-		targetTextures[1] = _paused ? textureDivided[1] : textureDivided[2];
-		targetTextures[2] = vke::texture::MirrorHorizontally(textureDivided[0]);
-		targetTextures[3] = textureDivided[3];
-
-		// Smooth animation when turn action is triggered.
-		for (size_t i = 0; i < 5; ++i)
 		{
-			auto& keyLerp = _keyVerticalLerps[i];
-			keyLerp += info.deltaTime / visuals.onPressedAnimDuration;
-			keyLerp = jlb::math::Min<float>(1, keyLerp);
-		}
+			const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
+			jlb::StackArray<vke::SubTexture, 4> textureDivided{};
+			vke::texture::Subdivide(timelineSubTexture, 4, textureDivided);
 
-		const float scale = cameraPixelSize * vke::PIXEL_SIZE_ENTITY;
-		auto curveOvershoot = jlb::CreateCurveOvershooting();
-		auto curveDecelerate = jlb::CreateCurveDecelerate();
+			// Calculate screen space coordinates.
+			jlb::StackArray<vke::SubTexture, 5> coordinatesDivided{};
+			vke::SubTexture screenSpaceCoordinates{};
+			screenSpaceCoordinates.lTop = glm::vec2(-cameraPixelSize *
+				(vke::PIXEL_SIZE_ENTITY + visuals.padding) * 2.5f, visuals.screenYCoordinates);
+			screenSpaceCoordinates.rBot = screenSpaceCoordinates.lTop;
+			screenSpaceCoordinates.rBot.x *= -1;
+			vke::texture::Subdivide(screenSpaceCoordinates, 5, coordinatesDivided);
 
-		// Draw time multiplier.
-		{
-			const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
+			// Define textures used.
+			jlb::StackArray<vke::SubTexture, 4> targetTextures{};
+			targetTextures[0] = textureDivided[0];
+			targetTextures[1] = _paused ? textureDivided[1] : textureDivided[2];
+			targetTextures[2] = vke::texture::MirrorHorizontally(textureDivided[0]);
+			targetTextures[3] = textureDivided[3];
 
-			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[4], curveOvershoot, curveDecelerate);
-			const float offset = -eval * visuals.onPressedTimeVerticalOffsetMultiplier;
-
-			TextRenderTask textRenderTask{};
-			textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
-			textRenderTask.origin.y += offset;
-			textRenderTask.text = "x";
-			auto result = textRenderSys->TryAdd(info, textRenderTask);
-			assert(result != SIZE_MAX);
-
-			const char* stringLiterals[]
+			// Smooth animation when turn action is triggered.
+			for (size_t i = 0; i < 5; ++i)
 			{
-				"1", "2", "4", "8", "16"
-			};
-
-			size_t index = 0;
-			size_t ticks = 1;
-
-			while (ticks != _ticksPerSecond)
-			{
-				++index;
-				ticks *= 2;
+				auto& keyLerp = _keyVerticalLerps[i];
+				keyLerp += info.deltaTime / visuals.onPressedAnimDuration;
+				keyLerp = jlb::math::Min<float>(1, keyLerp);
 			}
 
-			assert(index < sizeof stringLiterals / sizeof(const char*));
-			textRenderTask.text = stringLiterals[index];
-			textRenderTask.appendIndex = result;
-			result = textRenderSys->TryAdd(info, textRenderTask);
-			assert(result != SIZE_MAX);
-		}
-		
-		// Draw the UI for the textures.
-		for (size_t i = 0; i < 4; ++i)
-		{
-			vke::UIRenderTask renderTask{};
-			renderTask.subTexture = targetTextures[i];
-			renderTask.position = vke::texture::GetCenter(coordinatesDivided[i]);
-			renderTask.scale = glm::vec2(scale);
-			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
-			renderTask.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
-			const auto result = uiSys->TryAdd(info, renderTask);
-			assert(result != SIZE_MAX);
+			
+			auto curveOvershoot = jlb::CreateCurveOvershooting();
+			auto curveDecelerate = jlb::CreateCurveDecelerate();
+
+			// Draw time multiplier.
+			{
+				const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
+
+				const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[4], curveOvershoot, curveDecelerate);
+				const float offset = -eval * visuals.onPressedTimeVerticalOffsetMultiplier;
+
+				TextRenderTask textRenderTask{};
+				textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
+				textRenderTask.origin.y += offset;
+				textRenderTask.text = "x";
+				auto result = textRenderSys->TryAdd(info, textRenderTask);
+				assert(result != SIZE_MAX);
+
+				const char* stringLiterals[]
+				{
+					"1", "2", "4", "8", "16"
+				};
+
+				size_t index = 0;
+				size_t ticks = 1;
+
+				while (ticks != _ticksPerSecond)
+				{
+					++index;
+					ticks *= 2;
+				}
+
+				assert(index < sizeof stringLiterals / sizeof(const char*));
+				textRenderTask.text = stringLiterals[index];
+				textRenderTask.appendIndex = result;
+				result = textRenderSys->TryAdd(info, textRenderTask);
+				assert(result != SIZE_MAX);
+			}
+
+			// Draw the UI for the textures.
+			for (size_t i = 0; i < 4; ++i)
+			{
+				vke::UIRenderTask renderTask{};
+				renderTask.subTexture = targetTextures[i];
+				renderTask.position = vke::texture::GetCenter(coordinatesDivided[i]);
+				renderTask.scale = glm::vec2(scale);
+				const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
+				renderTask.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
+				const auto result = uiSys->TryAdd(info, renderTask);
+				assert(result != SIZE_MAX);
+			}
 		}
 
 		const float dTicksPerSecond = 1.f / static_cast<float>(_previousTicksPerSecond);
 
 		_time += _paused ? 0 : info.deltaTime * 0.001f;
 		_lerp = fmodf(_time, dTicksPerSecond) / dTicksPerSecond;
+
+		// Draw the timer itself.
+		{
+			const auto timerSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timer);
+			
+			vke::UIRenderTask renderTask{};
+			renderTask.subTexture = timerSubTexture;
+			renderTask.position.y = visuals.screenYCoordinates + vke::PIXEL_SIZE_ENTITY * cameraPixelSize;
+			renderTask.scale = glm::vec2(scale * 8, scale);
+			const auto result = uiSys->TryAdd(info, renderTask);
+			assert(result != SIZE_MAX);
+		}
 		
 		if (_time > dTicksPerSecond)
 		{

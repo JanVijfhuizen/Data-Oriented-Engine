@@ -27,7 +27,8 @@ namespace game
 			alphabet,
 			mouse,
 			numbers,
-			timeline
+			timeline,
+			timer
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;

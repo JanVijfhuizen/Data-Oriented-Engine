@@ -30,7 +30,7 @@ namespace game
 
 		constexpr auto ATLAS_LENGTH = 2;
 		constexpr auto ATLAS_LENGTH_TILE = 1;
-		constexpr auto ATLAS_LENGTH_UI = 4;
+		constexpr auto ATLAS_LENGTH_UI = 5;
 
 #ifdef _DEBUG
 		// Entity Render System.
@@ -60,6 +60,8 @@ namespace game
 			partitions[2].width = 10;
 			partitions[3].path = "Textures/timeline.png";
 			partitions[3].width = 4;
+			partitions[4].path = "Textures/timer.png";
+			partitions[4].width = 8;
 
 			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 8, 32);
 		}
