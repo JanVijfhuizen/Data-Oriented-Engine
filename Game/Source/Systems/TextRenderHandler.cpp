@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/ResourceManager.h"
+#include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -65,8 +66,8 @@ namespace game
 				charSubTexture.rBot.x = charSubTexture.lTop.x + chunkSize;
 
 				vke::UIRenderTask uiRenderTask{};
-				uiRenderTask.transform.position = origin;
-				uiRenderTask.transform.scale = fontSize;
+				uiRenderTask.position = origin;
+				uiRenderTask.scale = glm::vec2(fontSize);
 				uiRenderTask.subTexture = charSubTexture;
 
 				const auto result = uiSys->TryAdd(info, uiRenderTask);

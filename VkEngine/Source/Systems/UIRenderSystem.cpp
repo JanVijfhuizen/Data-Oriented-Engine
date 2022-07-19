@@ -1,16 +1,18 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
+#include "VkEngine/Graphics/RenderConventions.h"
+
 namespace vke
 {
 	glm::vec2 UIRenderSystem::ScreenToWorldPos(const glm::vec2 pos, const Camera& camera)
 	{
-		return (pos / camera.pixelSize + camera.position) / static_cast<float>(PIXEL_SIZE_ENTITY);
+		return (pos / camera.pixelSize + camera.position) / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 	}
 
 	glm::vec2 UIRenderSystem::WorldToScreenPos(const glm::vec2 pos, const Camera& camera)
 	{
-		return (pos * static_cast<float>(PIXEL_SIZE_ENTITY) - camera.position) * camera.pixelSize;
+		return (pos * static_cast<float>(vke::PIXEL_SIZE_ENTITY) - camera.position) * camera.pixelSize;
 	}
 
 	jlb::StringView UIRenderSystem::GetTextureAtlasFilePath() const

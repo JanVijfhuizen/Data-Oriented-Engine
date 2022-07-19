@@ -8,7 +8,8 @@ layout(location = 1) in vec2 inTexCoords;
 
 struct InstanceData
 {
-    Transform transform;
+    vec2 position;
+    vec2 scale;
     SubTexture subTexture;
 };
 
@@ -35,7 +36,7 @@ void HandleInstance(in InstanceData instance)
     outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
 
-    gl_Position = CalculatePosition(instance.transform, pushConstants.cameraPosition, inPosition, pushConstants.resolution, 1);
+    gl_Position = CalculatePosition(instance.position, instance.scale, pushConstants.cameraPosition, inPosition, pushConstants.resolution, 1);
 }
 
 void main()

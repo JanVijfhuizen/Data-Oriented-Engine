@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "RenderSystem.h"
-#include "VkEngine/Components/Transform.h"
 #include "VkEngine/Graphics/Camera.h"
 #include "VkEngine/Graphics/SubTexture.h"
 
@@ -12,7 +11,8 @@ namespace vke
 
 	struct UIRenderTask final
 	{
-		Transform transform{};
+		glm::vec2 position;
+		glm::vec2 scale{ 1 };
 		SubTexture subTexture{};
 	};
 

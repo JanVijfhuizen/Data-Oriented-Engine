@@ -4,6 +4,7 @@
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
+#include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -16,6 +17,11 @@ namespace game
 	float TurnSystem::GetTickLerp() const
 	{
 		return _lerp;
+	}
+
+	size_t TurnSystem::GetTicksPerSecond() const
+	{
+		return _ticksPerSecond;
 	}
 
 	void TurnSystem::PauseAtEndOfTick()
@@ -108,10 +114,10 @@ namespace game
 		{
 			vke::UIRenderTask renderTask{};
 			renderTask.subTexture = targetTextures[i];
-			renderTask.transform.position = vke::texture::GetCenter(coordinatesDivided[i]);
-			renderTask.transform.scale = scale;
+			renderTask.position = vke::texture::GetCenter(coordinatesDivided[i]);
+			renderTask.scale = glm::vec2(scale);
 			const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
-			renderTask.transform.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
+			renderTask.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
 			const auto result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 		}
