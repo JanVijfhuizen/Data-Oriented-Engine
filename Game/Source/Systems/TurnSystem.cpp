@@ -24,6 +24,11 @@ namespace game
 		return _ticksPerSecond;
 	}
 
+	bool TurnSystem::GetIsPaused() const
+	{
+		return _paused;
+	}
+
 	void TurnSystem::PauseAtEndOfTick()
 	{
 		_pauseAtEndOfTick = true;

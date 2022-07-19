@@ -27,11 +27,14 @@ namespace game
 		vke::EntityRenderTask renderTask{};
 		renderTask.subTexture = subTexturesDivided[0];
 
-		MovementTask movementTask{};
-
+		const bool isPaused = turnSys->GetIsPaused();
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 
+		MovementTask movementTask{};
 		glm::vec2 cameraCenter{};
+
+		for (auto& input : _movementInput)
+			input.valid = isPaused ? input.pressed : input.valid;
 
 		for (auto& entity : entities)
 		{

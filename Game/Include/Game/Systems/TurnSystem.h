@@ -31,6 +31,7 @@ namespace game
 		// The linear interpolation between 0 and 1 of the time between turns.
 		[[nodiscard]] float GetTickLerp() const;
 		[[nodiscard]] size_t GetTicksPerSecond() const;
+		[[nodiscard]] bool GetIsPaused() const;
 
 		void PauseAtEndOfTick();
 
