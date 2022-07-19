@@ -17,4 +17,9 @@ namespace vke
 	{
 		return "Shaders/vert-tile.spv";
 	}
+
+	size_t TileRenderSystem::DefineCapacity(const EngineData& info)
+	{
+		return 1024;
+	}
 }

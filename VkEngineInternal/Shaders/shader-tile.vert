@@ -33,10 +33,10 @@ layout(location = 0) out Data
 
 void HandleInstance(in InstanceData instance)
 {
-    outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, instance.size * fract(inTexCoords));
+    outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);//instance.shape * fract(inTexCoords));
     outData.fragPos = inPosition;
 
-    gl_Position = CalculatePosition(instance.transform, instance.shape, pushConstants.cameraPosition, inPosition, pushConstants.resolution, pushConstants.pixelSize);
+    gl_Position = CalculatePosition(instance.position, instance.shape, pushConstants.cameraPosition, inPosition, pushConstants.resolution, pushConstants.pixelSize);
 }
 
 void main() 

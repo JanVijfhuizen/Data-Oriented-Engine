@@ -330,8 +330,10 @@ namespace vke
 		const jlb::Systems<EngineData> systems,
 		const jlb::NestedVector<Task>& tasks)
 	{
-		const auto& root = tasks.GetRoot();
+		if (tasks.GetLength() == 0)
+			return;
 
+		const auto& root = tasks.GetRoot();
 		const auto& cmd = info.swapChainData->commandBuffer;
 
 		const auto& logicalDevice = info.app->logicalDevice;

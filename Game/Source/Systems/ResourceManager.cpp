@@ -28,8 +28,8 @@ namespace game
 		constexpr auto SUB_TEXTURE_PATH_TILE = "Textures/subTextures-tile.dat";
 		constexpr auto SUB_TEXTURE_PATH_UI = "Textures/subTextures-ui.dat";
 
-		constexpr auto ATLAS_LENGTH = 3;
-		constexpr auto ATLAS_LENGTH_TILE = 0;
+		constexpr auto ATLAS_LENGTH = 2;
+		constexpr auto ATLAS_LENGTH_TILE = 1;
 		constexpr auto ATLAS_LENGTH_UI = 4;
 
 #ifdef _DEBUG
@@ -39,7 +39,6 @@ namespace game
 			partitions[0].path = "Textures/mouse.png";
 			partitions[1].path = "Textures/humanoid.png";
 			partitions[1].width = 2;
-			partitions[2].path = "Textures/tile.png";
 
 			vke::texture::GenerateAtlas(info, "Textures/atlas.png", SUB_TEXTURE_PATH, partitions, 8, 4);	
 		}
@@ -47,7 +46,8 @@ namespace game
 		// Tile Render System.
 		{
 			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_TILE> partitions{};
-			vke::texture::GenerateAtlas(info, "Textures/atlas-tile.png", SUB_TEXTURE_PATH_TILE, partitions, 8, 4);
+			partitions[0].path = "Textures/tile.png";
+			vke::texture::GenerateAtlas(info, "Textures/atlas-tile.png", SUB_TEXTURE_PATH_TILE, partitions, 8, 1);
 		}
 
 		// UI Render System.

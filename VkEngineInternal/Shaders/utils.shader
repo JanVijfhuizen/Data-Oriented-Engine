@@ -43,7 +43,7 @@ vec4 CalculatePosition(in vec2 position, in vec2 scale, in vec2 camPosition, in 
 {
     float aspectFix = GetAspectRatio(resolution);
     vec2 localPos = vertPosition * scale;
-    vec2 worldPos = (transform.position - camPosition + localPos) * pixelSize;
+    vec2 worldPos = (position - camPosition + localPos) * pixelSize;
     vec4 pos = vec4(worldPos, 1, 1);
     pos.x *= aspectFix;
     return pos;

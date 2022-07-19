@@ -12,14 +12,13 @@ namespace game
 		enum class EntitySubTextures
 		{
 			mouse,
-			humanoid,
-			tile
+			humanoid
 		};
 
 		// Subtextures available for the tile renderer.
 		enum class TileSubTextures
 		{
-			
+			tile
 		};
 
 		// Subtextures available for the UI renderer.
