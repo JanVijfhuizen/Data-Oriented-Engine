@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="Include\Allocation.h" />
     <ClInclude Include="Include\ArrayUtils.h" />
+    <ClInclude Include="Include\DistanceTree.h" />
     <ClInclude Include="Include\Curve.h" />
     <ClInclude Include="Include\Map.h" />
     <ClInclude Include="Include\NestedVector.h" />

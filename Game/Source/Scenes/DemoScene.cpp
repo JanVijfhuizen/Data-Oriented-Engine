@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
+
+#include "DistanceTree.h"
 #include "Systems/GameManager.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
@@ -10,11 +12,20 @@ namespace game::demo
 		Scene::PreUpdate(info, systems);
 		_playerArchetype.PreUpdate(info, systems, _player);
 
+		// Tile test.
 		const auto tileSys = systems.GetSystem<vke::TileRenderSystem>();
 		vke::TileRenderTask task{};
 		task.shape = glm::ivec2(3, 5);
 		const auto result = tileSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
+
+		jlb::DistanceTree disTree{};
+		disTree.Allocate(*info.dumpAllocator, 16);
+
+		for (int i = 0; i < 16; ++i)
+		{
+			//disTree.Add(glm::vec2(rand() % 100 - 50, rand() % 100 - 50));
+		}
 	}
 
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
