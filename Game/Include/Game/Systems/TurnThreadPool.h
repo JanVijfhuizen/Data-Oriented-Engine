@@ -4,6 +4,11 @@
 
 #include "VkEngine/Systems/TaskSystem.h"
 
+namespace vke
+{
+	class ThreadPoolSystem;
+}
+
 namespace game
 {
 	struct TurnThreadPoolTask final
@@ -17,7 +22,7 @@ namespace game
 		// Pauses and continues managed threads based on how busy the ThreadPoolSystem is.
 		struct ManagingThread final
 		{
-			void operator()(TurnThreadPool* sys) const;
+			void operator()(TurnThreadPool* sys, vke::ThreadPoolSystem* threadPoolSys) const;
 		};
 
 		bool _takesTasks = false;

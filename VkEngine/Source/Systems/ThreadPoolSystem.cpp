@@ -14,12 +14,13 @@ namespace vke
 	{
 		auto& tasks = sys->GetTasks();
 
-		while(true)
+		while(!sys->_stopThreads)
 		{
-			while (sys->_tasksRemaining == 0 && !sys->_stopThreads)
+			if(sys->_tasksRemaining == 0)
+			{
 				Sleep(0);
-			if (sys->_stopThreads)
-				break;
+				continue;
+			}
 
 			// Get task.
 			sys->_getNextTaskMutex.lock();

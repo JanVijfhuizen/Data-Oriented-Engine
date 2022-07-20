@@ -5,16 +5,24 @@
 
 namespace game
 {
-	void TurnThreadPool::ManagingThread::operator()(TurnThreadPool* sys) const
+	void TurnThreadPool::ManagingThread::operator()(TurnThreadPool* sys, vke::ThreadPoolSystem* threadPoolSys) const
 	{
 		auto& tasks = sys->GetTasks();
 
-		while (true)
+		while (!sys->_stopThreads)
 		{
-			while (sys->_tasksRemaining == 0 && !sys->_stopThreads)
+			if (sys->_tasksRemaining == 0)
+			{
 				Sleep(0);
-			if (sys->_stopThreads)
-				break;
+				continue;
+			}
+
+			const size_t freeSlots = threadPoolSys->GetFreeThreadSlots();
+			if(freeSlots == 0)
+			{
+				Sleep(0);
+				continue;
+			}
 		}
 	}
 
