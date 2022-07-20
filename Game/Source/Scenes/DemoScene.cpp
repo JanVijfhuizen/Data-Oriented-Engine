@@ -21,7 +21,7 @@ namespace game::demo
 		const auto result = tileSys->TryAdd(info, task);
 
 		srand(time(NULL));
-		const size_t S = 25;
+		const size_t S = 50;
 		jlb::StackArray<jlb::BoundingVolumeHierarchy::Instance, S> vs{};
 		for (int i = 0; i < S; ++i)
 		{
@@ -32,10 +32,17 @@ namespace game::demo
 		bvh.Allocate(*info.allocator, vs);
 
 		jlb::StackArray<uint32_t, S> out{};
-		size_t count = bvh.GetIntersections(glm::vec2(0), glm::vec2(4, 2), vs, out);
+		const auto src = glm::vec2(15);
+
+		size_t count = bvh.GetIntersections(glm::vec2(0), src, vs, out);
 		for (int i = 0; i < count; ++i)
 		{
 			std::cout << vs[out[i]].position.x << " " << vs[out[i]].position.y << std::endl;
+		}
+		std::cout << std::endl;
+		for (auto& v : vs)
+		{
+			std::cout << v.position.x << " " << v.position.y << std::endl;
 		}
 
 		bvh.Free(*info.allocator);

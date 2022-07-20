@@ -117,10 +117,10 @@ namespace jlb
 		auto& node = _nodes.Add();
 		node.lBot = lBot;
 		node.rTop = rTop;
-		node.begin = isLeaf ? 0 : from;
-		node.end = isLeaf ? 0 : to;
-		node.children[0] = from + nodeCapacity >= partitionIndex ? 0 : QuickSort(instances, from, partitionIndex, nodeCapacity, depth + 1);
-		node.children[1] = partitionIndex + nodeCapacity >= to ? 0 : QuickSort(instances, partitionIndex, to, nodeCapacity, depth + 1);
+		node.begin = isLeaf ? from : 0;
+		node.end = isLeaf ? to : 0;
+		node.children[0] = isLeaf ? 0 : QuickSort(instances, from, partitionIndex, nodeCapacity, depth + 1);
+		node.children[1] = isLeaf ? 0 : QuickSort(instances, partitionIndex, to, nodeCapacity, depth + 1);
 
 		return index;
 	}
@@ -133,10 +133,9 @@ namespace jlb
 
 		const uint32_t aChild = node.children[0];
 		const uint32_t bChild = node.children[1];
-		const bool isLeaf = aChild == 0;
 
 		// Check objects in range.
-		for (uint32_t i = !isLeaf ? SIZE_MAX : node.begin; i < node.end; ++i)
+		for (uint32_t i = node.begin; i < node.end; ++i)
 		{
 			const uint32_t index = _indexes[i];
 			const auto& instance = instances[index];
@@ -148,9 +147,9 @@ namespace jlb
 		const auto& aChildNode = _nodes[aChild];
 		const auto& bChildNode = _nodes[bChild];
 
-		isLeaf ? nullptr : !IntersectsBounds(aChildNode.lBot, aChildNode.rTop, position, scale) ? nullptr :
+		aChild == 0 ? nullptr : !IntersectsBounds(aChildNode.lBot, aChildNode.rTop, position, scale) ? nullptr :
 			GetIntersections(position, scale, aChild, instances, outArray, outIndex);
-		isLeaf ? nullptr : !IntersectsBounds(bChildNode.lBot, bChildNode.rTop, position, scale) ? nullptr :
+		bChild == 0 ? nullptr : !IntersectsBounds(bChildNode.lBot, bChildNode.rTop, position, scale) ? nullptr :
 			GetIntersections(position, scale, bChild, instances, outArray, outIndex);
 		return nullptr;
 	}
