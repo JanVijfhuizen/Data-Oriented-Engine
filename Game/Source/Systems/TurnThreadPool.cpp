@@ -5,7 +5,7 @@
 
 namespace game
 {
-	void TurnThreadPool::ManagingThread::operator()(TurnThreadPool* sys, vke::ThreadPoolSystem* threadPoolSys) const
+	void TurnThreadPool::ThreadObj::operator()(TurnThreadPool* sys) const
 	{
 		auto& tasks = sys->GetTasks();
 
@@ -17,12 +17,19 @@ namespace game
 				continue;
 			}
 
-			const size_t freeSlots = threadPoolSys->GetFreeThreadSlots();
-			if(freeSlots == 0)
+			// Get task.
+			sys->_getNextTaskMutex.lock();
+			// When another thread has stolen the task already.
+			if (sys->_tasksRemaining == 0)
 			{
-				Sleep(0);
+				sys->_getNextTaskMutex.unlock();
 				continue;
 			}
+			const auto task = tasks[--sys->_tasksRemaining];
+			sys->_getNextTaskMutex.unlock();
+
+			task.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems, task.userPtr);
+			--sys->_tasksUnfinished;
 		}
 	}
 
@@ -30,13 +37,12 @@ namespace game
 	{
 		TaskSystem<TurnThreadPoolTask>::Allocate(info);
 		_threadCount = vke::ThreadPoolSystem::GetThreadCount();
-		_managingThread = info.allocator->New<std::thread>(1, ManagingThread(), this);
-		
+		_threads = info.allocator->New<std::thread>(_threadCount, ThreadObj(), this);
 	}
 
 	void TurnThreadPool::Free(const vke::EngineData& info)
 	{
-		info.allocator->MFree(_managingThread.id);
+		info.allocator->MFree(_threads.id);
 		TaskSystem<TurnThreadPoolTask>::Free(info);
 	}
 
@@ -49,7 +55,14 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 		_takesTasks = isTickEvent;
-		ClearTasks();
+
+		if(isTickEvent)
+		{
+			// Wait for the threads to finish.
+			while (_tasksUnfinished > 0)
+				Sleep(0);
+			ClearTasks();
+		}
 	}
 
 	void TurnThreadPool::OnPostUpdate(const vke::EngineData& info, 
@@ -61,16 +74,19 @@ namespace game
 		if (_takesTasks) 
 		{
 			_takesTasks = false;
-			_tasksRemaining = tasks.GetCount();
+
+			// Continue the threads.
+			_threadSharedInfo.info = &info;
+			_threadSharedInfo.systems = systems;
+			_tasksRemaining = _tasksUnfinished = tasks.GetCount();
 		}
 	}
 
 	void TurnThreadPool::Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_stopThreads = true;
-		_managingThread.ptr->join();
-		//for (int i = 0; i < _threadCount; ++i)
-			//_threads.ptr[i].join();
+		for (int i = 0; i < _threadCount; ++i)
+			_threads.ptr[i].join();
 		TaskSystem<TurnThreadPoolTask>::Exit(info, systems);
 	}
 

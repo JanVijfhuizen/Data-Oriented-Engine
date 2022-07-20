@@ -45,7 +45,7 @@ namespace vke
 		{
 			EngineData const* info;
 			jlb::Systems<EngineData> systems;
-		} _threadSharedInfo;
+		} _threadSharedInfo{};
 
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
