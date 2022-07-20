@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Game.h"
-
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"

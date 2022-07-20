@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/TurnThreadPoolSystem.h"
 #include "Systems/TurnSystem.h"
-#include "VkEngine/Systems/ThreadPoolSystem.h"
 
 namespace game
 {
@@ -18,16 +17,7 @@ namespace game
 			}
 
 			// Get task.
-			sys->_getNextTaskMutex.lock();
-			// When another thread has stolen the task already.
-			if (sys->_tasksRemaining == 0)
-			{
-				sys->_getNextTaskMutex.unlock();
-				continue;
-			}
 			const auto task = tasks[--sys->_tasksRemaining];
-			sys->_getNextTaskMutex.unlock();
-
 			task.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems, task.userPtr);
 			--sys->_tasksUnfinished;
 		}
@@ -36,13 +26,12 @@ namespace game
 	void TurnThreadPoolSystem::Allocate(const vke::EngineData& info)
 	{
 		TaskSystem<TurnThreadPoolTask>::Allocate(info);
-		_threadCount = vke::ThreadPoolSystem::GetThreadCount();
-		_threads = info.allocator->New<std::thread>(_threadCount, ThreadObj(), this);
+		_thread = info.allocator->New<std::thread>(1, ThreadObj(), this);
 	}
 
 	void TurnThreadPoolSystem::Free(const vke::EngineData& info)
 	{
-		info.allocator->MFree(_threads.id);
+		info.allocator->MFree(_thread.id);
 		TaskSystem<TurnThreadPoolTask>::Free(info);
 	}
 
@@ -85,8 +74,7 @@ namespace game
 	void TurnThreadPoolSystem::Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_stopThreads = true;
-		for (int i = 0; i < _threadCount; ++i)
-			_threads.ptr[i].join();
+		_thread.ptr->join();
 		TaskSystem<TurnThreadPoolTask>::Exit(info, systems);
 	}
 

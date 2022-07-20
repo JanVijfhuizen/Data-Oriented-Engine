@@ -95,7 +95,7 @@ namespace vke
 
 	size_t ThreadPoolSystem::GetThreadCount()
 	{
-		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
+		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1 - THREAD_POOL_SYSTEM_UNUSED_THREAD_COUNT);
 	}
 
 	size_t ThreadPoolSystem::GetFreeThreadSlots() const

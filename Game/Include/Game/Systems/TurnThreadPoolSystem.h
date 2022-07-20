@@ -26,12 +26,10 @@ namespace game
 		};
 
 		bool _takesTasks = false;
-		jlb::Allocation<std::thread> _threads{};
+		jlb::Allocation<std::thread> _thread{};
 		std::atomic<bool> _stopThreads = false;
 		std::atomic<size_t> _tasksRemaining = 0;
 		std::atomic<size_t> _tasksUnfinished = 0;
-		std::mutex _getNextTaskMutex{};
-		size_t _threadCount = 0;
 
 		struct ThreadSharedInfo final
 		{
