@@ -24,6 +24,9 @@ namespace vke
 		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
+		[[nodiscard]] virtual bool AutoClearOnFrameEnd();
+		void ClearTasks();
+
 		[[nodiscard]] size_t GetLength() const;
 		[[nodiscard]] size_t GetCount() const;
 
@@ -78,6 +81,19 @@ namespace vke
 	}
 
 	template <typename T>
+	bool TaskSystem<T>::AutoClearOnFrameEnd()
+	{
+		return true;
+	}
+
+	template <typename T>
+	void TaskSystem<T>::ClearTasks()
+	{
+		_tasks.DetachNested();
+		_tasks.Clear();
+	}
+
+	template <typename T>
 	size_t TaskSystem<T>::GetLength() const
 	{
 		return _tasks.GetLength();
@@ -114,7 +130,7 @@ namespace vke
 	{
 		System<EngineData>::PostUpdate(info, systems);
 		OnPostUpdate(info, systems, _tasks);
-		_tasks.DetachNested();
-		_tasks.Clear();
+		if(AutoClearOnFrameEnd())
+			ClearTasks();
 	}
 }

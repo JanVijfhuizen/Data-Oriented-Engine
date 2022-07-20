@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Curve.h"
-#include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/GameSystem.h"
 
 namespace game
@@ -16,8 +15,8 @@ namespace game
 			float zoom = 0;
 
 			glm::vec2 bias{};
-			glm::vec2 deadZone{ vke::PIXEL_SIZE_ENTITY * 4 };
-			glm::vec2 moveZone{ vke::PIXEL_SIZE_ENTITY * 10 };
+			glm::vec2 deadZone{ 4 };
+			glm::vec2 moveZone{ 10 };
 			glm::vec2 zoomZone = deadZone;
 
 			float pixelSize = 0.008f;

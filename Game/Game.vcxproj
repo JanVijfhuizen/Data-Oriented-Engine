@@ -165,6 +165,7 @@
     <ClInclude Include="Include\Game\Entities\Player.h" />
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
     <ClInclude Include="Include\Game\Systems\CameraSystem.h" />
+    <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
     <ClInclude Include="Include\Game\Systems\GameManager.h" />
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
@@ -177,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Systems\CameraSystem.cpp" />
+    <ClCompile Include="Source\Systems\CollisionSystem.cpp" />
     <ClCompile Include="Source\Systems\MovementSystem.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
     <ClCompile Include="Source\Systems\ResourceManager.cpp" />

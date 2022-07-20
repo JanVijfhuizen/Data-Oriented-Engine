@@ -57,7 +57,6 @@ namespace game
 	void CameraSystem::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		System<vke::EngineData>::PostUpdate(info, systems);
-
 		
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto tileRenderSys = systems.GetSystem<vke::TileRenderSystem>();

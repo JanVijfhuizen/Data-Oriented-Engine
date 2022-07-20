@@ -1,5 +1,4 @@
 #pragma once
-#include "VkEngine/Graphics/RenderConventions.h"
 
 namespace vke
 {
@@ -10,6 +9,6 @@ namespace vke
 		// In radians.
 		float rotation = 0;
 		// In pixels.
-		float scale = PIXEL_SIZE_ENTITY;
+		float scale = 1;
 	};
 }

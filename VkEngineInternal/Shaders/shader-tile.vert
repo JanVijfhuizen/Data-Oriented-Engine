@@ -41,7 +41,7 @@ void HandleInstance(in InstanceData instance)
     outData.fragPos = inPosition;
     outData.shape = instance.shape;
 
-    gl_Position = CalculatePosition(instance.position, instance.shape * pushConstants.entitySize, pushConstants.cameraPosition, inPosition, pushConstants.resolution, pushConstants.pixelSize);
+    gl_Position = CalculatePosition(instance.position, instance.shape * pushConstants.entitySize, pushConstants.cameraPosition * pushConstants.entitySize, inPosition, pushConstants.resolution, pushConstants.pixelSize);
 }
 
 void main() 
