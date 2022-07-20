@@ -25,7 +25,7 @@ namespace vke
 		friend struct ThreadObj;
 
 	public:
-		[[nodiscard]] size_t GetThreadCount() const;
+		[[nodiscard]] static size_t GetThreadCount();
 		[[nodiscard]] size_t GetFreeThreadSlots() const;
 
 	private:

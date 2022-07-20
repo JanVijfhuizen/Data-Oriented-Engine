@@ -41,7 +41,7 @@ namespace vke
 	{
 		TaskSystem<ThreadPoolTask>::Allocate(info);
 
-		_threadCount = jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
+		_threadCount = GetThreadCount();
 		_threads = info.allocator->New<std::thread>(_threadCount, ThreadObj(), this);
 	}
 
@@ -92,9 +92,9 @@ namespace vke
 		return THREAD_POOL_SYSTEM_NESTED_CAPACITY;
 	}
 
-	size_t ThreadPoolSystem::GetThreadCount() const
+	size_t ThreadPoolSystem::GetThreadCount()
 	{
-		return _threadCount;
+		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
 	}
 
 	size_t ThreadPoolSystem::GetFreeThreadSlots() const
