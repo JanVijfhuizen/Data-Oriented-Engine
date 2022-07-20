@@ -2,6 +2,7 @@
 #include "Game.h"
 
 #include "Systems/CameraSystem.h"
+#include "Systems/CollisionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
@@ -29,6 +30,7 @@ namespace game
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 		initializer.DefineSystem<CameraSystem>();
+		initializer.DefineSystem<CollisionSystem>();
 
 		// Core engine Post update.
 		initializer.DefineSystem<vke::TileRenderSystem>();
