@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "RenderSystem.h"
-#include "VkEngine/Graphics/Camera.h"
 #include "VkEngine/Graphics/SubTexture.h"
 
 namespace vke
@@ -9,6 +8,13 @@ namespace vke
 #define UI_RENDER_SYSTEM_CAPACITY 1024
 #endif
 
+	struct UICamera final
+	{
+		glm::vec2 position{};
+		// Size of a pixel, where the window width equals 1.
+		float pixelSize = 0.008f;
+	};
+
 	struct UIRenderTask final
 	{
 		glm::vec2 position;
@@ -16,11 +22,11 @@ namespace vke
 		SubTexture subTexture{};
 	};
 
-	class UIRenderSystem final : public RenderSystem<UIRenderTask, Camera>
+	class UIRenderSystem final : public RenderSystem<UIRenderTask, UICamera>
 	{
 	public:
-		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const Camera& camera);
-		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const Camera& camera);
+		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const UICamera& camera);
+		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const UICamera& camera);
 
 	private:
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;

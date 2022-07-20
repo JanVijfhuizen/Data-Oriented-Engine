@@ -5,12 +5,12 @@
 
 namespace vke
 {
-	glm::vec2 UIRenderSystem::ScreenToWorldPos(const glm::vec2 pos, const Camera& camera)
+	glm::vec2 UIRenderSystem::ScreenToWorldPos(const glm::vec2 pos, const UICamera& camera)
 	{
 		return (pos / camera.pixelSize + camera.position) / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 	}
 
-	glm::vec2 UIRenderSystem::WorldToScreenPos(const glm::vec2 pos, const Camera& camera)
+	glm::vec2 UIRenderSystem::WorldToScreenPos(const glm::vec2 pos, const UICamera& camera)
 	{
 		return (pos * static_cast<float>(vke::PIXEL_SIZE_ENTITY) - camera.position) * camera.pixelSize;
 	}

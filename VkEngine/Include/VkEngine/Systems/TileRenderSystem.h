@@ -9,7 +9,8 @@ namespace vke
 		glm::vec2 position{};
 		// Size of a pixel, where the window width equals 1.
 		float pixelSize = 0.008f;
-		int32_t tileSize = PIXEL_SIZE_ENTITY;
+	private:
+		int32_t _tileSize = PIXEL_SIZE_ENTITY;
 	};
 
 	struct TileRenderTask final

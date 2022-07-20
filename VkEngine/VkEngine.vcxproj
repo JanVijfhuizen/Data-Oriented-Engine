@@ -169,7 +169,6 @@
     <ClInclude Include="Include\VkEngine\Graphics\ShaderLoader.h" />
     <ClInclude Include="Include\VkEngineIntermediate\framework.h" />
     <ClInclude Include="Include\VkEngineIntermediate\pch.h" />
-    <ClInclude Include="Include\VkEngine\Graphics\Camera.h" />
     <ClInclude Include="Include\VkEngine\Components\Transform.h" />
     <ClInclude Include="Include\VkEngine\EngineData.h" />
     <ClInclude Include="Include\VkEngine\Graphics\SubTexture.h" />

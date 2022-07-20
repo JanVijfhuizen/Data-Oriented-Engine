@@ -68,7 +68,7 @@ namespace game
 				
 				// Round the from position.
 				const glm::vec2 from = glm::vec2(glm::ivec2(entity.transform.position));
-				const glm::vec2 delta = glm::vec2(dir * static_cast<int32_t>(vke::PIXEL_SIZE_ENTITY));
+				const glm::vec2 delta = glm::vec2(dir);
 
 				movementUserDefined.from = from;
 				movementUserDefined.to = from + delta;

@@ -1,7 +1,5 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
-
-#include "VkEngine/Graphics/Camera.h"
 #include "VkEngine/Graphics/CameraUtils.h"
 
 namespace vke
