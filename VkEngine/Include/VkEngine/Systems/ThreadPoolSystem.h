@@ -24,6 +24,11 @@ namespace vke
 	{
 		friend struct ThreadObj;
 
+	public:
+		[[nodiscard]] size_t GetThreadCount() const;
+		[[nodiscard]] size_t GetFreeThreadSlots() const;
+
+	private:
 		struct ThreadObj final
 		{
 			void operator()(ThreadPoolSystem* sys) const;
@@ -34,6 +39,7 @@ namespace vke
 		std::atomic<size_t> _tasksRemaining = 0;
 		std::atomic<size_t> _tasksUnfinished = 0;
 		std::mutex _getNextTaskMutex{};
+		size_t _threadCount = 0;
 
 		struct ThreadSharedInfo final
 		{
@@ -51,6 +57,5 @@ namespace vke
 
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
 		size_t DefineNestedCapacity(const EngineData& info) override;
-		[[nodiscard]] size_t GetThreadCount() const;
 	};
 }
