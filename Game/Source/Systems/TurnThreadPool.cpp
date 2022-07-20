@@ -28,7 +28,7 @@ namespace game
 
 	void TurnThreadPool::Free(const vke::EngineData& info)
 	{
-
+		info.allocator->MFree(_managingThread.id);
 		TaskSystem<TurnThreadPoolTask>::Free(info);
 	}
 
