@@ -1,5 +1,9 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
+
+#include <ctime>
+
+#include "BVH.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
 namespace game::demo
@@ -14,6 +18,18 @@ namespace game::demo
 		vke::TileRenderTask task{};
 		task.shape = glm::ivec2(3, 5);
 		const auto result = tileSys->TryAdd(info, task);
+
+		srand(time(NULL));
+		const size_t S = 25;
+		jlb::StackArray<jlb::BoundingVolumeHierarchy::Instance, S> vs{};
+		for (int i = 0; i < S; ++i)
+		{
+			vs[i].position = glm::vec2(rand() % 50 - 25, rand() % 50 - 25);
+		}
+
+		jlb::BoundingVolumeHierarchy bvh{};
+		bvh.Allocate(*info.allocator, vs);
+		bvh.Free(*info.allocator);
 	}
 
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
