@@ -41,8 +41,8 @@ namespace vke
 	{
 		TaskSystem<ThreadPoolTask>::Allocate(info);
 
-		const size_t threadCount = GetThreadCount();
-		_threads = info.allocator->New<std::thread>(threadCount, ThreadObj(), this);
+		_threadCount = GetThreadCount();
+		_threads = info.allocator->New<std::thread>(_threadCount, ThreadObj(), this);
 	}
 
 	void ThreadPoolSystem::Free(const EngineData& info)
@@ -77,8 +77,7 @@ namespace vke
 	void ThreadPoolSystem::Exit(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		_stopThreads = true;
-		const size_t threadCount = GetThreadCount();
-		for (int i = 0; i < threadCount; ++i)
+		for (int i = 0; i < _threadCount; ++i)
 			_threads.ptr[i].join();
 		TaskSystem<ThreadPoolTask>::Exit(info, systems);
 	}
@@ -93,8 +92,13 @@ namespace vke
 		return THREAD_POOL_SYSTEM_NESTED_CAPACITY;
 	}
 
-	size_t ThreadPoolSystem::GetThreadCount() const
+	size_t ThreadPoolSystem::GetThreadCount()
 	{
 		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
+	}
+
+	size_t ThreadPoolSystem::GetFreeThreadSlots() const
+	{
+		return _threadCount < _tasksUnfinished ? 0 : _threadCount - _tasksUnfinished;
 	}
 }

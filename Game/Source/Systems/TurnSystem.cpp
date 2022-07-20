@@ -141,8 +141,10 @@ namespace game
 
 			vke::UIRenderTask renderTask{};
 			renderTask.subTexture = timerArrowSubTexture;
-			renderTask.position.y = visuals.screenYCoordinates + vke::PIXEL_SIZE_ENTITY * cameraPixelSize;
-			renderTask.position.x = scale * ((1.f - _lerp) * 8.f - 4.f);
+			renderTask.position.y = visuals.screenYCoordinates + scale;
+			const float lerp = 1.f - jlb::math::Clamp<float>(_lerp, 0, 1);
+			const float maxWidth = (scale - cameraPixelSize) * 4;
+			renderTask.position.x = lerp * maxWidth * 2 - maxWidth;
 			renderTask.scale = glm::vec2(scale);
 			auto result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);

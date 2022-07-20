@@ -112,6 +112,10 @@ namespace game
 		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1]);
 		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2]);
 		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3]);
+
+		if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+			for (auto& movementInput : _movementInput)
+				movementInput.valid = movementInput.pressed;
 	}
 
 	void PlayerArchetype::OnMouseInput(const vke::EngineData& info, 
