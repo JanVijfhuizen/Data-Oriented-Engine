@@ -17,12 +17,12 @@ namespace game
 		void* userPtr = nullptr;
 	};
 
-	class TurnThreadPool final : public vke::TaskSystem<TurnThreadPoolTask>
+	class TurnThreadPoolSystem final : public vke::TaskSystem<TurnThreadPoolTask>
 	{
 		// Pauses and continues managed threads based on how busy the ThreadPoolSystem is.
 		struct ThreadObj final
 		{
-			void operator()(TurnThreadPool* sys) const;
+			void operator()(TurnThreadPoolSystem* sys) const;
 		};
 
 		bool _takesTasks = false;

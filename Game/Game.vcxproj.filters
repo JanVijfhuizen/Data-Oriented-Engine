@@ -63,7 +63,7 @@
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Systems\TurnThreadPool.h">
+    <ClInclude Include="Include\Game\Systems\TurnThreadPoolSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -107,7 +107,7 @@
     <ClCompile Include="Source\Systems\CollisionSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Systems\TurnThreadPool.cpp">
+    <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

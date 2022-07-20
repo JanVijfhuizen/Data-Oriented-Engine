@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
-#include "Systems/TurnThreadPool.h"
+#include "Systems/TurnThreadPoolSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
 
 namespace game
 {
-	void TurnThreadPool::ThreadObj::operator()(TurnThreadPool* sys) const
+	void TurnThreadPoolSystem::ThreadObj::operator()(TurnThreadPoolSystem* sys) const
 	{
 		auto& tasks = sys->GetTasks();
 
@@ -33,20 +33,20 @@ namespace game
 		}
 	}
 
-	void TurnThreadPool::Allocate(const vke::EngineData& info)
+	void TurnThreadPoolSystem::Allocate(const vke::EngineData& info)
 	{
 		TaskSystem<TurnThreadPoolTask>::Allocate(info);
 		_threadCount = vke::ThreadPoolSystem::GetThreadCount();
 		_threads = info.allocator->New<std::thread>(_threadCount, ThreadObj(), this);
 	}
 
-	void TurnThreadPool::Free(const vke::EngineData& info)
+	void TurnThreadPoolSystem::Free(const vke::EngineData& info)
 	{
 		info.allocator->MFree(_threads.id);
 		TaskSystem<TurnThreadPoolTask>::Free(info);
 	}
 
-	void TurnThreadPool::OnPreUpdate(const vke::EngineData& info, 
+	void TurnThreadPoolSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<TurnThreadPoolTask>& tasks)
 	{
@@ -65,7 +65,7 @@ namespace game
 		}
 	}
 
-	void TurnThreadPool::OnPostUpdate(const vke::EngineData& info, 
+	void TurnThreadPoolSystem::OnPostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<TurnThreadPoolTask>& tasks)
 	{
@@ -82,7 +82,7 @@ namespace game
 		}
 	}
 
-	void TurnThreadPool::Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void TurnThreadPoolSystem::Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_stopThreads = true;
 		for (int i = 0; i < _threadCount; ++i)
@@ -90,12 +90,12 @@ namespace game
 		TaskSystem<TurnThreadPoolTask>::Exit(info, systems);
 	}
 
-	bool TurnThreadPool::AutoClearOnFrameEnd()
+	bool TurnThreadPoolSystem::AutoClearOnFrameEnd()
 	{
 		return false;
 	}
 
-	bool TurnThreadPool::ValidateOnTryAdd(const TurnThreadPoolTask& task)
+	bool TurnThreadPoolSystem::ValidateOnTryAdd(const TurnThreadPoolTask& task)
 	{
 		return _takesTasks ? TaskSystem<TurnThreadPoolTask>::ValidateOnTryAdd(task) : false;
 	}
