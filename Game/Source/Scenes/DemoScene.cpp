@@ -2,6 +2,7 @@
 #include "Scenes/DemoScene.h"
 
 #include <ctime>
+#include <iostream>
 
 #include "BVH.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
@@ -29,6 +30,14 @@ namespace game::demo
 
 		jlb::BoundingVolumeHierarchy bvh{};
 		bvh.Allocate(*info.allocator, vs);
+
+		jlb::StackArray<uint32_t, S> out{};
+		size_t count = bvh.GetIntersections(glm::vec2(0), glm::vec2(4, 2), vs, out);
+		for (int i = 0; i < count; ++i)
+		{
+			std::cout << vs[out[i]].position.x << " " << vs[out[i]].position.y << std::endl;
+		}
+
 		bvh.Free(*info.allocator);
 	}
 

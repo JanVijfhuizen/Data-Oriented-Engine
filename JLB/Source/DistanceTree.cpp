@@ -59,7 +59,7 @@ namespace jlb
 		return current;
 	}
 
-	size_t DistanceTree::GetInstancesInRange(const glm::vec2& position, const float range, ArrayView<size_t> outArray)
+	size_t DistanceTree::GetInstancesInRange(const glm::vec2& position, const float range, const ArrayView<size_t> outArray)
 	{
 		size_t index = 0;
 		GetInstancesInRange(position, range, 0, outArray.data, index);
