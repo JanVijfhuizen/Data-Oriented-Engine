@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Game.h"
-
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
@@ -12,7 +11,7 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
-#include "Systems/TurnThreadPool.h"
+#include "Systems/TurnThreadPoolSystem.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
@@ -27,7 +26,7 @@ namespace game
 
 		// Game systems.
 		initializer.DefineSystem<TurnSystem>();
-		initializer.DefineSystem<TurnThreadPool>();
+		initializer.DefineSystem<TurnThreadPoolSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();

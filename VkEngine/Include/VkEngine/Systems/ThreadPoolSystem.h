@@ -14,13 +14,17 @@ namespace vke
 #define THREAD_POOL_SYSTEM_NESTED_CAPACITY 8
 #endif
 
+#ifndef THREAD_POOL_SYSTEM_UNUSED_THREAD_COUNT
+#define THREAD_POOL_SYSTEM_UNUSED_THREAD_COUNT 1
+#endif
+
 	struct ThreadPoolTask final
 	{
 		void (*func)(const EngineData& info, jlb::Systems<EngineData> systems, void* userPtr);
 		void* userPtr = nullptr;
 	};
 
-	class ThreadPoolSystem : public TaskSystem<ThreadPoolTask>
+	class ThreadPoolSystem final : public TaskSystem<ThreadPoolTask>
 	{
 		friend struct ThreadObj;
 
@@ -45,7 +49,7 @@ namespace vke
 		{
 			EngineData const* info;
 			jlb::Systems<EngineData> systems;
-		} _threadSharedInfo;
+		} _threadSharedInfo{};
 
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;

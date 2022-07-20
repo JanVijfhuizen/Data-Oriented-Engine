@@ -14,12 +14,13 @@ namespace vke
 	{
 		auto& tasks = sys->GetTasks();
 
-		while(true)
+		while(!sys->_stopThreads)
 		{
-			while (sys->_tasksRemaining == 0 && !sys->_stopThreads)
+			if(sys->_tasksRemaining == 0)
+			{
 				Sleep(0);
-			if (sys->_stopThreads)
-				break;
+				continue;
+			}
 
 			// Get task.
 			sys->_getNextTaskMutex.lock();
@@ -94,7 +95,7 @@ namespace vke
 
 	size_t ThreadPoolSystem::GetThreadCount()
 	{
-		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1);
+		return jlb::math::Max<size_t>(1, std::thread::hardware_concurrency() - 1 - THREAD_POOL_SYSTEM_UNUSED_THREAD_COUNT);
 	}
 
 	size_t ThreadPoolSystem::GetFreeThreadSlots() const
