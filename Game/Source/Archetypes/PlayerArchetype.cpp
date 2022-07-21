@@ -58,7 +58,7 @@ namespace game
 				// Collision task.
 				auto& transform = entity.transform;
 				CollisionTask task{};
-				task.position = glm::ivec2(transform.position);
+				task.position = entity.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(entity.movementComponent.userDefined.to);
 				task.scale = glm::vec2(transform.scale);
 				entity.collisionTaskId = collisionSys->TryAdd(task);
 				assert(entity.collisionTaskId != SIZE_MAX);
@@ -122,7 +122,7 @@ namespace game
 						const glm::vec2 to = from + delta;
 
 						uint32_t outCollision;
-						size_t collided = collisionSys->GetIntersections(to, glm::vec2(1), outCollision);
+						const size_t collided = collisionSys->GetIntersections(to, glm::vec2(1), outCollision);
 						if(collided)
 						{
 							continue;

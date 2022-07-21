@@ -22,6 +22,7 @@ namespace jlb
 		[[nodiscard]] virtual size_t GetCount() const;
 		// Cannot exceed the capacity of the managed memory.
 		void SetCount(size_t count);
+		void Fill(const T& value = {}, size_t from = 0, size_t to = SIZE_MAX);
 
 		[[nodiscard]] ArrayView<T> GetView() const override;
 
@@ -70,6 +71,17 @@ namespace jlb
 	{
 		assert(count <= Array<T>::GetLength());
 		_count = count;
+	}
+
+	template <typename T>
+	void Vector<T>::Fill(const T& value, const size_t from, size_t to)
+	{
+		to = to == SIZE_MAX ? _count : to;
+		assert(from <= to);
+
+		auto data = Array<T>::GetData();
+		for (size_t i = from; i < to; ++i)
+			data[i] = value;
 	}
 
 	template <typename T>
