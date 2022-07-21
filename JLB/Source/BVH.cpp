@@ -5,16 +5,19 @@
 
 namespace jlb
 {
-	void BoundingVolumeHierarchy::Allocate(StackAllocator& allocator, const ArrayView<Instance> instances, const size_t nodeCapacity)
+	void BoundingVolumeHierarchy::Allocate(StackAllocator& allocator, const uint32_t size)
 	{
-		const auto& length = instances.length;
-		assert(length > 0);
-		_nodes.Allocate(allocator, length);
-		_indexes.Allocate(allocator, length);
+		assert(size > 0);
+		_nodes.Allocate(allocator, size);
+		_indexes.Allocate(allocator, size);
+	}
 
+	void BoundingVolumeHierarchy::Build(const ArrayView<Instance> instances, const size_t nodeCapacity)
+	{
+		const uint32_t length = instances.length;
+		assert(length == _indexes.GetLength());
 		for (uint32_t i = 0; i < length; ++i)
 			_indexes[i] = i;
-
 		QuickSort(instances.data, 0, length, nodeCapacity, 0);
 	}
 

@@ -27,11 +27,11 @@ namespace game
 		// Game systems.
 		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<TurnThreadPoolSystem>();
+		initializer.DefineSystem<CollisionSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 		initializer.DefineSystem<CameraSystem>();
-		initializer.DefineSystem<CollisionSystem>();
 
 		// Core engine Post update.
 		initializer.DefineSystem<vke::TileRenderSystem>();

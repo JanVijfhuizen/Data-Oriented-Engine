@@ -87,4 +87,10 @@ namespace game
 	{
 		return _takesTasks ? TaskSystem<TurnThreadPoolTask>::ValidateOnTryAdd(task) : false;
 	}
+
+	size_t TurnThreadPoolSystem::DefineCapacity(const vke::EngineData& info)
+	{
+		// WIP nested vector gives deallocation issues.
+		return 0;// 8;
+	}
 }
