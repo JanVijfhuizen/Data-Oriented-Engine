@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "BVH.h"
-#include "SwapChain.h"
 #include "VkEngine/Systems/TaskSystem.h"
 
 namespace game
@@ -9,7 +8,6 @@ namespace game
 
 	class CollisionSystem final : public vke::TaskSystem<CollisionTask>
 	{
-	private:
 		jlb::BoundingVolumeHierarchy _bvh{};
 
 		void Allocate(const vke::EngineData& info) override;
