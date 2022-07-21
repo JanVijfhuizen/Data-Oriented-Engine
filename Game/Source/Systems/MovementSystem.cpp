@@ -39,8 +39,7 @@ namespace game
 				const auto& component = task.component;
 				const auto& settings = component.settings;
 				const auto& userDefined = component.userDefined;
-
-				assert(userDefined.remaining > 0);
+				
 				MovementTaskOutput output{};
 				output.remaining = userDefined.remaining - isTickEvent;
 
@@ -69,8 +68,6 @@ namespace game
 			}
 		};
 		threadTask.userPtr = this;
-
-		
 
 		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, threadTask);

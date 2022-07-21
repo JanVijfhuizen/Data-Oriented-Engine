@@ -19,11 +19,16 @@ namespace game::demo
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PostUpdate(info, systems);
-		_playerArchetype.PostUpdate(info, systems, _player);
 	}
 
-	void DemoScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, const int key,
-		const int action)
+	void DemoScene::EndFrame(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		Scene::EndFrame(info, systems);
+		_playerArchetype.EndFrame(info, systems, _player);
+	}
+
+	void DemoScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
+		const int key, const int action)
 	{
 		Scene::OnKeyInput(info, systems, key, action);
 		_playerArchetype.OnKeyInput(info, systems, key, action);

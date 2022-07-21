@@ -38,6 +38,25 @@ namespace game
 		for (auto& input : _movementInput)
 			input.valid = isPaused ? input.pressed : input.valid;
 
+		for (auto& entity : entities)
+		{
+			auto& movementComponent = entity.movementComponent;
+			auto& transform = entity.transform;
+
+			renderTask.transform = transform;
+			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
+
+			const auto result = entityRenderSys->TryAdd(info, renderTask);
+			assert(result != SIZE_MAX);
+
+			cameraCenter += entity.transform.position;
+			movementTask.component = movementComponent;
+			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
+		}
+
+		cameraCenter /= entities.length;
+		cameraSys->settings.target = cameraCenter;
+
 		if (isTickEvent)
 		{
 			for (auto& entity : entities)
@@ -83,32 +102,13 @@ namespace game
 				}
 			}
 		}
-
-		for (auto& entity : entities)
-		{
-			auto& movementComponent = entity.movementComponent;
-			auto& transform = entity.transform;
-	
-			renderTask.transform = transform;
-			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-
-			const auto result = entityRenderSys->TryAdd(info, renderTask);
-			assert(result != SIZE_MAX);
-			
-			cameraCenter += entity.transform.position;
-			movementTask.component = movementComponent;
-			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
-		}
-
-		cameraCenter /= entities.length;
-		cameraSys->settings.target = cameraCenter;
 	}
 
-	void PlayerArchetype::PostUpdate(const vke::EngineData& info, 
+	void PlayerArchetype::EndFrame(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::ArrayView<Player> entities)
 	{
-		Archetype<Player>::PostUpdate(info, systems, entities);
+		Archetype<Player>::EndFrame(info, systems, entities);
 
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto& movementOutputs = movementSys->GetOutput();
