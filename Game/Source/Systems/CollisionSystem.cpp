@@ -5,60 +5,72 @@
 
 namespace game
 {
+	size_t CollisionSystem::TryAdd(const CollisionTask& task)
+	{
+		auto& current = _collisionFrames.GetCurrent();
+		current.tasks.Add(task);
+		return current.tasks.GetCount() - 1;
+	}
+
 	size_t CollisionSystem::GetIntersections(
 		const glm::vec2& position,  glm::vec2 scale,
 		const jlb::ArrayView<uint32_t> outArray)
 	{
 		scale += FLT_EPSILON;
-		return _bvh.GetIntersections(position, scale, GetTasks().GetRoot(), outArray);
+		auto& previous = _collisionFrames.GetPrevious();
+		return previous.bvh.GetIntersections(position, scale, previous.tasks, outArray);
 	}
 
 	size_t CollisionSystem::ReserveTile(const glm::ivec2& position)
 	{
-		return _distanceTree.Add(position);
+		auto& current = _collisionFrames.GetCurrent();
+		return current.distanceTree.Add(position);
 	}
 
 	size_t CollisionSystem::CheckIfTileIsReserved(const glm::ivec2& position)
 	{
+		auto& current = _collisionFrames.GetCurrent();
 		size_t out = SIZE_MAX;
-		const size_t _ = _distanceTree.GetInstancesInRange(position, .2f, out);
+		const size_t _ = current.distanceTree.GetInstancesInRange(position, .2f, out);
 		return out;
 	}
 
 	void CollisionSystem::Allocate(const vke::EngineData& info)
 	{
-		TaskSystem<CollisionTask>::Allocate(info);
-		_bvh.Allocate(*info.allocator, GetLength());
-		_distanceTree.Allocate(*info.allocator, GetLength());
+		vke::GameSystem::Allocate(info);
+		for (auto& collisionFrame : _collisionFrames)
+		{
+			collisionFrame.tasks.Allocate(*info.allocator, ENTITY_CAPACITY);
+			collisionFrame.bvh.Allocate(*info.allocator, ENTITY_CAPACITY);
+			collisionFrame.distanceTree.Allocate(*info.allocator, ENTITY_CAPACITY);
+		}
 	}
 
 	void CollisionSystem::Free(const vke::EngineData& info)
 	{
-		_distanceTree.Free(*info.allocator);
-		_bvh.Free(*info.allocator);
-		TaskSystem<CollisionTask>::Free(info);
+		for (int32_t i = 1; i >= 0; --i)
+		{
+			auto& collisionFrame = _collisionFrames[i];
+			collisionFrame.distanceTree.Free(*info.allocator);
+			collisionFrame.bvh.Free(*info.allocator);
+			collisionFrame.tasks.Free(*info.allocator);
+		}
+
+		vke::GameSystem::Free(info);
 	}
 
-	size_t CollisionSystem::DefineNestedCapacity(const vke::EngineData& info)
+	void CollisionSystem::Update(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
 	{
-		return 0;
-	}
-
-	void CollisionSystem::OnUpdate(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems,
-	    const jlb::NestedVector<CollisionTask>& tasks)
-	{
-		TaskSystem<CollisionTask>::OnUpdate(info, systems, tasks);
+		System<vke::EngineData>::Update(info, systems);
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
-		// If tick event, clear tasks.
-		const bool isTickEvent = turnSys->GetIfTickEvent();
-
 		// If the previous frame was for adding tasks.
-		if (isTickEvent)
+		if (turnSys->GetIfTickEvent())
 		{
-			ClearTasks();
-			_distanceTree.Clear();
+			_collisionFrames.Swap();
+			auto& previous = _collisionFrames.GetPrevious();
+			previous.tasks.SetCount(0);
+			previous.distanceTree.Clear();
 
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
 			TurnThreadPoolTask task{};
@@ -66,25 +78,16 @@ namespace game
 			task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 			{
 				const auto sys = reinterpret_cast<CollisionSystem*>(userPtr);
-				auto& tasks = sys->GetTasks();
+				auto& frame = sys->_collisionFrames.GetPrevious();
 
 				// Compile into collision distance tree.
-				if (sys->GetCount() > 0)
-					sys->_bvh.Build(tasks.GetRoot());
+				const auto& tasks = frame.tasks;
+				if (tasks.GetCount() > 0)
+					frame.bvh.Build(tasks);
 			};
 
 			const auto result = turnThreadSys->TryAdd(info, task);
 			assert(result != SIZE_MAX);
 		}
-	}
-
-	size_t CollisionSystem::DefineCapacity(const vke::EngineData& info)
-	{
-		return ENTITY_CAPACITY;
-	}
-
-	bool CollisionSystem::AutoClearOnFrameEnd()
-	{
-		return false;
 	}
 }

@@ -60,7 +60,7 @@ namespace game
 				CollisionTask task{};
 				task.position = glm::ivec2(transform.position);
 				task.scale = glm::vec2(transform.scale);
-				entity.collisionTaskId = collisionSys->TryAdd(info, task);
+				entity.collisionTaskId = collisionSys->TryAdd(task);
 				assert(entity.collisionTaskId != SIZE_MAX);
 			}
 

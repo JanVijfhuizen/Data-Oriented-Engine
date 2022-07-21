@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
-
 #include "Systems/CollisionSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
@@ -17,7 +16,6 @@ namespace game::demo
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		// Tile test.
-		
 		vke::TileRenderTask tileTask{};
 		tileTask.shape = glm::ivec2(3, 5);
 		tileTask.position = glm::ivec2(3, 5);
@@ -28,7 +26,7 @@ namespace game::demo
 			CollisionTask collisionTask{};
 			collisionTask.position = tileTask.position;
 			collisionTask.scale = tileTask.shape;
-			result = collisionSys->TryAdd(info, collisionTask);
+			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 		}
 	}
