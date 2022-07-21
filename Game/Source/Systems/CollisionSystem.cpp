@@ -39,8 +39,6 @@ namespace game
 		// If the previous frame was for adding tasks.
 		if (isTickEvent)
 		{
-			_bvhs.Swap();
-
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
 			TurnThreadPoolTask task{};
 			task.userPtr = this;
@@ -53,6 +51,7 @@ namespace game
 				if (sys->GetCount() > 0)
 					sys->_bvhs.GetCurrent().Build(tasks.GetRoot());
 				sys->ClearTasks();
+				sys->_bvhs.Swap();
 			};
 
 			const auto result = turnThreadSys->TryAdd(info, task);
