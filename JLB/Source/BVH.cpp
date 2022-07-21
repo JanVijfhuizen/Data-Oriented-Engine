@@ -15,7 +15,7 @@ namespace jlb
 	void BoundingVolumeHierarchy::Build(const ArrayView<Instance> instances, const size_t nodeCapacity)
 	{
 		const uint32_t length = instances.length;
-		assert(length == _indexes.GetLength());
+		assert(length > 0);
 		for (uint32_t i = 0; i < length; ++i)
 			_indexes[i] = i;
 		QuickSort(instances.data, 0, length, nodeCapacity, 0);

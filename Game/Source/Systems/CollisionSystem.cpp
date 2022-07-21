@@ -34,12 +34,11 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		// If tick event, clear tasks.
-		_mayAddTasks = turnSys->GetIfTickEvent();
+		const bool isTickEvent = turnSys->GetIfTickEvent();
 
 		// If the previous frame was for adding tasks.
-		if (_mayAddTasks)
+		if (isTickEvent)
 		{
-			ClearTasks();
 			_bvhs.Swap();
 
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
@@ -53,16 +52,12 @@ namespace game
 				// Compile into collision distance tree.
 				if (sys->GetCount() > 0)
 					sys->_bvhs.GetCurrent().Build(tasks.GetRoot());
+				sys->ClearTasks();
 			};
 
 			const auto result = turnThreadSys->TryAdd(info, task);
 			assert(result != SIZE_MAX);
 		}
-	}
-
-	bool CollisionSystem::ValidateOnTryAdd(const CollisionTask& task)
-	{
-		return _mayAddTasks ? TaskSystem<CollisionTask>::ValidateOnTryAdd(task) : false;
 	}
 
 	size_t CollisionSystem::DefineCapacity(const vke::EngineData& info)

@@ -35,8 +35,8 @@ namespace vke
 		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 
-		void OnKeyInput(const EngineData& info, const jlb::Systems<EngineData> systems, int key, int action) override;
-		void OnMouseInput(const EngineData& info, const jlb::Systems<EngineData> systems, int key, int action) override;
+		void OnKeyInput(const EngineData& info, jlb::Systems<EngineData> systems, int key, int action) override;
+		void OnMouseInput(const EngineData& info, jlb::Systems<EngineData> systems, int key, int action) override;
 	};
 
 	template <typename T>
