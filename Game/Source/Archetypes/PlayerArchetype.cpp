@@ -122,7 +122,7 @@ namespace game
 						const glm::vec2 to = from + delta;
 
 						uint32_t outCollision;
-						size_t collided = collisionSys->GetIntersections(from, glm::vec2(1e7), outCollision);
+						size_t collided = collisionSys->GetIntersections(to, glm::vec2(1), outCollision);
 						if(collided)
 						{
 							continue;

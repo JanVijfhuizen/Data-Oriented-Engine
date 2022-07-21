@@ -7,9 +7,9 @@ namespace game
 {
 	size_t CollisionSystem::TryAdd(const CollisionTask& task)
 	{
-		auto& current = _collisionFrames.GetCurrent();
-		current.tasks.Add(task);
-		return current.tasks.GetCount() - 1;
+		auto& previous = _collisionFrames.GetPrevious();
+		previous.tasks.Add(task);
+		return previous.tasks.GetCount() - 1;
 	}
 
 	size_t CollisionSystem::GetIntersections(
@@ -17,8 +17,8 @@ namespace game
 		const jlb::ArrayView<uint32_t> outArray)
 	{
 		scale += FLT_EPSILON;
-		auto& previous = _collisionFrames.GetPrevious();
-		return previous.bvh.GetIntersections(position, scale, previous.tasks, outArray);
+		auto& current = _collisionFrames.GetPrevious();
+		return current.bvh.GetIntersections(position, scale, current.tasks, outArray);
 	}
 
 	size_t CollisionSystem::ReserveTile(const glm::ivec2& position)
@@ -59,9 +59,9 @@ namespace game
 		vke::GameSystem::Free(info);
 	}
 
-	void CollisionSystem::Update(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
+	void CollisionSystem::PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
 	{
-		System<vke::EngineData>::Update(info, systems);
+		System<vke::EngineData>::PreUpdate(info, systems);
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		// If the previous frame was for adding tasks.
@@ -78,12 +78,12 @@ namespace game
 			task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 			{
 				const auto sys = reinterpret_cast<CollisionSystem*>(userPtr);
-				auto& frame = sys->_collisionFrames.GetPrevious();
+				auto& previous = sys->_collisionFrames.GetPrevious();
 
 				// Compile into collision distance tree.
-				const auto& tasks = frame.tasks;
+				const auto& tasks = previous.tasks;
 				if (tasks.GetCount() > 0)
-					frame.bvh.Build(tasks);
+					previous.bvh.Build(tasks);
 			};
 
 			const auto result = turnThreadSys->TryAdd(info, task);
