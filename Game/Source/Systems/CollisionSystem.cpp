@@ -6,9 +6,10 @@
 namespace game
 {
 	size_t CollisionSystem::GetIntersections(
-		const glm::vec2& position, const glm::vec2& scale,
+		const glm::vec2& position,  glm::vec2 scale,
 		const jlb::ArrayView<uint32_t> outArray)
 	{
+		scale += FLT_EPSILON;
 		return _bvh.GetIntersections(position, scale, GetTasks().GetRoot(), outArray);
 	}
 

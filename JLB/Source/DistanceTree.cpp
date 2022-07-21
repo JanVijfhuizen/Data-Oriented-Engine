@@ -61,8 +61,9 @@ namespace jlb
 
 	size_t DistanceTree::GetInstancesInRange(const glm::vec2& position, const float range, const ArrayView<size_t> outArray)
 	{
+		assert(outArray.length > 0);
 		size_t index = 0;
-		GetInstancesInRange(position, range, 0, outArray.data, index);
+		GetInstancesInRange(position, range, 0, outArray, index);
 		return index;
 	}
 
@@ -85,7 +86,7 @@ namespace jlb
 
 	void* DistanceTree::GetInstancesInRange(const glm::vec2& position,
 		const float range, const size_t current,
-		size_t* outArray, size_t& arrayIndex)
+		const ArrayView<size_t>& outArray, size_t& arrayIndex)
 	{
 		const auto& node = _nodes[current];
 		const bool isValid = node.index != SIZE_MAX;
@@ -100,9 +101,13 @@ namespace jlb
 		outArray[arrayIndex] = node.index;
 		arrayIndex += instanceInRange;
 
-		// Silly optimization to avoid branching.
-		!nodeInRange || node.left == 0 ? nullptr : GetInstancesInRange(position, range, node.left, outArray, arrayIndex);
-		!nodeInRange || node.right == 0 ? nullptr : GetInstancesInRange(position, range, node.right, outArray, arrayIndex);
+		if(arrayIndex < outArray.length)
+		{
+			// Silly optimization to avoid branching.
+			!nodeInRange || node.left == 0 ? nullptr : GetInstancesInRange(position, range, node.left, outArray, arrayIndex);
+			!nodeInRange || node.right == 0 ? nullptr : GetInstancesInRange(position, range, node.right, outArray, arrayIndex);
+		}
+		
 		return nullptr;
 	}
 }

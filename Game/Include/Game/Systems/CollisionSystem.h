@@ -11,7 +11,7 @@ namespace game
 	{
 	public:
 		[[nodiscard]] size_t GetIntersections(
-			const glm::vec2& position, const glm::vec2& scale,
+			const glm::vec2& position, glm::vec2 scale,
 			jlb::ArrayView<uint32_t> outArray);
 
 		[[nodiscard]] size_t ReserveTile(const glm::ivec2& position);

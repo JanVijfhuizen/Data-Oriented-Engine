@@ -30,6 +30,7 @@ namespace jlb
 		size_t _index = 0;
 
 		[[nodiscard]] float CalculateDistance(const glm::vec2& position, const Node& node) const;
-		void* GetInstancesInRange(const glm::vec2& position, float range, size_t current, size_t* outArray, size_t& arrayIndex);
+		void* GetInstancesInRange(const glm::vec2& position, float range, size_t current, 
+			const ArrayView<size_t>& outArray, size_t& arrayIndex);
 	};
 }
