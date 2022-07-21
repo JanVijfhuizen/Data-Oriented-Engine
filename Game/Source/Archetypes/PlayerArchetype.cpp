@@ -38,25 +38,6 @@ namespace game
 		for (auto& input : _movementInput)
 			input.valid = isPaused ? input.pressed : input.valid;
 
-		for (auto& entity : entities)
-		{
-			auto& movementComponent = entity.movementComponent;
-			auto& transform = entity.transform;
-
-			renderTask.transform = transform;
-			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-
-			const auto result = entityRenderSys->TryAdd(info, renderTask);
-			assert(result != SIZE_MAX);
-
-			cameraCenter += entity.transform.position;
-			movementTask.component = movementComponent;
-			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
-		}
-
-		cameraCenter /= entities.length;
-		cameraSys->settings.target = cameraCenter;
-
 		if (isTickEvent)
 		{
 			for (auto& entity : entities)
@@ -102,6 +83,25 @@ namespace game
 				}
 			}
 		}
+
+		for (auto& entity : entities)
+		{
+			auto& movementComponent = entity.movementComponent;
+			auto& transform = entity.transform;
+
+			renderTask.transform = transform;
+			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
+
+			const auto result = entityRenderSys->TryAdd(info, renderTask);
+			assert(result != SIZE_MAX);
+
+			cameraCenter += entity.transform.position;
+			movementTask.component = movementComponent;
+			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
+		}
+
+		cameraCenter /= entities.length;
+		cameraSys->settings.target = cameraCenter;
 	}
 
 	void PlayerArchetype::EndFrame(const vke::EngineData& info,

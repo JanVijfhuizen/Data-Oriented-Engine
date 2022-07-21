@@ -44,7 +44,7 @@ namespace game
 		const size_t _maxTicksPerSecond = 16;
 
 		float _time = 0;
-		bool _tickCalled = false;
+		bool _tickCalled = true;
 		float _lerp = 0;
 		bool _pauseAtEndOfTick = false;
 		bool _forwardToNextTick = false;
