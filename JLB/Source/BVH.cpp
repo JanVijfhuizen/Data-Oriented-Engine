@@ -31,6 +31,7 @@ namespace jlb
 		const glm::vec2& position, const glm::vec2& scale,
 		const ArrayView<Instance> instances, const ArrayView<uint32_t> outArray)
 	{
+		assert(outArray.length > 0);
 		uint32_t outIndex = 0;
 		GetIntersections(position, scale, 0, instances, outArray, outIndex);
 		return outIndex;
@@ -101,6 +102,8 @@ namespace jlb
 		const uint32_t aChild = node.children[0];
 		const uint32_t bChild = node.children[1];
 
+		bool maxIntersectionsReached = false;
+
 		// Check objects in range.
 		for (uint32_t i = node.begin; i < node.end; ++i)
 		{
@@ -109,15 +112,22 @@ namespace jlb
 			const bool intersects = IntersectsObjects(instance.position, instance.scale, position, scale);
 			outArray[outIndex] = index;
 			outIndex += intersects;
+
+			maxIntersectionsReached = outIndex == outArray.length;
+			i = maxIntersectionsReached ? node.end : i;
 		}
 
-		const auto& aChildNode = _nodes[aChild];
-		const auto& bChildNode = _nodes[bChild];
+		if(!maxIntersectionsReached)
+		{
+			const auto& aChildNode = _nodes[aChild];
+			const auto& bChildNode = _nodes[bChild];
 
-		aChild == 0 ? nullptr : !IntersectsBounds(aChildNode.lBot, aChildNode.rTop, position, scale) ? nullptr :
-			GetIntersections(position, scale, aChild, instances, outArray, outIndex);
-		bChild == 0 ? nullptr : !IntersectsBounds(bChildNode.lBot, bChildNode.rTop, position, scale) ? nullptr :
-			GetIntersections(position, scale, bChild, instances, outArray, outIndex);
+			aChild == 0 ? nullptr : !IntersectsBounds(aChildNode.lBot, aChildNode.rTop, position, scale) ? nullptr :
+				GetIntersections(position, scale, aChild, instances, outArray, outIndex);
+			bChild == 0 ? nullptr : !IntersectsBounds(bChildNode.lBot, bChildNode.rTop, position, scale) ? nullptr :
+				GetIntersections(position, scale, bChild, instances, outArray, outIndex);
+		}
+		
 		return nullptr;
 	}
 

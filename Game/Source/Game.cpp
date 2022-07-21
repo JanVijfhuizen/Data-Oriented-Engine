@@ -28,8 +28,8 @@ namespace game
 		initializer.DefineSystem<TurnThreadPoolSystem>();
 		
 		// Game systems.
-		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<CollisionSystem>();
+		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();

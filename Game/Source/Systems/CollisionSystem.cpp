@@ -22,11 +22,11 @@ namespace game
 		return 0;
 	}
 
-	void CollisionSystem::OnPreUpdate(const vke::EngineData& info, 
+	void CollisionSystem::OnUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 	    const jlb::NestedVector<CollisionTask>& tasks)
 	{
-		TaskSystem<CollisionTask>::OnPreUpdate(info, systems, tasks);
+		TaskSystem<CollisionTask>::OnUpdate(info, systems, tasks);
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		// If tick event, clear tasks.
