@@ -4,6 +4,10 @@
 
 namespace vke
 {
+#ifndef TILE_RENDER_SYSTEM_CAPACITY
+#define TILE_RENDER_SYSTEM_CAPACITY 1024
+#endif
+
 	struct TileCamera final
 	{
 		glm::vec2 position{};

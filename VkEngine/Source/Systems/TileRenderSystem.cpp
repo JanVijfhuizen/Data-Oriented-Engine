@@ -21,7 +21,7 @@ namespace vke
 
 	size_t TileRenderSystem::DefineCapacity(const EngineData& info)
 	{
-		return 1024;
+		return TILE_RENDER_SYSTEM_CAPACITY;
 	}
 
 	bool TileRenderSystem::ValidateOnTryAdd(const TileRenderTask& task)

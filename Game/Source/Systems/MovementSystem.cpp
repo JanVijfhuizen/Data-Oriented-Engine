@@ -70,7 +70,7 @@ namespace game
 
 	size_t MovementSystem::DefineCapacity(const vke::EngineData& info)
 	{
-		return 64;
+		return ENTITY_CAPACITY;
 	}
 
 	bool MovementSystem::ValidateOnTryAdd(const MovementTask& task)

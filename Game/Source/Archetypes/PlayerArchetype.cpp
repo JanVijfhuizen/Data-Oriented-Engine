@@ -53,15 +53,15 @@ namespace game
 		}
 
 		if (isTickEvent)
-			for (const auto& entity : entities)
+			for (auto& entity : entities)
 			{
 				// Collision task.
 				auto& transform = entity.transform;
 				CollisionTask task{};
-				task.position = glm::ivec2(transform.position);
+				task.position = entity.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(entity.movementComponent.userDefined.to);
 				task.scale = glm::vec2(transform.scale);
-				const auto result = collisionSys->TryAdd(info, task);
-				assert(result != SIZE_MAX);
+				entity.collisionTaskId = collisionSys->TryAdd(task);
+				assert(entity.collisionTaskId != SIZE_MAX);
 			}
 
 		cameraCenter /= entities.length;
@@ -74,6 +74,7 @@ namespace game
 	{
 		Archetype<Player>::EndFrame(info, systems, entities);
 
+		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto& movementOutputs = movementSys->GetOutput();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
@@ -91,10 +92,7 @@ namespace game
 			transform.rotation = movementOutput.rotation;
 		}
 
-		const bool isTickEvent = turnSys->GetIfTickEvent();
-
-		if (isTickEvent)
-		{
+		if (turnSys->GetIfTickEvent())
 			for (auto& entity : entities)
 			{
 				auto& movementComponent = entity.movementComponent;
@@ -121,15 +119,25 @@ namespace game
 						// Round the from position.
 						const glm::vec2 from = glm::vec2(glm::ivec2(entity.transform.position));
 						const glm::vec2 delta = glm::vec2(dir);
+						const glm::vec2 to = from + delta;
 
+						if (collisionSys->CheckIfTileIsReserved(to) != SIZE_MAX)
+							continue;
+
+						uint32_t outCollision;
+						const size_t collided = collisionSys->GetIntersections(to, glm::vec2(1), outCollision);
+						
+						if(collided)
+							continue;
+
+						const size_t reserved = collisionSys->ReserveTile(to);
 						movementUserDefined.from = from;
-						movementUserDefined.to = from + delta;
+						movementUserDefined.to = to;
 						movementUserDefined.rotation = transform.rotation;
 						movementComponent.Build();
 					}
 				}
 			}
-		}
 	}
 
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 

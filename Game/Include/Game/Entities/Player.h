@@ -10,5 +10,6 @@ namespace game
 		vke::Transform transform{};
 
 		size_t movementTaskId;
+		size_t collisionTaskId;
 	};
 }

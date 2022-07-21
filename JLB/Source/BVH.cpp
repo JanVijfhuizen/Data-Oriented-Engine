@@ -16,6 +16,8 @@ namespace jlb
 	{
 		const uint32_t length = instances.length;
 		assert(length > 0);
+		_nodes.Fill();
+		_nodes.SetCount(0);
 		for (uint32_t i = 0; i < length; ++i)
 			_indexes[i] = i;
 		QuickSort(instances.data, 0, length, nodeCapacity, 0);
