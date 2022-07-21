@@ -70,6 +70,8 @@ namespace game
 		};
 		threadTask.userPtr = this;
 
+		
+
 		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, threadTask);
 		assert(result != SIZE_MAX);

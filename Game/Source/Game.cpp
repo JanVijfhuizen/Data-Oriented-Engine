@@ -22,11 +22,13 @@ namespace game
 		// Core engine pre update.
 		initializer.DefineSystem<vke::ThreadPoolSystem>();
 		initializer.DefineSystem<ResourceManager>();
-		initializer.DefineSystem<vke::SceneSystem>();
 
-		// Game systems.
+		// Core game systems.
 		initializer.DefineSystem<TurnSystem>();
 		initializer.DefineSystem<TurnThreadPoolSystem>();
+		
+		// Game systems.
+		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<CollisionSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();

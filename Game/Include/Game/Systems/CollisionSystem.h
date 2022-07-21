@@ -9,7 +9,8 @@ namespace game
 
 	class CollisionSystem final : public vke::TaskSystem<CollisionTask>
 	{
-		jlb::SwapChain<jlb::BoundingVolumeHierarchy, 2> _bvhs{};
+	private:
+		jlb::BoundingVolumeHierarchy _bvh{};
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;

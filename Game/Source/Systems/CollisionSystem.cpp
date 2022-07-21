@@ -9,15 +9,12 @@ namespace game
 	void CollisionSystem::Allocate(const vke::EngineData& info)
 	{
 		TaskSystem<CollisionTask>::Allocate(info);
-		for (auto& bvh : _bvhs)
-			bvh.Allocate(*info.allocator, GetLength());
+		_bvh.Allocate(*info.allocator, GetLength());
 	}
 
 	void CollisionSystem::Free(const vke::EngineData& info)
 	{
-		for (int32_t i = _bvhs.GetLength() - 1; i >= 0; --i)
-			_bvhs[i].Free(*info.allocator);
-
+		_bvh.Free(*info.allocator);
 		TaskSystem<CollisionTask>::Free(info);
 	}
 
@@ -39,6 +36,8 @@ namespace game
 		// If the previous frame was for adding tasks.
 		if (isTickEvent)
 		{
+			ClearTasks();
+
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
 			TurnThreadPoolTask task{};
 			task.userPtr = this;
@@ -49,9 +48,7 @@ namespace game
 
 				// Compile into collision distance tree.
 				if (sys->GetCount() > 0)
-					sys->_bvhs.GetCurrent().Build(tasks.GetRoot());
-				sys->ClearTasks();
-				sys->_bvhs.Swap();
+					sys->_bvh.Build(tasks.GetRoot());
 			};
 
 			const auto result = turnThreadSys->TryAdd(info, task);
