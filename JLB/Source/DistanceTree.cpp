@@ -72,10 +72,11 @@ namespace jlb
 		return _nodes.GetLength();
 	}
 
-	void DistanceTree::Clear() const
+	void DistanceTree::Clear()
 	{
 		for (size_t i = 0; i < _index; ++i)
 			_nodes[i] = {};
+		_index = 0;
 	}
 
 	float DistanceTree::CalculateDistance(const glm::vec2& position, const Node& node) const

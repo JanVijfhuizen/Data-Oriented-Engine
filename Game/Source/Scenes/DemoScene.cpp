@@ -28,6 +28,8 @@ namespace game::demo
 			collisionTask.scale = tileTask.shape;
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
+
+			collisionSys->ReserveTile(glm::vec2(2, 2));
 		}
 	}
 

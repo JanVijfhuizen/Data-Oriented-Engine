@@ -14,7 +14,7 @@ namespace jlb
 		[[nodiscard]] size_t Add(const glm::vec2& position);
 		size_t GetInstancesInRange(const glm::vec2& position, float range, ArrayView<size_t> outArray);
 		[[nodiscard]] size_t GetLength() const;
-		void Clear() const;
+		void Clear();
 
 	private:
 		struct Node final

@@ -121,13 +121,16 @@ namespace game
 						const glm::vec2 delta = glm::vec2(dir);
 						const glm::vec2 to = from + delta;
 
+						if (collisionSys->CheckIfTileIsReserved(to) != SIZE_MAX)
+							continue;
+
 						uint32_t outCollision;
 						const size_t collided = collisionSys->GetIntersections(to, glm::vec2(1), outCollision);
+						
 						if(collided)
-						{
 							continue;
-						}
 
+						const size_t reserved = collisionSys->ReserveTile(to);
 						movementUserDefined.from = from;
 						movementUserDefined.to = to;
 						movementUserDefined.rotation = transform.rotation;

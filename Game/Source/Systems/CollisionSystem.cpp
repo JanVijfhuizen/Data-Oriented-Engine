@@ -31,8 +31,8 @@ namespace game
 	{
 		auto& current = _collisionFrames.GetCurrent();
 		size_t out = SIZE_MAX;
-		const size_t _ = current.distanceTree.GetInstancesInRange(position, .2f, out);
-		return out;
+		const size_t count = current.distanceTree.GetInstancesInRange(position, .2f, out);
+		return count == 0 ? SIZE_MAX : out;
 	}
 
 	void CollisionSystem::Allocate(const vke::EngineData& info)
