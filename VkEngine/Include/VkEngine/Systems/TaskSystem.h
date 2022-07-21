@@ -57,7 +57,7 @@ namespace vke
 	template <typename T>
 	void TaskSystem<T>::Free(const EngineData& info)
 	{
-		_tasks.RemoveNested(*info.dumpAllocator);
+		_tasks.DetachNested();
 		_tasks.Free(*info.allocator);
 		System<EngineData>::Free(info);
 	}
