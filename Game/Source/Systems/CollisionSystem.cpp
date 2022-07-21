@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Systems/CollisionSystem.h"
 #include <Systems/TurnSystem.h>
-
 #include "Systems/TurnThreadPoolSystem.h"
 
 namespace game
