@@ -31,12 +31,26 @@ namespace game
 
 		vke::EntityRenderTask renderTask{};
 		renderTask.subTexture = subTexturesDivided[0];
-
-		MovementTask movementTask{};
+		
 		glm::vec2 cameraCenter{};
 
 		for (auto& input : _movementInput)
 			input.valid = isPaused ? input.pressed : input.valid;
+
+		for (auto& entity : entities)
+		{
+			auto& movementComponent = entity.movementComponent;
+			auto& transform = entity.transform;
+
+			renderTask.transform = transform;
+			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
+
+			const auto result = entityRenderSys->TryAdd(info, renderTask);
+			assert(result != SIZE_MAX);
+
+			cameraCenter += entity.transform.position;
+			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
+		}
 
 		if (isTickEvent)
 		{
@@ -46,6 +60,7 @@ namespace game
 				auto& transform = entity.transform;
 
 				auto& movementUserDefined = movementComponent.userDefined;
+				auto& movementSystemDefined = movementComponent.systemDefined;
 
 				// Collision task.
 				{
@@ -57,7 +72,7 @@ namespace game
 				}
 
 				// Update movement task with new input.
-				if (movementUserDefined.remaining == 0)
+				if (movementSystemDefined.remaining <= 1)
 				{
 					glm::ivec2 dir{};
 					dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
@@ -77,27 +92,11 @@ namespace game
 
 						movementUserDefined.from = from;
 						movementUserDefined.to = from + delta;
-						movementUserDefined.remaining = _movementDuration;
 						movementUserDefined.rotation = transform.rotation;
+						movementComponent.Build();
 					}
 				}
 			}
-		}
-
-		for (auto& entity : entities)
-		{
-			auto& movementComponent = entity.movementComponent;
-			auto& transform = entity.transform;
-
-			renderTask.transform = transform;
-			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-
-			const auto result = entityRenderSys->TryAdd(info, renderTask);
-			assert(result != SIZE_MAX);
-
-			cameraCenter += entity.transform.position;
-			movementTask.component = movementComponent;
-			entity.movementTaskId = movementSys->TryAdd(info, movementTask);
 		}
 
 		cameraCenter /= entities.length;
@@ -118,10 +117,12 @@ namespace game
 			if (entity.movementTaskId == SIZE_MAX)
 				continue;
 
+			auto& transform = entity.transform;
 			const auto& movementOutput = movementOutputs[entity.movementTaskId];
-			MovementSystem::UpdateComponent(entity.movementComponent, movementOutput);
-			entity.transform.position = movementOutput.position;
-			entity.transform.rotation = movementOutput.rotation;
+
+			entity.movementComponent.Update(movementOutput);
+			transform.position = movementOutput.position;
+			transform.rotation = movementOutput.rotation;
 		}
 	}
 

@@ -5,11 +5,7 @@
 
 namespace game
 {
-	struct MovementTask final
-	{
-		MovementComponent component{};
-		size_t duration = 1;
-	};
+	typedef MovementComponent MovementTask;
 
 	struct MovementTaskOutput final
 	{
@@ -31,10 +27,7 @@ namespace game
 		float bobbingScaling = 0.1f;
 		// Percent (0-1) of the turn spend on rotation.
 		float rotationDuration = .25f;
-
-		// Updates the component with the corresponding task output data.
-		static void UpdateComponent(MovementComponent& component, const MovementTaskOutput& output);
-
+		
 	private:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 		[[nodiscard]] bool ValidateOnTryAdd(const MovementTask& task) override;

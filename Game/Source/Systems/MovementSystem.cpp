@@ -7,12 +7,6 @@
 
 namespace game
 {
-	void MovementSystem::UpdateComponent(MovementComponent& component, const MovementTaskOutput& output)
-	{
-		component.userDefined.remaining = output.remaining;
-		component.systemDefined.scaleMultiplier = output.scaleMultiplier;
-	}
-
 	void MovementSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<MovementTask>& tasks)
@@ -36,14 +30,14 @@ namespace game
 
 			for (const auto& task : tasks)
 			{
-				const auto& component = task.component;
-				const auto& settings = component.settings;
-				const auto& userDefined = component.userDefined;
+				const auto& settings = task.settings;
+				const auto& userDefined = task.userDefined;
+				const auto& systemDefined = task.systemDefined;
 				
 				MovementTaskOutput output{};
-				output.remaining = userDefined.remaining - isTickEvent;
+				output.remaining = systemDefined.remaining - isTickEvent;
 
-				const auto durationF = static_cast<float>(task.duration);
+				const auto durationF = static_cast<float>(userDefined.duration);
 				// Smoothly move between grid positions.
 				const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(output.remaining) / durationF;
 				output.position = jlb::math::LerpPct(userDefined.from, userDefined.to, pct);
@@ -81,6 +75,6 @@ namespace game
 
 	bool MovementSystem::ValidateOnTryAdd(const MovementTask& task)
 	{
-		return task.component.userDefined.remaining == 0 ? false : TaskSystemWithOutput<MovementTask, MovementTaskOutput>::ValidateOnTryAdd(task);
+		return task.systemDefined.remaining == 0 ? false : TaskSystemWithOutput<MovementTask, MovementTaskOutput>::ValidateOnTryAdd(task);
 	}
 }

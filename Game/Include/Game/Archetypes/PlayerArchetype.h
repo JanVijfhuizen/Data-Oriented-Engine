@@ -24,7 +24,6 @@ namespace game
 		};
 
 		Input _movementInput[4]{};
-		const size_t _movementDuration = 1;
 
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input);
 	};

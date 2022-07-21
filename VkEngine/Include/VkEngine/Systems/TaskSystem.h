@@ -22,6 +22,7 @@ namespace vke
 		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
 		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
+
 		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
 
 		[[nodiscard]] virtual bool AutoClearOnFrameEnd();
