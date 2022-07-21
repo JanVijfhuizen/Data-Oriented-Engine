@@ -171,6 +171,7 @@
     <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StackVector.h" />
     <ClInclude Include="Include\StringView.h" />
+    <ClInclude Include="Include\SwapChain.h" />
     <ClInclude Include="Include\System.h" />
     <ClInclude Include="Include\SystemManager.h" />
     <ClInclude Include="Include\Vector.h" />

@@ -1,7 +1,6 @@
 ﻿#pragma once
-#include <atomic>
-
 #include "BVH.h"
+#include "SwapChain.h"
 #include "VkEngine/Systems/TaskSystem.h"
 
 namespace game
@@ -10,9 +9,8 @@ namespace game
 
 	class CollisionSystem final : public vke::TaskSystem<CollisionTask>
 	{
-		jlb::BoundingVolumeHierarchy _bvh{};
+		jlb::SwapChain<jlb::BoundingVolumeHierarchy, 2> _bvhs{};
 		bool _mayAddTasks = false;
-		std::atomic<bool> _bvhBuilt = false;
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;
