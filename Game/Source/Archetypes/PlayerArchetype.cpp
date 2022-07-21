@@ -53,26 +53,58 @@ namespace game
 		}
 
 		if (isTickEvent)
+			for (const auto& entity : entities)
+			{
+				// Collision task.
+				auto& transform = entity.transform;
+				CollisionTask task{};
+				task.position = glm::ivec2(transform.position);
+				task.scale = glm::vec2(transform.scale);
+				const auto result = collisionSys->TryAdd(info, task);
+				assert(result != SIZE_MAX);
+			}
+
+		cameraCenter /= entities.length;
+		cameraSys->settings.target = cameraCenter;
+	}
+
+	void PlayerArchetype::EndFrame(const vke::EngineData& info,
+		const jlb::Systems<vke::EngineData> systems,
+		const jlb::ArrayView<Player> entities)
+	{
+		Archetype<Player>::EndFrame(info, systems, entities);
+
+		const auto movementSys = systems.GetSystem<MovementSystem>();
+		const auto& movementOutputs = movementSys->GetOutput();
+		const auto turnSys = systems.GetSystem<TurnSystem>();
+
+		for (auto& entity : entities)
+		{
+			if (entity.movementTaskId == SIZE_MAX)
+				continue;
+
+			auto& transform = entity.transform;
+			const auto& movementOutput = movementOutputs[entity.movementTaskId];
+
+			entity.movementComponent.Update(movementOutput);
+			transform.position = movementOutput.position;
+			transform.rotation = movementOutput.rotation;
+		}
+
+		const bool isTickEvent = turnSys->GetIfTickEvent();
+
+		if (isTickEvent)
 		{
 			for (auto& entity : entities)
 			{
 				auto& movementComponent = entity.movementComponent;
-				auto& transform = entity.transform;
+				const auto& transform = entity.transform;
 
 				auto& movementUserDefined = movementComponent.userDefined;
-				auto& movementSystemDefined = movementComponent.systemDefined;
-
-				// Collision task.
-				{
-					CollisionTask task{};
-					task.position = glm::ivec2(transform.position);
-					task.scale = glm::vec2(transform.scale);
-					const auto result = collisionSys->TryAdd(info, task);
-					assert(result != SIZE_MAX);
-				}
+				const auto& movementSystemDefined = movementComponent.systemDefined;
 
 				// Update movement task with new input.
-				if (movementSystemDefined.remaining <= 1)
+				if (movementSystemDefined.remaining == 0)
 				{
 					glm::ivec2 dir{};
 					dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
@@ -97,32 +129,6 @@ namespace game
 					}
 				}
 			}
-		}
-
-		cameraCenter /= entities.length;
-		cameraSys->settings.target = cameraCenter;
-	}
-
-	void PlayerArchetype::EndFrame(const vke::EngineData& info,
-		const jlb::Systems<vke::EngineData> systems,
-		const jlb::ArrayView<Player> entities)
-	{
-		Archetype<Player>::EndFrame(info, systems, entities);
-
-		const auto movementSys = systems.GetSystem<MovementSystem>();
-		const auto& movementOutputs = movementSys->GetOutput();
-
-		for (auto& entity : entities)
-		{
-			if (entity.movementTaskId == SIZE_MAX)
-				continue;
-
-			auto& transform = entity.transform;
-			const auto& movementOutput = movementOutputs[entity.movementTaskId];
-
-			entity.movementComponent.Update(movementOutput);
-			transform.position = movementOutput.position;
-			transform.rotation = movementOutput.rotation;
 		}
 	}
 
