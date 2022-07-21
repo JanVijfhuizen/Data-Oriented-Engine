@@ -178,6 +178,7 @@
     <ClInclude Include="Include\Game\Systems\TurnThreadPoolSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Components\MovementComponent.cpp" />
     <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp" />
     <ClCompile Include="Source\Systems\CameraSystem.cpp" />
     <ClCompile Include="Source\Systems\CollisionSystem.cpp" />

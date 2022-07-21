@@ -1,31 +1,63 @@
 #include "pch.h"
 #include "Systems/CollisionSystem.h"
 #include <Systems/TurnSystem.h>
+#include "Systems/TurnThreadPoolSystem.h"
 
 namespace game
 {
+	void CollisionSystem::Allocate(const vke::EngineData& info)
+	{
+		TaskSystem<CollisionTask>::Allocate(info);
+		_bvh.Allocate(*info.allocator, GetLength());
+	}
+
+	void CollisionSystem::Free(const vke::EngineData& info)
+	{
+		_bvh.Free(*info.allocator);
+		TaskSystem<CollisionTask>::Free(info);
+	}
+
+	size_t CollisionSystem::DefineNestedCapacity(const vke::EngineData& info)
+	{
+		return 0;
+	}
+
 	void CollisionSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<CollisionTask>& tasks)
+	    const jlb::NestedVector<CollisionTask>& tasks)
 	{
 		TaskSystem<CollisionTask>::OnPreUpdate(info, systems, tasks);
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
-		// If the previous frame was for adding tasks.
-		if (_mayAddTasks)
-		{
-			// Compile into collision distance tree.
-		}
-
 		// If tick event, clear tasks.
-		_mayAddTasks = turnSys->GetIfTickEvent();
-		if (_mayAddTasks)
+		const bool isTickEvent = turnSys->GetIfTickEvent();
+
+		// If the previous frame was for adding tasks.
+		if (isTickEvent)
+		{
 			ClearTasks();
+
+			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
+			TurnThreadPoolTask task{};
+			task.userPtr = this;
+			task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
+			{
+				const auto sys = reinterpret_cast<CollisionSystem*>(userPtr);
+				auto& tasks = sys->GetTasks();
+
+				// Compile into collision distance tree.
+				if (sys->GetCount() > 0)
+					sys->_bvh.Build(tasks.GetRoot());
+			};
+
+			const auto result = turnThreadSys->TryAdd(info, task);
+			assert(result != SIZE_MAX);
+		}
 	}
 
-	bool CollisionSystem::ValidateOnTryAdd(const CollisionTask& task)
+	size_t CollisionSystem::DefineCapacity(const vke::EngineData& info)
 	{
-		return _mayAddTasks ? TaskSystem<CollisionTask>::ValidateOnTryAdd(task) : false;
+		return 1024;
 	}
 
 	bool CollisionSystem::AutoClearOnFrameEnd()

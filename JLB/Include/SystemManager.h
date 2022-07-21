@@ -162,11 +162,15 @@ namespace jlb
 	void SystemManager<T>::Update(const T& data)
 	{
 		for (auto& sys : _vector)
+			sys->BeginFrame(data, *this);
+		for (auto& sys : _vector)
 			sys->PreUpdate(data, *this);
 		for (auto& sys : _vector)
 			sys->Update(data, *this);
 		for (auto& sys : _vector)
 			sys->PostUpdate(data, *this);
+		for (auto& sys : _vector)
+			sys->EndFrame(data, *this);
 	}
 
 	template <typename T>

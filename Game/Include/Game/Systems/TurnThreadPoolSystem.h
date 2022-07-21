@@ -43,6 +43,7 @@ namespace game
 		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TurnThreadPoolTask>& tasks) override;
 		void Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
 		[[nodiscard]] bool AutoClearOnFrameEnd() override;
-		bool ValidateOnTryAdd(const TurnThreadPoolTask& task) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const TurnThreadPoolTask& task) override;
+		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 	};
 }

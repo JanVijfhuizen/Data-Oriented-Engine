@@ -66,7 +66,7 @@ namespace jlb
 		size_t _nestableCapacity = 0;
 
 		[[nodiscard]] T& IntAdd(StackAllocator& allocator, const T& value);
-		void FreeNestedInstance(StackAllocator& allocator, Allocation<Node>& allocation);
+		void RemoveNested(StackAllocator& allocator, Node& node);
 	};
 
 	template <typename T>
@@ -154,10 +154,7 @@ namespace jlb
 	template <typename T>
 	void NestedVector<T>::RemoveNested(StackAllocator& allocator)
 	{
-		auto& next = _root.ptr->_next;
-		if(next)
-			FreeNestedInstance(allocator, next);
-		next = {};
+		RemoveNested(allocator, *_root.ptr);
 	}
 
 	template <typename T>
@@ -292,11 +289,13 @@ namespace jlb
 	}
 
 	template <typename T>
-	void NestedVector<T>::FreeNestedInstance(StackAllocator& allocator, Allocation<Node>& allocation)
+	void NestedVector<T>::RemoveNested(StackAllocator& allocator, Node& node)
 	{
-		if (allocation.ptr->_next)
-			FreeNestedInstance(allocator, allocation.ptr->_next);
-		allocation.ptr->Free(allocator);
-		allocator.MFree(allocation.id);
+		if (!node._next)
+			return;
+		RemoveNested(allocator, *node._next.ptr);
+		node._next.ptr->Free(allocator);
+		allocator.MFree(node._next.id);
+		node._next = {};
 	}
 }

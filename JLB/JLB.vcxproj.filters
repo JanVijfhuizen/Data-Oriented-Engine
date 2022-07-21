@@ -33,9 +33,6 @@
     <ClCompile Include="Source\Curve.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\DistanceTree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BVH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -104,10 +101,10 @@
     <ClInclude Include="Include\NestedVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\DistanceTree.h">
+    <ClInclude Include="Include\BVH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\BVH.h">
+    <ClInclude Include="Include\SwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

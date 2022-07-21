@@ -2,6 +2,8 @@
 
 namespace game
 {
+	struct MovementTaskOutput;
+
 	// Component related to the movement system.
 	struct MovementComponent final
 	{
@@ -15,12 +17,16 @@ namespace game
 			glm::vec2 from{};
 			glm::vec2 to{};
 			float rotation;
-			size_t remaining = 0;
+			size_t duration = 1;
 		} userDefined;
 		
 		struct SystemDefined final
 		{
 			float scaleMultiplier = 1;
+			size_t remaining = 0;
 		} systemDefined;
+
+		void Build();
+		void Update(const MovementTaskOutput& output);
 	};
 }

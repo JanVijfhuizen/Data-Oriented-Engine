@@ -15,7 +15,8 @@ namespace jlb
 			glm::vec2 scale;
 		};
 
-		void Allocate(StackAllocator& allocator, ArrayView<Instance> instances, size_t nodeCapacity = 4);
+		void Allocate(StackAllocator& allocator, uint32_t size);
+		void Build(ArrayView<Instance> instances, size_t nodeCapacity = 4);
 		void Free(StackAllocator& allocator);
 
 		[[nodiscard]] size_t GetIntersections(const glm::vec2& position, const glm::vec2& scale, 

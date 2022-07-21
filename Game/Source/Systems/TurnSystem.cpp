@@ -75,7 +75,6 @@ namespace game
 				keyLerp += info.deltaTime / visuals.onPressedAnimDuration;
 				keyLerp = jlb::math::Min<float>(1, keyLerp);
 			}
-
 			
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
 			auto curveDecelerate = jlb::CreateCurveDecelerate();
