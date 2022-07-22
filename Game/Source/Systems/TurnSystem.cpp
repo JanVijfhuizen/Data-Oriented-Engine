@@ -2,6 +2,7 @@
 #include "Systems/TurnSystem.h"
 #include "Curve.h"
 #include "JlbMath.h"
+#include "String.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "VkEngine/Graphics/RenderConventions.h"
@@ -93,22 +94,10 @@ namespace game
 				auto result = textRenderSys->TryAdd(info, textRenderTask);
 				assert(result != SIZE_MAX);
 
-				const char* stringLiterals[]
-				{
-					"1", "2", "4", "8", "16"
-				};
+				jlb::String string{};
+				string.AllocateFromNumber(*info.dumpAllocator, _ticksPerSecond);
 
-				size_t index = 0;
-				size_t ticks = 1;
-
-				while (ticks != _ticksPerSecond)
-				{
-					++index;
-					ticks *= 2;
-				}
-
-				assert(index < sizeof stringLiterals / sizeof(const char*));
-				textRenderTask.text = stringLiterals[index];
+				textRenderTask.text = string.GetStringView();
 				textRenderTask.appendIndex = result;
 				result = textRenderSys->TryAdd(info, textRenderTask);
 				assert(result != SIZE_MAX);
