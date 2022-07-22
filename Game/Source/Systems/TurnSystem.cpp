@@ -97,6 +97,7 @@ namespace game
 				textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
 				textRenderTask.origin.y += offset;
 				textRenderTask.text = "x";
+				textRenderTask.padding = -8;
 				auto result = textRenderSys->TryAdd(info, textRenderTask);
 				assert(result != SIZE_MAX);
 
@@ -137,7 +138,7 @@ namespace game
 			renderTask.subTexture = timerArrowSubTexture;
 			renderTask.position.y = visuals.screenYCoordinates + scale;
 			const float lerp = 1.f - jlb::math::Clamp<float>(_lerp, 0, 1);
-			const float maxWidth = (scale - cameraPixelSize) * 4;
+			const float maxWidth = (scale - cameraPixelSize) * 3;
 			renderTask.position.x = lerp * maxWidth * 2 - maxWidth;
 			renderTask.scale = glm::vec2(scale);
 			auto result = uiSys->TryAdd(info, renderTask);

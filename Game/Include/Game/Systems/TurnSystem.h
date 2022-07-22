@@ -15,7 +15,7 @@ namespace game
 		struct Visuals final
 		{
 			// Padding between the keys.
-			size_t padding = 4;
+			int32_t padding = -2;
 			// Height of the turn ui in screen space.
 			float screenYCoordinates = .8f;
 			// UI buttons scale this much if they have been pressed.
