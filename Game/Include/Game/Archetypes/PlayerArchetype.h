@@ -25,6 +25,6 @@ namespace game
 
 		Input _movementInput[4]{};
 
-		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input);
+		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
 	};
 }

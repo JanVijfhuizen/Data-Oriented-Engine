@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
+
+#include "JlbMath.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MovementSystem.h"
@@ -25,22 +27,27 @@ namespace game
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
 		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-
-		const bool isPaused = turnSys->GetIsPaused();
+		
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 
 		vke::EntityRenderTask renderTask{};
 		renderTask.subTexture = subTexturesDivided[0];
 		
 		glm::vec2 cameraCenter{};
-
-		for (auto& input : _movementInput)
-			input.valid = isPaused ? input.pressed : input.valid;
+		
+		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
+		glm::vec2 inputDirs[4]
+		{
+			glm::vec2(0, -1),
+			glm::vec2(-1, 0),
+			glm::vec2(0, 1),
+			glm::vec2(1, 0)
+		};
 
 		for (auto& entity : entities)
 		{
-			auto& movementComponent = entity.movementComponent;
-			auto& transform = entity.transform;
+			const auto& movementComponent = entity.movementComponent;
+			const auto& transform = entity.transform;
 
 			renderTask.transform = transform;
 			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
@@ -50,6 +57,15 @@ namespace game
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
+
+			renderTask.subTexture = subTextureDirArrow;
+			for (size_t i = 0; i < 4; ++i)
+			{
+				auto& input = _movementInput[i];
+				renderTask.transform.position = transform.position + inputDirs[i];
+				renderTask.transform.rotation = -jlb::math::PI * i * .5f;
+				input.valid ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
+			}
 		}
 
 		if (isTickEvent)
@@ -105,7 +121,7 @@ namespace game
 				{
 					glm::ivec2 dir{};
 					dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
-					dir.y = dir.x == 0 ? static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid : 0;
+					dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
 
 					for (auto& input : _movementInput)
 					{
@@ -142,10 +158,10 @@ namespace game
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
 	{
-		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _movementInput[0]);
-		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1]);
-		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2]);
-		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3]);
+		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _movementInput[0], _movementInput[2]);
+		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1], _movementInput[3]);
+		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2], _movementInput[0]);
+		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3], _movementInput[1]);
 
 		if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 			for (auto& movementInput : _movementInput)
@@ -157,7 +173,7 @@ namespace game
 	{
 	}
 
-	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input)
+	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input, Input& opposite)
 	{
 		if (targetKey != activatedKey)
 			return;
@@ -165,7 +181,8 @@ namespace game
 		if (action == GLFW_PRESS)
 		{
 			input.pressed = true;
-			input.valid = true;
+			input.valid = !input.valid;
+			opposite.valid = false;
 		}
 			
 		if (action == GLFW_RELEASE)

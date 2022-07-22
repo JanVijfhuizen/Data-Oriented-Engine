@@ -2,7 +2,7 @@
 #include "Systems/TurnSystem.h"
 #include "Curve.h"
 #include "JlbMath.h"
-#include "String.h"
+#include "JlbString.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "VkEngine/Graphics/RenderConventions.h"
