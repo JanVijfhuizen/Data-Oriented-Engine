@@ -21,17 +21,17 @@ namespace game
 		return current.bvh.GetIntersections(position, scale, current.tasks, outArray);
 	}
 
-	size_t CollisionSystem::ReserveTile(const glm::ivec2& position)
+	size_t CollisionSystem::ReserveTiles(const jlb::Bounds& bounds)
 	{
 		auto& current = _collisionFrames.GetCurrent();
-		return current.distanceTree.Add(position);
+		return current.distanceTree.Add(bounds);
 	}
 
-	size_t CollisionSystem::CheckIfTileIsReserved(const glm::ivec2& position)
+	size_t CollisionSystem::CheckIfTilesAreReserved(const jlb::Bounds& bounds)
 	{
 		auto& current = _collisionFrames.GetCurrent();
-		size_t out = SIZE_MAX;
-		const size_t count = current.distanceTree.GetInstancesInRange(position, .2f, out);
+		uint32_t out = SIZE_MAX;
+		const uint32_t count = current.distanceTree.GetInstancesInRange(bounds, out);
 		return count == 0 ? SIZE_MAX : out;
 	}
 

@@ -29,7 +29,7 @@ namespace game::demo
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 
-			collisionSys->ReserveTile(glm::vec2(2, 2));
+			collisionSys->ReserveTiles(glm::ivec2(2, 2));
 		}
 	}
 

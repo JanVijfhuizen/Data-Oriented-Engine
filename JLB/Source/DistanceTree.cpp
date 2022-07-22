@@ -3,7 +3,7 @@
 
 namespace jlb
 {
-	void DistanceTree::Allocate(StackAllocator& allocator, const size_t size)
+	void DistanceTree::Allocate(StackAllocator& allocator, const uint32_t size)
 	{
 		_nodes.Allocate(allocator, size);
 	}
@@ -13,26 +13,43 @@ namespace jlb
 		_nodes.Free(allocator);
 	}
 
-	size_t DistanceTree::Add(const glm::vec2& position)
+	uint32_t DistanceTree::Add(const Bounds& bounds)
+	{
+		return Add(bounds, bounds.GetCenter());
+	}
+
+	uint32_t DistanceTree::Add(const Bounds& bounds, const glm::ivec2& center)
 	{
 		assert(_index < _nodes.GetLength());
 
-		size_t current = 0;
+		uint32_t current = 0;
 		bool stop = false;
+
+		auto& lBot = bounds.lBot;
+		auto& rTop = bounds.rTop;
 
 		while (!stop)
 		{
+			auto& node = _nodes[current];
+			auto& nodeBounds = node.bounds;
+			auto& lBotNode = nodeBounds.lBot;
+			auto& rTopNode = nodeBounds.rTop;
+
 			// Check if the current node is empty.
 			// If so, stop at this node.
-			auto& node = _nodes[current];
-			stop = node.index == SIZE_MAX;
+			stop = node.index == UINT32_MAX;
 
 			// Change the index + position + next if this node is a leaf.
 			node.index = stop ? _index : node.index;
-			node.position = stop ? position : node.position;
+			lBotNode = stop ? lBot : lBotNode;
+			rTopNode = stop ? rTop : rTopNode;
+			node.instanceBounds = stop ? bounds : node.instanceBounds;
 
-			// Updates range to equal that of the furthest most leaf branch.
-			node.range = stop ? node.range : math::Max(node.range, CalculateDistance(position, node));
+			// Updates bounds to reflect new instance.
+			lBotNode.x = math::Min(lBot.x, lBotNode.x);
+			lBotNode.y = math::Min(lBot.y, lBotNode.y);
+			rTopNode.x = math::Max(lBot.x, rTopNode.x);
+			rTopNode.y = math::Max(lBot.y, rTopNode.y);
 
 			_index += stop;
 
@@ -48,8 +65,10 @@ namespace jlb
 			const auto& rightNode = _nodes[right];
 
 			// Calculate distances for the child nodes.
-			const float leftDis = right == _index ? SIZE_MAX : CalculateDistance(position, leftNode);
-			const float rightDis = left == _index ? SIZE_MAX : CalculateDistance(position, rightNode);
+			const bool checkLeft = right != _index && left != 0;
+			const bool checkRight = left != _index && right != 0;
+			const float leftDis = checkLeft ? CalculateDistance(center, leftNode.bounds) : FLT_MAX;
+			const float rightDis = checkRight ? CalculateDistance(center, rightNode.bounds) : FLT_MAX;
 
 			// Don't change the current node if stop is true.
 			// Else, set the current node to the node closest by.
@@ -59,15 +78,15 @@ namespace jlb
 		return current;
 	}
 
-	size_t DistanceTree::GetInstancesInRange(const glm::vec2& position, const float range, const ArrayView<size_t> outArray)
+	uint32_t DistanceTree::GetInstancesInRange(const Bounds& bounds, const ArrayView<uint32_t> outArray)
 	{
 		assert(outArray.length > 0);
-		size_t index = 0;
-		GetInstancesInRange(position, range, 0, outArray, index);
+		uint32_t index = 0;
+		GetInstancesInRange(bounds, 0, outArray, index);
 		return index;
 	}
 
-	size_t DistanceTree::GetLength() const
+	uint32_t DistanceTree::GetLength() const
 	{
 		return _nodes.GetLength();
 	}
@@ -79,35 +98,42 @@ namespace jlb
 		_index = 0;
 	}
 
-	float DistanceTree::CalculateDistance(const glm::vec2& position, const Node& node) const
+	float DistanceTree::CalculateDistance(const glm::ivec2& position, const Bounds& bounds) const
 	{
-		const bool empty = node.index == SIZE_MAX;
-		return empty ? 0 : math::Max<float>(glm::distance(position, node.position) - node.range, 0);
+		const auto& lBot = bounds.lBot;
+		const auto& rTop = bounds.rTop;
+
+		const bool xInBounds = position.x >= lBot.x && position.x <= rTop.x;
+		const bool yInBounds = position.y >= lBot.y && position.y <= rTop.y;
+
+		const size_t xOffset = xInBounds ? 0 : math::Min(abs(position.x - lBot.x), abs(position.x - rTop.x));
+		const size_t yOffset = yInBounds ? 0 : math::Min(abs(position.y - lBot.y), abs(position.y - rTop.y));
+
+		return glm::length(glm::vec2(xOffset, yOffset));
 	}
 
-	void* DistanceTree::GetInstancesInRange(const glm::vec2& position,
-		const float range, const size_t current,
-		const ArrayView<size_t>& outArray, size_t& arrayIndex)
+	bool DistanceTree::Intersects(const Bounds& a, const Bounds& b)
+	{
+		return a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
+	}
+
+	void* DistanceTree::GetInstancesInRange(const Bounds& bounds, const uint32_t current, 
+		const ArrayView<uint32_t>& outArray, uint32_t& arrayIndex)
 	{
 		const auto& node = _nodes[current];
-		const bool isValid = node.index != SIZE_MAX;
+		bool isValid = node.index != UINT32_MAX;
 
-		const float dis = glm::distance(position, node.position) - range;
-		// If the node's instance is in range. If so, we can add it to the array.
-		const bool instanceInRange = isValid ? dis < 0 : false;
-		// If the node's radius is large enough, the children are still worth looking into.
-		const bool nodeInRange = isValid ? dis - node.range < 0 : false;
+		const bool nodeIntersects = isValid ? Intersects(bounds, node.bounds) : false;
+		const bool instanceIntersects = nodeIntersects ? Intersects(bounds, node.instanceBounds) : false;
 
 		// Add the current node and increment the array index.
 		outArray[arrayIndex] = node.index;
-		arrayIndex += instanceInRange;
+		arrayIndex += instanceIntersects;
 
-		if(arrayIndex < outArray.length)
-		{
-			// Silly optimization to avoid branching.
-			!nodeInRange || node.left == 0 ? nullptr : GetInstancesInRange(position, range, node.left, outArray, arrayIndex);
-			!nodeInRange || node.right == 0 ? nullptr : GetInstancesInRange(position, range, node.right, outArray, arrayIndex);
-		}
+		isValid = isValid ? arrayIndex < outArray.length && nodeIntersects : false;
+		// Silly optimization to avoid branching.
+		!isValid || node.left == 0 ? nullptr : GetInstancesInRange(bounds, node.left, outArray, arrayIndex);
+		!isValid || node.right == 0 ? nullptr : GetInstancesInRange(bounds, node.right, outArray, arrayIndex);
 		
 		return nullptr;
 	}

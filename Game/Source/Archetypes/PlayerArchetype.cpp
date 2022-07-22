@@ -121,7 +121,7 @@ namespace game
 						const glm::vec2 delta = glm::vec2(dir);
 						const glm::vec2 to = from + delta;
 
-						if (collisionSys->CheckIfTileIsReserved(to) != SIZE_MAX)
+						if (collisionSys->CheckIfTilesAreReserved(glm::ivec2(to)) != SIZE_MAX)
 							continue;
 
 						uint32_t outCollision;
@@ -130,7 +130,7 @@ namespace game
 						if(collided)
 							continue;
 
-						const size_t reserved = collisionSys->ReserveTile(to);
+						const size_t reserved = collisionSys->ReserveTiles(glm::ivec2(to));
 						movementUserDefined.from = from;
 						movementUserDefined.to = to;
 						movementUserDefined.rotation = transform.rotation;

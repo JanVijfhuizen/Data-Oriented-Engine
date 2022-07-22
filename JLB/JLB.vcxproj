@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Allocation.cpp" />
+    <ClCompile Include="Source\Bounds.cpp" />
     <ClCompile Include="Source\BVH.cpp" />
     <ClCompile Include="Source\Curve.cpp" />
     <ClCompile Include="Source\DistanceTree.cpp" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="Include\Allocation.h" />
     <ClInclude Include="Include\ArrayUtils.h" />
+    <ClInclude Include="Include\Bounds.h" />
     <ClInclude Include="Include\BVH.h" />
     <ClInclude Include="Include\Curve.h" />
     <ClInclude Include="Include\DistanceTree.h" />
