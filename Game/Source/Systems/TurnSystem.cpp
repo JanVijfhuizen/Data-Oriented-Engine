@@ -35,6 +35,12 @@ namespace game
 		_pauseAtEndOfTick = true;
 	}
 
+	void TurnSystem::SkipToNextTick()
+	{
+		_forwardToNextTick = true;
+		_pauseAtEndOfTick = true;
+	}
+
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		vke::GameSystem::PreUpdate(info, systems);

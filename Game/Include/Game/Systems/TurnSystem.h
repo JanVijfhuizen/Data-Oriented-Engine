@@ -34,6 +34,7 @@ namespace game
 		[[nodiscard]] bool GetIsPaused() const;
 
 		void PauseAtEndOfTick();
+		void SkipToNextTick();
 
 	private:
 		jlb::StackArray<float, 5> _keyVerticalLerps{1};
