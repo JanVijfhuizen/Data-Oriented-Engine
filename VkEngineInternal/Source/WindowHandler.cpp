@@ -44,7 +44,7 @@ namespace vke
 		// Set input callback.
 		glfwSetKeyCallback(_window, GLFWKeyCallback);
 		glfwSetMouseButtonCallback(_window, GLFWMouseKeyCallback);
-		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 
 	void WindowHandler::Free() const
