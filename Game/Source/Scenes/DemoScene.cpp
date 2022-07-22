@@ -1,5 +1,9 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
+
+#include <iostream>
+
+#include "String.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"

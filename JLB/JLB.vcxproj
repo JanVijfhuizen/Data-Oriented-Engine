@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\String.cpp" />
     <ClCompile Include="Source\Allocation.cpp" />
     <ClCompile Include="Source\Bounds.cpp" />
     <ClCompile Include="Source\BVH.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Include\JlbMath.h" />
     <ClInclude Include="Include\StackArray.h" />
     <ClInclude Include="Include\StackVector.h" />
+    <ClInclude Include="Include\String.h" />
     <ClInclude Include="Include\StringView.h" />
     <ClInclude Include="Include\SwapChain.h" />
     <ClInclude Include="Include\System.h" />
