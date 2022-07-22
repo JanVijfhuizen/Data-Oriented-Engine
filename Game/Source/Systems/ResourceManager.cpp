@@ -28,7 +28,7 @@ namespace game
 		constexpr auto SUB_TEXTURE_PATH_TILE = "Textures/subTextures-tile.dat";
 		constexpr auto SUB_TEXTURE_PATH_UI = "Textures/subTextures-ui.dat";
 
-		constexpr auto ATLAS_LENGTH = 2;
+		constexpr auto ATLAS_LENGTH = 3;
 		constexpr auto ATLAS_LENGTH_TILE = 1;
 		constexpr auto ATLAS_LENGTH_UI = 6;
 
@@ -39,6 +39,7 @@ namespace game
 			partitions[0].path = "Textures/mouse.png";
 			partitions[1].path = "Textures/humanoid.png";
 			partitions[1].width = 2;
+			partitions[2].path = "Textures/directional-arrow.png";
 
 			vke::texture::GenerateAtlas(info, "Textures/atlas.png", SUB_TEXTURE_PATH, partitions, 8, 4);	
 		}

@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
+
+#include "JlbMath.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MovementSystem.h"
@@ -37,6 +39,7 @@ namespace game
 		for (auto& input : _movementInput)
 			input.valid = isPaused ? input.pressed : input.valid;
 
+		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
 		glm::vec2 inputDirs[4]
 		{
 			glm::vec2(0, -1),
@@ -59,10 +62,12 @@ namespace game
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
 
+			renderTask.subTexture = subTextureDirArrow;
 			for (size_t i = 0; i < 4; ++i)
 			{
 				auto& input = _movementInput[i];
 				renderTask.transform.position = transform.position + inputDirs[i];
+				renderTask.transform.rotation = -jlb::math::PI * i * .5f;
 				input.valid ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
 			}
 		}
@@ -157,10 +162,10 @@ namespace game
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
 	{
-		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _movementInput[0]);
-		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1]);
-		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2]);
-		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3]);
+		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _movementInput[0], _movementInput[2]);
+		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1], _movementInput[3]);
+		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2], _movementInput[0]);
+		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3], _movementInput[1]);
 
 		if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 			for (auto& movementInput : _movementInput)
@@ -172,18 +177,16 @@ namespace game
 	{
 	}
 
-	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input)
+	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input, Input& opposite)
 	{
 		if (targetKey != activatedKey)
 			return;
 
 		if (action == GLFW_PRESS)
 		{
-			for (auto& other : _movementInput)
-				other.valid = false;
-
 			input.pressed = true;
 			input.valid = true;
+			opposite.valid = false;
 		}
 			
 		if (action == GLFW_RELEASE)

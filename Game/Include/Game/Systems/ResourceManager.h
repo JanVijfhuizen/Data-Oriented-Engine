@@ -12,7 +12,8 @@ namespace game
 		enum class EntitySubTextures
 		{
 			mouse,
-			humanoid
+			humanoid,
+			directionalArrow
 		};
 
 		// Subtextures available for the tile renderer.
