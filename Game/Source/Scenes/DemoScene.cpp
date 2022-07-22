@@ -24,8 +24,8 @@ namespace game::demo
 		if(turnSys->GetIfTickEvent())
 		{
 			CollisionTask collisionTask{};
-			collisionTask.position = tileTask.position;
-			collisionTask.scale = tileTask.shape;
+			collisionTask.lBot = glm::ivec2(2, 3);
+			collisionTask.rTop = collisionTask.lBot + glm::ivec2(2, 4);
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 

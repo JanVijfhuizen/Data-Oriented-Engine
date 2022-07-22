@@ -6,7 +6,7 @@
 
 namespace game
 {
-	typedef jlb::BoundingVolumeHierarchy::Instance CollisionTask;
+	typedef jlb::Bounds CollisionTask;
 
 	class CollisionSystem final : public vke::GameSystem
 	{

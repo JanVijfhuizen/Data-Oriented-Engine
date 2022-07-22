@@ -18,7 +18,7 @@ namespace game
 	{
 		scale += FLT_EPSILON;
 		auto& current = _collisionFrames.GetPrevious();
-		return current.bvh.GetIntersections(position, scale, current.tasks, outArray);
+		return current.bvh.GetIntersections(glm::ivec2(position), current.tasks, outArray);
 	}
 
 	size_t CollisionSystem::ReserveTiles(const jlb::Bounds& bounds)
