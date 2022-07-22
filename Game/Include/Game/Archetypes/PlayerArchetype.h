@@ -24,6 +24,7 @@ namespace game
 		};
 
 		Input _movementInput[4]{};
+		const float _scalingOnSelected = 0.5f;
 
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
 	};
