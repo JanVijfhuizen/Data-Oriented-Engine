@@ -12,13 +12,10 @@ namespace game
 		return previous.tasks.GetCount() - 1;
 	}
 
-	size_t CollisionSystem::GetIntersections(
-		const glm::vec2& position,  glm::vec2 scale,
-		const jlb::ArrayView<uint32_t> outArray)
+	size_t CollisionSystem::GetIntersections(const jlb::Bounds& bounds, const jlb::ArrayView<uint32_t> outArray)
 	{
-		scale += FLT_EPSILON;
 		auto& current = _collisionFrames.GetPrevious();
-		return current.bvh.GetIntersections(glm::ivec2(position), current.tasks, outArray);
+		return current.bvh.GetIntersections(bounds, current.tasks, outArray);
 	}
 
 	size_t CollisionSystem::ReserveTiles(const jlb::Bounds& bounds)

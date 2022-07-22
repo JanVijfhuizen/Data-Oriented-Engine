@@ -8,13 +8,18 @@ namespace game
 {
 	typedef jlb::Bounds CollisionTask;
 
+	enum class CollisionLayers
+	{
+		main = 0b1,
+		interactable = 0b10
+	};
+
 	class CollisionSystem final : public vke::GameSystem
 	{
 	public:
 		[[nodiscard]] size_t TryAdd(const CollisionTask& task);
 
-		[[nodiscard]] size_t GetIntersections(
-			const glm::vec2& position, glm::vec2 scale,
+		[[nodiscard]] size_t GetIntersections(const jlb::Bounds& bounds,
 			jlb::ArrayView<uint32_t> outArray);
 
 		[[nodiscard]] size_t ReserveTiles(const jlb::Bounds& bounds);
