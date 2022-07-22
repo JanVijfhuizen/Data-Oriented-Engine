@@ -7,6 +7,7 @@ namespace jlb
 	class String final : public Array<char>
 	{
 	public:
+		void AllocateFromNumber(StackAllocator& allocator, size_t number);
 		void Allocate(StackAllocator& allocator, const StringView& view);
 		void Allocate(StackAllocator& allocator, size_t size, const char& fillValue = {}) override;
 		char& operator[](size_t index) const override;
