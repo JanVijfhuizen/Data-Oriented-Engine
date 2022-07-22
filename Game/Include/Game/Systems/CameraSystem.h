@@ -15,7 +15,7 @@ namespace game
 			float zoom = 0;
 
 			glm::vec2 bias{};
-			glm::vec2 deadZone{ 8, 4 };
+			glm::vec2 deadZone{ 3.5f, 2.5f };
 			glm::vec2 moveZone{ 10 };
 			glm::vec2 zoomZone = deadZone;
 

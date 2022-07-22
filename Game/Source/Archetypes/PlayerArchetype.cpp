@@ -182,7 +182,7 @@ namespace game
 		if (action == GLFW_PRESS)
 		{
 			input.pressed = true;
-			input.valid = !input.valid;
+			input.valid = true;
 			opposite.valid = false;
 			opposite.pressedSinceStartOfFrame = false;
 		}
