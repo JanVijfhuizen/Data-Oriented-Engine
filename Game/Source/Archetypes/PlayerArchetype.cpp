@@ -27,18 +27,14 @@ namespace game
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
 		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-
-		const bool isPaused = turnSys->GetIsPaused();
+		
 		const bool isTickEvent = turnSys->GetIfTickEvent();
 
 		vke::EntityRenderTask renderTask{};
 		renderTask.subTexture = subTexturesDivided[0];
 		
 		glm::vec2 cameraCenter{};
-
-		for (auto& input : _movementInput)
-			input.valid = isPaused ? input.pressed : input.valid;
-
+		
 		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
 		glm::vec2 inputDirs[4]
 		{
@@ -185,7 +181,7 @@ namespace game
 		if (action == GLFW_PRESS)
 		{
 			input.pressed = true;
-			input.valid = true;
+			input.valid = !input.valid;
 			opposite.valid = false;
 		}
 			
