@@ -43,13 +43,16 @@ namespace jlb
 			node.index = stop ? _index : node.index;
 			lBotNode = stop ? lBot : lBotNode;
 			rTopNode = stop ? rTop : rTopNode;
-			node.instanceBounds = stop ? bounds : node.instanceBounds;
+
+			auto& instance = node.instance;
+			instance = stop ? bounds : instance;
 
 			// Updates bounds to reflect new instance.
 			lBotNode.x = math::Min(lBot.x, lBotNode.x);
 			lBotNode.y = math::Min(lBot.y, lBotNode.y);
 			rTopNode.x = math::Max(lBot.x, rTopNode.x);
 			rTopNode.y = math::Max(lBot.y, rTopNode.y);
+			instance.layers |= bounds.layers;
 
 			_index += stop;
 
@@ -114,7 +117,7 @@ namespace jlb
 
 	bool DistanceTree::Intersects(const Bounds& a, const Bounds& b)
 	{
-		return a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
+		return (a.layers & b.layers) == 0 ? false : a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
 	}
 
 	void* DistanceTree::GetInstancesInRange(const Bounds& bounds, const uint32_t current, 
@@ -124,7 +127,7 @@ namespace jlb
 		bool isValid = node.index != UINT32_MAX;
 
 		const bool nodeIntersects = isValid ? Intersects(bounds, node.bounds) : false;
-		const bool instanceIntersects = nodeIntersects ? Intersects(bounds, node.instanceBounds) : false;
+		const bool instanceIntersects = nodeIntersects ? Intersects(bounds, node.instance) : false;
 
 		// Add the current node and increment the array index.
 		outArray[arrayIndex] = node.index;

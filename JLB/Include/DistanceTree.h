@@ -21,7 +21,7 @@ namespace jlb
 		struct Node final
 		{
 			uint32_t index = UINT32_MAX;
-			Bounds instanceBounds{};
+			Bounds instance{};
 			Bounds bounds{};
 			uint32_t left = 0;
 			uint32_t right = 0;

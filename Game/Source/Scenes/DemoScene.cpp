@@ -34,7 +34,9 @@ namespace game::demo
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 
-			collisionSys->ReserveTiles(glm::ivec2(2, 2));
+			jlb::Bounds b = glm::ivec2(2);
+			b.layers = 0b1;
+			collisionSys->ReserveTiles(b);
 		}
 	}
 
