@@ -7,6 +7,7 @@ namespace jlb
 	{
 		glm::ivec2 lBot{};
 		glm::ivec2 rTop{};
+		uint32_t layers = 1;
 
 		Bounds();
 		Bounds(const glm::ivec2& position);

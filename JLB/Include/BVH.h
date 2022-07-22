@@ -1,6 +1,4 @@
 #pragma once
-#include <glm/vec2.hpp>
-
 #include "Bounds.h"
 #include "Vector.h"
 

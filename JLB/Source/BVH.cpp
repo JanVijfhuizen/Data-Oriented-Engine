@@ -31,7 +31,7 @@ namespace jlb
 
 	bool BoundingVolumeHierarchy::Intersects(const Bounds& a, const Bounds& b)
 	{
-		return a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
+		return (a.layers & b.layers) == 0 ? false : a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
 	}
 
 	size_t BoundingVolumeHierarchy::GetIntersections(const Bounds& bounds, 
@@ -64,6 +64,7 @@ namespace jlb
 			lBot.y = math::Min(lBot.y, lBotInstance.y);
 			rTop.x = math::Max(rTop.x, rTopInstance.x);
 			rTop.y = math::Max(rTop.y, rTopInstance.x);
+			bounds.layers |= instance.layers;
 		}
 
 		median /= to - from;

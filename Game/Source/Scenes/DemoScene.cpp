@@ -30,6 +30,7 @@ namespace game::demo
 			CollisionTask collisionTask{};
 			collisionTask.lBot = glm::ivec2(2, 3);
 			collisionTask.rTop = collisionTask.lBot + glm::ivec2(2, 4);
+			collisionTask.layers = 0b11;
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 
