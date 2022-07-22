@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/CollisionSystem.h"
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -14,6 +15,7 @@ namespace game
 			return;
 
 		const auto& mousePos = info.mousePos;
+		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 

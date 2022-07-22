@@ -36,7 +36,7 @@ void HandleInstance(in InstanceData instance)
     outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
 
-    gl_Position = CalculatePosition(instance.position, instance.scale, pushConstants.cameraPosition, inPosition, pushConstants.resolution, 1);
+    gl_Position = CalculatePositionUI(instance.position, instance.scale, pushConstants.cameraPosition, inPosition, pushConstants.resolution, 1);
 }
 
 void main()

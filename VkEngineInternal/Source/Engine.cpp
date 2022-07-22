@@ -106,10 +106,18 @@ namespace vke
 				double x;
 				double y;
 				glfwGetCursorPos(windowHandler.GetGLFWWindow(), &x, &y);
+
 				x /= engineSwapChainData.resolution.x;
 				y /= engineSwapChainData.resolution.y;
-				outData.mousePos.x = x;
-				outData.mousePos.y = y;
+
+				x = x * 2 - 1;
+				y = y * 2 - 1;
+
+				auto& mousePos = outData.mousePos;
+				mousePos.x = x;
+				mousePos.y = y;
+
+				outData.mouseAvailable = mousePos.x > -1 && mousePos.x < 1 && mousePos.y > -1 && mousePos.y < 1;
 			}
 
 			// Update the game.
