@@ -32,7 +32,7 @@ namespace game
 
 			// Calculate position.
 			{
-				const glm::vec2 delta = glm::length(moveDelta) > 1e-3f ? moveDelta : deadDelta * info.deltaTime * 1e-2f;
+				const glm::vec2 delta = glm::length(moveDelta) > 1e-3f ? moveDelta : deadDelta * info.deltaTime * 1e-2f * settings.moveSpeed;
 				sys->settings.position += delta;
 			}
 

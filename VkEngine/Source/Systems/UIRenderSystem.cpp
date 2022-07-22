@@ -1,17 +1,18 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
-
 #include "VkEngine/Graphics/RenderConventions.h"
 
 namespace vke
 {
-	glm::vec2 UIRenderSystem::ScreenToWorldPos(const glm::vec2 pos, const UICamera& camera)
+	glm::vec2 UIRenderSystem::ScreenToWorldPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution)
 	{
+		pos.x *= static_cast<float>(resolution.x) / resolution.y;
 		return (pos / camera.pixelSize + camera.position) / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 	}
 
-	glm::vec2 UIRenderSystem::WorldToScreenPos(const glm::vec2 pos, const UICamera& camera)
+	glm::vec2 UIRenderSystem::WorldToScreenPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution)
 	{
+		pos.x *= static_cast<float>(resolution.y) / resolution.x;
 		return (pos * static_cast<float>(vke::PIXEL_SIZE_ENTITY) - camera.position) * camera.pixelSize;
 	}
 

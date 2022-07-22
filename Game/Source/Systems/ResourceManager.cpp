@@ -57,6 +57,7 @@ namespace game
 			partitions[0].path = "Textures/alphabet.png";
 			partitions[0].width = 26;
 			partitions[1].path = "Textures/mouse.png";
+			partitions[1].width = 2;
 			partitions[2].path = "Textures/numbers.png";
 			partitions[2].width = 10;
 			partitions[3].path = "Textures/timeline.png";

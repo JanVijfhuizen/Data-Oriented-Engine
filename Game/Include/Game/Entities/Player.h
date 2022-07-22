@@ -9,7 +9,8 @@ namespace game
 		MovementComponent movementComponent{};
 		vke::Transform transform{};
 
-		size_t movementTaskId;
-		size_t collisionTaskId;
+		size_t movementTaskId = SIZE_MAX;
+		size_t collisionTaskId = SIZE_MAX;
+		size_t movementTileReservation = SIZE_MAX;
 	};
 }

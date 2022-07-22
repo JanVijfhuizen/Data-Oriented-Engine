@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
-
 #include "JlbMath.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
@@ -20,6 +20,7 @@ namespace game
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
+		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
@@ -44,6 +45,8 @@ namespace game
 			glm::vec2(1, 0)
 		};
 
+		size_t hoveredObj = mouseSys->GetHoveredObject();
+
 		for (auto& entity : entities)
 		{
 			const auto& movementComponent = entity.movementComponent;
@@ -51,6 +54,8 @@ namespace game
 
 			renderTask.transform = transform;
 			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
+			const bool hovered = hoveredObj == entity.collisionTaskId && hoveredObj != SIZE_MAX;
+			renderTask.transform.scale *= 1.f + _scalingOnSelected * static_cast<float>(hovered);
 
 			const auto result = entityRenderSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
@@ -75,6 +80,7 @@ namespace game
 				auto& transform = entity.transform;
 				CollisionTask task{};
 				task = entity.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(entity.movementComponent.userDefined.to);
+				task.layers = collisionLayerMain | collisionLayerInteractable;
 				entity.collisionTaskId = collisionSys->TryAdd(task);
 				assert(entity.collisionTaskId != SIZE_MAX);
 			}
@@ -116,6 +122,8 @@ namespace game
 				auto& movementUserDefined = movementComponent.userDefined;
 				const auto& movementSystemDefined = movementComponent.systemDefined;
 
+				entity.movementTileReservation = SIZE_MAX;
+
 				// Update movement task with new input.
 				if (movementSystemDefined.remaining == 0)
 				{
@@ -145,7 +153,7 @@ namespace game
 						if(collided)
 							continue;
 
-						const size_t reserved = collisionSys->ReserveTiles(glm::ivec2(to));
+						entity.movementTileReservation = collisionSys->ReserveTiles(glm::ivec2(to));
 						movementUserDefined.from = from;
 						movementUserDefined.to = to;
 						movementUserDefined.rotation = transform.rotation;
@@ -181,7 +189,7 @@ namespace game
 		if (action == GLFW_PRESS)
 		{
 			input.pressed = true;
-			input.valid = !input.valid;
+			input.valid = true;
 			opposite.valid = false;
 			opposite.pressedSinceStartOfFrame = false;
 		}

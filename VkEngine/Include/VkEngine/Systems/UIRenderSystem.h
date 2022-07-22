@@ -25,8 +25,8 @@ namespace vke
 	class UIRenderSystem final : public RenderSystem<UIRenderTask, UICamera>
 	{
 	public:
-		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const UICamera& camera);
-		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const UICamera& camera);
+		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution);
+		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution);
 
 	private:
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;

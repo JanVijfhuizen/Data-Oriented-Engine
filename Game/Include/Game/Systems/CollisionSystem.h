@@ -8,10 +8,10 @@ namespace game
 {
 	typedef jlb::Bounds CollisionTask;
 
-	enum class CollisionLayers
+	enum CollisionLayers
 	{
-		main = 0b1,
-		interactable = 0b10
+		collisionLayerMain = 0b1,
+		collisionLayerInteractable = 0b10
 	};
 
 	class CollisionSystem final : public vke::GameSystem
