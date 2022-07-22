@@ -6,7 +6,7 @@
 
 namespace game
 {
-	typedef jlb::BoundingVolumeHierarchy::Instance CollisionTask;
+	typedef jlb::Bounds CollisionTask;
 
 	class CollisionSystem final : public vke::GameSystem
 	{
@@ -17,8 +17,8 @@ namespace game
 			const glm::vec2& position, glm::vec2 scale,
 			jlb::ArrayView<uint32_t> outArray);
 
-		[[nodiscard]] size_t ReserveTile(const glm::ivec2& position);
-		[[nodiscard]] size_t CheckIfTileIsReserved(const glm::ivec2& position);
+		[[nodiscard]] size_t ReserveTiles(const jlb::Bounds& bounds);
+		[[nodiscard]] size_t CheckIfTilesAreReserved(const jlb::Bounds& bounds);
 
 	private:
 		struct CollisionFrame final
