@@ -37,10 +37,18 @@ namespace game
 		for (auto& input : _movementInput)
 			input.valid = isPaused ? input.pressed : input.valid;
 
+		glm::vec2 inputDirs[4]
+		{
+			glm::vec2(0, -1),
+			glm::vec2(-1, 0),
+			glm::vec2(0, 1),
+			glm::vec2(1, 0)
+		};
+
 		for (auto& entity : entities)
 		{
-			auto& movementComponent = entity.movementComponent;
-			auto& transform = entity.transform;
+			const auto& movementComponent = entity.movementComponent;
+			const auto& transform = entity.transform;
 
 			renderTask.transform = transform;
 			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
@@ -50,6 +58,13 @@ namespace game
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
+
+			for (size_t i = 0; i < 4; ++i)
+			{
+				auto& input = _movementInput[i];
+				renderTask.transform.position = transform.position + inputDirs[i];
+				input.valid ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
+			}
 		}
 
 		if (isTickEvent)
@@ -105,7 +120,7 @@ namespace game
 				{
 					glm::ivec2 dir{};
 					dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
-					dir.y = dir.x == 0 ? static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid : 0;
+					dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
 
 					for (auto& input : _movementInput)
 					{
@@ -164,6 +179,9 @@ namespace game
 
 		if (action == GLFW_PRESS)
 		{
+			for (auto& other : _movementInput)
+				other.valid = false;
+
 			input.pressed = true;
 			input.valid = true;
 		}
