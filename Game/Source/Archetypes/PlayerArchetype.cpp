@@ -183,6 +183,7 @@ namespace game
 			input.pressed = true;
 			input.valid = !input.valid;
 			opposite.valid = false;
+			opposite.pressedSinceStartOfFrame = false;
 		}
 			
 		if (action == GLFW_RELEASE)
@@ -190,6 +191,7 @@ namespace game
 			input.pressed = false;
 			if(input.pressedSinceStartOfFrame)
 				input.valid = false;
+			input.pressedSinceStartOfFrame = false;
 		}
 	}
 }
