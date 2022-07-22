@@ -7,5 +7,6 @@ namespace game
 	class MouseSystem final : public vke::GameSystem
 	{
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void OnMouseInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};
 }

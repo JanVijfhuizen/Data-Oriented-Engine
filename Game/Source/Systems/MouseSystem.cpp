@@ -1,8 +1,12 @@
 ﻿#include "pch.h"
 #include "Systems/MouseSystem.h"
+
+#include <iostream>
+
 #include "Systems/CollisionSystem.h"
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Graphics/RenderConventions.h"
+#include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -26,5 +30,32 @@ namespace game
 
 		const auto result = uiSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
+	}
+
+	void MouseSystem::OnMouseInput(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems, 
+		const int key, const int action)
+	{
+		System<vke::EngineData>::OnMouseInput(info, systems, key, action);
+		if(key == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS)
+		{
+			const auto collisionSys = systems.GetSystem<CollisionSystem>();
+			const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
+			const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
+
+			const auto& resolution = info.swapChainData->resolution;
+			uint32_t intersection;
+			const auto uiWorldPos = vke::UIRenderSystem::ScreenToWorldPos(info.mousePos, uiSys->camera, resolution);
+			auto pos = uiWorldPos + entitySys->camera.position;
+			pos = round(pos);
+			jlb::Bounds bounds = static_cast<glm::ivec2>(pos);
+			std::cout << bounds.lBot.x << " " << bounds.lBot.y << std::endl;
+			bounds.layers = collisionLayerInteractable;
+			const size_t count = collisionSys->GetIntersections(bounds, intersection);
+
+			// WIP
+			if (count > 0)
+				std::cout << "eyo" << std::endl;
+		}
 	}
 }

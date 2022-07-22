@@ -75,6 +75,7 @@ namespace game
 				auto& transform = entity.transform;
 				CollisionTask task{};
 				task = entity.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(entity.movementComponent.userDefined.to);
+				task.layers = collisionLayerMain | collisionLayerInteractable;
 				entity.collisionTaskId = collisionSys->TryAdd(task);
 				assert(entity.collisionTaskId != SIZE_MAX);
 			}
