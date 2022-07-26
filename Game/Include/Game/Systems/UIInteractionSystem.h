@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include "VkEngine/Components/Transform.h"
+#include "VkEngine/Graphics/SubTexture.h"
 #include "VkEngine/Systems/TaskSystemWithOutput.h"
 
 namespace game
 {
 	struct UIInteractionTask final
 	{
-		vke::Transform transform{};
+		vke::SubTexture bounds{};
 	};
 
 	struct UIInteractionTaskOutput final

@@ -45,7 +45,7 @@ namespace game
 			glm::vec2(1, 0)
 		};
 
-		size_t hoveredObj = mouseSys->GetHoveredObject();
+		const size_t hoveredObj = mouseSys->GetHoveredObject();
 
 		for (auto& entity : entities)
 		{
