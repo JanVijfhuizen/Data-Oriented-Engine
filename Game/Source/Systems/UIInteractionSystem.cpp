@@ -4,13 +4,15 @@
 
 namespace game
 {
-	void UIInteractionSystem::OnUpdate(const vke::EngineData& info, 
+	void UIInteractionSystem::OnPreUpdate(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<UIInteractionTask>& uiInteractionTasks,
-		jlb::NestedVector<UIInteractionTaskOutput>& taskOutputs)
+		const jlb::NestedVector<UIInteractionTask>& uiInteractionTasks)
 	{
-		TaskSystemWithOutput<UIInteractionTask, UIInteractionTaskOutput>::OnUpdate(
-			info, systems, uiInteractionTasks, taskOutputs);
+		TaskSystem<UIInteractionTask>::OnUpdate(info, systems, uiInteractionTasks);
+
+		_frameData.Swap();
+		_frameData.GetPrevious() = {};
+
 		if (!info.mouseAvailable)
 			return;
 
@@ -19,17 +21,20 @@ namespace game
 		task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto self = reinterpret_cast<UIInteractionSystem*>(userPtr);
-			auto& dumpAllocator = *info.dumpAllocator;
 			const auto& mousePos = info.mousePos;
 
 			const auto& tasks = self->GetTasks();
-			auto& outputs = self->GetOutputEditable();
 
 			const size_t count = tasks.GetCount();
 			for (size_t i = 0; i < count; ++i)
 			{
-				UIInteractionTaskOutput output{};
-				outputs.Add(dumpAllocator, output);
+				const auto& task = tasks[i];
+				if(task.bounds.Intersects(mousePos))
+				{
+					auto& frameData = self->_frameData.GetPrevious();
+					frameData.index = i;
+					break;
+				}
 			}
 		};
 

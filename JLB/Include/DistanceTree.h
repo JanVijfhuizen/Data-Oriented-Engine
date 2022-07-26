@@ -32,7 +32,6 @@ namespace jlb
 
 		[[nodiscard]] uint32_t Add(const Bounds& bounds, const glm::ivec2& center);
 		[[nodiscard]] float CalculateDistance(const glm::ivec2& position, const Bounds& bounds) const;
-		[[nodiscard]] static bool Intersects(const Bounds& a, const Bounds& b);
 		void* GetInstancesInRange(const Bounds& bounds, uint32_t current,
 			const ArrayView<uint32_t>& outArray, uint32_t& arrayIndex);
 	};

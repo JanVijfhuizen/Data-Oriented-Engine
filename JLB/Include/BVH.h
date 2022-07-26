@@ -31,6 +31,5 @@ namespace jlb
 		[[nodiscard]] uint32_t QuickSort(const Bounds* instances, uint32_t from, uint32_t to, uint32_t nodeCapacity, uint32_t depth);
 		void* GetIntersections(const Bounds& bounds, uint32_t current, 
 			const ArrayView<Bounds>& instances, const ArrayView<uint32_t>& outArray, uint32_t& outIndex);
-		[[nodiscard]] static bool Intersects(const Bounds& a, const Bounds& b);
 	};
 }
