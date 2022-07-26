@@ -3,6 +3,7 @@
 #include "JlbMath.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
@@ -20,6 +21,7 @@ namespace game
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
+		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
@@ -59,6 +61,11 @@ namespace game
 
 			const auto result = entityRenderSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
+
+			// Render Player Menu.
+			MenuCreateInfo menuCreateInfo{};
+			menuCreateInfo.interactable = true;
+			const auto menu = menuSys->CreateMenu(info, systems, menuCreateInfo);
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);

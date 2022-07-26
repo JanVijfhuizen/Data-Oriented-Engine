@@ -14,9 +14,16 @@ namespace game
 		return _hoveredObject;
 	}
 
+	bool MouseSystem::GetPressedThisTurn() const
+	{
+		return _pressedThisTurn;
+	}
+
 	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		vke::GameSystem::PreUpdate(info, systems);
+
+		_pressedThisTurn = false;
 		if (!info.mouseAvailable)
 			return;
 
@@ -67,6 +74,11 @@ namespace game
 	{
 		System<vke::EngineData>::OnMouseInput(info, systems, key, action);
 		if(key == GLFW_MOUSE_BUTTON_1)
-			_pressed = action == GLFW_PRESS ? true : action == GLFW_RELEASE ? false : _pressed;
+		{
+			const bool pressed = action == GLFW_PRESS;
+			_pressedThisTurn = !_pressed && pressed;
+			_pressed = pressed ? true : action == GLFW_RELEASE ? false : _pressed;
+		}
+			
 	}
 }

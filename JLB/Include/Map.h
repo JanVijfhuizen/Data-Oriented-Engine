@@ -89,7 +89,7 @@ namespace jlb
 	T* Map<T>::Contains(const size_t key) const
 	{
 		const size_t length = _array.GetLength();
-		assert(_count < length);
+		assert(_count <= length);
 
 		// Get and use the hash as an index.
 		const size_t hash = GetHash(key);

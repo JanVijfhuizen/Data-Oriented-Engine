@@ -66,7 +66,7 @@ namespace vke
 	template <typename T>
 	size_t TaskSystem<T>::DefineCapacity(const EngineData& info)
 	{
-		return 0;
+		return 8;
 	}
 
 	template <typename T>

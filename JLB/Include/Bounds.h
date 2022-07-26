@@ -13,7 +13,7 @@ namespace jlb
 		uint32_t layers = 1;
 
 		TBounds();
-		TBounds(const Vec2& position, const Vec2& scale = Vec2{0});
+		TBounds(const Vec2& position, Vec2 scale = Vec2{0});
 
 		[[nodiscard]] bool Intersects(const TBounds& other) const;
 		[[nodiscard]] bool Intersects(const Vec2& position) const;
@@ -27,10 +27,11 @@ namespace jlb
 	TBounds<T>::TBounds() = default;
 
 	template <typename T>
-	TBounds<T>::TBounds(const Vec2& position, const Vec2& scale) : lBot(position), rTop(position)
+	TBounds<T>::TBounds(const Vec2& position, Vec2 scale) : lBot(position), rTop(position)
 	{
-		lBot -= scale / 2;
-		rTop += scale / 2;
+		scale /= 2;
+		lBot -= scale;
+		rTop += scale;
 	}
 
 	template <typename T>
