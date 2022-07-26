@@ -2,6 +2,7 @@
 #include "Systems/MouseSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -49,6 +50,15 @@ namespace game
 			const size_t count = collisionSys->GetIntersections(bounds, intersection);
 			_hoveredObject = count == 0 ? SIZE_MAX : intersection;
 		}
+	}
+
+	void MouseSystem::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		System<vke::EngineData>::PostUpdate(info, systems);
+
+		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
+		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
+		_hoveredObject = uiHoveredObj == SIZE_MAX ? _hoveredObject : SIZE_MAX;
 	}
 
 	void MouseSystem::OnMouseInput(const vke::EngineData& info, 

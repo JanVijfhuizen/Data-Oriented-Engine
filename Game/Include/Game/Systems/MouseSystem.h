@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "SwapChain.h"
 #include "VkEngine/Systems/GameSystem.h"
 
 namespace game
@@ -15,6 +14,7 @@ namespace game
 		bool _pressed = false;
 		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
 		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};
 }

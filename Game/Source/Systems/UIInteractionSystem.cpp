@@ -4,14 +4,26 @@
 
 namespace game
 {
+	size_t UIInteractionSystem::GetHoveredObject()
+	{
+		return _hovered.GetCurrent();
+	}
+
+	void UIInteractionSystem::Allocate(const vke::EngineData& info)
+	{
+		TaskSystem<UIInteractionTask>::Allocate(info);
+		for (auto& hovered : _hovered)
+			hovered = SIZE_MAX;
+	}
+
 	void UIInteractionSystem::OnPreUpdate(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<UIInteractionTask>& uiInteractionTasks)
 	{
 		TaskSystem<UIInteractionTask>::OnUpdate(info, systems, uiInteractionTasks);
 
-		_frameData.Swap();
-		_frameData.GetPrevious() = {};
+		_hovered.Swap();
+		_hovered.GetPrevious() = SIZE_MAX;
 
 		if (!info.mouseAvailable)
 			return;
@@ -31,8 +43,8 @@ namespace game
 				const auto& task = tasks[i];
 				if(task.bounds.Intersects(mousePos))
 				{
-					auto& frameData = self->_frameData.GetPrevious();
-					frameData.index = i;
+					auto& frameData = self->_hovered.GetPrevious();
+					frameData = i;
 					break;
 				}
 			}
