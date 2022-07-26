@@ -11,6 +11,7 @@ struct InstanceData
     vec2 position;
     vec2 scale;
     SubTexture subTexture;
+    vec4 color;
 };
 
 layout(std140, set = 0, binding = 0) readonly buffer InstanceBuffer
@@ -29,12 +30,14 @@ layout(location = 0) out Data
 {
     vec2 fragTexCoord;
     vec2 fragPos;
+    vec4 color;
 } outData;
 
 void HandleInstance(in InstanceData instance)
 {
     outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
+    outData.color = instance.color;
 
     gl_Position = CalculatePositionUI(instance.position, instance.scale, pushConstants.cameraPosition, inPosition, pushConstants.resolution, 1);
 }

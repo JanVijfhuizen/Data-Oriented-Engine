@@ -7,13 +7,14 @@ layout(location = 0) in Data
 {
     vec2 fragTexCoord;
     vec2 fragPos;
+    vec4 color;
 } inData;
 
 layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    vec4 color = texture(textureAtlas, inData.fragTexCoord);
+    vec4 color = texture(textureAtlas, inData.fragTexCoord) * inData.color;
     if(color.a < .01f)
         discard;
     outColor = color;

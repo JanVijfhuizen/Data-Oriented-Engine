@@ -23,6 +23,7 @@ namespace game
 		renderTask.position = createInfo.position;
 		renderTask.scale = glm::vec2(createInfo.width * scale, scale);
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+		renderTask.color = glm::vec4(0, 0, 0, 1);
 		auto result = uiRenderSys->TryAdd(info, renderTask);
 		assert(result != SIZE_MAX);
 

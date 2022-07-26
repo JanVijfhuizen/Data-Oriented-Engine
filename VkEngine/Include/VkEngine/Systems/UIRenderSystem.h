@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <glm/vec4.hpp>
 #include "RenderSystem.h"
 #include "VkEngine/Graphics/SubTexture.h"
 
@@ -20,6 +21,7 @@ namespace vke
 		glm::vec2 position;
 		glm::vec2 scale{ 1 };
 		SubTexture subTexture{};
+		glm::vec4 color{ 1 };
 	};
 
 	class UIRenderSystem final : public RenderSystem<UIRenderTask, UICamera>
