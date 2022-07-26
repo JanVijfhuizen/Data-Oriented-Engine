@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "StringView.h"
+#include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/TaskSystem.h"
 
 namespace game
@@ -10,6 +11,8 @@ namespace game
 		jlb::StringView text{};
 		// Origin position for the text.
 		glm::vec2 origin;
+		// Scale multiplier, relative to pixel size.
+		size_t scale = vke::PIXEL_SIZE_ENTITY;
 		// Overrides the length of the string.
 		size_t lengthOverride = SIZE_MAX;
 		// Ignores origin value to place it after the text of target task.

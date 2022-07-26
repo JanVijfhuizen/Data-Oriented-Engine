@@ -3,25 +3,33 @@
 #include "StringView.h"
 #include "VkEngine/Systems/GameSystem.h"
 
+namespace vke
+{
+	struct EntityCamera;
+	struct UICamera;
+}
+
 namespace game
 {
 	struct MenuCreateInfo final
 	{
-		glm::vec2 position{};
-		float width = 1;
+		glm::vec2 origin{};
+		size_t width = 1;
 		jlb::ArrayView<jlb::StringView> content{};
 		bool interactable = false;
+		vke::EntityCamera* entityCamera = nullptr;
+		vke::UICamera* uiCamera = nullptr;
 	};
 
 	struct Menu final
 	{
-		jlb::FBounds bounds{};
+		
 	};
 
 	class MenuSystem final : public vke::GameSystem
 	{
 	public:
-		[[nodiscard]] Menu CreateMenu(const vke::EngineData& info,
+		[[nodiscard]] static Menu CreateMenu(const vke::EngineData& info,
 			jlb::Systems<vke::EngineData> systems, const MenuCreateInfo& createInfo);
 	};
 }

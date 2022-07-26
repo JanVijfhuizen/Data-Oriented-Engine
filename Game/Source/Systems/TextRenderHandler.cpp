@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/ResourceManager.h"
-#include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
@@ -16,7 +15,6 @@ namespace game
 		const auto resourceSys = systems.GetSystem<game::ResourceManager>();
 
 		const float pixelSize = uiSys->camera.pixelSize;
-		const float fontSize = pixelSize * vke::PIXEL_SIZE_ENTITY;
 
 		const auto alphabetTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::alphabet);
 		const float alphabetChunkSize = vke::texture::GetChunkSize(alphabetTexture, 26);
@@ -26,6 +24,8 @@ namespace game
 
 		for (const auto& task : tasks)
 		{
+			const float fontSize = pixelSize * task.scale;
+
 			const size_t length = task.lengthOverride == SIZE_MAX ? task.text.GetLength() : task.lengthOverride;
 			assert(task.lengthOverride == SIZE_MAX ? true : task.lengthOverride <= task.text.GetLength());
 

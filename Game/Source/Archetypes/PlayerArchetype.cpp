@@ -9,6 +9,7 @@
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
+#include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
@@ -26,6 +27,7 @@ namespace game
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
@@ -63,9 +65,22 @@ namespace game
 			assert(result != SIZE_MAX);
 
 			// Render Player Menu.
-			MenuCreateInfo menuCreateInfo{};
-			menuCreateInfo.interactable = true;
-			const auto menu = menuSys->CreateMenu(info, systems, menuCreateInfo);
+			{
+				MenuCreateInfo menuCreateInfo{};
+				menuCreateInfo.interactable = true;
+				menuCreateInfo.origin = transform.position;
+				menuCreateInfo.entityCamera = &entityRenderSys->camera;
+				menuCreateInfo.uiCamera = &uiRenderSys->camera;
+
+				jlb::Array<jlb::StringView> strs{};
+				strs.Allocate(*info.dumpAllocator, 3);
+				strs[0] = "hello";
+				strs[1] = "bye";
+				strs[2] = "n";
+				menuCreateInfo.width = 2;
+				menuCreateInfo.content = strs;
+				const auto menu = menuSys->CreateMenu(info, systems, menuCreateInfo);
+			}
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
