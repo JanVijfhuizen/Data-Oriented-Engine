@@ -27,10 +27,10 @@ namespace game
 		const size_t length = createInfo.content.length;
 		assert(length > 0);
 
+		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;
 		const auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
-		const auto yOffset = jlb::math::Threshold<float>(.5f + static_cast<float>(length) * .5f, -1.f, 1.f) * ((camera.position.y > createInfo.origin.y) * 2 - 1);
-		const auto worldPos = createInfo.origin + glm::vec2(xOffset, yOffset) - entityRenderSys->camera.position;
+		const auto worldPos = createInfo.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
 
 		vke::UIRenderTask renderTask{};
@@ -38,20 +38,21 @@ namespace game
 		renderTask.scale = glm::vec2(scale * createInfo.width, scale * length);
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 		renderTask.color = glm::vec4(0, 0, 0, 1);
-		auto result = uiRenderSys->TryAdd(info, renderTask);
+		const auto result = uiRenderSys->TryAdd(info, renderTask);
 		assert(result != SIZE_MAX);
 
+		// Draw the text.
 		{
 			const auto tabSize = renderTask.scale.y / length;
-			glm::vec2 offset{ renderTask.scale.x * -.5f, -renderTask.scale.y * .5f };
+			const float yOffset = (renderTask.scale.y - tabSize) * .5f;
 			size_t i = 0;
 
 			for (const auto& content : createInfo.content)
 			{
 				TextRenderTask task{};
-				task.origin = screenPos; + offset + glm::vec2(0,  + tabSize * i++);
+				task.origin = screenPos - glm::vec2(0, yOffset - tabSize * i++);
 				task.text = content;
-				task.scale = 6;
+				//task.scale = 8;
 
 				const auto result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);

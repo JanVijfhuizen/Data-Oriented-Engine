@@ -10,7 +10,7 @@ namespace game
 		// Text to render. Can include lowercase characters, spaces and numbers.
 		jlb::StringView text{};
 		// Origin position for the text.
-		glm::vec2 origin;
+		glm::vec2 origin{};
 		// Scale multiplier, relative to pixel size.
 		size_t scale = vke::PIXEL_SIZE_ENTITY;
 		// Overrides the length of the string.
@@ -19,6 +19,8 @@ namespace game
 		size_t appendIndex = SIZE_MAX;
 		// Space between characters. Can be negative.
 		int32_t padding = -2;
+		// Center the text on the origin.
+		bool center = false;
 	};
 
 	/*

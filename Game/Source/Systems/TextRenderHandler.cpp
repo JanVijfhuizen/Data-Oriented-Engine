@@ -29,7 +29,9 @@ namespace game
 			const size_t length = task.lengthOverride == SIZE_MAX ? task.text.GetLength() : task.lengthOverride;
 			assert(task.lengthOverride == SIZE_MAX ? true : task.lengthOverride <= task.text.GetLength());
 
+			const float paddedFontSize = fontSize + pixelSize * static_cast<float>(task.padding);
 			glm::vec2 origin = task.origin;
+			origin.x -= task.center ? paddedFontSize * .5f * length - .5f * paddedFontSize : 0;
 
 			// If the task is appending on another task.
 			if (task.appendIndex != SIZE_MAX)
@@ -41,7 +43,6 @@ namespace game
 				origin.x += additionalOffset;
 			}
 
-			const float paddedFontSize = fontSize + pixelSize * static_cast<float>(task.padding);
 			origin.x -= paddedFontSize;
 
 			for (size_t i = 0; i < length; ++i)

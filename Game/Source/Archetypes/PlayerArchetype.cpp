@@ -77,7 +77,7 @@ namespace game
 				strs[0] = "hello";
 				strs[1] = "bye";
 				strs[2] = "n";
-				menuCreateInfo.width = 2;
+				menuCreateInfo.width = 6;
 				menuCreateInfo.content = strs;
 				const auto menu = menuSys->CreateMenu(info, systems, menuCreateInfo);
 			}
