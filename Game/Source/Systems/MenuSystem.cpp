@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Systems/MenuSystem.h"
-
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
@@ -11,7 +10,7 @@
 
 namespace game
 {
-	Menu MenuSystem::CreateMenu(const vke::EngineData& info,
+	void MenuSystem::CreateMenu(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
 		const MenuCreateInfo& createInfo)
 	{
@@ -43,34 +42,33 @@ namespace game
 
 		// Draw the text.
 		{
-			const auto tabSize = renderTask.scale.y / length;
 			const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);
+			const glm::vec2 tabSize{ renderTask.scale.x * rAspectFix, renderTask.scale.y / length };
 			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
-			const float yOffset = (renderTask.scale.y - tabSize) * .5f;
+			const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
 
 			TextRenderTask task{};
-			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize);
+			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
 			task.scale = 8;
 			task.padding = -4;
+
+			size_t i = 0;
 
 			for (const auto& content : createInfo.content)
 			{
 				task.text = content;
-				task.origin.y += tabSize;
+				task.origin.y += tabSize.y;
 
 				auto result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);
 
-				/*
 				UIInteractionTask interactionTask{};
-				interactionTask.bounds = jlb::FBounds(renderTask.position, renderTask.scale);
+				interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize);
 				result = uiInteractionSys->TryAdd(info, interactionTask);
 				assert(result != SIZE_MAX);
-				*/
+
+				createInfo.outInteractIds[i++] = result;
 			}
 		}
-
-		Menu menu{};
-		return menu;
 	}
 }

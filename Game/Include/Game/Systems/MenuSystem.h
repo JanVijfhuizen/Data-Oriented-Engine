@@ -19,17 +19,13 @@ namespace game
 		bool interactable = false;
 		vke::EntityCamera* entityCamera = nullptr;
 		vke::UICamera* uiCamera = nullptr;
-	};
-
-	struct Menu final
-	{
-		
+		jlb::ArrayView<size_t> outInteractIds{};
 	};
 
 	class MenuSystem final : public vke::GameSystem
 	{
 	public:
-		[[nodiscard]] static Menu CreateMenu(const vke::EngineData& info,
+		static void CreateMenu(const vke::EngineData& info,
 			jlb::Systems<vke::EngineData> systems, const MenuCreateInfo& createInfo);
 	};
 }

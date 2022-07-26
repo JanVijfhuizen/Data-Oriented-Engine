@@ -64,7 +64,11 @@ namespace game
 			const auto result = entityRenderSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 
+			const bool mouseAction = mouseSys->GetPressedThisTurn() && !mouseSys->GetIsUIBlocking();
+			_menuOpen = mouseAction ? _menuOpen ? false : hovered : _menuOpen;
+
 			// Render Player Menu.
+			if(_menuOpen)
 			{
 				MenuCreateInfo menuCreateInfo{};
 				menuCreateInfo.interactable = true;
@@ -73,13 +77,15 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
 				jlb::Array<jlb::StringView> strs{};
+				jlb::StackArray<size_t, 3> outIds{};
 				strs.Allocate(*info.dumpAllocator, 3);
 				strs[0] = "inventory";
 				strs[1] = "social";
 				strs[2] = "test";
 				menuCreateInfo.width = 4;
 				menuCreateInfo.content = strs;
-				const auto menu = menuSys->CreateMenu(info, systems, menuCreateInfo);
+				menuCreateInfo.outInteractIds = outIds;
+				menuSys->CreateMenu(info, systems, menuCreateInfo);
 			}
 
 			cameraCenter += entity.transform.position;

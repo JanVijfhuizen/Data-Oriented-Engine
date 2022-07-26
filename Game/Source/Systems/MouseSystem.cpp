@@ -19,6 +19,11 @@ namespace game
 		return _pressedThisTurn;
 	}
 
+	bool MouseSystem::GetIsUIBlocking() const
+	{
+		return _isUIBlocking;
+	}
+
 	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		vke::GameSystem::PreUpdate(info, systems);
@@ -66,6 +71,7 @@ namespace game
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 		_hoveredObject = uiHoveredObj == SIZE_MAX ? _hoveredObject : SIZE_MAX;
+		_isUIBlocking = uiHoveredObj != SIZE_MAX;
 	}
 
 	void MouseSystem::OnMouseInput(const vke::EngineData& info, 

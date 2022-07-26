@@ -43,7 +43,7 @@ namespace jlb
 	template <typename T>
 	bool TBounds<T>::Intersects(const Vec2& position) const
 	{
-		return lBot.x < position.x&& lBot.y < position.y&& rTop.x > position.x&& rTop.y > position.y;
+		return lBot.x < position.x && lBot.y < position.y && rTop.x > position.x && rTop.y > position.y;
 	}
 
 	template <typename T>
