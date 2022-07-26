@@ -176,8 +176,10 @@
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
     <ClInclude Include="Include\Game\Systems\TurnThreadPoolSystem.h" />
+    <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />
     <ClCompile Include="Source\Components\MovementComponent.cpp" />
     <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp" />
     <ClCompile Include="Source\Systems\CameraSystem.cpp" />
