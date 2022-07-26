@@ -18,7 +18,7 @@ namespace game
 		// Ignores origin value to place it after the text of target task.
 		size_t appendIndex = SIZE_MAX;
 		// Space between characters. Can be negative.
-		int32_t padding = -2;
+		int32_t padding = -8;
 		// Center the text on the origin.
 		bool center = false;
 	};

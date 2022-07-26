@@ -27,6 +27,8 @@ namespace vke
 	class UIRenderSystem final : public RenderSystem<UIRenderTask, UICamera>
 	{
 	public:
+		[[nodiscard]] static float GetAspectFix(const glm::vec2& resolution);
+		[[nodiscard]] static float GetReversedAspectFix(const glm::vec2& resolution);
 		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution);
 		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution);
 

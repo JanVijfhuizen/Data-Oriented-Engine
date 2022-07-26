@@ -44,28 +44,32 @@ namespace game
 		// Draw the text.
 		{
 			const auto tabSize = renderTask.scale.y / length;
+			const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);
+			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
 			const float yOffset = (renderTask.scale.y - tabSize) * .5f;
-			size_t i = 0;
+
+			TextRenderTask task{};
+			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize);
+			task.scale = 8;
+			task.padding = -4;
 
 			for (const auto& content : createInfo.content)
 			{
-				TextRenderTask task{};
-				task.origin = screenPos - glm::vec2(0, yOffset - tabSize * i++);
 				task.text = content;
-				//task.scale = 8;
+				task.origin.y += tabSize;
 
-				const auto result = textRenderSys->TryAdd(info, task);
+				auto result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);
+
+				/*
+				UIInteractionTask interactionTask{};
+				interactionTask.bounds = jlb::FBounds(renderTask.position, renderTask.scale);
+				result = uiInteractionSys->TryAdd(info, interactionTask);
+				assert(result != SIZE_MAX);
+				*/
 			}
 		}
-		
 
-		/*
-		UIInteractionTask interactionTask{};
-		interactionTask.bounds = jlb::FBounds(renderTask.position, renderTask.scale);
-		result = uiInteractionSys->TryAdd(info, interactionTask);
-		assert(result != SIZE_MAX);
-		*/
 		Menu menu{};
 		return menu;
 	}

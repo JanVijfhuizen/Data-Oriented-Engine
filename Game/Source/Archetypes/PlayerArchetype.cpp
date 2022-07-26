@@ -74,10 +74,10 @@ namespace game
 
 				jlb::Array<jlb::StringView> strs{};
 				strs.Allocate(*info.dumpAllocator, 3);
-				strs[0] = "hello";
-				strs[1] = "bye";
-				strs[2] = "n";
-				menuCreateInfo.width = 6;
+				strs[0] = "inventory";
+				strs[1] = "social";
+				strs[2] = "test";
+				menuCreateInfo.width = 4;
 				menuCreateInfo.content = strs;
 				const auto menu = menuSys->CreateMenu(info, systems, menuCreateInfo);
 			}
