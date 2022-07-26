@@ -20,7 +20,13 @@ namespace game
 			const auto& settings = sys->settings;
 			const auto& target = settings.target;
 
-			const glm::vec2 offset = target - settings.position - settings.bias;
+			const auto& mouseOffsetZone = settings.mouseOffsetZone;
+			const auto mousePos = jlb::math::Clamp(info.mousePos, glm::vec2(-1), glm::vec2(1));
+			glm::vec2 mouseOffset = jlb::math::Threshold(mousePos, -mouseOffsetZone, mouseOffsetZone);
+			mouseOffset *= settings.mouseMaxOffset;
+
+			const glm::vec2 center = settings.position - settings.bias;
+			const glm::vec2 offset = target + mouseOffset - center;
 			const glm::vec2 deadZone = settings.deadZone * .5f;
 			const glm::vec2 moveZone = settings.moveZone * .5f;
 

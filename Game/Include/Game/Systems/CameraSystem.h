@@ -18,6 +18,8 @@ namespace game
 			glm::vec2 deadZone{ 3.5f, 2.5f };
 			glm::vec2 moveZone{ 10 };
 			glm::vec2 zoomZone = deadZone;
+			glm::vec2 mouseOffsetZone{.35f };
+			float mouseMaxOffset = 5;
 
 			float pixelSize = 0.008f;
 			float zoomMultiplier = .15f;
