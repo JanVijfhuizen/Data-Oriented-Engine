@@ -21,13 +21,10 @@ namespace game
 		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
-		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
@@ -105,20 +102,6 @@ namespace game
 			}
 		}
 
-		if (turnSys->GetIfTickEvent())
-			for (auto& entity : entities)
-			{
-				auto& character = entity.character;
-
-				// Collision task.
-				auto& transform = character.transform;
-				CollisionTask task{};
-				task = character.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(character.movementComponent.userDefined.to);
-				task.layers = collisionLayerMain | collisionLayerInteractable;
-				character.collisionTaskId = collisionSys->TryAdd(task);
-				assert(character.collisionTaskId != SIZE_MAX);
-			}
-
 		cameraCenter /= entities.length;
 		cameraSys->settings.target = cameraCenter;
 	}
@@ -129,74 +112,29 @@ namespace game
 	{
 		Archetype<Player>::EndFrame(info, systems, entities);
 
-		const auto collisionSys = systems.GetSystem<CollisionSystem>();
-		const auto movementSys = systems.GetSystem<MovementSystem>();
-		const auto& movementOutputs = movementSys->GetOutput();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
+
+		CharacterInput characterInput{};
+
+		if (turnSys->GetIfTickEvent())
+		{
+			auto& dir = characterInput.movementDir;
+			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
+			dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
+
+			for (auto& input : _movementInput)
+			{
+				input.pressedSinceStartOfFrame = input.pressed;
+				input.valid = input.pressed;
+			}
+		}
 
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
-			if (character.movementTaskId == SIZE_MAX)
-				continue;
-
-			auto& transform = character.transform;
-			const auto& movementOutput = movementOutputs[character.movementTaskId];
-
-			character.movementComponent.Update(movementOutput);
-			transform.position = movementOutput.position;
-			transform.rotation = movementOutput.rotation;
+			EndFrameCharacter(info, character, characterUpdateInfo, characterInput);
 		}
-
-		if (turnSys->GetIfTickEvent())
-			for (auto& entity : entities)
-			{
-				auto& character = entity.character;
-				auto& movementComponent = character.movementComponent;
-				const auto& transform = character.transform;
-
-				auto& movementUserDefined = movementComponent.userDefined;
-				const auto& movementSystemDefined = movementComponent.systemDefined;
-
-				character.movementTileReservation = SIZE_MAX;
-
-				// Update movement task with new input.
-				if (movementSystemDefined.remaining == 0)
-				{
-					glm::ivec2 dir{};
-					dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
-					dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
-
-					for (auto& input : _movementInput)
-					{
-						input.pressedSinceStartOfFrame = input.pressed;
-						input.valid = input.pressed;
-					}
-
-					if (dir.x != 0 || dir.y != 0)
-					{
-						// Round the from position.
-						const glm::vec2 from = glm::vec2(glm::ivec2(character.transform.position));
-						const glm::vec2 delta = glm::vec2(dir);
-						const glm::vec2 to = from + delta;
-
-						if (collisionSys->CheckIfTilesAreReserved(glm::ivec2(to)) != SIZE_MAX)
-							continue;
-
-						uint32_t outCollision;
-						const size_t collided = collisionSys->GetIntersections(glm::ivec2(to), outCollision);
-						
-						if(collided)
-							continue;
-
-						character.movementTileReservation = collisionSys->ReserveTiles(glm::ivec2(to));
-						movementUserDefined.from = from;
-						movementUserDefined.to = to;
-						movementUserDefined.rotation = transform.rotation;
-						movementComponent.Build();
-					}
-				}
-			}
 	}
 
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
