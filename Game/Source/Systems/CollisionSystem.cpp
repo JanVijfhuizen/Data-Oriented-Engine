@@ -14,7 +14,7 @@ namespace game
 
 	size_t CollisionSystem::GetIntersections(const jlb::Bounds& bounds, const jlb::ArrayView<uint32_t> outArray)
 	{
-		auto& current = _collisionFrames.GetPrevious();
+		auto& current = _collisionFrames.GetCurrent();
 		return current.bvh.GetIntersections(bounds, current.tasks, outArray);
 	}
 
@@ -68,6 +68,7 @@ namespace game
 			auto& previous = _collisionFrames.GetPrevious();
 			previous.tasks.SetCount(0);
 			previous.distanceTree.Clear();
+			previous.finished = false;
 			
 			TurnThreadPoolTask task{};
 			task.userPtr = this;
@@ -80,6 +81,7 @@ namespace game
 				const auto& tasks = previous.tasks;
 				if (tasks.GetCount() > 0)
 					previous.bvh.Build(tasks);
+				previous.finished = true;
 			};
 
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
