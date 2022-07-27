@@ -1,4 +1,7 @@
 #include "BVH.h"
+
+#include <iostream>
+
 #include "JlbMath.h"
 #include "StackAllocator.h"
 #include "glm/geometric.hpp"
@@ -84,6 +87,15 @@ namespace jlb
 			partitionIndex -= !left;
 			i += left;
 		}
+
+		std::cout << median.x << " // " << median.y << std::endl;
+		for (int i = from; i < to; ++i)
+		{
+			auto& instance = instances[_indexes[i]];
+			std::cout << instance.GetCenter().x << " " << instance.GetCenter().y << std::endl;
+		}
+		std::cout << partitionIndex << std::endl;
+		std::cout << std::endl;
 
 		const bool isLeaf = from + nodeCapacity >= to;
 		const uint32_t index = _nodes.GetCount();
