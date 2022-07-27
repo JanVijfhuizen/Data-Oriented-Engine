@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/MenuSystem.h"
+#include "Curve.h"
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
@@ -10,9 +11,15 @@
 
 namespace game
 {
+	void MenuUpdateInfo::Reset()
+	{
+		opened = false;
+		duration = 0;
+	}
+
 	void MenuSystem::CreateMenu(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
-		const MenuCreateInfo& createInfo)
+		const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const
 	{
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
@@ -26,19 +33,32 @@ namespace game
 		const size_t length = createInfo.content.length;
 		assert(length > 0);
 
+		// Update open duration.
+		updateInfo.duration += info.deltaTime * 1e-2f;
+
 		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;
 		const auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
 		const auto worldPos = createInfo.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
 
+		if(updateInfo.right && xOffset < 0 || !updateInfo.right && xOffset > 0)
+		{
+			updateInfo.right = !updateInfo.right;
+			updateInfo.duration = 0;
+		}
+
+		constexpr auto color = glm::vec4(0, 0, 0, 1);
+		constexpr auto interactedColor = glm::vec4(.5f, 0, 0, 1);
+
 		vke::UIRenderTask renderTask{};
 		renderTask.position = screenPos;
 		renderTask.scale = glm::vec2(scale * createInfo.width, scale * length);
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
-		renderTask.color = glm::vec4(0, 0, 0, 1);
-		const auto result = uiRenderSys->TryAdd(info, renderTask);
-		assert(result != SIZE_MAX);
+
+		auto overshooting = jlb::CreateCurveOvershooting();
+		const float openLerp = updateInfo.duration / openDuration;
+		const float openTextLerp = updateInfo.duration / (openDuration + openWriteTextDuration);
 
 		// Draw the text.
 		{
@@ -46,6 +66,8 @@ namespace game
 			const glm::vec2 tabSize{ renderTask.scale.x * rAspectFix, renderTask.scale.y / length };
 			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
 			const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
+
+			renderTask.scale.y /= length + 1;
 
 			TextRenderTask task{};
 			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
@@ -56,10 +78,19 @@ namespace game
 
 			for (const auto& content : createInfo.content)
 			{
+				const float tabDelay = openTabDelay * i;
+
 				task.text = content;
 				task.origin.y += tabSize.y;
+				renderTask.position.y = task.origin.y;
+				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
+				renderTask.color = i == createInfo.interactedIndex && updateInfo.opened ? interactedColor : color;
 
-				auto result = textRenderSys->TryAdd(info, task);
+				auto result = uiRenderSys->TryAdd(info, renderTask);
+				assert(result != SIZE_MAX);
+
+				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
+				result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);
 
 				UIInteractionTask interactionTask{};
@@ -70,5 +101,7 @@ namespace game
 				createInfo.outInteractIds[i++] = result;
 			}
 		}
+
+		updateInfo.opened = true;
 	}
 }

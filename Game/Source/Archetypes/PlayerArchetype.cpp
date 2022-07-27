@@ -8,6 +8,7 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
+#include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
@@ -28,6 +29,7 @@ namespace game
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
+		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
@@ -50,6 +52,7 @@ namespace game
 		};
 
 		const size_t hoveredObj = mouseSys->GetHoveredObject();
+		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 
 		for (auto& entity : entities)
 		{
@@ -68,7 +71,7 @@ namespace game
 			_menuOpen = mouseAction ? _menuOpen ? false : hovered : _menuOpen;
 
 			// Render Player Menu.
-			if(_menuOpen)
+			if (_menuOpen)
 			{
 				MenuCreateInfo menuCreateInfo{};
 				menuCreateInfo.interactable = true;
@@ -77,16 +80,25 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
 				jlb::Array<jlb::StringView> strs{};
-				jlb::StackArray<size_t, 3> outIds{};
-				strs.Allocate(*info.dumpAllocator, 3);
+				strs.Allocate(*info.dumpAllocator, 5);
 				strs[0] = "inventory";
 				strs[1] = "social";
 				strs[2] = "test";
+				strs[3] = "social";
+				strs[4] = "test";
 				menuCreateInfo.width = 4;
 				menuCreateInfo.content = strs;
-				menuCreateInfo.outInteractIds = outIds;
-				menuSys->CreateMenu(info, systems, menuCreateInfo);
+				menuCreateInfo.outInteractIds = entity.menuInteractIds;
+
+				auto& idx = menuCreateInfo.interactedIndex;
+				idx = SIZE_MAX;
+				for (size_t i = 0; i < 5; ++i)
+					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
+
+				menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
 			}
+			else
+				entity.menuUpdateInfo.Reset();
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
