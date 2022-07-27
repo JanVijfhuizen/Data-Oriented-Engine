@@ -66,41 +66,49 @@ namespace jlb
 
 		median /= to - from;
 
-		// Partition values based on the median index.
-		uint32_t partitionIndex = to;
-		const bool partitionXAxis = depth % 2 == 0;
-
-		for (uint32_t i = from; i < partitionIndex;)
-		{
-			const auto& instance = instances[_indexes[i]];
-			const auto center = instance.GetCenter();
-			const bool left = partitionXAxis ? center.x < median.x : center.y < median.y;
-
-			const uint32_t index = left ? i : partitionIndex - 1;
-
-			// Swap.
-			const uint32_t temp = _indexes[index];
-			_indexes[index] = _indexes[i];
-			_indexes[i] = temp;
-
-			partitionIndex -= !left;
-			i += left;
-		}
-		
-		const bool isLeaf = from + nodeCapacity >= to;
-
-		// If the data couldn't be partitioned, use the other axis.
-		// This assumes there won't be more than nodeCapacity amount of objects on the same spot.
-		if(partitionIndex == from && !isLeaf)
-			return QuickSort(instances, from, to, nodeCapacity, depth + 1);
-		
 		const uint32_t index = _nodes.GetCount();
 		auto& node = _nodes.Add();
-		node.bounds = bounds;
-		node.begin = isLeaf ? from : 0;
-		node.end = isLeaf ? to : 0;
-		node.children[0] = isLeaf ? 0 : QuickSort(instances, from, partitionIndex, nodeCapacity, depth + 1);
-		node.children[1] = isLeaf ? 0 : QuickSort(instances, partitionIndex, to, nodeCapacity, depth + 1);
+		const bool isLeaf = from + nodeCapacity >= to;
+
+		for (auto& child : node.children)
+			child = 0;
+		node.begin = from;
+		node.end = to;
+
+		if (!isLeaf)
+		{
+			// Partition values based on the median index.
+			uint32_t partitionIndex = to;
+			const bool partitionXAxis = depth % 2 == 0;
+
+			for (uint32_t i = from; i < partitionIndex;)
+			{
+				const auto& instance = instances[_indexes[i]];
+				const auto center = instance.GetCenter();
+				const bool left = partitionXAxis ? center.x < median.x : center.y < median.y;
+
+				const uint32_t index = left ? i : partitionIndex - 1;
+
+				// Swap.
+				const uint32_t temp = _indexes[index];
+				_indexes[index] = _indexes[i];
+				_indexes[i] = temp;
+
+				partitionIndex -= !left;
+				i += left;
+			}
+
+			// If the data couldn't be partitioned, use the other axis.
+			// This assumes there won't be more than nodeCapacity amount of objects on the same spot.
+			if (partitionIndex == from)
+				return QuickSort(instances, from, to, nodeCapacity, depth + 1);
+			
+			node.bounds = bounds;
+			node.begin = 0;
+			node.end = 0;
+			node.children[0] = QuickSort(instances, from, partitionIndex, nodeCapacity, depth + 1);
+			node.children[1] = QuickSort(instances, partitionIndex, to, nodeCapacity, depth + 1);
+		}
 
 		return index;
 	}
@@ -112,9 +120,7 @@ namespace jlb
 
 		const uint32_t aChild = node.children[0];
 		const uint32_t bChild = node.children[1];
-
-		bool maxIntersectionsReached = false;
-
+		
 		// Check objects in range.
 		for (uint32_t i = node.begin; i < node.end; ++i)
 		{
@@ -124,21 +130,20 @@ namespace jlb
 			outArray[outIndex] = index;
 			outIndex += intersects;
 
-			maxIntersectionsReached = outIndex == outArray.length;
-			i = maxIntersectionsReached ? node.end : i;
+			i = outIndex == outArray.length ? node.end : i;
 		}
 
-		if(!maxIntersectionsReached)
-		{
-			const auto& aChildNode = _nodes[aChild];
-			const auto& bChildNode = _nodes[bChild];
+		aChild == 0 || outIndex < outArray.length ? nullptr : GetIntersections(bounds, aChild, instances, outArray, outIndex);
+		bChild == 0 || outIndex < outArray.length ? nullptr : GetIntersections(bounds, bChild, instances, outArray, outIndex);
 
-			aChild == 0 ? nullptr : !bounds.Intersects(aChildNode.bounds) ? nullptr :
-				GetIntersections(bounds, aChild, instances, outArray, outIndex);
-			bChild == 0 ? nullptr : !bounds.Intersects(bChildNode.bounds) ? nullptr :
-				GetIntersections(bounds, bChild, instances, outArray, outIndex);
-		}
-		
+		const auto& aChildNode = _nodes[aChild];
+		const auto& bChildNode = _nodes[bChild];
+
+		aChild == 0 || outIndex < outArray.length ? nullptr : !bounds.Intersects(aChildNode.bounds) ? nullptr :
+			GetIntersections(bounds, aChild, instances, outArray, outIndex);
+		bChild == 0 || outIndex < outArray.length ? nullptr : !bounds.Intersects(bChildNode.bounds) ? nullptr :
+			GetIntersections(bounds, bChild, instances, outArray, outIndex);
+
 		return nullptr;
 	}
 }
