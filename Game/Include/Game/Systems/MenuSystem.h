@@ -25,7 +25,7 @@ namespace game
 	class MenuSystem final : public vke::GameSystem
 	{
 	public:
-		static void CreateMenu(const vke::EngineData& info,
-			jlb::Systems<vke::EngineData> systems, const MenuCreateInfo& createInfo);
+		void CreateMenu(const vke::EngineData& info,
+			jlb::Systems<vke::EngineData> systems, const MenuCreateInfo& createInfo) const;
 	};
 }

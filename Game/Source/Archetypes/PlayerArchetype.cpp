@@ -77,11 +77,13 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
 				jlb::Array<jlb::StringView> strs{};
-				jlb::StackArray<size_t, 3> outIds{};
-				strs.Allocate(*info.dumpAllocator, 3);
+				jlb::StackArray<size_t, 5> outIds{};
+				strs.Allocate(*info.dumpAllocator, 5);
 				strs[0] = "inventory";
 				strs[1] = "social";
 				strs[2] = "test";
+				strs[3] = "social";
+				strs[4] = "test";
 				menuCreateInfo.width = 4;
 				menuCreateInfo.content = strs;
 				menuCreateInfo.outInteractIds = outIds;
