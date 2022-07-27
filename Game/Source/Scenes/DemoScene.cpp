@@ -1,19 +1,40 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
-
-#include <iostream>
-
-#include "String.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
 namespace game::demo
 {
+	void DemoScene::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		Scene::Allocate(info, systems);
+
+		const int32_t dummyCount = 6;
+		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
+
+		for (int32_t i = 0; i < dummyCount; ++i)
+		{
+			for (int32_t j = 0; j < dummyCount; ++j)
+			{
+				const auto pos = glm::vec2(i - dummyCount / 2 - dummyCount, j - dummyCount / 2 - dummyCount);
+				_dummies[i * dummyCount + j].character.transform.position = pos;
+			}
+			
+		}
+	}
+
+	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		_dummies.Free(*info.allocator);
+		Scene::Free(info, systems);
+	}
+
 	void DemoScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PreUpdate(info, systems);
 		_playerArchetype.PreUpdate(info, systems, _player);
+		_dummyArchetype.PreUpdate(info, systems, _dummies);
 
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto tileSys = systems.GetSystem<vke::TileRenderSystem>();
@@ -43,12 +64,8 @@ namespace game::demo
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PostUpdate(info, systems);
-	}
-
-	void DemoScene::EndFrame(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
-	{
-		Scene::EndFrame(info, systems);
-		_playerArchetype.EndFrame(info, systems, _player);
+		_playerArchetype.PostUpdate(info, systems, _player);
+		_dummyArchetype.PostUpdate(info, systems, _dummies);
 	}
 
 	void DemoScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 

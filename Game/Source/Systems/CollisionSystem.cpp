@@ -14,7 +14,7 @@ namespace game
 
 	size_t CollisionSystem::GetIntersections(const jlb::Bounds& bounds, const jlb::ArrayView<uint32_t> outArray)
 	{
-		auto& current = _collisionFrames.GetPrevious();
+		auto& current = _collisionFrames.GetCurrent();
 		return current.bvh.GetIntersections(bounds, current.tasks, outArray);
 	}
 

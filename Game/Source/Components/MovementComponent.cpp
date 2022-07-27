@@ -9,9 +9,15 @@ namespace game
 		systemDefined.remaining = userDefined.duration;
 	}
 
+	void MovementComponent::Finish()
+	{
+		systemDefined.remaining = 0;
+	}
+
 	void MovementComponent::Update(const MovementTaskOutput& output)
 	{
-		systemDefined.remaining = output.remaining;
-		systemDefined.scaleMultiplier = output.scaleMultiplier;
+		const bool finished = output.remaining == 0;
+		systemDefined.scaleMultiplier = finished ? systemDefined.scaleMultiplier : output.scaleMultiplier;
+		systemDefined.remaining = finished ? systemDefined.remaining : output.remaining;
 	}
 }
