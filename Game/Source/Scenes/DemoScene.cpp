@@ -10,7 +10,7 @@ namespace game::demo
 	{
 		Scene::Allocate(info, systems);
 
-		const int32_t dummyCount = 1;
+		const int32_t dummyCount = 6;
 		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
 
 		for (int32_t i = 0; i < dummyCount; ++i)

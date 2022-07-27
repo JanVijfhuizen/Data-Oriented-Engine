@@ -22,9 +22,8 @@ namespace game::demo
 		for (auto& entity : entities)
 		{
 			CharacterInput characterInput{};
-			//characterInput.movementDir.x = rand() % 3 - 1;
-			//characterInput.movementDir.y = rand() % 3 - 1;
-			characterInput.movementDir.y = 1;
+			characterInput.movementDir.x = rand() % 3 - 1;
+			characterInput.movementDir.y = rand() % 3 - 1;
 
 			auto& character = entity.character;
 			PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0], characterInput);

@@ -108,10 +108,11 @@ namespace game
 				const glm::vec2 from = glm::vec2(jlb::math::RoundNearest(character.transform.position));
 				const glm::vec2 delta = glm::vec2(dir);
 				glm::vec2 to = from + delta;
-				glm::ivec2 toRounded = jlb::math::RoundNearest(to);
 				
 				if (dir.x != 0 || dir.y != 0)
 				{
+					glm::ivec2 toRounded = jlb::math::RoundNearest(to);
+
 					uint32_t outCollision;
 					if (collisionSys->CheckIfTilesAreReserved(toRounded) != SIZE_MAX ||
 						collisionSys->GetIntersections(toRounded, outCollision))
@@ -132,7 +133,7 @@ namespace game
 
 				// Collision task.
 				CollisionTask collisionTask{};
-				collisionTask = toRounded;
+				collisionTask = jlb::math::RoundNearest(to);
 				collisionTask.layers = collisionLayerMain | collisionLayerInteractable;
 				character.collisionTaskId = collisionSys->TryAdd(collisionTask);
 				assert(character.collisionTaskId != SIZE_MAX);
