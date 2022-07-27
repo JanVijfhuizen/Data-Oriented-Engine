@@ -23,39 +23,46 @@ namespace game
 	class CharacterArchetype : public Archetype<T>
 	{
 	protected:
-		struct CharacterUpdateInfo final
+		struct CharacterPreUpdateInfo final
 		{
 			vke::EntityRenderSystem* entityRenderSys = nullptr;
 			MouseSystem* mouseSys = nullptr;
 			MovementSystem* movementSys = nullptr;
 			float scalingOnSelected = 0.5f;
+
+			[[nodiscard]] bool GetIsHovered(const Character& character) const;
 		};
 
-		[[nodiscard]] CharacterUpdateInfo CreateCharacterUpdateInfo(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems);
-		void UpdateCharacter(const vke::EngineData& info, Character& character, const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture);
+		[[nodiscard]] CharacterPreUpdateInfo CreateCharacterPreUpdateInfo(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems);
+		void PreUpdateCharacter(const vke::EngineData& info, Character& character, const CharacterPreUpdateInfo& updateInfo, const vke::SubTexture& subTexture);
 	};
 
 	template <typename T>
-	typename CharacterArchetype<T>::CharacterUpdateInfo CharacterArchetype<T>::CreateCharacterUpdateInfo(
+	bool CharacterArchetype<T>::CharacterPreUpdateInfo::GetIsHovered(const Character& character) const
+	{
+		const size_t hoveredObj = mouseSys->GetHoveredObject();
+		return hoveredObj == character.collisionTaskId && hoveredObj != SIZE_MAX;
+	}
+
+	template <typename T>
+	typename CharacterArchetype<T>::CharacterPreUpdateInfo CharacterArchetype<T>::CreateCharacterPreUpdateInfo(
 		const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		CharacterUpdateInfo updateInfo{};
+		CharacterPreUpdateInfo updateInfo{};
 		updateInfo.entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		updateInfo.mousesys = systems.GetSystem<MouseSystem>();
+		updateInfo.mouseSys = systems.GetSystem<MouseSystem>();
 		updateInfo.movementSys = systems.GetSystem<MovementSystem>();
 
 		return updateInfo;
 	}
 
 	template <typename T>
-	void CharacterArchetype<T>::UpdateCharacter(const vke::EngineData& info, Character& character, 
-		const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture)
+	void CharacterArchetype<T>::PreUpdateCharacter(const vke::EngineData& info, Character& character, 
+		const CharacterPreUpdateInfo& updateInfo, const vke::SubTexture& subTexture)
 	{
 		const auto mouseSys = updateInfo.mouseSys;
 		const auto movementSys = updateInfo.movementSys;
-
-		const size_t hoveredObj = mouseSys->GetHoveredObject();
-
+		
 		const auto& movementComponent = character.movementComponent;
 		const auto& transform = character.transform;
 
@@ -63,7 +70,7 @@ namespace game
 		renderTask.subTexture = subTexture;
 		renderTask.transform = transform;
 		renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-		const bool hovered = hoveredObj == character.collisionTaskId && updateInfo.hoveredObj != SIZE_MAX;
+		const bool hovered = updateInfo.GetIsHovered(character);
 		renderTask.transform.scale *= 1.f + updateInfo.scalingOnSelected * static_cast<float>(hovered);
 
 		const auto result = updateInfo.entityRenderSys->TryAdd(info, renderTask);

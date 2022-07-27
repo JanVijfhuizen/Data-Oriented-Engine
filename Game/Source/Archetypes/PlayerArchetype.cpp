@@ -34,8 +34,6 @@ namespace game
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
 		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-		
-		const bool isTickEvent = turnSys->GetIfTickEvent();
 
 		vke::EntityRenderTask renderTask{};
 		renderTask.subTexture = subTexturesDivided[0];
@@ -50,26 +48,19 @@ namespace game
 			glm::vec2(0, 1),
 			glm::vec2(1, 0)
 		};
-
-		const size_t hoveredObj = mouseSys->GetHoveredObject();
+		
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
+		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
 
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
+			PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0]);
 
-			const auto& movementComponent = character.movementComponent;
 			const auto& transform = character.transform;
 
-			renderTask.transform = transform;
-			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-			const bool hovered = hoveredObj == character.collisionTaskId && hoveredObj != SIZE_MAX;
-			renderTask.transform.scale *= 1.f + _scalingOnSelected * static_cast<float>(hovered);
-
-			const auto result = entityRenderSys->TryAdd(info, renderTask);
-			assert(result != SIZE_MAX);
-
 			const bool mouseAction = mouseSys->GetPressedThisTurn() && !mouseSys->GetIsUIBlocking();
+			const bool hovered = characterUpdateInfo.GetIsHovered(character);
 			const bool menuOpen = mouseAction ? entity.menuUpdateInfo.opened ? false : hovered : entity.menuUpdateInfo.opened;
 
 			// Render Player Menu.
@@ -103,7 +94,6 @@ namespace game
 				entity.menuUpdateInfo.Reset();
 
 			cameraCenter += character.transform.position;
-			character.movementTaskId = movementSys->TryAdd(info, movementComponent);
 
 			renderTask.subTexture = subTextureDirArrow;
 			for (size_t i = 0; i < 4; ++i)
@@ -115,7 +105,7 @@ namespace game
 			}
 		}
 
-		if (isTickEvent)
+		if (turnSys->GetIfTickEvent())
 			for (auto& entity : entities)
 			{
 				auto& character = entity.character;
