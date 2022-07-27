@@ -29,11 +29,6 @@ namespace jlb
 		_nodes.Free(allocator);
 	}
 
-	bool BoundingVolumeHierarchy::Intersects(const Bounds& a, const Bounds& b)
-	{
-		return (a.layers & b.layers) == 0 ? false : a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
-	}
-
 	size_t BoundingVolumeHierarchy::GetIntersections(const Bounds& bounds, 
 		const ArrayView<Bounds> instances, const ArrayView<uint32_t> outArray)
 	{
@@ -116,7 +111,7 @@ namespace jlb
 		{
 			const uint32_t index = _indexes[i];
 			const auto& instance = instances[index];
-			const bool intersects = Intersects(instance, bounds);
+			const bool intersects = instance.Intersects(bounds);
 			outArray[outIndex] = index;
 			outIndex += intersects;
 
@@ -129,9 +124,9 @@ namespace jlb
 			const auto& aChildNode = _nodes[aChild];
 			const auto& bChildNode = _nodes[bChild];
 
-			aChild == 0 ? nullptr : !Intersects(aChildNode.bounds, bounds) ? nullptr :
+			aChild == 0 ? nullptr : !bounds.Intersects(aChildNode.bounds) ? nullptr :
 				GetIntersections(bounds, aChild, instances, outArray, outIndex);
-			bChild == 0 ? nullptr : !Intersects(bChildNode.bounds, bounds) ? nullptr :
+			bChild == 0 ? nullptr : !bounds.Intersects(bChildNode.bounds) ? nullptr :
 				GetIntersections(bounds, bChild, instances, outArray, outIndex);
 		}
 		

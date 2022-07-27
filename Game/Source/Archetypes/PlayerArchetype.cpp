@@ -3,11 +3,13 @@
 #include "JlbMath.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
+#include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
@@ -20,10 +22,12 @@ namespace game
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
+		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
@@ -45,7 +49,7 @@ namespace game
 			glm::vec2(1, 0)
 		};
 
-		size_t hoveredObj = mouseSys->GetHoveredObject();
+		const size_t hoveredObj = mouseSys->GetHoveredObject();
 
 		for (auto& entity : entities)
 		{
@@ -59,6 +63,30 @@ namespace game
 
 			const auto result = entityRenderSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
+
+			const bool mouseAction = mouseSys->GetPressedThisTurn() && !mouseSys->GetIsUIBlocking();
+			_menuOpen = mouseAction ? _menuOpen ? false : hovered : _menuOpen;
+
+			// Render Player Menu.
+			if(_menuOpen)
+			{
+				MenuCreateInfo menuCreateInfo{};
+				menuCreateInfo.interactable = true;
+				menuCreateInfo.origin = transform.position;
+				menuCreateInfo.entityCamera = &entityRenderSys->camera;
+				menuCreateInfo.uiCamera = &uiRenderSys->camera;
+
+				jlb::Array<jlb::StringView> strs{};
+				jlb::StackArray<size_t, 3> outIds{};
+				strs.Allocate(*info.dumpAllocator, 3);
+				strs[0] = "inventory";
+				strs[1] = "social";
+				strs[2] = "test";
+				menuCreateInfo.width = 4;
+				menuCreateInfo.content = strs;
+				menuCreateInfo.outInteractIds = outIds;
+				menuSys->CreateMenu(info, systems, menuCreateInfo);
+			}
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);

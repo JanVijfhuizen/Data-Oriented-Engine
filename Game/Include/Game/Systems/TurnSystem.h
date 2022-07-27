@@ -33,6 +33,7 @@ namespace game
 		[[nodiscard]] size_t GetTicksPerSecond() const;
 		[[nodiscard]] bool GetIsPaused() const;
 
+		void Pause();
 		void PauseAtEndOfTick();
 		void SkipToNextTick();
 
@@ -52,5 +53,6 @@ namespace game
 		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
+		void PressKey(size_t index);
 	};
 }

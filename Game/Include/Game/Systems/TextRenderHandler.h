@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "StringView.h"
+#include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/TaskSystem.h"
 
 namespace game
@@ -9,13 +10,17 @@ namespace game
 		// Text to render. Can include lowercase characters, spaces and numbers.
 		jlb::StringView text{};
 		// Origin position for the text.
-		glm::vec2 origin;
+		glm::vec2 origin{};
+		// Scale multiplier, relative to pixel size.
+		size_t scale = vke::PIXEL_SIZE_ENTITY;
 		// Overrides the length of the string.
 		size_t lengthOverride = SIZE_MAX;
 		// Ignores origin value to place it after the text of target task.
 		size_t appendIndex = SIZE_MAX;
 		// Space between characters. Can be negative.
-		int32_t padding = -2;
+		int32_t padding = -8;
+		// Center the text on the origin.
+		bool center = false;
 	};
 
 	/*

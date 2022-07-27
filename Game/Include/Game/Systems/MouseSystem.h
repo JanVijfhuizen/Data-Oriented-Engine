@@ -8,12 +8,17 @@ namespace game
 	{
 	public:
 		[[nodiscard]] size_t GetHoveredObject() const;
+		[[nodiscard]] bool GetPressedThisTurn() const;
+		[[nodiscard]] bool GetIsUIBlocking() const;
 
 	private:
 		size_t _hoveredObject = SIZE_MAX;
 		bool _pressed = false;
-
+		bool _pressedThisTurn = false;
+		bool _isUIBlocking = false;
+		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};
 }

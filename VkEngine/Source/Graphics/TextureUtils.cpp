@@ -345,6 +345,15 @@ namespace vke::texture
 		return ret;
 	}
 
+	SubTexture ToSubTexture(const glm::vec2& position, const glm::vec2& scale)
+	{
+		SubTexture ret{};
+		const glm::vec2 halfScale = scale * .5f;
+		ret.lTop = position + glm::vec2(-halfScale.x, halfScale.y);
+		ret.rBot = position + glm::vec2(halfScale.x, -halfScale.y);
+		return ret;
+	}
+
 	Texture Load(const EngineData& info, const jlb::StringView path)
 	{
 		// Load pixels.

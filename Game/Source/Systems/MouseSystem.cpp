@@ -2,6 +2,7 @@
 #include "Systems/MouseSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -13,10 +14,21 @@ namespace game
 		return _hoveredObject;
 	}
 
+	bool MouseSystem::GetPressedThisTurn() const
+	{
+		return _pressedThisTurn;
+	}
+
+	bool MouseSystem::GetIsUIBlocking() const
+	{
+		return _isUIBlocking;
+	}
+
 	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		vke::GameSystem::PreUpdate(info, systems);
 
+		_pressedThisTurn = false;
 		if (!info.mouseAvailable)
 			return;
 
@@ -52,12 +64,27 @@ namespace game
 		}
 	}
 
+	void MouseSystem::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		System<vke::EngineData>::PostUpdate(info, systems);
+
+		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
+		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
+		_hoveredObject = uiHoveredObj == SIZE_MAX ? _hoveredObject : SIZE_MAX;
+		_isUIBlocking = uiHoveredObj != SIZE_MAX;
+	}
+
 	void MouseSystem::OnMouseInput(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems, 
 		const int key, const int action)
 	{
 		System<vke::EngineData>::OnMouseInput(info, systems, key, action);
 		if(key == GLFW_MOUSE_BUTTON_1)
-			_pressed = action == GLFW_PRESS ? true : action == GLFW_RELEASE ? false : _pressed;
+		{
+			const bool pressed = action == GLFW_PRESS;
+			_pressedThisTurn = !_pressed && pressed;
+			_pressed = pressed ? true : action == GLFW_RELEASE ? false : _pressed;
+		}
+			
 	}
 }

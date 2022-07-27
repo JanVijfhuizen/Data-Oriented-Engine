@@ -170,14 +170,18 @@
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
+    <ClInclude Include="Include\Game\Systems\MenuSystem.h" />
     <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
     <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
     <ClInclude Include="Include\Game\Systems\TurnThreadPoolSystem.h" />
+    <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\MenuSystem.cpp" />
+    <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />
     <ClCompile Include="Source\Components\MovementComponent.cpp" />
     <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp" />
     <ClCompile Include="Source\Systems\CameraSystem.cpp" />

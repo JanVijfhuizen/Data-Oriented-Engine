@@ -4,15 +4,25 @@
 
 namespace vke
 {
+	float UIRenderSystem::GetAspectFix(const glm::vec2& resolution)
+	{
+		return static_cast<float>(resolution.x) / resolution.y;
+	}
+
+	float UIRenderSystem::GetReversedAspectFix(const glm::vec2& resolution)
+	{
+		return static_cast<float>(resolution.y) / resolution.x;
+	}
+
 	glm::vec2 UIRenderSystem::ScreenToWorldPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution)
 	{
-		pos.x *= static_cast<float>(resolution.x) / resolution.y;
+		pos.x *= GetAspectFix(resolution);
 		return (pos / camera.pixelSize + camera.position) / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 	}
 
 	glm::vec2 UIRenderSystem::WorldToScreenPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution)
 	{
-		pos.x *= static_cast<float>(resolution.y) / resolution.x;
+		pos.x *= GetReversedAspectFix(resolution);
 		return (pos * static_cast<float>(vke::PIXEL_SIZE_ENTITY) - camera.position) * camera.pixelSize;
 	}
 

@@ -115,19 +115,14 @@ namespace jlb
 		return glm::length(glm::vec2(xOffset, yOffset));
 	}
 
-	bool DistanceTree::Intersects(const Bounds& a, const Bounds& b)
-	{
-		return (a.layers & b.layers) == 0 ? false : a.lBot.x <= b.rTop.x && a.rTop.x >= b.lBot.x && a.lBot.y <= b.rTop.y && a.rTop.y >= b.lBot.y;
-	}
-
 	void* DistanceTree::GetInstancesInRange(const Bounds& bounds, const uint32_t current, 
 		const ArrayView<uint32_t>& outArray, uint32_t& arrayIndex)
 	{
 		const auto& node = _nodes[current];
 		bool isValid = node.index != UINT32_MAX;
 
-		const bool nodeIntersects = isValid ? Intersects(bounds, node.bounds) : false;
-		const bool instanceIntersects = nodeIntersects ? Intersects(bounds, node.instance) : false;
+		const bool nodeIntersects = isValid ? bounds.Intersects(node.bounds) : false;
+		const bool instanceIntersects = nodeIntersects ? bounds.Intersects(node.instance) : false;
 
 		// Add the current node and increment the array index.
 		outArray[arrayIndex] = node.index;

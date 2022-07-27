@@ -6,12 +6,14 @@
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/GameManager.h"
+#include "Systems/MenuSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/TurnThreadPoolSystem.h"
+#include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
@@ -34,6 +36,8 @@ namespace game
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 		initializer.DefineSystem<CameraSystem>();
+		initializer.DefineSystem<MenuSystem>();
+		initializer.DefineSystem<UIInteractionSystem>();
 
 		// Core engine Post update.
 		initializer.DefineSystem<vke::TileRenderSystem>();

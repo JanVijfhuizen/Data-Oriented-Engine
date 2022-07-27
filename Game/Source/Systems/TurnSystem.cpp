@@ -30,9 +30,14 @@ namespace game
 		return _paused;
 	}
 
+	void TurnSystem::Pause()
+	{
+		_paused = true;
+	}
+
 	void TurnSystem::PauseAtEndOfTick()
 	{
-		_pauseAtEndOfTick = true;
+		_pauseAtEndOfTick = _paused ? _pauseAtEndOfTick : true;
 	}
 
 	void TurnSystem::SkipToNextTick()
@@ -189,7 +194,7 @@ namespace game
 		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 		{
 			_paused = !_paused;
-			_keyVerticalLerps[1] = 0;
+			PressKey(1);
 		}
 			
 		// Go to the next tick.
@@ -198,23 +203,30 @@ namespace game
 			_forwardToNextTick = true;
 			_pauseAtEndOfTick = true;
 			_paused = false;
+			PressKey(1);
+			PressKey(3);
 		}
 
 		// Adjust turn speed.
 		if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 		{
 			_ticksPerSecond /= 2;
-			_keyVerticalLerps[0] = 0;
-			_keyVerticalLerps[4] = 0;
+			PressKey(0);
+			PressKey(4);
 		}
 			
 		if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
 		{
 			_ticksPerSecond *= 2;
-			_keyVerticalLerps[2] = 0;
-			_keyVerticalLerps[4] = 0;
+			PressKey(2);
+			PressKey(4);
 		}
 			
 		_ticksPerSecond = jlb::math::Clamp<size_t>(_ticksPerSecond, 1, _maxTicksPerSecond);
+	}
+
+	void TurnSystem::PressKey(const size_t index)
+	{
+		_keyVerticalLerps[index] = 0;
 	}
 }

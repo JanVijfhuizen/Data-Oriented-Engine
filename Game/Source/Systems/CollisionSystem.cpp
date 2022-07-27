@@ -68,8 +68,7 @@ namespace game
 			auto& previous = _collisionFrames.GetPrevious();
 			previous.tasks.SetCount(0);
 			previous.distanceTree.Clear();
-
-			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
+			
 			TurnThreadPoolTask task{};
 			task.userPtr = this;
 			task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
@@ -83,6 +82,7 @@ namespace game
 					previous.bvh.Build(tasks);
 			};
 
+			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
 			const auto result = turnThreadSys->TryAdd(info, task);
 			assert(result != SIZE_MAX);
 		}
