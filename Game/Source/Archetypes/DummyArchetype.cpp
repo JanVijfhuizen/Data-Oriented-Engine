@@ -37,8 +37,8 @@ namespace game::demo
 		for (auto& entity : entities)
 		{
 			CharacterInput characterInput{};
-			//characterInput.movementDir.x = rand() % 3 - 1;
-			//characterInput.movementDir.y = rand() % 3 - 1;
+			characterInput.movementDir.x = rand() % 3 - 1;
+			characterInput.movementDir.y = rand() % 3 - 1;
 
 			auto& character = entity.character;
 			EndFrameCharacter(info, character, characterUpdateInfo, characterInput);

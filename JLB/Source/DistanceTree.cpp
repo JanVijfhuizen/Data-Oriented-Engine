@@ -131,6 +131,7 @@ namespace jlb
 		isValid = isValid ? arrayIndex < outArray.length && nodeIntersects : false;
 		// Silly optimization to avoid branching.
 		!isValid || node.left == 0 ? nullptr : GetInstancesInRange(bounds, node.left, outArray, arrayIndex);
+		isValid = isValid ? arrayIndex < outArray.length : false;
 		!isValid || node.right == 0 ? nullptr : GetInstancesInRange(bounds, node.right, outArray, arrayIndex);
 		
 		return nullptr;

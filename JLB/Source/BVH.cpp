@@ -60,7 +60,7 @@ namespace jlb
 			lBot.x = math::Min(lBot.x, lBotInstance.x);
 			lBot.y = math::Min(lBot.y, lBotInstance.y);
 			rTop.x = math::Max(rTop.x, rTopInstance.x);
-			rTop.y = math::Max(rTop.y, rTopInstance.x);
+			rTop.y = math::Max(rTop.y, rTopInstance.y);
 			bounds.layers |= instance.layers;
 		}
 
@@ -72,6 +72,8 @@ namespace jlb
 
 		for (auto& child : node.children)
 			child = 0;
+
+		node.bounds = bounds;
 		node.begin = from;
 		node.end = to;
 
@@ -102,8 +104,7 @@ namespace jlb
 			// This assumes there won't be more than nodeCapacity amount of objects on the same spot.
 			if (partitionIndex == from)
 				return QuickSort(instances, from, to, nodeCapacity, depth + 1);
-			
-			node.bounds = bounds;
+
 			node.begin = 0;
 			node.end = 0;
 			node.children[0] = QuickSort(instances, from, partitionIndex, nodeCapacity, depth + 1);
@@ -133,15 +134,12 @@ namespace jlb
 			i = outIndex == outArray.length ? node.end : i;
 		}
 
-		aChild == 0 || outIndex < outArray.length ? nullptr : GetIntersections(bounds, aChild, instances, outArray, outIndex);
-		bChild == 0 || outIndex < outArray.length ? nullptr : GetIntersections(bounds, bChild, instances, outArray, outIndex);
-
 		const auto& aChildNode = _nodes[aChild];
 		const auto& bChildNode = _nodes[bChild];
 
-		aChild == 0 || outIndex < outArray.length ? nullptr : !bounds.Intersects(aChildNode.bounds) ? nullptr :
+		aChild == 0 || outIndex >= outArray.length ? nullptr : !bounds.Intersects(aChildNode.bounds) ? nullptr :
 			GetIntersections(bounds, aChild, instances, outArray, outIndex);
-		bChild == 0 || outIndex < outArray.length ? nullptr : !bounds.Intersects(bChildNode.bounds) ? nullptr :
+		bChild == 0 || outIndex >= outArray.length ? nullptr : !bounds.Intersects(bChildNode.bounds) ? nullptr :
 			GetIntersections(bounds, bChild, instances, outArray, outIndex);
 
 		return nullptr;

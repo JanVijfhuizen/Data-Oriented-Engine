@@ -31,7 +31,6 @@ namespace game
 			jlb::BoundingVolumeHierarchy bvh{};
 			jlb::DistanceTree distanceTree{};
 			jlb::Vector<CollisionTask> tasks{};
-			bool finished = false;
 		};
 
 		jlb::SwapChain<CollisionFrame, 2> _collisionFrames{};

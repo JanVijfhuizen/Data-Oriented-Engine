@@ -68,7 +68,6 @@ namespace game
 			auto& previous = _collisionFrames.GetPrevious();
 			previous.tasks.SetCount(0);
 			previous.distanceTree.Clear();
-			previous.finished = false;
 			
 			TurnThreadPoolTask task{};
 			task.userPtr = this;
@@ -81,7 +80,6 @@ namespace game
 				const auto& tasks = previous.tasks;
 				if (tasks.GetCount() > 0)
 					previous.bvh.Build(tasks);
-				previous.finished = true;
 			};
 
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
