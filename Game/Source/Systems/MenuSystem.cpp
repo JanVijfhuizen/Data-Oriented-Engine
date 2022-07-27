@@ -19,7 +19,7 @@ namespace game
 		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractionSys = systems.GetSystem<UIInteractionSystem>();
-
+		
 		const auto& camera = entityRenderSys->camera;
 		const float scale = camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 
