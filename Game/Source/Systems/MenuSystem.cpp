@@ -13,6 +13,7 @@ namespace game
 {
 	void MenuUpdateInfo::Reset()
 	{
+		opened = false;
 		duration = 0;
 	}
 
@@ -47,11 +48,13 @@ namespace game
 			updateInfo.duration = 0;
 		}
 
+		constexpr auto color = glm::vec4(0, 0, 0, 1);
+		constexpr auto interactedColor = glm::vec4(.5f, 0, 0, 1);
+
 		vke::UIRenderTask renderTask{};
 		renderTask.position = screenPos;
 		renderTask.scale = glm::vec2(scale * createInfo.width, scale * length);
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
-		renderTask.color = glm::vec4(0, 0, 0, 1);
 
 		auto overshooting = jlb::CreateCurveOvershooting();
 		const float openLerp = updateInfo.duration / openDuration;
@@ -81,6 +84,7 @@ namespace game
 				task.origin.y += tabSize.y;
 				renderTask.position.y = task.origin.y;
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
+				renderTask.color = i == createInfo.interactedIndex && updateInfo.opened ? interactedColor : color;
 
 				auto result = uiRenderSys->TryAdd(info, renderTask);
 				assert(result != SIZE_MAX);
@@ -97,5 +101,7 @@ namespace game
 				createInfo.outInteractIds[i++] = result;
 			}
 		}
+
+		updateInfo.opened = true;
 	}
 }

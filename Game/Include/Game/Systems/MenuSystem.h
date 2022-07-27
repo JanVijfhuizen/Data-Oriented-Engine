@@ -19,11 +19,14 @@ namespace game
 		bool interactable = false;
 		vke::EntityCamera* entityCamera = nullptr;
 		vke::UICamera* uiCamera = nullptr;
+
 		jlb::ArrayView<size_t> outInteractIds{};
+		size_t interactedIndex = SIZE_MAX;
 	};
 
 	struct MenuUpdateInfo final
 	{
+		bool opened = false;
 		float duration = 0;
 		bool right = false;
 
