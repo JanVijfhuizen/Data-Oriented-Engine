@@ -31,9 +31,6 @@ namespace game
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
 		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-
-		vke::EntityRenderTask renderTask{};
-		renderTask.subTexture = subTexturesDivided[0];
 		
 		glm::vec2 cameraCenter{};
 		
@@ -92,6 +89,7 @@ namespace game
 
 			cameraCenter += character.transform.position;
 
+			vke::EntityRenderTask renderTask{};
 			renderTask.subTexture = subTextureDirArrow;
 			for (size_t i = 0; i < 4; ++i)
 			{

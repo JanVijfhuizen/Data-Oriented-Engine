@@ -1,12 +1,13 @@
 ﻿#pragma once
-#include "Archetype.h"
+#include "CharacterArchetype.h"
 #include "Entities/DummyEntity.h"
 
 namespace game::demo
 {
-	class DummyArchetype final : public Archetype<DummyEntity> 
+	class DummyArchetype final : public CharacterArchetype<DummyEntity> 
 	{
 	public:
-
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::ArrayView<DummyEntity> entities) override;
+		void EndFrame(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::ArrayView<DummyEntity> entities) override;
 	};
 }

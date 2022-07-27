@@ -89,8 +89,6 @@ namespace game
 		renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
 		const auto result = updateInfo.entityRenderSys->TryAdd(info, renderTask);
-		assert(result != SIZE_MAX);
-		
 		character.movementTaskId = movementSys->TryAdd(info, movementComponent);
 
 		if(turnSys->GetIfTickEvent())

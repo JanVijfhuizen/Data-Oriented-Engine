@@ -48,6 +48,7 @@ namespace jlb
 		auto& lBot = bounds.lBot;
 		auto& rTop = bounds.rTop;
 
+		// Calculate median and BVH node size.
 		for (uint32_t i = from; i < to; ++i)
 		{
 			const auto& instance = instances[_indexes[i]];
@@ -61,9 +62,9 @@ namespace jlb
 			rTop.y = math::Max(rTop.y, rTopInstance.x);
 			bounds.layers |= instance.layers;
 		}
-
 		median /= to - from;
 
+		// Partition values based on the median index.
 		uint32_t partitionIndex = to;
 		const bool partitionXAxis = depth % 2 == 0;
 
