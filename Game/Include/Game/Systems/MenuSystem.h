@@ -22,10 +22,20 @@ namespace game
 		jlb::ArrayView<size_t> outInteractIds{};
 	};
 
+	struct MenuUpdateInfo final
+	{
+		float duration = 0;
+		bool right = false;
+	};
+
 	class MenuSystem final : public vke::GameSystem
 	{
-	public:
-		void CreateMenu(const vke::EngineData& info,
-			jlb::Systems<vke::EngineData> systems, const MenuCreateInfo& createInfo) const;
+	public:;
+		float openHorizontalDuration = .5f;
+		float openHorizontalTabDelay = .2f;
+		float openWriteTextDuration = .5f;
+
+		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
+			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;
 	};
 }

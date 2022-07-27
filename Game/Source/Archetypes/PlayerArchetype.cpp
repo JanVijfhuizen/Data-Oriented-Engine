@@ -68,7 +68,7 @@ namespace game
 			_menuOpen = mouseAction ? _menuOpen ? false : hovered : _menuOpen;
 
 			// Render Player Menu.
-			if(_menuOpen)
+			if (_menuOpen)
 			{
 				MenuCreateInfo menuCreateInfo{};
 				menuCreateInfo.interactable = true;
@@ -87,8 +87,10 @@ namespace game
 				menuCreateInfo.width = 4;
 				menuCreateInfo.content = strs;
 				menuCreateInfo.outInteractIds = outIds;
-				menuSys->CreateMenu(info, systems, menuCreateInfo);
+				menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
 			}
+			else
+				entity.menuUpdateInfo = {};
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);

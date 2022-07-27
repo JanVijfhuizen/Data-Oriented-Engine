@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/MenuSystem.h"
-#include "JlbMath.h"
+#include "Curve.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
@@ -12,7 +12,7 @@ namespace game
 {
 	void MenuSystem::CreateMenu(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
-		const MenuCreateInfo& createInfo) const
+		const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const
 	{
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
@@ -26,17 +26,29 @@ namespace game
 		const size_t length = createInfo.content.length;
 		assert(length > 0);
 
+		// Update open duration.
+		updateInfo.duration += info.deltaTime * 1e-2f;
+
 		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;
 		const auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
 		const auto worldPos = createInfo.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
 
+		if(updateInfo.right && xOffset < 0 || !updateInfo.right && xOffset > 0)
+		{
+			updateInfo.right = !updateInfo.right;
+			updateInfo.duration = 0;
+		}
+
 		vke::UIRenderTask renderTask{};
 		renderTask.position = screenPos;
 		renderTask.scale = glm::vec2(scale * createInfo.width, scale * length);
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 		renderTask.color = glm::vec4(0, 0, 0, 1);
+
+		auto overshooting = jlb::CreateCurveOvershooting();
+		const float horizontalLerp = updateInfo.duration / openHorizontalDuration;
 
 		// Draw the text.
 		{
@@ -45,8 +57,7 @@ namespace game
 			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
 			const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
 
-			renderTask.scale.y /= (length + 1);
-			//renderTask.color = glm::vec4(1);
+			renderTask.scale.y /= length + 1;
 
 			TextRenderTask task{};
 			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
@@ -60,6 +71,7 @@ namespace game
 				task.text = content;
 				task.origin.y += tabSize.y;
 				renderTask.position.y = task.origin.y;
+				renderTask.scale.x *= overshooting.Evaluate(horizontalLerp - openHorizontalTabDelay * i);
 
 				auto result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);
