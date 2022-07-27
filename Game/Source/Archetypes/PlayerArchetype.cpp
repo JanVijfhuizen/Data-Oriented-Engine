@@ -90,7 +90,7 @@ namespace game
 				menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
 			}
 			else
-				entity.menuUpdateInfo = {};
+				entity.menuUpdateInfo.Reset();
 
 			cameraCenter += entity.transform.position;
 			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);

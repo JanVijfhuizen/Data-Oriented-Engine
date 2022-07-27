@@ -26,14 +26,16 @@ namespace game
 	{
 		float duration = 0;
 		bool right = false;
+
+		void Reset();
 	};
 
 	class MenuSystem final : public vke::GameSystem
 	{
 	public:;
-		float openHorizontalDuration = .5f;
-		float openHorizontalTabDelay = .2f;
-		float openWriteTextDuration = .5f;
+		float openDuration = .5f;
+		float openTabDelay = .2f;
+		float openWriteTextDuration = 2;
 
 		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
 			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;

@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Systems/MenuSystem.h"
 #include "Curve.h"
+#include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
@@ -10,6 +11,11 @@
 
 namespace game
 {
+	void MenuUpdateInfo::Reset()
+	{
+		duration = 0;
+	}
+
 	void MenuSystem::CreateMenu(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
 		const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const
@@ -48,7 +54,8 @@ namespace game
 		renderTask.color = glm::vec4(0, 0, 0, 1);
 
 		auto overshooting = jlb::CreateCurveOvershooting();
-		const float horizontalLerp = updateInfo.duration / openHorizontalDuration;
+		const float openLerp = updateInfo.duration / openDuration;
+		const float openTextLerp = updateInfo.duration / (openDuration + openWriteTextDuration);
 
 		// Draw the text.
 		{
@@ -68,15 +75,18 @@ namespace game
 
 			for (const auto& content : createInfo.content)
 			{
+				const float tabDelay = openTabDelay * i;
+
 				task.text = content;
 				task.origin.y += tabSize.y;
 				renderTask.position.y = task.origin.y;
-				renderTask.scale.x *= overshooting.Evaluate(horizontalLerp - openHorizontalTabDelay * i);
+				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
 
-				auto result = textRenderSys->TryAdd(info, task);
+				auto result = uiRenderSys->TryAdd(info, renderTask);
 				assert(result != SIZE_MAX);
 
-				result = uiRenderSys->TryAdd(info, renderTask);
+				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
+				result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);
 
 				UIInteractionTask interactionTask{};
