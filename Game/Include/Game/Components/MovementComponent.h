@@ -27,6 +27,7 @@ namespace game
 		} systemDefined;
 
 		void Build();
+		void Finish();
 		void Update(const MovementTaskOutput& output);
 	};
 }

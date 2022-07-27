@@ -25,6 +25,7 @@ namespace game
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
@@ -46,10 +47,25 @@ namespace game
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
 
+		CharacterInput characterInput{};
+
+		if (turnSys->GetIfTickEvent())
+		{
+			auto& dir = characterInput.movementDir;
+			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
+			dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
+
+			for (auto& input : _movementInput)
+			{
+				input.pressedSinceStartOfFrame = input.pressed;
+				input.valid = input.pressed;
+			}
+		}
+
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
-			PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0]);
+			PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0], characterInput);
 
 			const auto& transform = character.transform;
 
@@ -104,34 +120,18 @@ namespace game
 		cameraSys->settings.target = cameraCenter;
 	}
 
-	void PlayerArchetype::EndFrame(const vke::EngineData& info,
+	void PlayerArchetype::PostUpdate(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::ArrayView<Player> entities)
 	{
-		Archetype<Player>::EndFrame(info, systems, entities);
+		Archetype<Player>::PostUpdate(info, systems, entities);
 
-		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
-
-		CharacterInput characterInput{};
-
-		if (turnSys->GetIfTickEvent())
-		{
-			auto& dir = characterInput.movementDir;
-			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
-			dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
-
-			for (auto& input : _movementInput)
-			{
-				input.pressedSinceStartOfFrame = input.pressed;
-				input.valid = input.pressed;
-			}
-		}
 
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
-			EndFrameCharacter(info, character, characterUpdateInfo, characterInput);
+			PostUpdateCharacter(info, character, characterUpdateInfo);
 		}
 	}
 

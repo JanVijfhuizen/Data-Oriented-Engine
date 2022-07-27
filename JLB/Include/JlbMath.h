@@ -14,6 +14,8 @@ namespace jlb::math
 	// Wraps an radians angle.
 	[[nodiscard]] float WrapAngle(float f);
 
+	[[nodiscard]] glm::ivec2 RoundNearest(const glm::vec2& v);
+
 	// Clamps a vector inside other vectors.
 	[[nodiscard]] glm::vec2 Clamp(glm::vec2 clampable, glm::vec2 min, glm::vec2 max);
 	// Returns the distance from the threshold if outside of the given bounds.

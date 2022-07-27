@@ -21,27 +21,28 @@ namespace game::demo
 
 		for (auto& entity : entities)
 		{
+			CharacterInput characterInput{};
+			//characterInput.movementDir.x = rand() % 3 - 1;
+			//characterInput.movementDir.y = rand() % 3 - 1;
+			characterInput.movementDir.y = 1;
+
 			auto& character = entity.character;
-			PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0]);
+			PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0], characterInput);
 		}
 	}
 
-	void DummyArchetype::EndFrame(const vke::EngineData& info, 
+	void DummyArchetype::PostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::ArrayView<DummyEntity> entities)
 	{
-		CharacterArchetype<DummyEntity>::EndFrame(info, systems, entities);
+		CharacterArchetype<DummyEntity>::PostUpdate(info, systems, entities);
 
 		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
 
 		for (auto& entity : entities)
 		{
-			CharacterInput characterInput{};
-			characterInput.movementDir.x = rand() % 3 - 1;
-			characterInput.movementDir.y = rand() % 3 - 1;
-
 			auto& character = entity.character;
-			EndFrameCharacter(info, character, characterUpdateInfo, characterInput);
+			PostUpdateCharacter(info, character, characterUpdateInfo);
 		}
 	}
 }

@@ -25,6 +25,11 @@ namespace jlb::math
 		return fmodf(f, PI * 2);
 	}
 
+	glm::ivec2 RoundNearest(const glm::vec2& v)
+	{
+		return {roundf(v.x), roundf(v.y)};
+	}
+
 	glm::vec2 Clamp(glm::vec2 clampable, const glm::vec2 min, const glm::vec2 max)
 	{
 		clampable.x = Clamp(clampable.x, min.x, max.x);

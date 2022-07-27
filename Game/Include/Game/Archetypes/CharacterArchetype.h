@@ -8,6 +8,7 @@
 #include "VkEngine/Components/Transform.h"
 #include "VkEngine/Graphics/SubTexture.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
+#include "JlbMath.h"
 
 namespace game
 {
@@ -44,8 +45,9 @@ namespace game
 		};
 
 		[[nodiscard]] CharacterUpdateInfo CreateCharacterPreUpdateInfo(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems);
-		void PreUpdateCharacter(const vke::EngineData& info, Character& character, const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture);
-		void EndFrameCharacter(const vke::EngineData& info, Character& character, const CharacterUpdateInfo& updateInfo, const CharacterInput& input);
+		void PreUpdateCharacter(const vke::EngineData& info, Character& character, const CharacterUpdateInfo& updateInfo, 
+			const vke::SubTexture& subTexture, const CharacterInput& input);
+		void PostUpdateCharacter(const vke::EngineData& info, Character& character, const CharacterUpdateInfo& updateInfo);
 	};
 
 	template <typename T>
@@ -71,14 +73,14 @@ namespace game
 
 	template <typename T>
 	void CharacterArchetype<T>::PreUpdateCharacter(const vke::EngineData& info, Character& character, 
-		const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture)
+		const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture, const CharacterInput& input)
 	{
 		const auto collisionSys = updateInfo.collisionSys;
 		const auto mouseSys = updateInfo.mouseSys;
 		const auto movementSys = updateInfo.movementSys;
 		const auto turnSys = updateInfo.turnSys;
 		
-		const auto& movementComponent = character.movementComponent;
+		auto& movementComponent = character.movementComponent;
 		const auto& transform = character.transform;
 
 		vke::EntityRenderTask renderTask{};
@@ -93,74 +95,66 @@ namespace game
 
 		if(turnSys->GetIfTickEvent())
 		{
-			// Collision task.
-			CollisionTask collisionTask{};
-			collisionTask = character.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) :
-				glm::ivec2(character.movementComponent.userDefined.to);
-			collisionTask.layers = collisionLayerMain | collisionLayerInteractable;
-			character.collisionTaskId = collisionSys->TryAdd(collisionTask);
-			assert(character.collisionTaskId != SIZE_MAX);
+			const auto& movementSystemDefined = movementComponent.systemDefined;
+			
+			// Update movement task with new input.
+			if (movementSystemDefined.remaining <= 1)
+			{
+				const auto& dir = input.movementDir;
+
+				character.movementTileReservation = SIZE_MAX;
+				movementComponent.Finish();
+
+				const glm::vec2 from = glm::vec2(jlb::math::RoundNearest(character.transform.position));
+				const glm::vec2 delta = glm::vec2(dir);
+				glm::vec2 to = from + delta;
+				glm::ivec2 toRounded = jlb::math::RoundNearest(to);
+				
+				if (dir.x != 0 || dir.y != 0)
+				{
+					uint32_t outCollision;
+					if (collisionSys->CheckIfTilesAreReserved(toRounded) != SIZE_MAX ||
+						collisionSys->GetIntersections(toRounded, outCollision))
+					{
+						to = from;
+					}
+					else
+					{
+						character.movementTileReservation = collisionSys->ReserveTiles(toRounded);
+						movementComponent.Build();
+					}
+				}
+
+				auto& movementUserDefined = movementComponent.userDefined;
+				movementUserDefined.from = from;
+				movementUserDefined.to = to;
+				movementUserDefined.rotation = transform.rotation;
+
+				// Collision task.
+				CollisionTask collisionTask{};
+				collisionTask = toRounded;
+				collisionTask.layers = collisionLayerMain | collisionLayerInteractable;
+				character.collisionTaskId = collisionSys->TryAdd(collisionTask);
+				assert(character.collisionTaskId != SIZE_MAX);
+			}
 		}
 	}
 
 	template <typename T>
-	void CharacterArchetype<T>::EndFrameCharacter(const vke::EngineData& info, 
-		Character& character, const CharacterUpdateInfo& updateInfo, const CharacterInput& input)
+	void CharacterArchetype<T>::PostUpdateCharacter(const vke::EngineData& info, 
+		Character& character, const CharacterUpdateInfo& updateInfo)
 	{
 		if (character.movementTaskId != SIZE_MAX)
 		{
 			const auto movementSys = updateInfo.movementSys;
 			auto& movementOutputs = movementSys->GetOutput();
-
-			auto& transform = character.transform;
 			const auto& movementOutput = movementOutputs[character.movementTaskId];
 
 			character.movementComponent.Update(movementOutput);
+
+			auto& transform = character.transform;
 			transform.position = movementOutput.position;
 			transform.rotation = movementOutput.rotation;
-		}
-
-		const auto turnSys = updateInfo.turnSys;
-
-		if (turnSys->GetIfTickEvent())
-		{
-			const auto collisionSys = updateInfo.collisionSys;
-
-			auto& movementComponent = character.movementComponent;
-			const auto& transform = character.transform;
-
-			auto& movementUserDefined = movementComponent.userDefined;
-			const auto& movementSystemDefined = movementComponent.systemDefined;
-
-			character.movementTileReservation = SIZE_MAX;
-
-			// Update movement task with new input.
-			if (movementSystemDefined.remaining == 0)
-			{
-				const auto& dir = input.movementDir;
-
-				if (dir.x != 0 || dir.y != 0)
-				{
-					// Round the from position.
-					const glm::vec2 from = glm::vec2(glm::ivec2(character.transform.position));
-					const glm::vec2 delta = glm::vec2(dir);
-					const glm::vec2 to = from + delta;
-
-					if (collisionSys->CheckIfTilesAreReserved(glm::ivec2(to)) != SIZE_MAX)
-						return;
-
-					uint32_t outCollision;
-					const size_t collided = collisionSys->GetIntersections(glm::ivec2(to), outCollision);
-					if (collided)
-						return;
-
-					character.movementTileReservation = collisionSys->ReserveTiles(glm::ivec2(to));
-					movementUserDefined.from = from;
-					movementUserDefined.to = to;
-					movementUserDefined.rotation = transform.rotation;
-					movementComponent.Build();
-				}
-			}
 		}
 	}
 }

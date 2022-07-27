@@ -10,13 +10,17 @@ namespace game::demo
 	{
 		Scene::Allocate(info, systems);
 
-		const int32_t dummyCount = 6;
-		_dummies.Allocate(*info.allocator, dummyCount);
+		const int32_t dummyCount = 1;
+		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
 
 		for (int32_t i = 0; i < dummyCount; ++i)
 		{
-			const auto pos = glm::vec2(i - dummyCount / 2 - 1, i - dummyCount / 2 + 3);
-			_dummies[i].character.transform.position = pos;
+			for (int32_t j = 0; j < dummyCount; ++j)
+			{
+				const auto pos = glm::vec2(i - dummyCount / 2 - dummyCount, j - dummyCount / 2 - dummyCount);
+				_dummies[i * dummyCount + j].character.transform.position = pos;
+			}
+			
 		}
 	}
 
@@ -60,13 +64,8 @@ namespace game::demo
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PostUpdate(info, systems);
-	}
-
-	void DemoScene::EndFrame(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
-	{
-		Scene::EndFrame(info, systems);
-		_playerArchetype.EndFrame(info, systems, _player);
-		_dummyArchetype.EndFrame(info, systems, _dummies);
+		_playerArchetype.PostUpdate(info, systems, _player);
+		_dummyArchetype.PostUpdate(info, systems, _dummies);
 	}
 
 	void DemoScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
