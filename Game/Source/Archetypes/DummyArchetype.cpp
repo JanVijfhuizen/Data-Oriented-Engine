@@ -33,12 +33,13 @@ namespace game::demo
 		CharacterArchetype<DummyEntity>::EndFrame(info, systems, entities);
 
 		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
-		CharacterInput characterInput{};
-		characterInput.movementDir.x = rand() % 3 - 1;
-		characterInput.movementDir.y = rand() % 3 - 1;
 
 		for (auto& entity : entities)
 		{
+			CharacterInput characterInput{};
+			//characterInput.movementDir.x = rand() % 3 - 1;
+			//characterInput.movementDir.y = rand() % 3 - 1;
+
 			auto& character = entity.character;
 			EndFrameCharacter(info, character, characterUpdateInfo, characterInput);
 		}

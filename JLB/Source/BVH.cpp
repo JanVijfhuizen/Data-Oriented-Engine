@@ -1,7 +1,4 @@
 #include "BVH.h"
-
-#include <iostream>
-
 #include "JlbMath.h"
 #include "StackAllocator.h"
 #include "glm/geometric.hpp"
@@ -23,6 +20,7 @@ namespace jlb
 		_nodes.SetCount(0);
 		for (uint32_t i = 0; i < length; ++i)
 			_indexes[i] = i;
+
 		QuickSort(instances.data, 0, length, nodeCapacity, 0);
 	}
 
@@ -65,6 +63,7 @@ namespace jlb
 			rTop.y = math::Max(rTop.y, rTopInstance.x);
 			bounds.layers |= instance.layers;
 		}
+
 		median /= to - from;
 
 		// Partition values based on the median index.
@@ -87,17 +86,14 @@ namespace jlb
 			partitionIndex -= !left;
 			i += left;
 		}
-
-		std::cout << median.x << " // " << median.y << std::endl;
-		for (int i = from; i < to; ++i)
-		{
-			auto& instance = instances[_indexes[i]];
-			std::cout << instance.GetCenter().x << " " << instance.GetCenter().y << std::endl;
-		}
-		std::cout << partitionIndex << std::endl;
-		std::cout << std::endl;
-
+		
 		const bool isLeaf = from + nodeCapacity >= to;
+
+		// If the data couldn't be partitioned, use the other axis.
+		// This assumes there won't be more than nodeCapacity amount of objects on the same spot.
+		if(partitionIndex == from && !isLeaf)
+			return QuickSort(instances, from, to, nodeCapacity, depth + 1);
+		
 		const uint32_t index = _nodes.GetCount();
 		auto& node = _nodes.Add();
 		node.bounds = bounds;

@@ -10,12 +10,12 @@ namespace game::demo
 	{
 		Scene::Allocate(info, systems);
 
-		const int32_t dummyCount = 20;
+		const int32_t dummyCount = 2;
 		_dummies.Allocate(*info.allocator, dummyCount);
 
 		for (int32_t i = 0; i < dummyCount; ++i)
 		{
-			const auto pos = glm::vec2(i - dummyCount / 2, 2);
+			const auto pos = glm::vec2(i - dummyCount / 2 - 1, i - dummyCount / 2 + 3);
 			_dummies[i].character.transform.position = pos;
 		}
 	}
