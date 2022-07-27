@@ -160,8 +160,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\Game\Archetypes\Archetype.h" />
+    <ClInclude Include="Include\Game\Archetypes\CharacterArchetype.h" />
+    <ClInclude Include="Include\Game\Archetypes\DummyArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Components\MovementComponent.h" />
+    <ClInclude Include="Include\Game\Entities\DummyEntity.h" />
     <ClInclude Include="Include\Game\Entities\Player.h" />
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
     <ClInclude Include="Include\Game\Systems\CameraSystem.h" />
@@ -180,6 +183,7 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Archetypes\DummyArchetype.cpp" />
     <ClCompile Include="Source\Systems\MenuSystem.cpp" />
     <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />
     <ClCompile Include="Source\Components\MovementComponent.cpp" />

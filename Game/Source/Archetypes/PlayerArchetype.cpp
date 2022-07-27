@@ -18,7 +18,7 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::ArrayView<Player> entities)
 	{
-		Archetype<Player>::PreUpdate(info, systems, entities);
+		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
@@ -56,22 +56,24 @@ namespace game
 
 		for (auto& entity : entities)
 		{
-			const auto& movementComponent = entity.movementComponent;
-			const auto& transform = entity.transform;
+			auto& character = entity.character;
+
+			const auto& movementComponent = character.movementComponent;
+			const auto& transform = character.transform;
 
 			renderTask.transform = transform;
 			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-			const bool hovered = hoveredObj == entity.collisionTaskId && hoveredObj != SIZE_MAX;
+			const bool hovered = hoveredObj == character.collisionTaskId && hoveredObj != SIZE_MAX;
 			renderTask.transform.scale *= 1.f + _scalingOnSelected * static_cast<float>(hovered);
 
 			const auto result = entityRenderSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 
 			const bool mouseAction = mouseSys->GetPressedThisTurn() && !mouseSys->GetIsUIBlocking();
-			_menuOpen = mouseAction ? _menuOpen ? false : hovered : _menuOpen;
+			const bool menuOpen = mouseAction ? entity.menuUpdateInfo.opened ? false : hovered : entity.menuUpdateInfo.opened;
 
 			// Render Player Menu.
-			if (_menuOpen)
+			if (menuOpen)
 			{
 				MenuCreateInfo menuCreateInfo{};
 				menuCreateInfo.interactable = true;
@@ -100,8 +102,8 @@ namespace game
 			else
 				entity.menuUpdateInfo.Reset();
 
-			cameraCenter += entity.transform.position;
-			entity.movementTaskId = movementSys->TryAdd(info, movementComponent);
+			cameraCenter += character.transform.position;
+			character.movementTaskId = movementSys->TryAdd(info, movementComponent);
 
 			renderTask.subTexture = subTextureDirArrow;
 			for (size_t i = 0; i < 4; ++i)
@@ -116,13 +118,15 @@ namespace game
 		if (isTickEvent)
 			for (auto& entity : entities)
 			{
+				auto& character = entity.character;
+
 				// Collision task.
-				auto& transform = entity.transform;
+				auto& transform = character.transform;
 				CollisionTask task{};
-				task = entity.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(entity.movementComponent.userDefined.to);
+				task = character.movementTaskId == SIZE_MAX ? glm::ivec2(transform.position) : glm::ivec2(character.movementComponent.userDefined.to);
 				task.layers = collisionLayerMain | collisionLayerInteractable;
-				entity.collisionTaskId = collisionSys->TryAdd(task);
-				assert(entity.collisionTaskId != SIZE_MAX);
+				character.collisionTaskId = collisionSys->TryAdd(task);
+				assert(character.collisionTaskId != SIZE_MAX);
 			}
 
 		cameraCenter /= entities.length;
@@ -142,13 +146,14 @@ namespace game
 
 		for (auto& entity : entities)
 		{
-			if (entity.movementTaskId == SIZE_MAX)
+			auto& character = entity.character;
+			if (character.movementTaskId == SIZE_MAX)
 				continue;
 
-			auto& transform = entity.transform;
-			const auto& movementOutput = movementOutputs[entity.movementTaskId];
+			auto& transform = character.transform;
+			const auto& movementOutput = movementOutputs[character.movementTaskId];
 
-			entity.movementComponent.Update(movementOutput);
+			character.movementComponent.Update(movementOutput);
 			transform.position = movementOutput.position;
 			transform.rotation = movementOutput.rotation;
 		}
@@ -156,13 +161,14 @@ namespace game
 		if (turnSys->GetIfTickEvent())
 			for (auto& entity : entities)
 			{
-				auto& movementComponent = entity.movementComponent;
-				const auto& transform = entity.transform;
+				auto& character = entity.character;
+				auto& movementComponent = character.movementComponent;
+				const auto& transform = character.transform;
 
 				auto& movementUserDefined = movementComponent.userDefined;
 				const auto& movementSystemDefined = movementComponent.systemDefined;
 
-				entity.movementTileReservation = SIZE_MAX;
+				character.movementTileReservation = SIZE_MAX;
 
 				// Update movement task with new input.
 				if (movementSystemDefined.remaining == 0)
@@ -180,7 +186,7 @@ namespace game
 					if (dir.x != 0 || dir.y != 0)
 					{
 						// Round the from position.
-						const glm::vec2 from = glm::vec2(glm::ivec2(entity.transform.position));
+						const glm::vec2 from = glm::vec2(glm::ivec2(character.transform.position));
 						const glm::vec2 delta = glm::vec2(dir);
 						const glm::vec2 to = from + delta;
 
@@ -193,7 +199,7 @@ namespace game
 						if(collided)
 							continue;
 
-						entity.movementTileReservation = collisionSys->ReserveTiles(glm::ivec2(to));
+						character.movementTileReservation = collisionSys->ReserveTiles(glm::ivec2(to));
 						movementUserDefined.from = from;
 						movementUserDefined.to = to;
 						movementUserDefined.rotation = transform.rotation;

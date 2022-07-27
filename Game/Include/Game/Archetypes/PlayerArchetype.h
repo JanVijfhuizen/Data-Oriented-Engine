@@ -1,11 +1,11 @@
 ﻿#pragma once
-#include "Archetype.h"
+#include "CharacterArchetype.h"
 #include "Entities/Player.h"
 
 namespace game
 {
 	// Handles player character behaviour and input.
-	class PlayerArchetype final : public Archetype<Player>
+	class PlayerArchetype final : public CharacterArchetype<Player>
 	{
 	public:
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
@@ -25,7 +25,6 @@ namespace game
 
 		Input _movementInput[4]{};
 		const float _scalingOnSelected = 0.5f;
-		bool _menuOpen = false;
 
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
 	};
