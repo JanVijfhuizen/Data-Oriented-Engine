@@ -8,6 +8,6 @@ namespace game
 	{
 		Character character{};
 		MenuUpdateInfo menuUpdateInfo{};
-		jlb::StackArray<size_t, 5> menuInteractIds{};
+		jlb::StackArray<size_t, 4> menuInteractIds{};
 	};
 }

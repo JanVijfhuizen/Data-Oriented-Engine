@@ -30,6 +30,7 @@ namespace game
 		bool opened = false;
 		float duration = 0;
 		bool right = false;
+		size_t scrollIdx = 0;
 		float scrollPos = 0;
 
 		void Reset();

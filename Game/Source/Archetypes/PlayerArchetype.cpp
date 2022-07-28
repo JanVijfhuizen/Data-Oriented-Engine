@@ -2,10 +2,8 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "JlbMath.h"
 #include "Systems/CameraSystem.h"
-#include "Systems/CollisionSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
-#include "Systems/MovementSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
@@ -82,20 +80,24 @@ namespace game
 				menuCreateInfo.entityCamera = &entityRenderSys->camera;
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
+				// Test.
+				constexpr size_t l = 5;
+				constexpr size_t ml = 4;
 				jlb::Array<jlb::StringView> strs{};
-				strs.Allocate(*info.dumpAllocator, 5);
+				strs.Allocate(*info.dumpAllocator, l);
 				strs[0] = "inventory";
 				strs[1] = "social";
 				strs[2] = "test";
 				strs[3] = "social";
 				strs[4] = "test";
 				menuCreateInfo.width = 4;
+				menuCreateInfo.maxLength = ml;
 				menuCreateInfo.content = strs;
 				menuCreateInfo.outInteractIds = entity.menuInteractIds;
 
 				auto& idx = menuCreateInfo.interactedIndex;
 				idx = SIZE_MAX;
-				for (size_t i = 0; i < 5; ++i)
+				for (size_t i = 0; i < ml; ++i)
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);

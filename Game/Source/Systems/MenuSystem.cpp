@@ -15,6 +15,7 @@ namespace game
 	{
 		opened = false;
 		duration = 0;
+		scrollIdx = 0;
 		scrollPos = 0;
 	}
 
@@ -31,8 +32,10 @@ namespace game
 		const auto& camera = entityRenderSys->camera;
 		const float scale = camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 
-		const size_t length = createInfo.content.length;
+		const size_t contentLength = createInfo.content.length;
+		const size_t length = jlb::math::Min(contentLength, createInfo.maxLength);
 		assert(length > 0);
+		assert(createInfo.outInteractIds.length == length);
 
 		// Update open duration.
 		updateInfo.duration += info.deltaTime * 1e-2f;
@@ -76,15 +79,16 @@ namespace game
 			task.padding = -4;
 
 			auto& scrollPos = updateInfo.scrollPos;
-			int32_t oldScrollPos = roundf(scrollPos);
+			int32_t oldScrollIdx = roundf(scrollPos);
 			scrollPos += _scrollDir;
-			scrollPos += scrollPos < 0 ? length : 0;
-			scrollPos = fmodf(scrollPos, length);
-			const size_t newScrollPos = roundf(scrollPos);
-
+			scrollPos += scrollPos < 0 ? contentLength : 0;
+			scrollPos = fmodf(scrollPos, contentLength);
+			auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
+			const bool scrolled = oldScrollIdx != scrollIdx;
+			
 			for (size_t i = 0; i < length; ++i)
 			{
-				const size_t idx = (newScrollPos + i) % length;
+				const size_t idx = (scrollIdx + i) % contentLength;
 
 				const auto& content = createInfo.content[idx];
 				const float tabDelay = openTabDelay * i;
