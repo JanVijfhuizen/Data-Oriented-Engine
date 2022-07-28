@@ -37,6 +37,8 @@ namespace jlb
 		virtual void OnKeyInput(const T& info, const Systems<T> systems, int key, int action){}
 		// Called when the mouse has moved / mousekey has been pressed.
 		virtual void OnMouseInput(const T& info, const Systems<T> systems, int key, int action){}
+		// Called when the mouse scroll is used.
+		virtual void OnScrollInput(const T& info, const Systems<T> systems, float xOffset, float yOffset){}
 		// Called at the end of the game.
 		virtual void Exit(const T& info, const Systems<T> systems){}
 	};
