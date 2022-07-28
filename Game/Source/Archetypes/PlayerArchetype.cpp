@@ -88,8 +88,8 @@ namespace game
 				strs[0] = "inventory";
 				strs[1] = "social";
 				strs[2] = "test";
-				strs[3] = "social";
-				strs[4] = "test";
+				strs[3] = "another";
+				strs[4] = "one";
 				menuCreateInfo.width = 4;
 				menuCreateInfo.maxLength = ml;
 				menuCreateInfo.content = strs;

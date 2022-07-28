@@ -32,6 +32,7 @@ namespace game
 		bool right = false;
 		size_t scrollIdx = 0;
 		float scrollPos = 0;
+		float scrollArrowsLerp[2]{1, 1};
 
 		void Reset();
 	};
@@ -42,6 +43,8 @@ namespace game
 		float openDuration = .5f;
 		float openTabDelay = .2f;
 		float openWriteTextDuration = 2;
+		float scrollAnimDuration = 1;
+		float scrollAnimScaleMultiplier = .4f;
 
 		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
 			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;

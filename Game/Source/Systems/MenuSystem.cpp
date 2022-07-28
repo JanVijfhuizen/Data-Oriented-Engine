@@ -17,6 +17,8 @@ namespace game
 		duration = 0;
 		scrollIdx = 0;
 		scrollPos = 0;
+		for (float& lerp : scrollArrowsLerp)
+			lerp = 1;
 	}
 
 	void MenuSystem::CreateMenu(const vke::EngineData& info,
@@ -55,10 +57,18 @@ namespace game
 		constexpr auto color = glm::vec4(0, 0, 0, 1);
 		constexpr auto interactedColor = glm::vec4(.5f, 0, 0, 1);
 
+		const auto renderTaskScale = glm::vec2(scale * createInfo.width, scale * length);
+
 		vke::UIRenderTask renderTask{};
 		renderTask.position = screenPos;
-		renderTask.scale = glm::vec2(scale * createInfo.width, scale * length);
+		renderTask.scale = renderTaskScale;
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+
+		auto& scrollPos = updateInfo.scrollPos;
+		scrollPos += _scrollDir;
+		scrollPos += scrollPos < 0 ? contentLength : 0;
+		scrollPos = fmodf(scrollPos, contentLength);
+		auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
 
 		auto overshooting = jlb::CreateCurveOvershooting();
 		const float openLerp = updateInfo.duration / openDuration;
@@ -77,14 +87,6 @@ namespace game
 			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
 			task.scale = 8;
 			task.padding = -4;
-
-			auto& scrollPos = updateInfo.scrollPos;
-			int32_t oldScrollIdx = roundf(scrollPos);
-			scrollPos += _scrollDir;
-			scrollPos += scrollPos < 0 ? contentLength : 0;
-			scrollPos = fmodf(scrollPos, contentLength);
-			auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
-			const bool scrolled = oldScrollIdx != scrollIdx;
 			
 			for (size_t i = 0; i < length; ++i)
 			{
@@ -113,6 +115,45 @@ namespace game
 
 				createInfo.outInteractIds[i] = result;
 			}
+		}
+
+		// Draw the scroll arrows if applicable
+		if (contentLength != length)
+		{
+			const int32_t scrollDir = round(_scrollDir);
+			auto overshootingCurve = jlb::CreateCurveOvershooting();
+			auto decelerateCurve = jlb::CreateCurveDecelerate();
+
+			const float scrollSpeed = 1.f / scrollAnimDuration;
+			for (int32_t i = 0; i < 2; ++i)
+			{
+				auto& lerp = updateInfo.scrollArrowsLerp[1 - i];
+				lerp = scrollDir == i * 2 - 1 ? 0 : lerp;
+				lerp += info.deltaTime * 1e-2f * scrollSpeed;
+				lerp = jlb::math::Min<float>(lerp, 1);
+			}
+
+			auto arrowSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::scrollArrow);
+			jlb::StackArray<vke::SubTexture, 2> arrows{};
+			vke::texture::Subdivide(arrowSubTexture, 2, arrows);
+
+			const glm::vec2 arrowOffset{ 0, renderTaskScale.y / 2 };
+			const auto arrowScale = glm::vec2(scale);
+			vke::UIRenderTask arrowRenderTask{};
+
+			arrowRenderTask.position = screenPos - arrowOffset;
+			arrowRenderTask.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[0], 
+				overshootingCurve, decelerateCurve) * scrollAnimScaleMultiplier);
+			arrowRenderTask.subTexture = arrows[0];
+			auto result = uiRenderSys->TryAdd(info, arrowRenderTask);
+			assert(result != SIZE_MAX);
+
+			arrowRenderTask.position = screenPos + arrowOffset;
+			arrowRenderTask.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[1], 
+				overshootingCurve, decelerateCurve) * scrollAnimScaleMultiplier);
+			arrowRenderTask.subTexture = arrows[1];
+			result = uiRenderSys->TryAdd(info, arrowRenderTask);
+			assert(result != SIZE_MAX);
 		}
 
 		updateInfo.opened = true;

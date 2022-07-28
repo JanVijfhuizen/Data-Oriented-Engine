@@ -31,7 +31,8 @@ namespace game
 			timeline,
 			timer,
 			timerArrow,
-			blank
+			blank,
+			scrollArrow
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;
