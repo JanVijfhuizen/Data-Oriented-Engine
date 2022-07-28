@@ -15,6 +15,7 @@ namespace game
 	{
 		glm::vec2 origin{};
 		size_t width = 1;
+		size_t maxLength = 4;
 		jlb::ArrayView<jlb::StringView> content{};
 		bool interactable = false;
 		vke::EntityCamera* entityCamera = nullptr;
@@ -29,6 +30,7 @@ namespace game
 		bool opened = false;
 		float duration = 0;
 		bool right = false;
+		float scrollPos = 0;
 
 		void Reset();
 	};
@@ -42,5 +44,12 @@ namespace game
 
 		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
 			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;
+		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+
+	private:
+		float _scrollDir = 0;
+
+		void OnScrollInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
+			float xOffset, float yOffset) override;
 	};
 }

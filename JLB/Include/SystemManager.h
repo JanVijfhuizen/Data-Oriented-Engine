@@ -62,6 +62,7 @@ namespace jlb
 		void OnRecreateSwapChainAssets(const T& data);
 		void OnKeyInput(const T& data, int key, int action);
 		void OnMouseInput(const T& data, int key, int action);
+		void OnScrollInput(const T& data, float xOffset, float yOffset);
 		void Exit(const T& data);
 
 		[[nodiscard]] operator Systems<T>();
@@ -192,6 +193,13 @@ namespace jlb
 	{
 		for (auto& sys : _vector)
 			sys->OnMouseInput(data, *this, key, action);
+	}
+
+	template <typename T>
+	void SystemManager<T>::OnScrollInput(const T& data, float xOffset, float yOffset)
+	{
+		for (auto& sys : _vector)
+			sys->OnScrollInput(data, *this, xOffset, yOffset);
 	}
 
 	template <typename T>

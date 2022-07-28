@@ -8,7 +8,7 @@ namespace vke
 	void GLFWKeyCallback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
 	{
 		const auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));
-		auto& outData = self->GetOutData();
+		const auto& outData = self->GetOutData();
 
 		self->GetSystemManager().OnKeyInput(outData, key, action);
 	}
@@ -19,6 +19,14 @@ namespace vke
 		auto& outData = self->GetOutData();
 
 		self->GetSystemManager().OnMouseInput(outData, button, action);
+	}
+
+	void GLFWScrollCallback(GLFWwindow* window, const double xOffset, const double yOffset)
+	{
+		const auto self = reinterpret_cast<WindowHandler*>(glfwGetWindowUserPointer(window));
+		auto& outData = self->GetOutData();
+
+		self->GetSystemManager().OnScrollInput(outData, xOffset, yOffset);
 	}
 
 	void WindowHandler::Allocate(const Info& info)
@@ -44,6 +52,7 @@ namespace vke
 		// Set input callback.
 		glfwSetKeyCallback(_window, GLFWKeyCallback);
 		glfwSetMouseButtonCallback(_window, GLFWMouseKeyCallback);
+		glfwSetScrollCallback(_window, GLFWScrollCallback);
 		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 
