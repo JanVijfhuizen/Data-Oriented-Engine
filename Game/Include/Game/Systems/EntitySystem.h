@@ -7,6 +7,6 @@ namespace game
 	class EntitySystem final : public vke::TaskSystem<Entity>
 	{
 	public:
-
+		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 	};
 }
