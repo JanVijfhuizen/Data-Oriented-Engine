@@ -48,7 +48,7 @@ namespace game
 	{
 	public:;
 		float openDuration = 1.f;
-		float openTabDelay = .2f;
+		float openTabDelay = .4f;
 		float openWriteTextDuration = 2;
 		float scrollAnimDuration = 1;
 		float scrollAnimScaleMultiplier = .4f;
