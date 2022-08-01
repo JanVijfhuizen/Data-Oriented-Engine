@@ -41,7 +41,7 @@ namespace game
 	class MenuSystem final : public vke::GameSystem
 	{
 	public:;
-		float openDuration = .5f;
+		float openDuration = 1.f;
 		float openTabDelay = .2f;
 		float openWriteTextDuration = 2;
 		float scrollAnimDuration = 1;

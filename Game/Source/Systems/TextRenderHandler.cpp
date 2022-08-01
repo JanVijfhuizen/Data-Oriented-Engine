@@ -70,6 +70,7 @@ namespace game
 				uiRenderTask.position = origin;
 				uiRenderTask.scale = glm::vec2(fontSize);
 				uiRenderTask.subTexture = charSubTexture;
+				uiRenderTask.color = task.color;
 
 				const auto result = uiSys->TryAdd(info, uiRenderTask);
 				assert(result != SIZE_MAX);

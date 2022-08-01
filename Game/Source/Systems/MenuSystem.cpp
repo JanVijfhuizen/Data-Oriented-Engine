@@ -85,8 +85,8 @@ namespace game
 
 			TextRenderTask task{};
 			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
-			task.scale = 8;
-			task.padding = -4;
+			task.scale = 12;
+			task.padding = -6;
 			
 			for (size_t i = 0; i < length; ++i)
 			{
@@ -100,7 +100,7 @@ namespace game
 				renderTask.position.y = task.origin.y;
 				renderTask.scale = tabSize;
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
-				renderTask.color = interactedColor;
+				renderTask.color = color;
 
 				if(i > 0)
 				{
@@ -109,16 +109,18 @@ namespace game
 					auto result = uiInteractionSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
 					createInfo.outInteractIds[i - 1] = result;
-					renderTask.color = i - 1 == createInfo.interactedIndex && updateInfo.opened ? interactedColor : color;
 				}
 
 				auto result = uiRenderSys->TryAdd(info, renderTask);
 				assert(result != SIZE_MAX);
 
-				//renderTask.scale = glm::vec2(0);// -= glm::ivec2(camera.pixelSize * 4);
-				//renderTask.color = glm::vec4(1);
-				//result = uiRenderSys->TryAdd(info, renderTask);
-				//assert(result != SIZE_MAX);
+				if(i > 0)
+				{
+					renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
+					renderTask.color = i - 1 == createInfo.interactedIndex && updateInfo.opened ? interactedColor : glm::vec4(1);
+					result = uiRenderSys->TryAdd(info, renderTask);
+					assert(result != SIZE_MAX);
+				}
 
 				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
 				result = textRenderSys->TryAdd(info, task);
