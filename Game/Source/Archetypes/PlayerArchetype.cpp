@@ -89,14 +89,16 @@ namespace game
 				switch (entity.menuIndex)
 				{
 				case Player::MenuIndex::main:
-					content.Allocate(dumpAllocator, 1);
-					content[0] = "cards";
+					content.Allocate(dumpAllocator, 2);
+					content[0] = "player";
+					content[1] = "cards";
 					break;
 				case Player::MenuIndex::cards:
-					content.Allocate(dumpAllocator, 3);
-					content[0] = "a";
-					content[1] = "b";
-					content[2] = "c";
+					content.Allocate(dumpAllocator, 4);
+					content[0] = "cards";
+					content[1] = "a";
+					content[2] = "b";
+					content[3] = "c";
 					break;
 				}
 
@@ -109,7 +111,7 @@ namespace game
 
 				auto& idx = menuCreateInfo.interactedIndex;
 				idx = SIZE_MAX;
-				const auto length = jlb::math::Min<size_t>(MENU_MAX_LENGTH, content.GetLength());
+				const auto length = jlb::math::Min<size_t>(MENU_MAX_LENGTH, content.GetLength() - 1);
 				for (size_t i = 0; i < length; ++i)
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 

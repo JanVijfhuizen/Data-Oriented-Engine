@@ -16,6 +16,7 @@ namespace game
 		glm::vec2 origin{};
 		size_t width = 1;
 		size_t maxLength = 4;
+		// First entry is used as the title.
 		jlb::ArrayView<jlb::StringView> content{};
 		bool interactable = false;
 		vke::EntityCamera* entityCamera = nullptr;

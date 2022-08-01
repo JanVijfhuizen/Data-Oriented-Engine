@@ -36,7 +36,7 @@ namespace game
 
 		const size_t contentLength = createInfo.content.length;
 		const size_t length = jlb::math::Min(contentLength, createInfo.maxLength);
-		assert(length > 0);
+		assert(length > 1);
 		assert(createInfo.outInteractIds.length >= length);
 
 		// Update open duration.
@@ -65,7 +65,7 @@ namespace game
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 
 		auto& scrollPos = updateInfo.scrollPos;
-		scrollPos += _scrollDir;
+		scrollPos -= _scrollDir;
 		scrollPos += scrollPos < 0 ? contentLength : 0;
 		scrollPos = fmodf(scrollPos, contentLength);
 		auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
@@ -90,7 +90,7 @@ namespace game
 			
 			for (size_t i = 0; i < length; ++i)
 			{
-				const size_t idx = (scrollIdx + i) % contentLength;
+				const size_t idx = i == 0 ? 0 : (scrollIdx + i) % (contentLength - 1) + 1;
 
 				const auto& content = createInfo.content[idx];
 				const float tabDelay = openTabDelay * i;
@@ -99,7 +99,17 @@ namespace game
 				task.origin.y += tabSize.y;
 				renderTask.position.y = task.origin.y;
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
-				renderTask.color = i == createInfo.interactedIndex && updateInfo.opened ? interactedColor : color;
+				renderTask.color = interactedColor;
+
+				if(i > 0)
+				{
+					UIInteractionTask interactionTask{};
+					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize);
+					auto result = uiInteractionSys->TryAdd(info, interactionTask);
+					assert(result != SIZE_MAX);
+					createInfo.outInteractIds[i - 1] = result;
+					renderTask.color = i - 1 == createInfo.interactedIndex && updateInfo.opened ? interactedColor : color;
+				}
 
 				auto result = uiRenderSys->TryAdd(info, renderTask);
 				assert(result != SIZE_MAX);
@@ -107,19 +117,12 @@ namespace game
 				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
 				result = textRenderSys->TryAdd(info, task);
 				assert(result != SIZE_MAX);
-
-				UIInteractionTask interactionTask{};
-				interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize);
-				result = uiInteractionSys->TryAdd(info, interactionTask);
-				assert(result != SIZE_MAX);
-
-				createInfo.outInteractIds[i] = result;
 			}
 		}
 
-		// Draw the scroll arrows if applicable
+		// Draw the scroll arrows.
 		{
-			const int32_t scrollDir = round(_scrollDir);
+			const int32_t scrollDir = roundf(_scrollDir);
 			auto overshootingCurve = jlb::CreateCurveOvershooting();
 			auto decelerateCurve = jlb::CreateCurveDecelerate();
 
