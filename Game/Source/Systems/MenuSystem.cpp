@@ -131,11 +131,10 @@ namespace game
 						assert(result != SIZE_MAX);
 					}
 
-					if(content.active || interacted)
+					if(content.active)
 					{
 						renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
-						renderTask.color = interacted ? glm::vec4(.5f, 0, 0, 1) : glm::vec4(1);
-						renderTask.color.r *= content.active ? 1 : .25f;
+						renderTask.color = glm::vec4(1);
 						result = uiRenderSys->TryAdd(info, renderTask);
 						assert(result != SIZE_MAX);
 					}
