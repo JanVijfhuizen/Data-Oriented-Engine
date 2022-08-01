@@ -165,14 +165,17 @@
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
     <ClInclude Include="Include\Game\Components\MovementComponent.h" />
     <ClInclude Include="Include\Game\Entities\DummyEntity.h" />
+    <ClInclude Include="Include\Game\Entities\Entity.h" />
     <ClInclude Include="Include\Game\Entities\Player.h" />
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
     <ClInclude Include="Include\Game\Systems\CameraSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
+    <ClInclude Include="Include\Game\Systems\EntitySystem.h" />
     <ClInclude Include="Include\Game\Systems\GameManager.h" />
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
+    <ClInclude Include="Include\Game\Systems\InteractSystem.h" />
     <ClInclude Include="Include\Game\Systems\MenuSystem.h" />
     <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
@@ -183,6 +186,8 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\InteractSystem.cpp" />
+    <ClCompile Include="Source\Systems\EntitySystem.cpp" />
     <ClCompile Include="Source\Archetypes\DummyArchetype.cpp" />
     <ClCompile Include="Source\Systems\MenuSystem.cpp" />
     <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />

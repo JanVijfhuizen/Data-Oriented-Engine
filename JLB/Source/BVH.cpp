@@ -12,7 +12,7 @@ namespace jlb
 		_indexes.Allocate(allocator, size);
 	}
 
-	void BoundingVolumeHierarchy::Build(const ArrayView<Bounds> instances, const size_t nodeCapacity)
+	void BoundingVolumeHierarchy::Build(const ArrayView<Instance> instances, const size_t nodeCapacity)
 	{
 		const uint32_t length = instances.length;
 		assert(length > 0);
@@ -31,7 +31,7 @@ namespace jlb
 	}
 
 	size_t BoundingVolumeHierarchy::GetIntersections(const Bounds& bounds, 
-		const ArrayView<Bounds> instances, const ArrayView<uint32_t> outArray)
+		const ArrayView<Instance> instances, const ArrayView<uint32_t> outArray)
 	{
 		assert(outArray.length > 0);
 		uint32_t outIndex = 0;
@@ -39,7 +39,7 @@ namespace jlb
 		return outIndex;
 	}
 
-	uint32_t BoundingVolumeHierarchy::QuickSort(const Bounds* instances, 
+	uint32_t BoundingVolumeHierarchy::QuickSort(const Instance* instances,
 		const uint32_t from, const uint32_t to, 
 		const uint32_t nodeCapacity, const uint32_t depth)
 	{
@@ -53,15 +53,16 @@ namespace jlb
 		for (uint32_t i = from; i < to; ++i)
 		{
 			const auto& instance = instances[_indexes[i]];
-			const auto& lBotInstance = instance.lBot;
-			const auto& rTopInstance = instance.rTop;
+			const auto& instanceBounds = instance.bounds;
+			const auto& lBotInstance = instanceBounds.lBot;
+			const auto& rTopInstance = instanceBounds.rTop;
 
-			median += instance.GetCenter();
+			median += instanceBounds.GetCenter();
 			lBot.x = math::Min(lBot.x, lBotInstance.x);
 			lBot.y = math::Min(lBot.y, lBotInstance.y);
 			rTop.x = math::Max(rTop.x, rTopInstance.x);
 			rTop.y = math::Max(rTop.y, rTopInstance.y);
-			bounds.layers |= instance.layers;
+			bounds.layers |= instanceBounds.layers;
 		}
 
 		median /= to - from;
@@ -86,7 +87,7 @@ namespace jlb
 			for (uint32_t i = from; i < partitionIndex;)
 			{
 				const auto& instance = instances[_indexes[i]];
-				const auto center = instance.GetCenter();
+				const auto center = instance.bounds.GetCenter();
 				const bool left = partitionXAxis ? center.x < median.x : center.y < median.y;
 
 				const uint32_t index = left ? i : partitionIndex - 1;
@@ -115,7 +116,7 @@ namespace jlb
 	}
 
 	void* BoundingVolumeHierarchy::GetIntersections(const Bounds& bounds, const uint32_t current,
-		const ArrayView<Bounds>& instances, const ArrayView<uint32_t>& outArray, uint32_t& outIndex)
+		const ArrayView<Instance>& instances, const ArrayView<uint32_t>& outArray, uint32_t& outIndex)
 	{
 		const auto& node = _nodes[current];
 
@@ -127,7 +128,7 @@ namespace jlb
 		{
 			const uint32_t index = _indexes[i];
 			const auto& instance = instances[index];
-			const bool intersects = instance.Intersects(bounds);
+			const bool intersects = instance.bounds.Intersects(bounds);
 			outArray[outIndex] = index;
 			outIndex += intersects;
 

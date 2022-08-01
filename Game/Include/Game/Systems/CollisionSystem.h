@@ -6,7 +6,7 @@
 
 namespace game
 {
-	typedef jlb::Bounds CollisionTask;
+	typedef jlb::BoundingVolumeHierarchy::Instance CollisionTask;
 
 	enum CollisionLayers
 	{

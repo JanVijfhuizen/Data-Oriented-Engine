@@ -133,8 +133,8 @@ namespace game
 
 				// Collision task.
 				CollisionTask collisionTask{};
-				collisionTask = jlb::math::RoundNearest(to);
-				collisionTask.layers = collisionLayerMain | collisionLayerInteractable;
+				collisionTask.bounds = jlb::math::RoundNearest(to);
+				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
 				character.collisionTaskId = collisionSys->TryAdd(collisionTask);
 				assert(character.collisionTaskId != SIZE_MAX);
 			}

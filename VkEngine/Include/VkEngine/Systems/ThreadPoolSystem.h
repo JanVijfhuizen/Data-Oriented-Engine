@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <mutex>
 #include <thread>
-#include "GameSystem.h"
 #include "TaskSystemWithOutput.h"
 
 namespace vke
@@ -12,10 +11,6 @@ namespace vke
 
 #ifndef THREAD_POOL_SYSTEM_NESTED_CAPACITY
 #define THREAD_POOL_SYSTEM_NESTED_CAPACITY 8
-#endif
-
-#ifndef THREAD_POOL_SYSTEM_UNUSED_THREAD_COUNT
-#define THREAD_POOL_SYSTEM_UNUSED_THREAD_COUNT 1
 #endif
 
 	struct ThreadPoolTask final
