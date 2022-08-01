@@ -37,7 +37,7 @@ namespace game
 		const size_t contentLength = createInfo.content.length;
 		const size_t length = jlb::math::Min(contentLength, createInfo.maxLength);
 		assert(length > 0);
-		assert(createInfo.outInteractIds.length == length);
+		assert(createInfo.outInteractIds.length >= length);
 
 		// Update open duration.
 		updateInfo.duration += info.deltaTime * 1e-2f;
@@ -118,7 +118,6 @@ namespace game
 		}
 
 		// Draw the scroll arrows if applicable
-		if (contentLength != length)
 		{
 			const int32_t scrollDir = round(_scrollDir);
 			auto overshootingCurve = jlb::CreateCurveOvershooting();

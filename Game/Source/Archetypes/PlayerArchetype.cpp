@@ -27,6 +27,8 @@ namespace game
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
+		auto& dumpAllocator = *info.dumpAllocator;
+
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
 		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
@@ -67,11 +69,12 @@ namespace game
 
 			const auto& transform = character.transform;
 
-			const bool mouseAction = mouseSys->GetPressedThisTurn() && !mouseSys->GetIsUIBlocking();
+			const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 			const bool hovered = characterUpdateInfo.GetIsHovered(character);
 			const bool menuOpen = mouseAction ? entity.menuUpdateInfo.opened ? false : hovered : entity.menuUpdateInfo.opened;
 
 			// Render Player Menu.
+			entity.menuIndex = menuOpen ? entity.menuIndex : Player::MenuIndex::main;
 			if (menuOpen)
 			{
 				MenuCreateInfo menuCreateInfo{};
@@ -80,27 +83,58 @@ namespace game
 				menuCreateInfo.entityCamera = &entityRenderSys->camera;
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
-				// Test.
-				constexpr size_t l = 5;
-				constexpr size_t ml = 4;
-				jlb::Array<jlb::StringView> strs{};
-				strs.Allocate(*info.dumpAllocator, l);
-				strs[0] = "inventory";
-				strs[1] = "social";
-				strs[2] = "test";
-				strs[3] = "another";
-				strs[4] = "one";
+				jlb::Array<jlb::StringView> content{};
+
+				// Create menu content.
+				switch (entity.menuIndex)
+				{
+				case Player::MenuIndex::main:
+					content.Allocate(dumpAllocator, 1);
+					content[0] = "cards";
+					break;
+				case Player::MenuIndex::cards:
+					content.Allocate(dumpAllocator, 3);
+					content[0] = "a";
+					content[1] = "b";
+					content[2] = "c";
+					break;
+				}
+
+				constexpr size_t MENU_MAX_LENGTH = 4;
+
 				menuCreateInfo.width = 4;
-				menuCreateInfo.maxLength = ml;
-				menuCreateInfo.content = strs;
+				menuCreateInfo.maxLength = MENU_MAX_LENGTH;
+				menuCreateInfo.content = content;
 				menuCreateInfo.outInteractIds = entity.menuInteractIds;
 
 				auto& idx = menuCreateInfo.interactedIndex;
 				idx = SIZE_MAX;
-				for (size_t i = 0; i < ml; ++i)
+				const auto length = jlb::math::Min<size_t>(MENU_MAX_LENGTH, content.GetLength());
+				for (size_t i = 0; i < length; ++i)
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 
-				menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
+				bool changePage = false;
+				bool pressedBack = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
+				bool close = false;
+
+				// Handle interaction.
+				switch (entity.menuIndex)
+				{
+				case Player::MenuIndex::main:
+					// If cards tab is pressed, go to card menu.
+					changePage = idx == entity.menuInteractIds[0] && mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
+					entity.menuIndex = changePage ? Player::MenuIndex::cards : entity.menuIndex;
+					close = pressedBack;
+					break;
+				case Player::MenuIndex::cards:
+					entity.menuIndex = pressedBack ? Player::MenuIndex::main : entity.menuIndex;
+					break;
+				}
+
+				if(changePage || pressedBack || close)
+					entity.menuUpdateInfo.Reset();
+				if(!close)
+					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
 			}
 			else
 				entity.menuUpdateInfo.Reset();

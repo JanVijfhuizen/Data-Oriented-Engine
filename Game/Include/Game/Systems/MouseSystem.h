@@ -7,14 +7,26 @@ namespace game
 	class MouseSystem final : public vke::GameSystem
 	{
 	public:
+		enum class Key
+		{
+			left,
+			right
+		};
+
 		[[nodiscard]] size_t GetHoveredObject() const;
-		[[nodiscard]] bool GetPressedThisTurn() const;
+		[[nodiscard]] bool GetIsPressed(Key key) const;
+		[[nodiscard]] bool GetIsPressedThisTurn(Key key) const;
 		[[nodiscard]] bool GetIsUIBlocking() const;
 
 	private:
+		struct KeyData final
+		{
+			bool pressed = false;
+			bool pressedThisTurn = false;
+		};
+
 		size_t _hoveredObject = SIZE_MAX;
-		bool _pressed = false;
-		bool _pressedThisTurn = false;
+		KeyData _keys[2];
 		bool _isUIBlocking = false;
 		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;

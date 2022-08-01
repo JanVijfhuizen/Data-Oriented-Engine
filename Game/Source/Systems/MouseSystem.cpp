@@ -14,9 +14,14 @@ namespace game
 		return _hoveredObject;
 	}
 
-	bool MouseSystem::GetPressedThisTurn() const
+	bool MouseSystem::GetIsPressed(const Key key) const
 	{
-		return _pressedThisTurn;
+		return _keys[static_cast<size_t>(key)].pressed;
+	}
+
+	bool MouseSystem::GetIsPressedThisTurn(const Key key) const
+	{
+		return _keys[static_cast<size_t>(key)].pressedThisTurn;
 	}
 
 	bool MouseSystem::GetIsUIBlocking() const
@@ -28,7 +33,8 @@ namespace game
 	{
 		vke::GameSystem::PreUpdate(info, systems);
 
-		_pressedThisTurn = false;
+		for (auto& key : _keys)
+			key.pressedThisTurn = false;
 		if (!info.mouseAvailable)
 			return;
 
@@ -45,7 +51,7 @@ namespace game
 		vke::UIRenderTask task{};
 		task.position = mousePos;
 		task.scale = glm::vec2(uiSys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY);
-		task.subTexture = subTextures[_pressed];
+		task.subTexture = subTextures[_keys[0].pressed];
 
 		const auto result = uiSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
@@ -79,12 +85,16 @@ namespace game
 		const int key, const int action)
 	{
 		System<vke::EngineData>::OnMouseInput(info, systems, key, action);
-		if(key == GLFW_MOUSE_BUTTON_1)
+
+		for (int i = GLFW_MOUSE_BUTTON_1; i <= GLFW_MOUSE_BUTTON_2; ++i)
 		{
-			const bool pressed = action == GLFW_PRESS;
-			_pressedThisTurn = !_pressed && pressed;
-			_pressed = pressed ? true : action == GLFW_RELEASE ? false : _pressed;
+			auto& keyData = _keys[i];
+			if (key == i)
+			{
+				const bool pressed = action == GLFW_PRESS;
+				keyData.pressedThisTurn = !keyData.pressed && pressed;
+				keyData.pressed = pressed ? true : action == GLFW_RELEASE ? false : keyData.pressed;
+			}
 		}
-			
 	}
 }
