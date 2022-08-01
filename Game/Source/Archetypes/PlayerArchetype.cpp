@@ -83,22 +83,23 @@ namespace game
 				menuCreateInfo.entityCamera = &entityRenderSys->camera;
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
-				jlb::Array<jlb::StringView> content{};
+				jlb::Array<MenuCreateInfo::Content> content{};
 
 				// Create menu content.
 				switch (entity.menuIndex)
 				{
 				case Player::MenuIndex::main:
 					content.Allocate(dumpAllocator, 2);
-					content[0] = "player";
-					content[1] = "cards";
+					content[0].string = "player";
+					content[1].string = "cards";
 					break;
 				case Player::MenuIndex::cards:
 					content.Allocate(dumpAllocator, 4);
-					content[0] = "cards";
-					content[1] = "a";
-					content[2] = "b";
-					content[3] = "c";
+					content[0].string = "cards";
+					content[1].string = "a";
+					content[2].string = "b";
+					content[3].string = "c";
+					content[3].active = false;
 					break;
 				}
 

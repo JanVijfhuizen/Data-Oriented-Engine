@@ -83,25 +83,34 @@ namespace game
 
 			renderTask.scale.y /= length + 1;
 
+			constexpr size_t TEXT_SCALE = 12;
+
 			TextRenderTask task{};
 			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
-			task.scale = 12;
-			task.padding = -6;
-			
+
 			for (size_t i = 0; i < length; ++i)
 			{
-				const size_t idx = i == 0 ? 0 : (scrollIdx + i) % (contentLength - 1) + 1;
+				const size_t idx = i == 0 ? 0 : (scrollIdx + i - 1) % (contentLength - 1) + 1;
 
 				const auto& content = createInfo.content[idx];
 				const float tabDelay = openTabDelay * i;
 
-				task.text = content;
+				const bool interacted = i == 0 ? false : i - 1 == createInfo.interactedIndex && updateInfo.opened;
+
+				task.text = content.string;
 				task.origin.y += tabSize.y;
+				task.scale = TEXT_SCALE;
+				task.padding = static_cast<int32_t>(TEXT_SCALE) / -2;
+				task.scale += 2 * static_cast<size_t>(interacted);
+				task.padding -= 1 * static_cast<size_t>(interacted);
+
 				renderTask.position.y = task.origin.y;
 				renderTask.scale = tabSize;
+				renderTask.scale += glm::vec2(camera.pixelSize) * 2.f * static_cast<float>(interacted);
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
 				renderTask.color = color;
 
+				// Add interaction task.
 				if(i > 0)
 				{
 					UIInteractionTask interactionTask{};
@@ -116,10 +125,22 @@ namespace game
 
 				if(i > 0)
 				{
-					renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
-					renderTask.color = i - 1 == createInfo.interactedIndex && updateInfo.opened ? interactedColor : glm::vec4(1);
-					result = uiRenderSys->TryAdd(info, renderTask);
-					assert(result != SIZE_MAX);
+					if (interacted)
+					{
+						vke::UIRenderTask enabledRenderTask = renderTask;
+						enabledRenderTask.color = glm::vec4(0, 0, 0, 1);
+						enabledRenderTask.position.x -= camera.pixelSize * 2;
+						result = uiRenderSys->TryAdd(info, enabledRenderTask);
+						assert(result != SIZE_MAX);
+					}
+
+					if(content.active)
+					{
+						renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
+						renderTask.color = glm::vec4(1);
+						result = uiRenderSys->TryAdd(info, renderTask);
+						assert(result != SIZE_MAX);
+					}
 				}
 
 				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);

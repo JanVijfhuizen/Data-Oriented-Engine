@@ -13,11 +13,17 @@ namespace game
 {
 	struct MenuCreateInfo final
 	{
+		struct Content final
+		{
+			jlb::StringView string{};
+			bool active = true;
+		};
+
 		glm::vec2 origin{};
 		size_t width = 1;
 		size_t maxLength = 4;
 		// First entry is used as the title.
-		jlb::ArrayView<jlb::StringView> content{};
+		jlb::ArrayView<Content> content{};
 		bool interactable = false;
 		vke::EntityCamera* entityCamera = nullptr;
 		vke::UICamera* uiCamera = nullptr;
