@@ -49,9 +49,10 @@ namespace game::demo
 		if(turnSys->GetIfTickEvent())
 		{
 			CollisionTask collisionTask{};
-			collisionTask.lBot = glm::ivec2(2, 3);
-			collisionTask.rTop = collisionTask.lBot + glm::ivec2(2, 4);
-			collisionTask.layers = 0b11;
+			auto& bounds = collisionTask.bounds;
+			bounds.lBot = glm::ivec2(2, 3);
+			bounds.rTop = bounds.lBot + glm::ivec2(2, 4);
+			bounds.layers = 0b11;
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 

@@ -21,6 +21,8 @@ namespace game
 		int32_t padding = -8;
 		// Center the text on the origin.
 		bool center = false;
+		// Color of the text.
+		glm::vec4 color{1};
 	};
 
 	/*

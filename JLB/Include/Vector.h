@@ -120,7 +120,7 @@ namespace jlb
 			// Free data and copy temporary array's values back in.
 			Free(*allocator);
 			Array<T>::Allocate(*allocator, newLength);
-			SetCount(length + 1);
+			SetCount(length);
 			Copy(GetView(), 0, length, tempArray.GetData());
 
 			// Delete temporary array.
