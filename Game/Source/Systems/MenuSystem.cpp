@@ -77,7 +77,7 @@ namespace game
 		// Draw the text and box.
 		{
 			const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);
-			const glm::vec2 tabSize{ renderTask.scale.x * rAspectFix, renderTask.scale.y / length };
+			const glm::vec2 tabSize{ renderTask.scale.x, renderTask.scale.y / length };
 			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
 			const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
 
@@ -98,13 +98,14 @@ namespace game
 				task.text = content;
 				task.origin.y += tabSize.y;
 				renderTask.position.y = task.origin.y;
+				renderTask.scale = tabSize;
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
 				renderTask.color = interactedColor;
 
 				if(i > 0)
 				{
 					UIInteractionTask interactionTask{};
-					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize);
+					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize * glm::vec2(rAspectFix, 1));
 					auto result = uiInteractionSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
 					createInfo.outInteractIds[i - 1] = result;
@@ -113,6 +114,11 @@ namespace game
 
 				auto result = uiRenderSys->TryAdd(info, renderTask);
 				assert(result != SIZE_MAX);
+
+				//renderTask.scale = glm::vec2(0);// -= glm::ivec2(camera.pixelSize * 4);
+				//renderTask.color = glm::vec4(1);
+				//result = uiRenderSys->TryAdd(info, renderTask);
+				//assert(result != SIZE_MAX);
 
 				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
 				result = textRenderSys->TryAdd(info, task);
