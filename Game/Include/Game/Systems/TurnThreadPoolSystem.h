@@ -45,5 +45,6 @@ namespace game
 		[[nodiscard]] bool AutoClearOnFrameEnd() override;
 		[[nodiscard]] bool ValidateOnTryAdd(const TurnThreadPoolTask& task) override;
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
+		size_t DefineNestedCapacity(const vke::EngineData& info) override;
 	};
 }

@@ -90,7 +90,11 @@ namespace game
 
 	size_t TurnThreadPoolSystem::DefineCapacity(const vke::EngineData& info)
 	{
-		// WIP nested vector gives deallocation issues.
-		return 0;// 8;
+		return 8;
+	}
+
+	size_t TurnThreadPoolSystem::DefineNestedCapacity(const vke::EngineData& info)
+	{
+		return 0;
 	}
 }
