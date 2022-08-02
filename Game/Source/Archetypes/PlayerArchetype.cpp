@@ -64,6 +64,9 @@ namespace game
 			}
 		}
 
+		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
+		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
+
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
@@ -106,13 +109,13 @@ namespace game
 						content[i + 1].string = card.name;
 						content[i + 1].amount = deck[i].amount;
 					}
-						
 					break;
 				}
 
 				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
 				menuCreateInfo.outInteractIds = entity.menuInteractIds;
+				menuCreateInfo.width = 7;
 
 				auto& idx = menuCreateInfo.interactedIndex;
 				idx = SIZE_MAX;
@@ -121,7 +124,6 @@ namespace game
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 
 				bool changePage = false;
-				bool pressedBack = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 				bool close = false;
 
 				// Handle interaction.
@@ -129,16 +131,25 @@ namespace game
 				{
 				case Player::MenuIndex::main:
 					// If cards tab is pressed, go to card menu.
-					changePage = idx == entity.menuInteractIds[0] && mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
+					changePage = idx == entity.menuInteractIds[0] && leftPressedThisTurn;
 					entity.menuIndex = changePage ? Player::MenuIndex::cards : entity.menuIndex;
-					close = pressedBack;
+					close = rightPressedThisTurn;
 					break;
 				case Player::MenuIndex::cards:
-					entity.menuIndex = pressedBack ? Player::MenuIndex::main : entity.menuIndex;
+					/*
+					if(leftPressedThisTurn)
+						for (size_t i = 0; i < length; ++i)
+						{
+							const bool pressed = idx == entity.menuInteractIds[0];
+							deck[i].amount = (deck[i].amount + 1) % (MAX_COPIES_CARD_IN_DECK + 1);
+							i = pressed ? length : i;
+						}
+						*/
+					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					break;
 				}
 
-				if(changePage || pressedBack || close)
+				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);

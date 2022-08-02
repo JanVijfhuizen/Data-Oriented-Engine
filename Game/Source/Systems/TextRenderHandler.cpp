@@ -22,7 +22,7 @@ namespace game
 		const auto numbersTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::numbers);
 		const float numbersChunkSize = vke::texture::GetChunkSize(numbersTexture, 10);
 
-		for (const auto& task : tasks)
+		for (auto& task : tasks)
 		{
 			const float fontSize = pixelSize * task.scale;
 
@@ -41,6 +41,7 @@ namespace game
 				const float additionalOffset = (fontSize + pixelSize * static_cast<float>(otherTask.padding)) * otherLength;
 				origin = otherTask.origin;
 				origin.x += additionalOffset;
+				task.origin = origin;
 			}
 
 			origin.x -= paddedFontSize;

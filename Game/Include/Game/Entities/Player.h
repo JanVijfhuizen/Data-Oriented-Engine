@@ -11,6 +11,7 @@ namespace game
 		auto& fireball = deck.slots[0];
 		fireball.index = 0;
 		fireball.amount = 3;
+		deck.count = 1;
 		return deck;
 	}
 
