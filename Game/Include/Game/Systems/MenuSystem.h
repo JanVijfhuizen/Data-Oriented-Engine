@@ -21,8 +21,10 @@ namespace game
 		};
 
 		glm::vec2 origin{};
-		size_t width = 1;
+		size_t width = 5;
 		size_t maxLength = 4;
+		size_t textScale = 10;
+		size_t titleScale = 12;
 		// First entry is used as the title.
 		jlb::ArrayView<Content> content{};
 		bool interactable = false;

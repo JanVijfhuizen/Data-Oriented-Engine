@@ -83,16 +83,15 @@ namespace game
 
 			renderTask.scale.y /= length + 1;
 
-			constexpr size_t TEXT_SCALE = 12;
-
 			TextRenderTask textTask{};
 			textTask.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
-			textTask.scale = TEXT_SCALE;
-			textTask.padding = static_cast<int32_t>(TEXT_SCALE) / -2;
 
 			for (size_t i = 0; i < length; ++i)
 			{
 				const size_t idx = i == 0 ? 0 : (scrollIdx + i - 1) % (contentLength - 1) + 1;
+
+				textTask.scale = i == 0 ? createInfo.titleScale : createInfo.textScale;
+				textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
 
 				const auto& content = createInfo.content[idx];
 				const float tabDelay = openTabDelay * i;

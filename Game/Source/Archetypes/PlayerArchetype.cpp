@@ -110,7 +110,6 @@ namespace game
 					break;
 				}
 
-				menuCreateInfo.width = 6;
 				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
 				menuCreateInfo.outInteractIds = entity.menuInteractIds;
