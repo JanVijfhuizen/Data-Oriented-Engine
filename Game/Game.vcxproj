@@ -163,6 +163,7 @@
     <ClInclude Include="Include\Game\Archetypes\CharacterArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\DummyArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
+    <ClInclude Include="Include\Game\Components\Deck.h" />
     <ClInclude Include="Include\Game\Components\MovementComponent.h" />
     <ClInclude Include="Include\Game\Entities\DummyEntity.h" />
     <ClInclude Include="Include\Game\Entities\Entity.h" />

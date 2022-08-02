@@ -37,7 +37,7 @@ namespace game
 		const size_t contentLength = createInfo.content.length;
 		const size_t length = jlb::math::Min(contentLength, createInfo.maxLength);
 		assert(length > 1);
-		assert(createInfo.outInteractIds.length >= length);
+		assert(createInfo.outInteractIds.length >= length - 1);
 
 		// Update open duration.
 		updateInfo.duration += info.deltaTime * 1e-2f;

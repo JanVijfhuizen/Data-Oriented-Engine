@@ -2,6 +2,7 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "JlbMath.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
@@ -9,6 +10,7 @@
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
+#include <iostream>
 
 namespace game
 {
@@ -19,6 +21,7 @@ namespace game
 		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
+		const auto cardSystem = systems.GetSystem<CardSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
@@ -84,6 +87,7 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
+				const jlb::ArrayView<DeckSlot> deck = entity.deck;
 
 				// Create menu content.
 				switch (entity.menuIndex)
@@ -94,27 +98,24 @@ namespace game
 					content[1].string = "cards";
 					break;
 				case Player::MenuIndex::cards:
-					content.Allocate(dumpAllocator, 4);
+					content.Allocate(dumpAllocator, deck.length + 1);
 					content[0].string = "cards";
-					content[1].string = "a";
-					content[2].string = "b";
-					content[3].string = "c";
-					content[3].active = false;
+					for (size_t i = 0; i < deck.length; ++i)
+						content[i + 1].string = cardSystem->GetCard(deck[i].index).name;
 					break;
 				}
 
-				constexpr size_t MENU_MAX_LENGTH = 4;
-
-				menuCreateInfo.width = 4;
-				menuCreateInfo.maxLength = MENU_MAX_LENGTH;
+				menuCreateInfo.width = 6;
+				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
 				menuCreateInfo.outInteractIds = entity.menuInteractIds;
 
 				auto& idx = menuCreateInfo.interactedIndex;
 				idx = SIZE_MAX;
-				const auto length = jlb::math::Min<size_t>(MENU_MAX_LENGTH, content.GetLength() - 1);
+				const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
 				for (size_t i = 0; i < length; ++i)
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
+				std::cout << uiHoveredObj << " " << idx << std::endl;
 
 				bool changePage = false;
 				bool pressedBack = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
