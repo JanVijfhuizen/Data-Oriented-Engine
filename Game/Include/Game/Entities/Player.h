@@ -5,10 +5,10 @@
 
 namespace game
 {
-	constexpr Deck<> CreatePlayerStarterDeck()
+	constexpr Inventory<> CreatePlayerStarterDeck()
 	{
 		// Test.
-		Deck deck{};
+		Inventory deck{};
 		auto& fireball = deck.slots[0];
 		fireball.index = 0;
 		fireball.amount = 0;
@@ -31,7 +31,7 @@ namespace game
 		};
 
 		Character character{};
-		Deck<> deck = CreatePlayerStarterDeck();
+		Inventory<> inventory = CreatePlayerStarterDeck();
 
 		MenuUpdateInfo menuUpdateInfo{};
 		jlb::StackArray<size_t, 8> menuInteractIds{};

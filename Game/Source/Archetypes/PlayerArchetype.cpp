@@ -90,7 +90,7 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
-				const jlb::ArrayView<DeckSlot> deck = entity.deck;
+				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
 				Card card;
 
 				// Create menu content.
@@ -102,13 +102,13 @@ namespace game
 					content[1].string = "inventory";
 					break;
 				case Player::MenuIndex::cards:
-					content.Allocate(dumpAllocator, deck.length + 1);
+					content.Allocate(dumpAllocator, inventory.length + 1);
 					content[0].string = "inventory";
-					for (size_t i = 0; i < deck.length; ++i)
+					for (size_t i = 0; i < inventory.length; ++i)
 					{
-						card = cardSystem->GetCard(deck[i].index);
+						card = cardSystem->GetCard(inventory[i].index);
 						content[i + 1].string = card.name;
-						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - deck[i].amount;
+						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 					}
 					break;
 				}
@@ -139,7 +139,7 @@ namespace game
 				case Player::MenuIndex::cards:
 					// Get what cards are being used in the deck.
 					size_t deckSize = 0;
-					for (size_t i = 0; i < deck.length; ++i)
+					for (size_t i = 0; i < inventory.length; ++i)
 					{
 						const auto& src = content[i + 1];
 						deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
@@ -147,7 +147,7 @@ namespace game
 
 					jlb::Vector<size_t> cardIndexes{};
 					cardIndexes.Allocate(tempAllocator, deckSize);
-					for (size_t i = 0; i < deck.length; ++i)
+					for (size_t i = 0; i < inventory.length; ++i)
 					{
 						const auto& src = content[i + 1];
 						if (src.amount != MAX_COPIES_CARD_IN_DECK)
@@ -161,7 +161,7 @@ namespace game
 						for (size_t i = 0; i < length; ++i)
 						{
 							const bool pressed = uiHoveredObj == entity.menuInteractIds[i];
-							auto& slot = deck[(entity.menuUpdateInfo.scrollIdx + i) % deck.length];
+							auto& slot = inventory[(entity.menuUpdateInfo.scrollIdx + i) % inventory.length];
 							slot.amount = jlb::math::Min(slot.amount + pressed, MAX_COPIES_CARD_IN_DECK);
 							i = pressed ? length : i;
 							deckResized = deckResized ? true : pressed && slot.amount == 1;
@@ -172,7 +172,7 @@ namespace game
 						{
 							const bool pressed = uiHoveredObj == entity.deckMenuInteractIds[i];
 							const size_t scrollId = (entity.deckMenuUpdateInfo.scrollIdx + i) % deckSize;
-							auto& slot = deck[cardIndexes[scrollId]];
+							auto& slot = inventory[cardIndexes[scrollId]];
 							slot.amount = slot.amount - pressed;
 							slot.amount = slot.amount == SIZE_MAX ? 0 : slot.amount;
 							i = pressed ? deckSize : i;
@@ -187,7 +187,7 @@ namespace game
 						deckContent[0].string = "deck";
 
 						size_t deckIndex = 1;
-						for (size_t i = 0; i < deck.length; ++i)
+						for (size_t i = 0; i < inventory.length; ++i)
 						{
 							const auto& src = content[i + 1];
 							if (src.amount != MAX_COPIES_CARD_IN_DECK)
