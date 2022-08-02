@@ -24,7 +24,7 @@ namespace vke
 		glm::vec4 color{ 1 };
 	};
 
-	class UIRenderSystem final : public RenderSystem<UIRenderTask, UICamera>
+	class UIRenderSystem : public RenderSystem<UIRenderTask, UICamera>
 	{
 	public:
 		[[nodiscard]] static float GetAspectFix(const glm::vec2& resolution);
@@ -32,7 +32,7 @@ namespace vke
 		[[nodiscard]] static glm::vec2 ScreenToWorldPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution);
 		[[nodiscard]] static glm::vec2 WorldToScreenPos(glm::vec2 pos, const UICamera& camera, const glm::ivec2& resolution);
 
-	private:
+	protected:
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;

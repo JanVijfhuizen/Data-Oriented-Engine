@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Game.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/EntitySystem.h"
@@ -49,6 +50,7 @@ namespace game
 		initializer.DefineSystem<vke::TileRenderSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::UIRenderSystem>();
+		initializer.DefineSystem<CardRenderSystem>();
 
 		// High level game manager.
 		initializer.DefineSystem<GameManager>();

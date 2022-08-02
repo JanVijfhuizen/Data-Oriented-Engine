@@ -36,14 +36,22 @@ namespace game
 			symbols
 		};
 
+		// Subtextures available for the Card renderer.
+		enum class CardSubTextures
+		{
+			test
+		};
+
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;
 		[[nodiscard]] vke::SubTexture GetSubTexture(TileSubTextures type) const;
 		[[nodiscard]] vke::SubTexture GetSubTexture(UISubTextures type) const;
+		[[nodiscard]] vke::SubTexture GetSubTexture(CardSubTextures type) const;
 
 	private:
 		jlb::Array<vke::SubTexture> _entitySubTextures{};
 		jlb::Array<vke::SubTexture> _tileSubTextures{};
 		jlb::Array<vke::SubTexture> _uiSubTextures{};
+		jlb::Array<vke::SubTexture> _cardSubTextures{};
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;

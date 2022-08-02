@@ -5,19 +5,24 @@
 
 namespace game
 {
-	vke::SubTexture ResourceManager::GetSubTexture(EntitySubTextures type) const
+	vke::SubTexture ResourceManager::GetSubTexture(const EntitySubTextures type) const
 	{
 		return _entitySubTextures[static_cast<int32_t>(type)];
 	}
 
-	vke::SubTexture ResourceManager::GetSubTexture(TileSubTextures type) const
+	vke::SubTexture ResourceManager::GetSubTexture(const TileSubTextures type) const
 	{
 		return _tileSubTextures[static_cast<int32_t>(type)];
 	}
 
-	vke::SubTexture ResourceManager::GetSubTexture(UISubTextures type) const
+	vke::SubTexture ResourceManager::GetSubTexture(const UISubTextures type) const
 	{
 		return _uiSubTextures[static_cast<int32_t>(type)];
+	}
+
+	vke::SubTexture ResourceManager::GetSubTexture(const CardSubTextures type) const
+	{
+		return _cardSubTextures[static_cast<int32_t>(type)];
 	}
 
 	void ResourceManager::Allocate(const vke::EngineData& info)
@@ -27,10 +32,12 @@ namespace game
 		constexpr auto SUB_TEXTURE_PATH = "Textures/subTextures.dat";
 		constexpr auto SUB_TEXTURE_PATH_TILE = "Textures/subTextures-tile.dat";
 		constexpr auto SUB_TEXTURE_PATH_UI = "Textures/subTextures-ui.dat";
+		constexpr auto SUB_TEXTURE_PATH_CARD = "Textures/subTextures-card.dat";
 
 		constexpr auto ATLAS_LENGTH = 3;
 		constexpr auto ATLAS_LENGTH_TILE = 1;
 		constexpr auto ATLAS_LENGTH_UI = 9;
+		constexpr auto ATLAS_LENGTH_CARD = 1;
 
 #ifdef _DEBUG
 		// Entity Render System.
@@ -72,21 +79,34 @@ namespace game
 
 			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 8, 32);
 		}
-#endif
 
-		_entitySubTextures.Allocate(*info.allocator, ATLAS_LENGTH);
-		_tileSubTextures.Allocate(*info.allocator, ATLAS_LENGTH_TILE);
-		_uiSubTextures.Allocate(*info.allocator, ATLAS_LENGTH_UI);
+		// Card Render System.
+		{
+			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_CARD> partitions{};
+			partitions[0].path = "Textures/card-test.png";
+			partitions[0].width = 4;
+			vke::texture::GenerateAtlas(info, "Textures/atlas-card.png", SUB_TEXTURE_PATH_CARD, partitions, 16, 4);
+		}
+
+#endif
+		auto& allocator = *info.allocator;
+		_entitySubTextures.Allocate(allocator, ATLAS_LENGTH);
+		_tileSubTextures.Allocate(allocator, ATLAS_LENGTH_TILE);
+		_uiSubTextures.Allocate(allocator, ATLAS_LENGTH_UI);
+		_cardSubTextures.Allocate(allocator, ATLAS_LENGTH_CARD);
 		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH, _entitySubTextures);
 		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH_TILE, _tileSubTextures);
 		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH_UI, _uiSubTextures);
+		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH_CARD, _cardSubTextures);
 	}
 
 	void ResourceManager::Free(const vke::EngineData& info)
 	{
-		_uiSubTextures.Free(*info.allocator);
-		_tileSubTextures.Free(*info.allocator);
-		_entitySubTextures.Free(*info.allocator);
+		auto& allocator = *info.allocator;
+		_cardSubTextures.Free(allocator);
+		_uiSubTextures.Free(allocator);
+		_tileSubTextures.Free(allocator);
+		_entitySubTextures.Free(allocator);
 		vke::GameSystem::Free(info);
 	}
 }
