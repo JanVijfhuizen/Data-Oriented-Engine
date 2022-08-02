@@ -136,24 +136,34 @@ namespace game
 					close = rightPressedThisTurn;
 					break;
 				case Player::MenuIndex::cards:
+					size_t deckSize = 0;
+					for (size_t i = 0; i < deck.length; ++i)
+					{
+						const auto& src = content[i + 1];
+						deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
+					}
+
 					if(leftPressedThisTurn)
+					{
 						for (size_t i = 0; i < length; ++i)
 						{
 							const bool pressed = uiHoveredObj == entity.menuInteractIds[i];
-							auto& slot = deck[(entity.menuUpdateInfo.scrollIdx + i) % length];
+							auto& slot = deck[(entity.menuUpdateInfo.scrollIdx + i) % deck.length];
 							slot.amount = (slot.amount + pressed) % (MAX_COPIES_CARD_IN_DECK + 1);
 							i = pressed ? length : i;
 						}
+
+						for (size_t i = 0; i < deckSize; ++i)
+						{
+							const bool pressed = uiHoveredObj == entity.deckMenuInteractIds[i];
+							auto& slot = deck[(entity.deckMenuUpdateInfo.scrollIdx + i) % deck.length];
+							slot.amount = (MAX_COPIES_CARD_IN_DECK + 1 + (static_cast<int64_t>(slot.amount) - pressed)) % (MAX_COPIES_CARD_IN_DECK + 1);
+							i = pressed ? deckSize : i;
+						}
+					}
+						
 					// Create deck menu.
 					{
-						size_t deckSize = 0;
-
-						for (size_t i = 0; i < deck.length; ++i)
-						{
-							const auto& src = content[i + 1];
-							deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
-						}
-
 						jlb::Array<MenuCreateInfo::Content> deckContent{};
 						deckContent.Allocate(dumpAllocator, deckSize + 1);
 

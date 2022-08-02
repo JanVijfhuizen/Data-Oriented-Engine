@@ -56,8 +56,7 @@ namespace game
 			updateInfo.right = !updateInfo.right;
 			updateInfo.duration = 0;
 		}
-
-		constexpr auto color = glm::vec4(0, 0, 0, 1);
+		
 		const auto renderTaskScale = glm::vec2(scale * createInfo.width, scale * length);
 
 		vke::UIRenderTask renderTask{};
@@ -65,22 +64,38 @@ namespace game
 		renderTask.scale = renderTaskScale;
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 
-		auto& scrollPos = updateInfo.scrollPos;
-		scrollPos -= _scrollDir;
-		scrollPos += scrollPos < 0 ? contentLength : 0;
-		scrollPos = fmodf(scrollPos, contentLength);
-		auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
-
 		auto overshooting = jlb::CreateCurveOvershooting();
 		const float openLerp = updateInfo.duration / openDuration;
 		const float openTextLerp = updateInfo.duration / (openDuration + openWriteTextDuration);
 
+		bool windowHovered = false;
 		// Draw the text and box.
 		{
 			const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);
 			const glm::vec2 tabSize{ renderTask.scale.x, renderTask.scale.y / length };
 			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
 			const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
+
+			// Update scroll position.
+			auto& scrollPos = updateInfo.scrollPos;
+			{
+				const auto& mousePos = info.mousePos;
+				const auto& rPos = renderTask.position;
+				const auto rScale = renderTask.scale * .5f;
+
+				if (mousePos.x > rPos.x - rScale.x && mousePos.x < rPos.x + rScale.x &&
+					mousePos.y > rPos.y - rScale.y && mousePos.y < rPos.y + rScale.y)
+				{
+					windowHovered = true;
+
+					// Allow for scrolling.
+					scrollPos -= _scrollDir;
+					scrollPos += scrollPos < 0 ? contentLength : 0;
+					scrollPos = fmodf(scrollPos, contentLength);
+				}
+			}
+
+			auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
 
 			renderTask.scale.y /= length + 1;
 
@@ -103,7 +118,7 @@ namespace game
 				renderTask.position.y = textTask.origin.y;
 				renderTask.scale = tabSize;
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
-				renderTask.color = color;
+				renderTask.color = glm::vec4(0, 0, 0, 1);
 
 				// Add interaction task.
 				if(i > 0)
@@ -121,7 +136,6 @@ namespace game
 				if(i > 0)
 				{
 					const bool interacted = i - 1 == createInfo.interactedIndex && updateInfo.opened;
-
 					if (interacted)
 					{
 						vke::UIRenderTask enabledRenderTask = renderTask;
@@ -134,7 +148,7 @@ namespace game
 					if(content.active)
 					{
 						renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
-						renderTask.color = glm::vec4(1);
+						renderTask.color = glm::vec4(glm::vec3(1 - interacted), 1);
 						result = uiRenderSys->TryAdd(info, renderTask);
 						assert(result != SIZE_MAX);
 					}
@@ -163,7 +177,7 @@ namespace game
 
 		// Draw the scroll arrows.
 		{
-			const int32_t scrollDir = roundf(_scrollDir);
+			const int32_t scrollDir = windowHovered ? roundf(_scrollDir) : 0;
 			auto overshootingCurve = jlb::CreateCurveOvershooting();
 			auto decelerateCurve = jlb::CreateCurveDecelerate();
 
