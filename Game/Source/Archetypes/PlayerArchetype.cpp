@@ -10,7 +10,6 @@
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
-#include <iostream>
 
 namespace game
 {
@@ -88,6 +87,7 @@ namespace game
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<DeckSlot> deck = entity.deck;
+				Card card;
 
 				// Create menu content.
 				switch (entity.menuIndex)
@@ -101,7 +101,12 @@ namespace game
 					content.Allocate(dumpAllocator, deck.length + 1);
 					content[0].string = "cards";
 					for (size_t i = 0; i < deck.length; ++i)
-						content[i + 1].string = cardSystem->GetCard(deck[i].index).name;
+					{
+						card = cardSystem->GetCard(deck[i].index);
+						content[i + 1].string = card.name;
+						content[i + 1].amount = deck[i].amount;
+					}
+						
 					break;
 				}
 
@@ -115,7 +120,6 @@ namespace game
 				const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
 				for (size_t i = 0; i < length; ++i)
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
-				std::cout << uiHoveredObj << " " << idx << std::endl;
 
 				bool changePage = false;
 				bool pressedBack = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);

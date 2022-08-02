@@ -50,6 +50,11 @@ namespace jlb
 		return Array<char>::operator[](index);
 	}
 
+	String::operator StringView() const
+	{
+		return GetStringView();
+	}
+
 	StringView String::GetStringView() const
 	{
 		const StringView view{GetData()};

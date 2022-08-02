@@ -8,11 +8,9 @@ namespace game
 	constexpr Deck<> CreatePlayerStarterDeck()
 	{
 		Deck deck{};
-		for (auto& slot : deck.slots)
-		{
-			slot.index = 0;
-			slot.amount = 1;
-		}
+		auto& fireball = deck.slots[0];
+		fireball.index = 0;
+		fireball.amount = 3;
 		return deck;
 	}
 

@@ -17,6 +17,7 @@ namespace game
 		{
 			jlb::StringView string{};
 			bool active = true;
+			size_t amount = SIZE_MAX;
 		};
 
 		glm::vec2 origin{};

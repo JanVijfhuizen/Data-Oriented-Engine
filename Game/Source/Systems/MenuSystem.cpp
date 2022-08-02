@@ -2,6 +2,7 @@
 #include "Systems/MenuSystem.h"
 #include "Curve.h"
 #include "JlbMath.h"
+#include "JlbString.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
@@ -30,7 +31,8 @@ namespace game
 		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractionSys = systems.GetSystem<UIInteractionSystem>();
-		
+
+		auto& dumpAllocator = *info.dumpAllocator;
 		const auto& camera = entityRenderSys->camera;
 		const float scale = camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 
@@ -55,8 +57,6 @@ namespace game
 		}
 
 		constexpr auto color = glm::vec4(0, 0, 0, 1);
-		constexpr auto interactedColor = glm::vec4(.5f, 0, 0, 1);
-
 		const auto renderTaskScale = glm::vec2(scale * createInfo.width, scale * length);
 
 		vke::UIRenderTask renderTask{};
@@ -85,10 +85,10 @@ namespace game
 
 			constexpr size_t TEXT_SCALE = 12;
 
-			TextRenderTask task{};
-			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
-			task.scale = TEXT_SCALE;
-			task.padding = static_cast<int32_t>(TEXT_SCALE) / -2;
+			TextRenderTask textTask{};
+			textTask.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
+			textTask.scale = TEXT_SCALE;
+			textTask.padding = static_cast<int32_t>(TEXT_SCALE) / -2;
 
 			for (size_t i = 0; i < length; ++i)
 			{
@@ -97,10 +97,10 @@ namespace game
 				const auto& content = createInfo.content[idx];
 				const float tabDelay = openTabDelay * i;
 
-				task.text = content.string;
-				task.origin.y += tabSize.y;
+				textTask.text = content.string;
+				textTask.origin.y += tabSize.y;
 
-				renderTask.position.y = task.origin.y;
+				renderTask.position.y = textTask.origin.y;
 				renderTask.scale = tabSize;
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
 				renderTask.color = color;
@@ -109,7 +109,7 @@ namespace game
 				if(i > 0)
 				{
 					UIInteractionTask interactionTask{};
-					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize * glm::vec2(rAspectFix, 1));
+					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, textTask.origin.y), tabSize * glm::vec2(rAspectFix, 1));
 					auto result = uiInteractionSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
 					createInfo.outInteractIds[i - 1] = result;
@@ -140,9 +140,24 @@ namespace game
 					}
 				}
 
-				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
-				result = textRenderSys->TryAdd(info, task);
+				textTask.lengthOverride = textTask.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
+				result = textRenderSys->TryAdd(info, textTask);
 				assert(result != SIZE_MAX);
+
+				// Draw amount if applicable.
+				if(content.amount != SIZE_MAX)
+				{
+					jlb::String str{};
+					str.Allocate(dumpAllocator, "x_");
+					str[1] = static_cast<char>(48 + content.amount);
+
+					TextRenderTask textTaskAmount = textTask;
+					textTaskAmount.text = str;
+					textTaskAmount.lengthOverride = SIZE_MAX;
+					textTaskAmount.appendIndex = result;
+					result = textRenderSys->TryAdd(info, textTaskAmount);
+					assert(result != SIZE_MAX);
+				}
 			}
 		}
 
