@@ -2,6 +2,7 @@
 #include "Systems/MenuSystem.h"
 #include "Curve.h"
 #include "JlbMath.h"
+#include "JlbString.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
@@ -30,21 +31,25 @@ namespace game
 		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractionSys = systems.GetSystem<UIInteractionSystem>();
-		
+
+		auto& dumpAllocator = *info.dumpAllocator;
+		auto& tempAllocator = *info.tempAllocator;
+
 		const auto& camera = entityRenderSys->camera;
 		const float scale = camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 
 		const size_t contentLength = createInfo.content.length;
 		const size_t length = jlb::math::Min(contentLength, createInfo.maxLength);
-		assert(length > 1);
-		assert(createInfo.outInteractIds.length >= length);
+		assert(length > 0);
+		assert(createInfo.outInteractIds.length >= length - 1);
 
 		// Update open duration.
 		updateInfo.duration += info.deltaTime * 1e-2f;
 
 		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;
-		const auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
+		auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
+		xOffset *= -2 * createInfo.reverseXAxis + 1;
 		const auto worldPos = createInfo.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
 
@@ -53,10 +58,7 @@ namespace game
 			updateInfo.right = !updateInfo.right;
 			updateInfo.duration = 0;
 		}
-
-		constexpr auto color = glm::vec4(0, 0, 0, 1);
-		constexpr auto interactedColor = glm::vec4(.5f, 0, 0, 1);
-
+		
 		const auto renderTaskScale = glm::vec2(scale * createInfo.width, scale * length);
 
 		vke::UIRenderTask renderTask{};
@@ -64,16 +66,11 @@ namespace game
 		renderTask.scale = renderTaskScale;
 		renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 
-		auto& scrollPos = updateInfo.scrollPos;
-		scrollPos -= _scrollDir;
-		scrollPos += scrollPos < 0 ? contentLength : 0;
-		scrollPos = fmodf(scrollPos, contentLength);
-		auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
-
 		auto overshooting = jlb::CreateCurveOvershooting();
 		const float openLerp = updateInfo.duration / openDuration;
 		const float openTextLerp = updateInfo.duration / (openDuration + openWriteTextDuration);
 
+		bool windowHovered = false;
 		// Draw the text and box.
 		{
 			const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);
@@ -81,40 +78,56 @@ namespace game
 			const float xOffset = scale * (createInfo.width - 1) / 2 * rAspectFix;
 			const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
 
+			// Update scroll position.
+			auto& scrollPos = updateInfo.scrollPos;
+			{
+				const auto& mousePos = info.mousePos;
+				const auto& rPos = renderTask.position;
+				const auto rScale = renderTask.scale * glm::vec2(rAspectFix, 1) * .5f;
+
+				if (mousePos.x > rPos.x - rScale.x && mousePos.x < rPos.x + rScale.x &&
+					mousePos.y > rPos.y - rScale.y && mousePos.y < rPos.y + rScale.y)
+				{
+					windowHovered = true;
+
+					// Allow for scrolling.
+					scrollPos -= _scrollDir;
+					scrollPos += scrollPos < 0 ? contentLength : 0;
+					scrollPos = fmodf(scrollPos, contentLength);
+				}
+			}
+
+			auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
+
 			renderTask.scale.y /= length + 1;
 
-			constexpr size_t TEXT_SCALE = 12;
-
-			TextRenderTask task{};
-			task.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
+			const auto origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
+			TextRenderTask textTask{};
+			textTask.origin = origin;
 
 			for (size_t i = 0; i < length; ++i)
 			{
 				const size_t idx = i == 0 ? 0 : (scrollIdx + i - 1) % (contentLength - 1) + 1;
 
+				textTask.scale = i == 0 ? createInfo.titleScale : createInfo.textScale;
+				textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
+
 				const auto& content = createInfo.content[idx];
 				const float tabDelay = openTabDelay * i;
 
-				const bool interacted = i == 0 ? false : i - 1 == createInfo.interactedIndex && updateInfo.opened;
+				textTask.text = content.string;
+				textTask.origin.y += tabSize.y;
 
-				task.text = content.string;
-				task.origin.y += tabSize.y;
-				task.scale = TEXT_SCALE;
-				task.padding = static_cast<int32_t>(TEXT_SCALE) / -2;
-				task.scale += 2 * static_cast<size_t>(interacted);
-				task.padding -= 1 * static_cast<size_t>(interacted);
-
-				renderTask.position.y = task.origin.y;
+				renderTask.position.y = textTask.origin.y;
 				renderTask.scale = tabSize;
-				renderTask.scale += glm::vec2(camera.pixelSize) * 2.f * static_cast<float>(interacted);
 				renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
-				renderTask.color = color;
+				renderTask.color = glm::vec4(0, 0, 0, 1);
 
 				// Add interaction task.
 				if(i > 0)
 				{
 					UIInteractionTask interactionTask{};
-					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, task.origin.y), tabSize * glm::vec2(rAspectFix, 1));
+					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, textTask.origin.y), tabSize * glm::vec2(rAspectFix, 1));
 					auto result = uiInteractionSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
 					createInfo.outInteractIds[i - 1] = result;
@@ -125,6 +138,7 @@ namespace game
 
 				if(i > 0)
 				{
+					const bool interacted = i - 1 == createInfo.interactedIndex && updateInfo.opened;
 					if (interacted)
 					{
 						vke::UIRenderTask enabledRenderTask = renderTask;
@@ -137,21 +151,63 @@ namespace game
 					if(content.active)
 					{
 						renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
-						renderTask.color = glm::vec4(1);
+						renderTask.color = glm::vec4(glm::vec3(1 - interacted), 1);
 						result = uiRenderSys->TryAdd(info, renderTask);
 						assert(result != SIZE_MAX);
 					}
 				}
 
-				task.lengthOverride = task.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
-				result = textRenderSys->TryAdd(info, task);
+				textTask.lengthOverride = textTask.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
+				result = textRenderSys->TryAdd(info, textTask);
+				assert(result != SIZE_MAX);
+
+				// Draw amount if applicable.
+				if(content.amount != SIZE_MAX)
+				{
+					jlb::String str{};
+					str.Allocate(dumpAllocator, "x_");
+					str[1] = static_cast<char>(48 + content.amount);
+
+					TextRenderTask textTaskAmount = textTask;
+					textTaskAmount.text = str;
+					textTaskAmount.lengthOverride = SIZE_MAX;
+					textTaskAmount.appendIndex = result;
+					result = textRenderSys->TryAdd(info, textTaskAmount);
+					assert(result != SIZE_MAX);
+				}
+			}
+
+			if(createInfo.usedSpace != SIZE_MAX && createInfo.capacity != SIZE_MAX)
+			{
+				jlb::String usedSpaceStr{};
+				usedSpaceStr.AllocateFromNumber(tempAllocator, createInfo.usedSpace);
+				jlb::String capacityStr{};
+				capacityStr.AllocateFromNumber(tempAllocator, createInfo.capacity);
+
+				jlb::String str{};
+				str.Allocate(dumpAllocator, usedSpaceStr.GetLength() + capacityStr.GetLength());
+				const auto strStart = str.GetData();
+				memcpy(&strStart[0], usedSpaceStr.GetData(), usedSpaceStr.GetLength() - 1);
+				strStart[usedSpaceStr.GetLength() - 1] = '/';
+				memcpy(&strStart[usedSpaceStr.GetLength()], capacityStr.GetData(), capacityStr.GetLength() - 1);
+
+				capacityStr.Free(tempAllocator);
+				usedSpaceStr.Free(tempAllocator);
+
+				TextRenderTask textTaskAmount{};
+				textTaskAmount.text = str;
+				textTaskAmount.scale = createInfo.textScale;
+				textTaskAmount.padding = static_cast<int32_t>(textTaskAmount.scale) / -2;
+				const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
+				textTaskAmount.origin = origin;
+				auto result = textRenderSys->TryAdd(info, textTaskAmount);
 				assert(result != SIZE_MAX);
 			}
 		}
 
 		// Draw the scroll arrows.
 		{
-			const int32_t scrollDir = roundf(_scrollDir);
+			const int32_t scrollDir = windowHovered ? roundf(_scrollDir) : 0;
 			auto overshootingCurve = jlb::CreateCurveOvershooting();
 			auto decelerateCurve = jlb::CreateCurveDecelerate();
 

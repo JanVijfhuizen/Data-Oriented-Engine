@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Game.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/EntitySystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
@@ -34,6 +35,7 @@ namespace game
 		// Game systems.
 		initializer.DefineSystem<CollisionSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
+		initializer.DefineSystem<CardSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();

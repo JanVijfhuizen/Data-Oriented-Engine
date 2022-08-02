@@ -2,6 +2,7 @@
 #include "Archetypes/PlayerArchetype.h"
 #include "JlbMath.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
@@ -19,6 +20,7 @@ namespace game
 		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
+		const auto cardSystem = systems.GetSystem<CardSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
@@ -28,6 +30,7 @@ namespace game
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
 		auto& dumpAllocator = *info.dumpAllocator;
+		auto& tempAllocator = *info.tempAllocator;
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
@@ -62,6 +65,9 @@ namespace game
 			}
 		}
 
+		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
+		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
+
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
@@ -84,6 +90,8 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
+				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
+				Card card;
 
 				// Create menu content.
 				switch (entity.menuIndex)
@@ -91,33 +99,32 @@ namespace game
 				case Player::MenuIndex::main:
 					content.Allocate(dumpAllocator, 2);
 					content[0].string = "player";
-					content[1].string = "cards";
+					content[1].string = "inventory";
 					break;
 				case Player::MenuIndex::cards:
-					content.Allocate(dumpAllocator, 4);
-					content[0].string = "cards";
-					content[1].string = "a";
-					content[2].string = "b";
-					content[3].string = "c";
-					content[3].active = false;
+					content.Allocate(dumpAllocator, inventory.length + 1);
+					content[0].string = "inventory";
+					for (size_t i = 0; i < inventory.length; ++i)
+					{
+						card = cardSystem->GetCard(inventory[i].index);
+						content[i + 1].string = card.name;
+						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
+					}
 					break;
 				}
 
-				constexpr size_t MENU_MAX_LENGTH = 4;
-
-				menuCreateInfo.width = 4;
-				menuCreateInfo.maxLength = MENU_MAX_LENGTH;
+				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
 				menuCreateInfo.outInteractIds = entity.menuInteractIds;
+				menuCreateInfo.width = 7;
 
 				auto& idx = menuCreateInfo.interactedIndex;
 				idx = SIZE_MAX;
-				const auto length = jlb::math::Min<size_t>(MENU_MAX_LENGTH, content.GetLength() - 1);
+				const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
 				for (size_t i = 0; i < length; ++i)
 					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 
 				bool changePage = false;
-				bool pressedBack = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 				bool close = false;
 
 				// Handle interaction.
@@ -125,16 +132,100 @@ namespace game
 				{
 				case Player::MenuIndex::main:
 					// If cards tab is pressed, go to card menu.
-					changePage = idx == entity.menuInteractIds[0] && mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
+					changePage = uiHoveredObj == entity.menuInteractIds[0] && leftPressedThisTurn;
 					entity.menuIndex = changePage ? Player::MenuIndex::cards : entity.menuIndex;
-					close = pressedBack;
+					close = rightPressedThisTurn;
 					break;
 				case Player::MenuIndex::cards:
-					entity.menuIndex = pressedBack ? Player::MenuIndex::main : entity.menuIndex;
+					// Get what cards are being used in the deck.
+					size_t deckSize = 0;
+					for (size_t i = 0; i < inventory.length; ++i)
+					{
+						const auto& src = content[i + 1];
+						deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
+					}
+
+					menuCreateInfo.usedSpace = inventory.length;
+					menuCreateInfo.capacity = entity.inventory.GetLength();
+
+					jlb::Vector<size_t> cardIndexes{};
+					cardIndexes.Allocate(tempAllocator, deckSize);
+					for (size_t i = 0; i < inventory.length; ++i)
+					{
+						const auto& src = content[i + 1];
+						if (src.amount != MAX_COPIES_CARD_IN_DECK)
+							cardIndexes.Add(i);
+					}
+
+					bool deckResized = false;
+					if(leftPressedThisTurn)
+					{
+						// Try and add a card to the deck.
+						for (size_t i = 0; i < length; ++i)
+						{
+							const bool pressed = uiHoveredObj == entity.menuInteractIds[i];
+							auto& slot = inventory[(entity.menuUpdateInfo.scrollIdx + i) % inventory.length];
+							slot.amount = jlb::math::Min(slot.amount + pressed, MAX_COPIES_CARD_IN_DECK);
+							i = pressed ? length : i;
+							deckResized = deckResized ? true : pressed && slot.amount == 1;
+						}
+
+						// Try and remove a card from the deck.
+						for (size_t i = 0; i < deckSize; ++i)
+						{
+							const bool pressed = uiHoveredObj == entity.deckMenuInteractIds[i];
+							const size_t scrollId = (entity.deckMenuUpdateInfo.scrollIdx + i) % deckSize;
+							auto& slot = inventory[cardIndexes[scrollId]];
+							slot.amount = slot.amount - pressed;
+							slot.amount = slot.amount == SIZE_MAX ? 0 : slot.amount;
+							i = pressed ? deckSize : i;
+							deckResized = deckResized ? true : pressed && slot.amount == 0;
+						}
+					}
+						
+					// Create deck menu.
+					{
+						jlb::Array<MenuCreateInfo::Content> deckContent{};
+						deckContent.Allocate(dumpAllocator, deckSize + 1);
+						deckContent[0].string = "deck";
+
+						size_t deckIndex = 1;
+						for (size_t i = 0; i < inventory.length; ++i)
+						{
+							const auto& src = content[i + 1];
+							if (src.amount != MAX_COPIES_CARD_IN_DECK)
+							{
+								auto& slot = deckContent[deckIndex];
+								slot = src;
+								slot.amount = MAX_COPIES_CARD_IN_DECK - slot.amount;
+								++deckIndex;
+							}
+						}
+
+						MenuCreateInfo deckMenuCreateInfo = menuCreateInfo;
+						deckMenuCreateInfo.reverseXAxis = true;
+						deckMenuCreateInfo.content = deckContent;
+						deckMenuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
+						deckMenuCreateInfo.interactedIndex = SIZE_MAX;
+						deckMenuCreateInfo.capacity = SIZE_MAX;
+						deckMenuCreateInfo.usedSpace = SIZE_MAX;
+
+						auto& deckIdx = deckMenuCreateInfo.interactedIndex;
+						const auto deckLength = jlb::math::Min<size_t>(deckMenuCreateInfo.maxLength, deckContent.GetLength()) - 1;
+						for (size_t i = 0; i < deckLength; ++i)
+							deckIdx = uiHoveredObj == entity.deckMenuInteractIds[i] ? i : deckIdx;
+
+						if (changePage || rightPressedThisTurn || close || deckResized)
+							entity.deckMenuUpdateInfo.Reset();
+						if (!close)
+							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.deckMenuUpdateInfo);
+					}
+					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					cardIndexes.Free(tempAllocator);
 					break;
 				}
-
-				if(changePage || pressedBack || close)
+				
+				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);

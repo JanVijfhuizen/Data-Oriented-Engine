@@ -17,11 +17,17 @@ namespace game
 		{
 			jlb::StringView string{};
 			bool active = true;
+			size_t amount = SIZE_MAX;
 		};
 
 		glm::vec2 origin{};
-		size_t width = 1;
+		bool reverseXAxis = false;
+		size_t width = 5;
 		size_t maxLength = 4;
+		size_t textScale = 10;
+		size_t titleScale = 12;
+		size_t usedSpace = SIZE_MAX;
+		size_t capacity = SIZE_MAX;
 		// First entry is used as the title.
 		jlb::ArrayView<Content> content{};
 		bool interactable = false;
@@ -48,7 +54,7 @@ namespace game
 	{
 	public:;
 		float openDuration = 1.f;
-		float openTabDelay = .2f;
+		float openTabDelay = .4f;
 		float openWriteTextDuration = 2;
 		float scrollAnimDuration = 1;
 		float scrollAnimScaleMultiplier = .4f;

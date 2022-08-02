@@ -22,7 +22,10 @@ namespace game
 		const auto numbersTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::numbers);
 		const float numbersChunkSize = vke::texture::GetChunkSize(numbersTexture, 10);
 
-		for (const auto& task : tasks)
+		const auto symbolsTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::symbols);
+		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 1);
+
+		for (auto& task : tasks)
 		{
 			const float fontSize = pixelSize * task.scale;
 
@@ -41,6 +44,7 @@ namespace game
 				const float additionalOffset = (fontSize + pixelSize * static_cast<float>(otherTask.padding)) * otherLength;
 				origin = otherTask.origin;
 				origin.x += additionalOffset;
+				task.origin = origin;
 			}
 
 			origin.x -= paddedFontSize;
@@ -55,15 +59,16 @@ namespace game
 				if (c == 32)
 					continue;
 
-				const bool isInteger = c < 'a';
+				const bool isSymbol = c < '0';
+				const bool isInteger = !isSymbol && c < 'a';
 				// Assert if it's a valid character.
-				assert(isInteger ? c >= '0' && c <= '9' : c >= 'a' && c <= 'z');
+				assert(isInteger ? c >= '0' && c <= '9' : isSymbol ? c >= '/' && c <= '/' : c >= 'a' && c <= 'z');
 
-				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : 'a'));
-				const float chunkSize = isInteger ? numbersChunkSize : alphabetChunkSize;
+				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : isSymbol ? '/' : 'a'));
+				const float chunkSize = isInteger ? numbersChunkSize : isSymbol ? symbolsChunkSize : alphabetChunkSize;
 
-				vke::SubTexture charSubTexture = isInteger ? numbersTexture : alphabetTexture;
-				charSubTexture.lTop.x = chunkSize * position;
+				vke::SubTexture charSubTexture = isInteger ? numbersTexture : isSymbol ? symbolsTexture : alphabetTexture;
+				charSubTexture.lTop.x += chunkSize * position;
 				charSubTexture.rBot.x = charSubTexture.lTop.x + chunkSize;
 
 				vke::UIRenderTask uiRenderTask{};

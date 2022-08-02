@@ -11,6 +11,7 @@ namespace jlb
 		void Allocate(StackAllocator& allocator, const StringView& view);
 		void Allocate(StackAllocator& allocator, size_t size, const char& fillValue = {}) override;
 		char& operator[](size_t index) const override;
+		operator StringView() const;
 		[[nodiscard]] StringView GetStringView() const;
 
 	private:
