@@ -48,7 +48,7 @@ namespace game
 
 		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;
-		auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
+		auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f + createInfo.xOffset) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
 		xOffset *= -2 * createInfo.reverseXAxis + 1;
 		const auto worldPos = createInfo.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
@@ -69,8 +69,9 @@ namespace game
 		auto overshooting = jlb::CreateCurveOvershooting();
 		const float openLerp = updateInfo.duration / openDuration;
 		const float openTextLerp = updateInfo.duration / (openDuration + openWriteTextDuration);
+		
+		auto& windowHovered = updateInfo.hovered = false;
 
-		bool windowHovered = false;
 		// Draw the text and box.
 		{
 			const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);

@@ -21,6 +21,7 @@ namespace game
 		};
 
 		glm::vec2 origin{};
+		float xOffset = 0;
 		bool reverseXAxis = false;
 		size_t width = 5;
 		size_t maxLength = 4;
@@ -41,6 +42,7 @@ namespace game
 	struct MenuUpdateInfo final
 	{
 		bool opened = false;
+		bool hovered = false;
 		float duration = 0;
 		bool right = false;
 		size_t scrollIdx = 0;
