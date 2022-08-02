@@ -7,11 +7,18 @@ namespace game
 {
 	constexpr Deck<> CreatePlayerStarterDeck()
 	{
+		// Test.
 		Deck deck{};
 		auto& fireball = deck.slots[0];
 		fireball.index = 0;
 		fireball.amount = MAX_COPIES_CARD_IN_DECK - 1;
-		deck.count = 1;
+		auto& fireball2 = deck.slots[1];
+		fireball2.index = 1;
+		fireball2.amount = MAX_COPIES_CARD_IN_DECK - 1;
+		auto& fireball3 = deck.slots[2];
+		fireball3.index = 2;
+		fireball3.amount = MAX_COPIES_CARD_IN_DECK - 1;
+		deck.count = 3;
 		return deck;
 	}
 

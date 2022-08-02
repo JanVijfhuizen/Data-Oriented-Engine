@@ -131,7 +131,7 @@ namespace game
 				{
 				case Player::MenuIndex::main:
 					// If cards tab is pressed, go to card menu.
-					changePage = idx == entity.menuInteractIds[0] && leftPressedThisTurn;
+					changePage = uiHoveredObj == entity.menuInteractIds[0] && leftPressedThisTurn;
 					entity.menuIndex = changePage ? Player::MenuIndex::cards : entity.menuIndex;
 					close = rightPressedThisTurn;
 					break;
@@ -139,7 +139,7 @@ namespace game
 					if(leftPressedThisTurn)
 						for (size_t i = 0; i < length; ++i)
 						{
-							const bool pressed = idx == entity.menuInteractIds[0];
+							const bool pressed = uiHoveredObj == entity.menuInteractIds[0];
 							deck[i].amount = (deck[i].amount + 1) % (MAX_COPIES_CARD_IN_DECK + 1);
 							i = pressed ? length : i;
 						}
@@ -178,7 +178,6 @@ namespace game
 						deckMenuCreateInfo.interactedIndex = SIZE_MAX;
 
 						auto& deckIdx = deckMenuCreateInfo.interactedIndex;
-						deckIdx = SIZE_MAX;
 						const auto deckLength = jlb::math::Min<size_t>(deckMenuCreateInfo.maxLength, deckContent.GetLength()) - 1;
 						for (size_t i = 0; i < deckLength; ++i)
 							deckIdx = uiHoveredObj == entity.deckMenuInteractIds[i] ? i : deckIdx;
@@ -191,7 +190,7 @@ namespace game
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					break;
 				}
-
+				
 				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
 				if(!close)

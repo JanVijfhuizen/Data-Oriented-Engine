@@ -11,8 +11,10 @@ namespace game
 	void CardSystem::Allocate(const vke::EngineData& info)
 	{
 		System<vke::EngineData>::Allocate(info);
-		_cards.Allocate(*info.allocator, 1);
+		_cards.Allocate(*info.allocator, 3);
 		_cards[0].name = "fireball";
+		_cards[1].name = "root";
+		_cards[2].name = "bash";
 	}
 
 	void CardSystem::Free(const vke::EngineData& info)
