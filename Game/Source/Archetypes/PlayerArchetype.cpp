@@ -139,11 +139,14 @@ namespace game
 					if(leftPressedThisTurn)
 						for (size_t i = 0; i < length; ++i)
 						{
-							const bool pressed = uiHoveredObj == entity.menuInteractIds[0];
-							deck[i].amount = (deck[i].amount + 1) % (MAX_COPIES_CARD_IN_DECK + 1);
+							const bool pressed = uiHoveredObj == entity.menuInteractIds[i];
+							auto& slot = deck[(entity.menuUpdateInfo.scrollIdx + i) % length];
+							slot.amount = (slot.amount + pressed) % (MAX_COPIES_CARD_IN_DECK + 1);
 							i = pressed ? length : i;
 						}
-					// Create deck menu.
+
+				// Create deck menu.
+					if(false)
 					{
 						size_t deckSize = 0;
 
