@@ -2,7 +2,6 @@
 
 namespace game
 {
-	constexpr size_t MAX_CARDS_IN_DECK = 16;
 	constexpr size_t MAX_COPIES_CARD_IN_DECK = 3;
 
 	struct InventorySlot final
@@ -11,15 +10,17 @@ namespace game
 		size_t amount = 1;
 	};
 
-	template <size_t S = MAX_CARDS_IN_DECK>
+	template <size_t S>
 	struct Inventory final
 	{
 		[[nodiscard]] operator jlb::ArrayView<InventorySlot>();
 
 		InventorySlot slots[S];
 		size_t count = 0;
-	};
 
+		[[nodiscard]] static size_t GetLength();
+	};
+	
 	template <size_t S>
 	Inventory<S>::operator jlb::ArrayView<InventorySlot>()
 	{
@@ -27,5 +28,11 @@ namespace game
 		view.length = count;
 		view.data = slots;
 		return view;
+	}
+
+	template <size_t S>
+	size_t Inventory<S>::GetLength()
+	{
+		return S;
 	}
 }

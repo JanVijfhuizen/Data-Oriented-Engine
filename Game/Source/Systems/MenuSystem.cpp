@@ -33,6 +33,8 @@ namespace game
 		const auto uiInteractionSys = systems.GetSystem<UIInteractionSystem>();
 
 		auto& dumpAllocator = *info.dumpAllocator;
+		auto& tempAllocator = *info.tempAllocator;
+
 		const auto& camera = entityRenderSys->camera;
 		const float scale = camera.pixelSize * vke::PIXEL_SIZE_ENTITY;
 
@@ -99,8 +101,9 @@ namespace game
 
 			renderTask.scale.y /= length + 1;
 
+			const auto origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
 			TextRenderTask textTask{};
-			textTask.origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
+			textTask.origin = origin;
 
 			for (size_t i = 0; i < length; ++i)
 			{
@@ -172,6 +175,33 @@ namespace game
 					result = textRenderSys->TryAdd(info, textTaskAmount);
 					assert(result != SIZE_MAX);
 				}
+			}
+
+			if(createInfo.usedSpace != SIZE_MAX && createInfo.capacity != SIZE_MAX)
+			{
+				jlb::String usedSpaceStr{};
+				usedSpaceStr.AllocateFromNumber(tempAllocator, createInfo.usedSpace);
+				jlb::String capacityStr{};
+				capacityStr.AllocateFromNumber(tempAllocator, createInfo.capacity);
+
+				jlb::String str{};
+				str.Allocate(dumpAllocator, usedSpaceStr.GetLength() + capacityStr.GetLength());
+				const auto strStart = str.GetData();
+				memcpy(&strStart[0], usedSpaceStr.GetData(), usedSpaceStr.GetLength() - 1);
+				strStart[usedSpaceStr.GetLength() - 1] = '/';
+				memcpy(&strStart[usedSpaceStr.GetLength()], capacityStr.GetData(), capacityStr.GetLength() - 1);
+
+				capacityStr.Free(tempAllocator);
+				usedSpaceStr.Free(tempAllocator);
+
+				TextRenderTask textTaskAmount{};
+				textTaskAmount.text = str;
+				textTaskAmount.scale = createInfo.textScale;
+				textTaskAmount.padding = static_cast<int32_t>(textTaskAmount.scale) / -2;
+				const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
+				textTaskAmount.origin = origin;
+				auto result = textRenderSys->TryAdd(info, textTaskAmount);
+				assert(result != SIZE_MAX);
 			}
 		}
 

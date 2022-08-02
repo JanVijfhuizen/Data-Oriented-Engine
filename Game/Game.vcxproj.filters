@@ -93,7 +93,7 @@
     <ClInclude Include="Include\Game\Systems\CardSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Components\Deck.h">
+    <ClInclude Include="Include\Game\Components\Inventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

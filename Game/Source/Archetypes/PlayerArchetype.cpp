@@ -145,6 +145,9 @@ namespace game
 						deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
 					}
 
+					menuCreateInfo.usedSpace = inventory.length;
+					menuCreateInfo.capacity = entity.inventory.GetLength();
+
 					jlb::Vector<size_t> cardIndexes{};
 					cardIndexes.Allocate(tempAllocator, deckSize);
 					for (size_t i = 0; i < inventory.length; ++i)
@@ -204,6 +207,8 @@ namespace game
 						deckMenuCreateInfo.content = deckContent;
 						deckMenuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
 						deckMenuCreateInfo.interactedIndex = SIZE_MAX;
+						deckMenuCreateInfo.capacity = SIZE_MAX;
+						deckMenuCreateInfo.usedSpace = SIZE_MAX;
 
 						auto& deckIdx = deckMenuCreateInfo.interactedIndex;
 						const auto deckLength = jlb::math::Min<size_t>(deckMenuCreateInfo.maxLength, deckContent.GetLength()) - 1;

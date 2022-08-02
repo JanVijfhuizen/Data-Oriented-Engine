@@ -26,6 +26,8 @@ namespace game
 		size_t maxLength = 4;
 		size_t textScale = 10;
 		size_t titleScale = 12;
+		size_t usedSpace = SIZE_MAX;
+		size_t capacity = SIZE_MAX;
 		// First entry is used as the title.
 		jlb::ArrayView<Content> content{};
 		bool interactable = false;

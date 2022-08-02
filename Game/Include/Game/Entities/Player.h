@@ -1,23 +1,25 @@
 ﻿#pragma once
 #include "StackArray.h"
-#include "Components/Deck.h"
+#include "Components/Inventory.h"
 #include "Systems/MenuSystem.h"
 
 namespace game
 {
-	constexpr Inventory<> CreatePlayerStarterDeck()
+	constexpr size_t PLAYER_INVENTORY_SIZE = 32;
+
+	constexpr Inventory<PLAYER_INVENTORY_SIZE> CreatePlayerStarterDeck()
 	{
 		// Test.
-		Inventory deck{};
+		Inventory<PLAYER_INVENTORY_SIZE> deck{};
 		auto& fireball = deck.slots[0];
 		fireball.index = 0;
 		fireball.amount = 0;
-		auto& fireball2 = deck.slots[1];
-		fireball2.index = 1;
-		fireball2.amount = 0;
-		auto& fireball3 = deck.slots[2];
-		fireball3.index = 2;
-		fireball3.amount = 0;
+		auto& root = deck.slots[1];
+		root.index = 1;
+		root.amount = 0;
+		auto& bash = deck.slots[2];
+		bash.index = 2;
+		bash.amount = 1;
 		deck.count = 3;
 		return deck;
 	}
@@ -31,7 +33,7 @@ namespace game
 		};
 
 		Character character{};
-		Inventory<> inventory = CreatePlayerStarterDeck();
+		Inventory<PLAYER_INVENTORY_SIZE> inventory = CreatePlayerStarterDeck();
 
 		MenuUpdateInfo menuUpdateInfo{};
 		jlb::StackArray<size_t, 8> menuInteractIds{};
