@@ -83,10 +83,10 @@ namespace game
 		// Card Render System.
 		{
 			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_CARD> partitions{};
-			partitions[0].path = "Textures/card-test.png";
+			partitions[0].path = "Textures/bash-card.png";
 			partitions[0].width = 4;
 			partitions[1].path = "Textures/blank-card.png";
-			partitions[2].path = "Textures/cardborder.png";
+			partitions[2].path = "Textures/border-card.png";
 			vke::texture::GenerateAtlas(info, "Textures/atlas-card.png", SUB_TEXTURE_PATH_CARD, partitions, 16, 4);
 		}
 

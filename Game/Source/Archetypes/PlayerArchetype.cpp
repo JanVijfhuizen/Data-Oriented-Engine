@@ -9,6 +9,7 @@
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
+#include "VkEngine/Graphics/Animation.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
@@ -223,25 +224,40 @@ namespace game
 						// Draw card, if applicable.
 						{
 							const size_t inventoryCardIndex = (entity.menuUpdateInfo.scrollIdx + idx) % inventory.length;
-							const size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index : deckIdx; // TODO DECKIDX
+							const size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index : inventory[cardIndexes[deckIdx]].index;
 
 							if(cardIndex != SIZE_MAX)
 							{
-								const auto& entityCamera = entityRenderSys->camera;
-								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
-
 								const auto worldPos = transform.position - entityRenderSys->camera.position;
 								const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
 								menuCreateInfo.xOffset = 1;
 								deckMenuCreateInfo.xOffset = 1;
 
+								// Todo use art.
 								const Card hoveredCard = cardSystem->GetCard(cardIndex);
+
+								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
+
 								vke::UIRenderTask cardRenderTask{};
 								cardRenderTask.scale = cardRenderSys->camera.pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
 								cardRenderTask.subTexture = cardBorder;
 								cardRenderTask.position = screenPos;
-								const auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+								assert(result != SIZE_MAX);
+
+								// Test.
+								static float f = 0;
+								f += info.deltaTime * 0.001f;
+								f = fmodf(f, 1);
+
+								vke::Animation cardAnim{};
+								cardAnim.lerp = f;
+								cardAnim.width = hoveredCard.animLength;
+								auto sub = cardAnim.Evaluate(hoveredCard.art, 0);
+
+								cardRenderTask.subTexture = sub;
+								result = cardRenderSys->TryAdd(info, cardRenderTask);
 								assert(result != SIZE_MAX);
 							}
 						}

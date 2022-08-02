@@ -39,7 +39,7 @@ namespace game
 		// Subtextures available for the Card renderer.
 		enum class CardSubTextures
 		{
-			test,
+			bash,
 			blank,
 			border
 		};

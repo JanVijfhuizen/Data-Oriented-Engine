@@ -17,6 +17,7 @@ namespace game
 		uint32_t tags = 0;
 
 		vke::SubTexture art{};
+		size_t animLength = 1;
 	};
 
 	class CardSystem final : public vke::GameSystem
@@ -24,6 +25,7 @@ namespace game
 	public:
 		[[nodiscard]] Card GetCard(size_t index) const;
 		void Allocate(const vke::EngineData& info) override;
+		void Start(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
 		void Free(const vke::EngineData& info) override;
 
 	private:
