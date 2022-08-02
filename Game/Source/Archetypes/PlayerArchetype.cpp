@@ -144,9 +144,7 @@ namespace game
 							slot.amount = (slot.amount + pressed) % (MAX_COPIES_CARD_IN_DECK + 1);
 							i = pressed ? length : i;
 						}
-
-				// Create deck menu.
-					if(false)
+					// Create deck menu.
 					{
 						size_t deckSize = 0;
 
