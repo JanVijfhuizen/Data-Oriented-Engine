@@ -21,6 +21,7 @@ namespace game
 		};
 
 		glm::vec2 origin{};
+		bool reverseXAxis = false;
 		size_t width = 5;
 		size_t maxLength = 4;
 		size_t textScale = 10;

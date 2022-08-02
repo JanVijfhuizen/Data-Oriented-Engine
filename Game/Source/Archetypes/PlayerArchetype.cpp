@@ -98,11 +98,11 @@ namespace game
 				case Player::MenuIndex::main:
 					content.Allocate(dumpAllocator, 2);
 					content[0].string = "player";
-					content[1].string = "cards";
+					content[1].string = "inventory";
 					break;
 				case Player::MenuIndex::cards:
 					content.Allocate(dumpAllocator, deck.length + 1);
-					content[0].string = "cards";
+					content[0].string = "deck";
 					for (size_t i = 0; i < deck.length; ++i)
 					{
 						card = cardSystem->GetCard(deck[i].index);
@@ -136,7 +136,6 @@ namespace game
 					close = rightPressedThisTurn;
 					break;
 				case Player::MenuIndex::cards:
-					/*
 					if(leftPressedThisTurn)
 						for (size_t i = 0; i < length; ++i)
 						{
@@ -144,7 +143,6 @@ namespace game
 							deck[i].amount = (deck[i].amount + 1) % (MAX_COPIES_CARD_IN_DECK + 1);
 							i = pressed ? length : i;
 						}
-						*/
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					break;
 				}
@@ -152,7 +150,28 @@ namespace game
 				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
 				if(!close)
+				{
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
+
+					// Create deck menu.
+					if(entity.menuIndex == Player::MenuIndex::cards)
+					{
+						jlb::Array<MenuCreateInfo::Content> inventoryContent{};
+						inventoryContent.Allocate(dumpAllocator, content.GetLength());
+						inventoryContent[0].string = "inventory";
+						for (size_t i = 1; i < inventoryContent.GetLength(); ++i)
+						{
+							auto& slot = inventoryContent[i];
+							slot = content[i];
+							slot.amount = MAX_COPIES_CARD_IN_DECK - slot.amount;
+						}
+
+						menuCreateInfo.reverseXAxis = true;
+						menuCreateInfo.content = inventoryContent;
+						menuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
+						menuSys->CreateMenu(info, systems, menuCreateInfo, entity.deckMenuUpdateInfo);
+					}
+				}
 			}
 			else
 				entity.menuUpdateInfo.Reset();

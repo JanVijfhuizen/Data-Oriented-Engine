@@ -46,7 +46,8 @@ namespace game
 
 		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;
-		const auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
+		auto xOffset = (.5f + static_cast<float>(createInfo.width) * .5f) * ((camera.position.x > createInfo.origin.x) * 2 - 1);
+		xOffset *= -2 * createInfo.reverseXAxis + 1;
 		const auto worldPos = createInfo.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
 
