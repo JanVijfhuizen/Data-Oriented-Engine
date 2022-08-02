@@ -81,7 +81,7 @@ namespace game
 			{
 				const auto& mousePos = info.mousePos;
 				const auto& rPos = renderTask.position;
-				const auto rScale = renderTask.scale * .5f;
+				const auto rScale = renderTask.scale * glm::vec2(rAspectFix, 1) * .5f;
 
 				if (mousePos.x > rPos.x - rScale.x && mousePos.x < rPos.x + rScale.x &&
 					mousePos.y > rPos.y - rScale.y && mousePos.y < rPos.y + rScale.y)
