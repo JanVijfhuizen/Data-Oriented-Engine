@@ -102,12 +102,12 @@ namespace game
 					break;
 				case Player::MenuIndex::cards:
 					content.Allocate(dumpAllocator, deck.length + 1);
-					content[0].string = "deck";
+					content[0].string = "inventory";
 					for (size_t i = 0; i < deck.length; ++i)
 					{
 						card = cardSystem->GetCard(deck[i].index);
 						content[i + 1].string = card.name;
-						content[i + 1].amount = deck[i].amount;
+						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - deck[i].amount;
 					}
 					break;
 				}
@@ -143,6 +143,51 @@ namespace game
 							deck[i].amount = (deck[i].amount + 1) % (MAX_COPIES_CARD_IN_DECK + 1);
 							i = pressed ? length : i;
 						}
+					// Create deck menu.
+					{
+						size_t deckSize = 0;
+
+						for (size_t i = 0; i < deck.length; ++i)
+						{
+							const auto& src = content[i + 1];
+							deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
+						}
+
+						jlb::Array<MenuCreateInfo::Content> deckContent{};
+						deckContent.Allocate(dumpAllocator, deckSize + 1);
+
+						deckContent[0].string = "deck";
+
+						size_t deckIndex = 1;
+						for (size_t i = 0; i < deck.length; ++i)
+						{
+							const auto& src = content[i + 1];
+							if (src.amount != MAX_COPIES_CARD_IN_DECK)
+							{
+								auto& slot = deckContent[deckIndex];
+								slot = src;
+								slot.amount = MAX_COPIES_CARD_IN_DECK - slot.amount;
+								++deckIndex;
+							}
+						}
+
+						MenuCreateInfo deckMenuCreateInfo = menuCreateInfo;
+						deckMenuCreateInfo.reverseXAxis = true;
+						deckMenuCreateInfo.content = deckContent;
+						deckMenuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
+						deckMenuCreateInfo.interactedIndex = SIZE_MAX;
+
+						auto& deckIdx = deckMenuCreateInfo.interactedIndex;
+						deckIdx = SIZE_MAX;
+						const auto deckLength = jlb::math::Min<size_t>(deckMenuCreateInfo.maxLength, deckContent.GetLength()) - 1;
+						for (size_t i = 0; i < deckLength; ++i)
+							deckIdx = uiHoveredObj == entity.deckMenuInteractIds[i] ? i : deckIdx;
+
+						if (changePage || rightPressedThisTurn || close)
+							entity.deckMenuUpdateInfo.Reset();
+						if (!close)
+							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.deckMenuUpdateInfo);
+					}
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					break;
 				}
@@ -150,28 +195,7 @@ namespace game
 				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
 				if(!close)
-				{
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
-
-					// Create deck menu.
-					if(entity.menuIndex == Player::MenuIndex::cards)
-					{
-						jlb::Array<MenuCreateInfo::Content> inventoryContent{};
-						inventoryContent.Allocate(dumpAllocator, content.GetLength());
-						inventoryContent[0].string = "inventory";
-						for (size_t i = 1; i < inventoryContent.GetLength(); ++i)
-						{
-							auto& slot = inventoryContent[i];
-							slot = content[i];
-							slot.amount = MAX_COPIES_CARD_IN_DECK - slot.amount;
-						}
-
-						menuCreateInfo.reverseXAxis = true;
-						menuCreateInfo.content = inventoryContent;
-						menuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
-						menuSys->CreateMenu(info, systems, menuCreateInfo, entity.deckMenuUpdateInfo);
-					}
-				}
 			}
 			else
 				entity.menuUpdateInfo.Reset();

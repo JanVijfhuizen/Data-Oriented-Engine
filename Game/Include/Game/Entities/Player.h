@@ -10,7 +10,7 @@ namespace game
 		Deck deck{};
 		auto& fireball = deck.slots[0];
 		fireball.index = 0;
-		fireball.amount = 3;
+		fireball.amount = MAX_COPIES_CARD_IN_DECK - 1;
 		deck.count = 1;
 		return deck;
 	}
