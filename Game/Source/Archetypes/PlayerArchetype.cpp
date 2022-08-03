@@ -5,7 +5,6 @@
 #include "Systems/CameraSystem.h"
 #include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
-#include "Systems/DialogueSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
@@ -27,7 +26,6 @@ namespace game
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSystem = systems.GetSystem<CardSystem>();
 		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
-		const auto dialogueSys = systems.GetSystem<DialogueSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
@@ -290,7 +288,7 @@ namespace game
 								result = textRenderSys->TryAdd(info, textTask);
 								assert(result != SIZE_MAX);
 
-								dialogueSys->DisplayText(hoveredCard.text);
+								//dialogueSys->DisplayText(hoveredCard.text);
 							}
 						}
 

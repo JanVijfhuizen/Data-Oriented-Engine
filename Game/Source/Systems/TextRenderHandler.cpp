@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderHandler.h"
+
+#include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
@@ -34,7 +36,7 @@ namespace game
 
 			const float paddedFontSize = fontSize + pixelSize * static_cast<float>(task.padding);
 			glm::vec2 origin = task.origin;
-			origin.x -= task.center ? paddedFontSize * .5f * length - .5f * paddedFontSize : 0;
+			origin.x -= task.center ? paddedFontSize * .5f * jlb::math::Min<float>(task.maxWidth, length) - .5f * paddedFontSize : 0;
 
 			// If the task is appending on another task.
 			if (task.appendIndex != SIZE_MAX)
@@ -46,18 +48,29 @@ namespace game
 				origin.x += additionalOffset;
 				task.origin = origin;
 			}
-
 			origin.x -= paddedFontSize;
+
+			glm::vec2 current = origin;
+			size_t xRemaining = task.maxWidth;
 
 			for (size_t i = 0; i < length; ++i)
 			{
-				origin.x += paddedFontSize;
+				current.x += paddedFontSize;
 
 				const auto& c = task.text[i];
 
+				--xRemaining;
+				xRemaining = xRemaining == SIZE_MAX ? 0 : xRemaining;
+
 				// If this is a space.
-				if (c == 32)
+				if (c == ' ')
+				{
+					const bool newLine = xRemaining == 0;
+					current.y += newLine * fontSize;
+					current.x = newLine ? origin.x : current.x;
+					xRemaining = newLine ? task.maxWidth : xRemaining;
 					continue;
+				}
 
 				const bool isSymbol = c < '0';
 				const bool isInteger = !isSymbol && c < 'a';
@@ -72,15 +85,13 @@ namespace game
 				charSubTexture.rBot.x = charSubTexture.lTop.x + chunkSize;
 
 				vke::UIRenderTask uiRenderTask{};
-				uiRenderTask.position = origin;
+				uiRenderTask.position = current;
 				uiRenderTask.scale = glm::vec2(fontSize);
 				uiRenderTask.subTexture = charSubTexture;
 				uiRenderTask.color = task.color;
 
 				const auto result = uiSys->TryAdd(info, uiRenderTask);
 				assert(result != SIZE_MAX);
-
-				origin.y += (c == '.') * task.padding;
 			}
 		}
 	}
