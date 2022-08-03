@@ -13,6 +13,8 @@ namespace game
 		jlb::StringView text{};
 
 		size_t cost = 1;
+		size_t range = 1;
+
 		void (*effect)(Entity& target, Entity& src, size_t multiplier);
 		uint32_t tags = 0;
 

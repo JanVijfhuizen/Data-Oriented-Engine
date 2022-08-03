@@ -23,7 +23,7 @@ namespace game
 		const float numbersChunkSize = vke::texture::GetChunkSize(numbersTexture, 10);
 
 		const auto symbolsTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::symbols);
-		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 1);
+		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 2);
 
 		for (auto& task : tasks)
 		{
@@ -62,9 +62,9 @@ namespace game
 				const bool isSymbol = c < '0';
 				const bool isInteger = !isSymbol && c < 'a';
 				// Assert if it's a valid character.
-				assert(isInteger ? c >= '0' && c <= '9' : isSymbol ? c >= '/' && c <= '/' : c >= 'a' && c <= 'z');
+				assert(isInteger ? c >= '0' && c <= '9' : isSymbol ? c >= '.' && c <= '/' : c >= 'a' && c <= 'z');
 
-				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : isSymbol ? '/' : 'a'));
+				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : isSymbol ? '.' : 'a'));
 				const float chunkSize = isInteger ? numbersChunkSize : isSymbol ? symbolsChunkSize : alphabetChunkSize;
 
 				vke::SubTexture charSubTexture = isInteger ? numbersTexture : isSymbol ? symbolsTexture : alphabetTexture;

@@ -4,6 +4,7 @@
 #include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/DialogueSystem.h"
 #include "Systems/EntitySystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/SceneSystem.h"
@@ -38,6 +39,7 @@ namespace game
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<CardSystem>();
 		initializer.DefineSystem<MovementSystem>();
+		initializer.DefineSystem<DialogueSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 		initializer.DefineSystem<CameraSystem>();
