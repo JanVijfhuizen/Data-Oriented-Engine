@@ -37,7 +37,7 @@ namespace game
 		constexpr auto ATLAS_LENGTH = 3;
 		constexpr auto ATLAS_LENGTH_TILE = 1;
 		constexpr auto ATLAS_LENGTH_UI = 9;
-		constexpr auto ATLAS_LENGTH_CARD = 3;
+		constexpr auto ATLAS_LENGTH_CARD = 5;
 
 #ifdef _DEBUG
 		// Entity Render System.
@@ -88,6 +88,10 @@ namespace game
 			partitions[0].width = 4;
 			partitions[1].path = "Textures/blank-card.png";
 			partitions[2].path = "Textures/border-card.png";
+			partitions[3].path = "Textures/root-card.png";
+			partitions[3].width = 4;
+			partitions[4].path = "Textures/fireball-card.png";
+			partitions[4].width = 4;
 			vke::texture::GenerateAtlas(info, "Textures/atlas-card.png", SUB_TEXTURE_PATH_CARD, partitions, 16, 4);
 		}
 

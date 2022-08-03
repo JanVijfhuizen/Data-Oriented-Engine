@@ -20,21 +20,20 @@ namespace game
 		System<vke::EngineData>::Start(info, systems);
 
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto bashArt = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::bash);
 
 		// Temp.
 		_cards[0].name = "fireball";
-		_cards[0].art = bashArt;
-		_cards[0].animLength = 2;
+		_cards[0].art = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::fireball);
+		_cards[0].animLength = 4;
 		_cards[0].cost = 2;
 		_cards[0].text = "deal 4 damage. keeps spreading to adjacent tiles, with the damage halved every time.";
 		_cards[1].name = "root";
-		_cards[1].art = bashArt;
-		_cards[1].animLength = 3;
+		_cards[1].art = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::root);
+		_cards[1].animLength = 4;
 		_cards[1].cost = 2;
 		_cards[1].text = "restrict movement for 2 turns.";
 		_cards[2].name = "bash";
-		_cards[2].art = bashArt;
+		_cards[2].art = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::bash);
 		_cards[2].animLength = 4;
 		_cards[2].text = "deal 3 damage.";
 	}

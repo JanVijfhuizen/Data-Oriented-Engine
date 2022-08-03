@@ -41,7 +41,9 @@ namespace game
 		{
 			bash,
 			blank,
-			border
+			border,
+			root,
+			fireball
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;

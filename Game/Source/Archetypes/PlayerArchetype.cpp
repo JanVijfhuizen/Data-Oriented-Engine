@@ -259,13 +259,11 @@ namespace game
 								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
 								assert(result != SIZE_MAX);
 
-								// Test.
-								static float f = 0;
-								f += info.deltaTime * 0.001f;
-								f = fmodf(f, 1);
+								_animLerp += info.deltaTime * 0.001f * _animSpeed / hoveredCard.animLength;
+								_animLerp = fmodf(_animLerp, 1);
 
 								vke::Animation cardAnim{};
-								cardAnim.lerp = f;
+								cardAnim.lerp = _animLerp;
 								cardAnim.width = hoveredCard.animLength;
 								auto sub = cardAnim.Evaluate(hoveredCard.art, 0);
 
