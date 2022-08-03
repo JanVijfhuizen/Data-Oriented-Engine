@@ -99,6 +99,9 @@
     <ClInclude Include="Include\Game\Systems\CardRenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Game\Systems\DialogueSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\dllmain.cpp">
@@ -165,6 +168,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Systems\CardRenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Systems\DialogueSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

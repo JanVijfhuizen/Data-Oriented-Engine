@@ -173,6 +173,7 @@
     <ClInclude Include="Include\Game\Systems\CardRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\CardSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
+    <ClInclude Include="Include\Game\Systems\DialogueSystem.h" />
     <ClInclude Include="Include\Game\Systems\EntitySystem.h" />
     <ClInclude Include="Include\Game\Systems\GameManager.h" />
     <ClInclude Include="Include\Game\framework.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\DialogueSystem.cpp" />
     <ClCompile Include="Source\Systems\CardRenderSystem.cpp" />
     <ClCompile Include="Source\Systems\CardSystem.cpp" />
     <ClCompile Include="Source\Systems\InteractSystem.cpp" />

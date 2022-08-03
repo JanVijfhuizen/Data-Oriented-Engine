@@ -7,6 +7,7 @@
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/TextRenderHandler.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Graphics/Animation.h"
@@ -28,6 +29,7 @@ namespace game
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
@@ -224,7 +226,9 @@ namespace game
 						// Draw card, if applicable.
 						{
 							const size_t inventoryCardIndex = (entity.menuUpdateInfo.scrollIdx + idx) % inventory.length;
-							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index : inventory[cardIndexes[deckIdx]].index;
+							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[(entity.deckMenuUpdateInfo.scrollIdx + deckIdx) % deckSize];
+							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
+								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 
 							const auto scale = cardRenderSys->camera.pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
 							const auto worldPos = transform.position - entityRenderSys->camera.position;
@@ -244,12 +248,13 @@ namespace game
 								menuCreateInfo.xOffset = 1;
 								deckMenuCreateInfo.xOffset = 1;
 
-								// Todo use art.
 								const Card hoveredCard = cardSystem->GetCard(cardIndex);
 								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
 
+								auto& pixelSize = cardRenderSys->camera.pixelSize;
+
 								vke::UIRenderTask cardRenderTask{};
-								cardRenderTask.scale = cardRenderSys->camera.pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+								cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
 								cardRenderTask.subTexture = cardBorder;
 								cardRenderTask.position = screenPos;
 								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
@@ -267,6 +272,15 @@ namespace game
 
 								cardRenderTask.subTexture = sub;
 								result = cardRenderSys->TryAdd(info, cardRenderTask);
+								assert(result != SIZE_MAX);
+
+								TextRenderTask textTask{};
+								textTask.center = true;
+								textTask.origin = screenPos;
+								textTask.origin.y += cardRenderTask.scale.y * .5f;
+								textTask.text = card.name;
+								textTask.scale = vke::PIXEL_SIZE_ENTITY;
+								result = textRenderSys->TryAdd(info, textTask);
 								assert(result != SIZE_MAX);
 							}
 						}

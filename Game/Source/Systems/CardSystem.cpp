@@ -14,9 +14,6 @@ namespace game
 	{
 		System<vke::EngineData>::Allocate(info);
 		_cards.Allocate(*info.allocator, 3);
-		_cards[0].name = "fireball";
-		_cards[1].name = "root";
-		_cards[2].name = "bash";
 	}
 
 	void CardSystem::Start(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
@@ -27,10 +24,13 @@ namespace game
 		const auto bashArt = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::bash);
 
 		// Temp.
+		_cards[0].name = "fireball";
 		_cards[0].art = bashArt;
-		_cards[0].animLength = 4;
+		_cards[0].animLength = 2;
+		_cards[1].name = "root";
 		_cards[1].art = bashArt;
-		_cards[1].animLength = 4;
+		_cards[1].animLength = 3;
+		_cards[2].name = "bash";
 		_cards[2].art = bashArt;
 		_cards[2].animLength = 4;
 	}
