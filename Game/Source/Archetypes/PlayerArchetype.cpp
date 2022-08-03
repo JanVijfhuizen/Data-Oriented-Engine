@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "JlbMath.h"
+#include "JlbString.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
@@ -274,12 +275,16 @@ namespace game
 								result = cardRenderSys->TryAdd(info, cardRenderTask);
 								assert(result != SIZE_MAX);
 
+								jlb::String str{};
+								str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
+
 								TextRenderTask textTask{};
 								textTask.center = true;
 								textTask.origin = screenPos;
 								textTask.origin.y += cardRenderTask.scale.y * .5f;
-								textTask.text = card.name;
+								textTask.text = str;
 								textTask.scale = vke::PIXEL_SIZE_ENTITY;
+								textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
 								result = textRenderSys->TryAdd(info, textTask);
 								assert(result != SIZE_MAX);
 							}

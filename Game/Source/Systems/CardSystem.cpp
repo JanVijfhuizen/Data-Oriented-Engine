@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Systems/CardSystem.h"
-
 #include "Systems/ResourceManager.h"
 
 namespace game
@@ -27,9 +26,11 @@ namespace game
 		_cards[0].name = "fireball";
 		_cards[0].art = bashArt;
 		_cards[0].animLength = 2;
+		_cards[0].cost = 2;
 		_cards[1].name = "root";
 		_cards[1].art = bashArt;
 		_cards[1].animLength = 3;
+		_cards[1].cost = 2;
 		_cards[2].name = "bash";
 		_cards[2].art = bashArt;
 		_cards[2].animLength = 4;
