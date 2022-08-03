@@ -40,5 +40,6 @@ namespace game
 		MenuUpdateInfo deckMenuUpdateInfo{};
 		jlb::StackArray<size_t, 8> deckMenuInteractIds{};
 		MenuIndex menuIndex = MenuIndex::main;
+		size_t cardHovered = SIZE_MAX;
 	};
 }

@@ -224,19 +224,28 @@ namespace game
 						// Draw card, if applicable.
 						{
 							const size_t inventoryCardIndex = (entity.menuUpdateInfo.scrollIdx + idx) % inventory.length;
-							const size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index : inventory[cardIndexes[deckIdx]].index;
+							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index : inventory[cardIndexes[deckIdx]].index;
 
+							const auto scale = cardRenderSys->camera.pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+							const auto worldPos = transform.position - entityRenderSys->camera.position;
+							const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
+
+							if(entity.cardHovered != SIZE_MAX)
+							{
+								jlb::FBounds bounds{ screenPos, scale };
+								entity.cardHovered = bounds.Intersects(info.mousePos) ? entity.cardHovered : SIZE_MAX;
+							}
+
+							cardIndex = entity.cardHovered == SIZE_MAX ? cardIndex : entity.cardHovered;
 							if(cardIndex != SIZE_MAX)
 							{
-								const auto worldPos = transform.position - entityRenderSys->camera.position;
-								const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
-
+								entity.cardHovered = true;
+								
 								menuCreateInfo.xOffset = 1;
 								deckMenuCreateInfo.xOffset = 1;
 
 								// Todo use art.
 								const Card hoveredCard = cardSystem->GetCard(cardIndex);
-
 								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
 
 								vke::UIRenderTask cardRenderTask{};
