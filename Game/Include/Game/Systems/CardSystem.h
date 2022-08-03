@@ -7,6 +7,8 @@ namespace game
 {
 	struct Entity;
 
+	constexpr size_t CARD_ANIM_LENGTH = 4;
+
 	struct Card final
 	{
 		jlb::StringView name{};
@@ -19,7 +21,6 @@ namespace game
 		uint32_t tags = 0;
 
 		vke::SubTexture art{};
-		size_t animLength = 1;
 	};
 
 	class CardSystem final : public vke::GameSystem

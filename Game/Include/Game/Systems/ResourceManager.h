@@ -43,7 +43,8 @@ namespace game
 			blank,
 			border,
 			root,
-			fireball
+			fireball,
+			idle
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;

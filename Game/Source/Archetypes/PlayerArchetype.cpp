@@ -237,20 +237,19 @@ namespace game
 							const auto worldPos = transform.position - entityRenderSys->camera.position;
 							const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
+							const size_t oldCardHovered = entity.cardHovered;
 							entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
-
 							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
-							if(cardIndex != SIZE_MAX)
+
 							{
+								_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
 								entity.cardHovered = cardIndex;
 								
 								menuCreateInfo.xOffset = 1;
 								deckMenuCreateInfo.xOffset = 1;
 
-								const Card hoveredCard = cardSystem->GetCard(cardIndex);
 								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
-
-								auto& pixelSize = cardRenderSys->camera.pixelSize;
+								const auto& pixelSize = cardRenderSys->camera.pixelSize;
 
 								vke::UIRenderTask cardRenderTask{};
 								cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
@@ -259,39 +258,46 @@ namespace game
 								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
 								assert(result != SIZE_MAX);
 
-								_animLerp += info.deltaTime * 0.001f * _animSpeed / hoveredCard.animLength;
+								vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
+								if (cardIndex != SIZE_MAX)
+								{
+									const Card hoveredCard = cardSystem->GetCard(cardIndex);
+									cardSubTexture = hoveredCard.art;
+
+									jlb::String str{};
+									str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
+
+									TextRenderTask textTask{};
+									textTask.center = true;
+									textTask.origin = screenPos;
+									textTask.origin.y += cardRenderTask.scale.y * .5f;
+									textTask.text = str;
+									textTask.scale = vke::PIXEL_SIZE_ENTITY;
+									textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
+									result = textRenderSys->TryAdd(info, textTask);
+									assert(result != SIZE_MAX);
+
+									cardTextRenderTask = textTask;
+									cardTextRenderTask.origin = screenPos;
+									cardTextRenderTask.origin.y += .5f;
+									cardTextRenderTask.text = hoveredCard.text;
+									cardTextRenderTask.maxWidth = 24;
+									cardTextRenderTask.scale = 12;
+									cardTextRenderTask.padding = static_cast<int32_t>(cardTextRenderTask.scale) / -2;
+									renderCardText = true;
+								}
+								
+								_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
 								_animLerp = fmodf(_animLerp, 1);
 
 								vke::Animation cardAnim{};
 								cardAnim.lerp = _animLerp;
-								cardAnim.width = hoveredCard.animLength;
-								auto sub = cardAnim.Evaluate(hoveredCard.art, 0);
+								cardAnim.width = CARD_ANIM_LENGTH;
+								auto sub = cardAnim.Evaluate(cardSubTexture, 0);
 
 								cardRenderTask.subTexture = sub;
 								result = cardRenderSys->TryAdd(info, cardRenderTask);
 								assert(result != SIZE_MAX);
-
-								jlb::String str{};
-								str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
-
-								TextRenderTask textTask{};
-								textTask.center = true;
-								textTask.origin = screenPos;
-								textTask.origin.y += cardRenderTask.scale.y * .5f;
-								textTask.text = str;
-								textTask.scale = vke::PIXEL_SIZE_ENTITY;
-								textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
-								result = textRenderSys->TryAdd(info, textTask);
-								assert(result != SIZE_MAX);
-
-								cardTextRenderTask = textTask;
-								cardTextRenderTask.origin = screenPos;
-								cardTextRenderTask.origin.y += .5f;
-								cardTextRenderTask.text = hoveredCard.text;
-								cardTextRenderTask.maxWidth = 24;
-								cardTextRenderTask.scale = 12;
-								cardTextRenderTask.padding = static_cast<int32_t>(cardTextRenderTask.scale) / -2;
-								renderCardText = true;
 							}
 						}
 
