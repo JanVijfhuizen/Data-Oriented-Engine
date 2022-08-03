@@ -27,16 +27,16 @@ namespace game
 		_cards[0].art = bashArt;
 		_cards[0].animLength = 2;
 		_cards[0].cost = 2;
-		_cards[0].text = "deal 4 damage to target node. continually repeat this for adjacent nodes while halving the damage";
+		_cards[0].text = "deal 4 damage. keeps spreading to adjacent nodes, with the damage halved every time.";
 		_cards[1].name = "root";
 		_cards[1].art = bashArt;
 		_cards[1].animLength = 3;
 		_cards[1].cost = 2;
-		_cards[1].text = "restricts the movement of entities for 2 turns.";
+		_cards[1].text = "restrict movement for 2 turns.";
 		_cards[2].name = "bash";
 		_cards[2].art = bashArt;
 		_cards[2].animLength = 4;
-		_cards[2].text = "deal 3 damage to target node.";
+		_cards[2].text = "deal 3 damage.";
 	}
 
 	void CardSystem::Free(const vke::EngineData& info)

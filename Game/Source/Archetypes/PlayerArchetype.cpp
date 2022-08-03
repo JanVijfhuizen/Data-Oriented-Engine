@@ -319,7 +319,23 @@ namespace game
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
 				if(renderCardText)
 				{
-					const auto result = textRenderSys->TryAdd(info, cardTextRenderTask);
+					const auto& pixelSize = uiRenderSys->camera.pixelSize;
+					const auto scale = pixelSize * cardTextRenderTask.scale;
+					const auto lineCount = cardTextRenderTask.GetLineCount();
+					const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
+
+					vke::UIRenderTask backgroundRenderTask{};
+					backgroundRenderTask.position = cardTextRenderTask.origin;
+					backgroundRenderTask.scale.x = aspectFix * (scale * cardTextRenderTask.GetWidth());
+					backgroundRenderTask.scale.y = scale * lineCount;
+					backgroundRenderTask.scale += glm::vec2(16, 8) * pixelSize;
+					backgroundRenderTask.color = glm::vec4(0, 0, 0, 1);
+					backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+					backgroundRenderTask.position.y += scale * .5f * lineCount - scale * .5f;
+					auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
+					assert(result != SIZE_MAX);
+
+					result = textRenderSys->TryAdd(info, cardTextRenderTask);
 					assert(result != SIZE_MAX);
 				}
 			}

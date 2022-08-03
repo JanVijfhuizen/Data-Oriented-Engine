@@ -76,7 +76,7 @@ namespace game
 			partitions[7].path = "Textures/scrollArrow.png";
 			partitions[7].width = 2;
 			partitions[8].path = "Textures/symbols.png";
-			partitions[8].width = 2;
+			partitions[8].width = 4;
 
 			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 8, 32);
 		}

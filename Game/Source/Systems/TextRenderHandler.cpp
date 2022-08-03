@@ -11,9 +11,14 @@ namespace game
 		return ceil(static_cast<float>(text.GetLength()) / maxWidth);
 	}
 
+	size_t TextRenderTask::GetWidth() const
+	{
+		return (maxWidth == SIZE_MAX ? text.GetLength() : jlb::math::Min(maxWidth, text.GetLength())) / 2;
+	}
+
 	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
-	    const jlb::Systems<vke::EngineData> systems,
-	    const jlb::NestedVector<TextRenderTask>& tasks)
+		const jlb::Systems<vke::EngineData> systems,
+		const jlb::NestedVector<TextRenderTask>& tasks)
 	{
 		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
 
@@ -29,7 +34,7 @@ namespace game
 		const float numbersChunkSize = vke::texture::GetChunkSize(numbersTexture, 10);
 
 		const auto symbolsTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::symbols);
-		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 2);
+		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 4);
 
 		for (auto& task : tasks)
 		{
@@ -79,9 +84,9 @@ namespace game
 				const bool isSymbol = c < '0';
 				const bool isInteger = !isSymbol && c < 'a';
 				// Assert if it's a valid character.
-				assert(isInteger ? c >= '0' && c <= '9' : isSymbol ? c >= '.' && c <= '/' : c >= 'a' && c <= 'z');
+				assert(isInteger ? c >= '0' && c <= '9' : isSymbol ? c >= ',' && c <= '/' : c >= 'a' && c <= 'z');
 
-				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : isSymbol ? '.' : 'a'));
+				const size_t position = static_cast<unsigned char>(c - (isInteger ? '0' : isSymbol ? ',' : 'a'));
 				const float chunkSize = isInteger ? numbersChunkSize : isSymbol ? symbolsChunkSize : alphabetChunkSize;
 
 				vke::SubTexture charSubTexture = isInteger ? numbersTexture : isSymbol ? symbolsTexture : alphabetTexture;
