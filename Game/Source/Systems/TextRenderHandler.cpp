@@ -74,10 +74,30 @@ namespace game
 				// If this is a space.
 				if (c == ' ')
 				{
-					const bool newLine = xRemaining == 0;
-					current.y += newLine * fontSize;
-					current.x = newLine ? origin.x : current.x;
-					xRemaining = newLine ? task.maxWidth : xRemaining;
+					bool newLine = xRemaining == 0;
+					
+					if(!newLine)
+					{
+						size_t wordLength = 0;
+						size_t j = i;
+						while (j < length)
+						{
+							++j;
+							const bool end = task.text[j] == ' ';
+							j = end ? length : j;
+							wordLength += !end;
+						}
+
+						newLine = wordLength > xRemaining;
+					}
+
+					if (newLine)
+					{
+						current.y += fontSize;
+						current.x = origin.x;
+						xRemaining = task.maxWidth;
+					}
+					
 					continue;
 				}
 

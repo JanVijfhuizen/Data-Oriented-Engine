@@ -97,6 +97,11 @@ namespace game
 					scrollPos += scrollPos < 0 ? contentLength : 0;
 					scrollPos = fmodf(scrollPos, contentLength);
 				}
+
+				const auto worldCenterPos = createInfo.origin + entityRenderSys->camera.position;
+				const auto screenCenterPos = vke::UIRenderSystem::WorldToScreenPos(worldCenterPos, uiCamera, info.swapChainData->resolution);
+				bounds = { screenCenterPos, rScale };
+				updateInfo.centerHovered = bounds.Intersects(mousePos);
 			}
 
 			auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);

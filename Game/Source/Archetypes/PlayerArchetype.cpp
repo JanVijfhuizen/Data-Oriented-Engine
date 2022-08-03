@@ -234,15 +234,10 @@ namespace game
 							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
 								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 
-							const auto scale = cardRenderSys->camera.pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
 							const auto worldPos = transform.position - entityRenderSys->camera.position;
 							const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
-							if(entity.cardHovered != SIZE_MAX)
-							{
-								jlb::FBounds bounds{ screenPos, scale };
-								entity.cardHovered = bounds.Intersects(info.mousePos) ? entity.cardHovered : SIZE_MAX;
-							}
+							entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
 
 							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
 							if(cardIndex != SIZE_MAX)

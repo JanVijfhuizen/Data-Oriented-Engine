@@ -27,7 +27,7 @@ namespace game
 		_cards[0].art = bashArt;
 		_cards[0].animLength = 2;
 		_cards[0].cost = 2;
-		_cards[0].text = "deal 4 damage. keeps spreading to adjacent nodes, with the damage halved every time.";
+		_cards[0].text = "deal 4 damage. keeps spreading to adjacent tiles, with the damage halved every time.";
 		_cards[1].name = "root";
 		_cards[1].art = bashArt;
 		_cards[1].animLength = 3;

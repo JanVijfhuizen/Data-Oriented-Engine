@@ -43,6 +43,7 @@ namespace game
 	{
 		bool opened = false;
 		bool hovered = false;
+		bool centerHovered = false;
 		float duration = 0;
 		bool right = false;
 		size_t scrollIdx = 0;
