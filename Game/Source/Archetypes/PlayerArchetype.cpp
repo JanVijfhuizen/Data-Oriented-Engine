@@ -133,6 +133,9 @@ namespace game
 				bool changePage = false;
 				bool close = false;
 
+				TextRenderTask cardTextRenderTask{};
+				bool renderCardText = false;
+
 				// Handle interaction.
 				switch (entity.menuIndex)
 				{
@@ -288,7 +291,14 @@ namespace game
 								result = textRenderSys->TryAdd(info, textTask);
 								assert(result != SIZE_MAX);
 
-								//dialogueSys->DisplayText(hoveredCard.text);
+								cardTextRenderTask = textTask;
+								cardTextRenderTask.origin = screenPos;
+								cardTextRenderTask.origin.y += .5f;
+								cardTextRenderTask.text = hoveredCard.text;
+								cardTextRenderTask.maxWidth = 24;
+								cardTextRenderTask.scale = 12;
+								cardTextRenderTask.padding = static_cast<int32_t>(cardTextRenderTask.scale) / -2;
+								renderCardText = true;
 							}
 						}
 
@@ -307,6 +317,11 @@ namespace game
 					entity.menuUpdateInfo.Reset();
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
+				if(renderCardText)
+				{
+					const auto result = textRenderSys->TryAdd(info, cardTextRenderTask);
+					assert(result != SIZE_MAX);
+				}
 			}
 			else
 				entity.menuUpdateInfo.Reset();

@@ -25,6 +25,8 @@ namespace game
 		glm::vec4 color{1};
 		// In characters.
 		size_t maxWidth = SIZE_MAX;
+
+		[[nodiscard]] size_t GetLineCount() const;
 	};
 
 	/*

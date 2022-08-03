@@ -1,15 +1,19 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderHandler.h"
-
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
+	size_t TextRenderTask::GetLineCount() const
+	{
+		return ceil(static_cast<float>(text.GetLength()) / maxWidth);
+	}
+
 	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<TextRenderTask>& tasks)
+	    const jlb::Systems<vke::EngineData> systems,
+	    const jlb::NestedVector<TextRenderTask>& tasks)
 	{
 		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
 
