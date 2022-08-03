@@ -243,10 +243,10 @@ namespace game
 								entity.cardHovered = bounds.Intersects(info.mousePos) ? entity.cardHovered : SIZE_MAX;
 							}
 
-							cardIndex = entity.cardHovered == SIZE_MAX ? cardIndex : entity.cardHovered;
+							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
 							if(cardIndex != SIZE_MAX)
 							{
-								entity.cardHovered = true;
+								entity.cardHovered = cardIndex;
 								
 								menuCreateInfo.xOffset = 1;
 								deckMenuCreateInfo.xOffset = 1;

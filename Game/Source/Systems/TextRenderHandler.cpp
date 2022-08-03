@@ -79,6 +79,8 @@ namespace game
 
 				const auto result = uiSys->TryAdd(info, uiRenderTask);
 				assert(result != SIZE_MAX);
+
+				origin.y += (c == '.') * task.padding;
 			}
 		}
 	}
