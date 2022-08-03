@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\VkEngine\Graphics\Animation.h" />
     <ClInclude Include="Include\VkEngine\Graphics\CameraUtils.h" />
     <ClInclude Include="Include\VkEngine\Systems\ThreadPoolSystem.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\Animation.cpp" />
     <ClCompile Include="Source\Graphics\CameraUtils.cpp" />
     <ClCompile Include="Source\Systems\TileRenderSystem.cpp" />
     <ClCompile Include="Source\Systems\UIRenderSystem.cpp" />

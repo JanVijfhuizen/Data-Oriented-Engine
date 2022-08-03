@@ -1,14 +1,17 @@
 ﻿#include "pch.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "JlbMath.h"
+#include "JlbString.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/TextRenderHandler.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
+#include "VkEngine/Graphics/Animation.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
@@ -27,6 +30,7 @@ namespace game
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
@@ -129,6 +133,9 @@ namespace game
 				bool changePage = false;
 				bool close = false;
 
+				TextRenderTask cardTextRenderTask{};
+				bool renderCardText = false;
+
 				// Handle interaction.
 				switch (entity.menuIndex)
 				{
@@ -223,25 +230,73 @@ namespace game
 						// Draw card, if applicable.
 						{
 							const size_t inventoryCardIndex = (entity.menuUpdateInfo.scrollIdx + idx) % inventory.length;
-							const size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index : deckIdx; // TODO DECKIDX
+							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[(entity.deckMenuUpdateInfo.scrollIdx + deckIdx) % deckSize];
+							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
+								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 
-							if(cardIndex != SIZE_MAX)
+							const auto worldPos = transform.position - entityRenderSys->camera.position;
+							const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
+
+							const size_t oldCardHovered = entity.cardHovered;
+							entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
+							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
+
 							{
-								const auto& entityCamera = entityRenderSys->camera;
-								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
-
-								const auto worldPos = transform.position - entityRenderSys->camera.position;
-								const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
-
+								_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
+								entity.cardHovered = cardIndex;
+								
 								menuCreateInfo.xOffset = 1;
 								deckMenuCreateInfo.xOffset = 1;
 
-								const Card hoveredCard = cardSystem->GetCard(cardIndex);
+								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
+								const auto& pixelSize = cardRenderSys->camera.pixelSize;
+
 								vke::UIRenderTask cardRenderTask{};
-								cardRenderTask.scale = cardRenderSys->camera.pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+								cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
 								cardRenderTask.subTexture = cardBorder;
 								cardRenderTask.position = screenPos;
-								const auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+								assert(result != SIZE_MAX);
+
+								vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
+								if (cardIndex != SIZE_MAX)
+								{
+									const Card hoveredCard = cardSystem->GetCard(cardIndex);
+									cardSubTexture = hoveredCard.art;
+
+									jlb::String str{};
+									str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
+
+									TextRenderTask textTask{};
+									textTask.center = true;
+									textTask.origin = screenPos;
+									textTask.origin.y += cardRenderTask.scale.y * .5f;
+									textTask.text = str;
+									textTask.scale = vke::PIXEL_SIZE_ENTITY;
+									textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
+									result = textRenderSys->TryAdd(info, textTask);
+									assert(result != SIZE_MAX);
+
+									cardTextRenderTask = textTask;
+									cardTextRenderTask.origin = screenPos;
+									cardTextRenderTask.origin.y += .5f;
+									cardTextRenderTask.text = hoveredCard.text;
+									cardTextRenderTask.maxWidth = 24;
+									cardTextRenderTask.scale = 12;
+									cardTextRenderTask.padding = static_cast<int32_t>(cardTextRenderTask.scale) / -2;
+									renderCardText = true;
+								}
+								
+								_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
+								_animLerp = fmodf(_animLerp, 1);
+
+								vke::Animation cardAnim{};
+								cardAnim.lerp = _animLerp;
+								cardAnim.width = CARD_ANIM_LENGTH;
+								auto sub = cardAnim.Evaluate(cardSubTexture, 0);
+
+								cardRenderTask.subTexture = sub;
+								result = cardRenderSys->TryAdd(info, cardRenderTask);
 								assert(result != SIZE_MAX);
 							}
 						}
@@ -261,6 +316,27 @@ namespace game
 					entity.menuUpdateInfo.Reset();
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
+				if(renderCardText)
+				{
+					const auto& pixelSize = uiRenderSys->camera.pixelSize;
+					const auto scale = pixelSize * cardTextRenderTask.scale;
+					const auto lineCount = cardTextRenderTask.GetLineCount();
+					const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
+
+					vke::UIRenderTask backgroundRenderTask{};
+					backgroundRenderTask.position = cardTextRenderTask.origin;
+					backgroundRenderTask.scale.x = aspectFix * (scale * cardTextRenderTask.GetWidth());
+					backgroundRenderTask.scale.y = scale * lineCount;
+					backgroundRenderTask.scale += glm::vec2(16, 8) * pixelSize;
+					backgroundRenderTask.color = glm::vec4(0, 0, 0, 1);
+					backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+					backgroundRenderTask.position.y += scale * .5f * lineCount - scale * .5f;
+					auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
+					assert(result != SIZE_MAX);
+
+					result = textRenderSys->TryAdd(info, cardTextRenderTask);
+					assert(result != SIZE_MAX);
+				}
 			}
 			else
 				entity.menuUpdateInfo.Reset();

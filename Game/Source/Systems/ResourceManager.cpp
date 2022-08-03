@@ -37,7 +37,7 @@ namespace game
 		constexpr auto ATLAS_LENGTH = 3;
 		constexpr auto ATLAS_LENGTH_TILE = 1;
 		constexpr auto ATLAS_LENGTH_UI = 9;
-		constexpr auto ATLAS_LENGTH_CARD = 3;
+		constexpr auto ATLAS_LENGTH_CARD = 6;
 
 #ifdef _DEBUG
 		// Entity Render System.
@@ -76,6 +76,7 @@ namespace game
 			partitions[7].path = "Textures/scrollArrow.png";
 			partitions[7].width = 2;
 			partitions[8].path = "Textures/symbols.png";
+			partitions[8].width = 4;
 
 			vke::texture::GenerateAtlas(info, "Textures/atlas-ui.png", SUB_TEXTURE_PATH_UI, partitions, 8, 32);
 		}
@@ -83,11 +84,17 @@ namespace game
 		// Card Render System.
 		{
 			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH_CARD> partitions{};
-			partitions[0].path = "Textures/card-test.png";
+			partitions[0].path = "Textures/bash-card.png";
 			partitions[0].width = 4;
 			partitions[1].path = "Textures/blank-card.png";
-			partitions[2].path = "Textures/cardborder.png";
-			vke::texture::GenerateAtlas(info, "Textures/atlas-card.png", SUB_TEXTURE_PATH_CARD, partitions, 16, 4);
+			partitions[2].path = "Textures/border-card.png";
+			partitions[3].path = "Textures/root-card.png";
+			partitions[3].width = 4;
+			partitions[4].path = "Textures/fireball-card.png";
+			partitions[4].width = 4;
+			partitions[5].path = "Textures/idle-card.png";
+			partitions[5].width = 4;
+			vke::texture::GenerateAtlas(info, "Textures/atlas-card.png", SUB_TEXTURE_PATH_CARD, partitions, 16, 8);
 		}
 
 #endif

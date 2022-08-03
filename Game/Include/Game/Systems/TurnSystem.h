@@ -17,7 +17,7 @@ namespace game
 			// Padding between the keys.
 			int32_t padding = -2;
 			// Height of the turn ui in screen space.
-			float screenYCoordinates = .8f;
+			float screenYCoordinates = -.9f;
 			// UI buttons scale this much if they have been pressed.
 			float onPressedSizeMultiplier = 1.5f;
 			// Duration of the movement/scaling animation, n milliseconds.

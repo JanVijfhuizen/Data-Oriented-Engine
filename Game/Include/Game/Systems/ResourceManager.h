@@ -39,9 +39,12 @@ namespace game
 		// Subtextures available for the Card renderer.
 		enum class CardSubTextures
 		{
-			test,
+			bash,
 			blank,
-			border
+			border,
+			root,
+			fireball,
+			idle
 		};
 
 		[[nodiscard]] vke::SubTexture GetSubTexture(EntitySubTextures type) const;

@@ -49,8 +49,8 @@ namespace game
 		// Core engine Post update.
 		initializer.DefineSystem<vke::TileRenderSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
-		initializer.DefineSystem<vke::UIRenderSystem>();
 		initializer.DefineSystem<CardRenderSystem>();
+		initializer.DefineSystem<vke::UIRenderSystem>();
 
 		// High level game manager.
 		initializer.DefineSystem<GameManager>();

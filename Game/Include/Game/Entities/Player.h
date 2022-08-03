@@ -20,7 +20,12 @@ namespace game
 		auto& bash = deck.slots[2];
 		bash.index = 2;
 		bash.amount = 1;
-		deck.count = 3;
+		deck.count = 12;
+
+		for (int i = 3; i < 12; ++i)
+		{
+			deck.slots[i] = deck.slots[0];
+		}
 		return deck;
 	}
 
@@ -36,9 +41,10 @@ namespace game
 		Inventory<PLAYER_INVENTORY_SIZE> inventory = CreatePlayerStarterDeck();
 
 		MenuUpdateInfo menuUpdateInfo{};
-		jlb::StackArray<size_t, 8> menuInteractIds{};
+		jlb::StackArray<size_t, 6> menuInteractIds{};
 		MenuUpdateInfo deckMenuUpdateInfo{};
-		jlb::StackArray<size_t, 8> deckMenuInteractIds{};
+		jlb::StackArray<size_t, 6> deckMenuInteractIds{};
 		MenuIndex menuIndex = MenuIndex::main;
+		size_t cardHovered = SIZE_MAX;
 	};
 }

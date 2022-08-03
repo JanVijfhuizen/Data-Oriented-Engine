@@ -23,6 +23,12 @@ namespace game
 		bool center = false;
 		// Color of the text.
 		glm::vec4 color{1};
+		// In characters.
+		size_t maxWidth = SIZE_MAX;
+
+		[[nodiscard]] size_t GetLineCount() const;
+		// In characters.
+		[[nodiscard]] size_t GetWidth() const;
 	};
 
 	/*

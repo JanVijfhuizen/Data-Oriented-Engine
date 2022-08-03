@@ -84,10 +84,11 @@ namespace game
 			{
 				const auto& mousePos = info.mousePos;
 				const auto& rPos = renderTask.position;
-				const auto rScale = renderTask.scale * glm::vec2(rAspectFix, 1) * .5f;
+				const auto rScale = renderTask.scale * glm::vec2(rAspectFix, 1);
 
-				if (mousePos.x > rPos.x - rScale.x && mousePos.x < rPos.x + rScale.x &&
-					mousePos.y > rPos.y - rScale.y && mousePos.y < rPos.y + rScale.y)
+				jlb::FBounds bounds{rPos, rScale};
+
+				if (bounds.Intersects(mousePos))
 				{
 					windowHovered = true;
 
@@ -96,6 +97,11 @@ namespace game
 					scrollPos += scrollPos < 0 ? contentLength : 0;
 					scrollPos = fmodf(scrollPos, contentLength);
 				}
+
+				const auto worldCenterPos = createInfo.origin + entityRenderSys->camera.position;
+				const auto screenCenterPos = vke::UIRenderSystem::WorldToScreenPos(worldCenterPos, uiCamera, info.swapChainData->resolution);
+				bounds = { screenCenterPos, rScale };
+				updateInfo.centerHovered = bounds.Intersects(mousePos);
 			}
 
 			auto& scrollIdx = updateInfo.scrollIdx = roundf(scrollPos);
