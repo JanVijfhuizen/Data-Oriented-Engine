@@ -1,10 +1,14 @@
 ﻿#pragma once
+#include "Bounds.h"
 #include "VkEngine/Systems/GameSystem.h"
+#include "VkEngine/Systems/TaskSystem.h"
 
 namespace game
 {
+	typedef jlb::FBounds MouseInteractTask;
+
 	// Handles the mouse visualization and behaviour.
-	class MouseSystem final : public vke::GameSystem
+	class MouseSystem final : public vke::TaskSystem<MouseInteractTask>
 	{
 	public:
 		enum class Key
@@ -28,9 +32,9 @@ namespace game
 		size_t _hoveredObject = SIZE_MAX;
 		KeyData _keys[2];
 		bool _isUIBlocking = false;
-		
-		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
-		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<jlb::TBounds<float>>& tasks) override;
+		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<jlb::TBounds<float>>& tasks) override;
 		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};
 }

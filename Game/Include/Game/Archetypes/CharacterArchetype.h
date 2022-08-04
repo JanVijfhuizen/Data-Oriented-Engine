@@ -9,6 +9,7 @@
 #include "VkEngine/Graphics/SubTexture.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "JlbMath.h"
+#include "VkEngine/Graphics/CameraUtils.h"
 
 namespace game
 {
@@ -19,6 +20,7 @@ namespace game
 
 		size_t movementTaskId = SIZE_MAX;
 		size_t collisionTaskId = SIZE_MAX;
+		size_t mouseTaskId = SIZE_MAX;
 		size_t movementTileReservation = SIZE_MAX;
 	};
 
@@ -54,7 +56,7 @@ namespace game
 	bool CharacterArchetype<T>::CharacterUpdateInfo::GetIsHovered(const Character& character) const
 	{
 		const size_t hoveredObj = mouseSys->GetHoveredObject();
-		return hoveredObj == character.collisionTaskId && hoveredObj != SIZE_MAX;
+		return hoveredObj == character.mouseTaskId && hoveredObj != SIZE_MAX;
 	}
 
 	template <typename T>
@@ -76,6 +78,7 @@ namespace game
 		const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture, const CharacterInput& input)
 	{
 		const auto collisionSys = updateInfo.collisionSys;
+		const auto entityRenderSys = updateInfo.entityRenderSys;
 		const auto mouseSys = updateInfo.mouseSys;
 		const auto movementSys = updateInfo.movementSys;
 		const auto turnSys = updateInfo.turnSys;
@@ -92,6 +95,17 @@ namespace game
 
 		const auto result = updateInfo.entityRenderSys->TryAdd(info, renderTask);
 		character.movementTaskId = movementSys->TryAdd(info, movementComponent);
+
+		{
+			const auto& camera = entityRenderSys->camera;
+			const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
+			character.mouseTaskId = SIZE_MAX;
+			if (!culls)
+			{
+				jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
+				character.mouseTaskId = mouseSys->TryAdd(info, bounds);
+			}
+		}
 
 		if(turnSys->GetIfTickEvent())
 		{
