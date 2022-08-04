@@ -17,6 +17,16 @@ namespace game
 		return jlb::math::Min<size_t>(maxLength, content.length) - 1;
 	}
 
+	size_t MenuCreateInfo::GetInteractedColumnIndex(const MenuUpdateInfo& updateInfo) const
+	{
+		return GetContentIndex(updateInfo, updateInfo.interactedIndex);
+	}
+
+	size_t MenuCreateInfo::GetContentIndex(const MenuUpdateInfo& updateInfo, const size_t columnIndex) const
+	{
+		return (updateInfo.scrollIdx + columnIndex) % (content.length - 1);
+	}
+
 	void MenuUpdateInfo::Reset()
 	{
 		opened = false;
@@ -54,7 +64,7 @@ namespace game
 			const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 			auto& idx = updateInfo.interactedIndex;
 			idx = SIZE_MAX;
-			const auto length = jlb::math::Min<size_t>(createInfo.maxLength, createInfo.content.length) - 1;
+			const auto length = createInfo.GetColumnCount();
 			for (size_t i = 0; i < length; ++i)
 				idx = uiHoveredObj == createInfo.interactIds[i] ? i : idx;
 		}

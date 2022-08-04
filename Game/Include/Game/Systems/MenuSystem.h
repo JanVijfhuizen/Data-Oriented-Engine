@@ -11,6 +11,8 @@ namespace vke
 
 namespace game
 {
+	struct MenuUpdateInfo;
+
 	struct MenuCreateInfo final
 	{
 		struct Content final
@@ -39,6 +41,9 @@ namespace game
 
 		// Returns the amount of columns rendered.
 		[[nodiscard]] size_t GetColumnCount() const;
+		// Excluding title.
+		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuUpdateInfo& updateInfo) const;
+		[[nodiscard]] size_t GetContentIndex(const MenuUpdateInfo& updateInfo, size_t columnIndex) const;
 	};
 
 	struct MenuUpdateInfo final

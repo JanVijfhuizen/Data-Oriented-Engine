@@ -180,7 +180,7 @@ namespace game
 
 						// Try and remove a card from the deck.
 						if(entity.deckMenuUpdateInfo.hovered)
-							for (size_t i = 0; i < deckSize; ++i)
+							for (size_t i = 0; i < deckSize; ++i) // todo fix.
 							{
 								const bool pressed = uiHoveredObj == entity.deckMenuInteractIds[i];
 								const size_t scrollId = (entity.deckMenuUpdateInfo.scrollIdx + i) % deckSize;
@@ -223,8 +223,8 @@ namespace game
 							const auto& menuUpdateInfo = entity.menuUpdateInfo;
 							const auto& deckMenuUpdateInfo = entity.deckMenuUpdateInfo;
 
-							const size_t inventoryCardIndex = (menuUpdateInfo.scrollIdx + menuUpdateInfo.interactedIndex) % inventory.length;
-							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[(deckMenuUpdateInfo.scrollIdx + deckMenuUpdateInfo.interactedIndex) % deckSize];
+							const size_t inventoryCardIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
+							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo)];
 							size_t cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
 								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 
