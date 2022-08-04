@@ -53,6 +53,16 @@ namespace game
 		void Reset();
 	};
 
+	struct TextBoxCreateInfo final
+	{
+		glm::vec2 origin{};
+		jlb::StringView text{};
+		size_t maxWidth = 24;
+		size_t scale = 12;
+		glm::vec2 borderSize{16, 8};
+		bool center = true;
+	};
+
 	class MenuSystem final : public vke::GameSystem
 	{
 	public:;
@@ -65,6 +75,8 @@ namespace game
 		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
 			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;
 		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		static void CreateTextBox(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+		                          const TextBoxCreateInfo& createInfo);
 
 	private:
 		float _scrollDir = 0;

@@ -259,8 +259,44 @@ namespace game
 		_scrollDir = 0;
 	}
 
+	void MenuSystem::CreateTextBox(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
+		const TextBoxCreateInfo& createInfo)
+	{
+		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
+		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
+
+		TextRenderTask cardTextRenderTask{};
+		cardTextRenderTask.center = createInfo.center;
+		cardTextRenderTask.origin = createInfo.origin;
+		cardTextRenderTask.text = createInfo.text;
+		cardTextRenderTask.maxWidth = createInfo.maxWidth;
+		cardTextRenderTask.scale = createInfo.scale;
+		cardTextRenderTask.padding = static_cast<int32_t>(cardTextRenderTask.scale) / -2;
+
+		const auto& pixelSize = uiRenderSys->camera.pixelSize;
+		const auto scale = pixelSize * cardTextRenderTask.scale;
+		const auto lineCount = cardTextRenderTask.GetLineCount();
+		const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
+
+		vke::UIRenderTask backgroundRenderTask{};
+		backgroundRenderTask.position = cardTextRenderTask.origin;
+		backgroundRenderTask.scale.x = aspectFix * (scale * cardTextRenderTask.GetWidth());
+		backgroundRenderTask.scale.y = scale * lineCount;
+		backgroundRenderTask.scale += createInfo.borderSize * pixelSize;
+		backgroundRenderTask.color = glm::vec4(0, 0, 0, 1);
+		backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+		backgroundRenderTask.position.y += scale * .5f * lineCount - scale * .5f;
+		auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
+		assert(result != SIZE_MAX);
+
+		result = textRenderSys->TryAdd(info, cardTextRenderTask);
+		assert(result != SIZE_MAX);
+	}
+
 	void MenuSystem::OnScrollInput(const vke::EngineData& info, 
-	    const jlb::Systems<vke::EngineData> systems,		
+		const jlb::Systems<vke::EngineData> systems,		
 		const float xOffset, const float yOffset)
 	{
 		System<vke::EngineData>::OnScrollInput(info, systems, xOffset, yOffset);

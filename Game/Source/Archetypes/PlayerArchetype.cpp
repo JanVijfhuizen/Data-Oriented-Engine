@@ -58,12 +58,14 @@ namespace game
 
 		CharacterInput characterInput{};
 
+		// Calculate movement direction, if any.
 		if (turnSys->GetIfTickEvent())
 		{
 			auto& dir = characterInput.movementDir;
 			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
 			dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
 
+			// Reset input.
 			for (auto& input : _movementInput)
 			{
 				input.pressedSinceStartOfFrame = input.pressed;
@@ -73,6 +75,7 @@ namespace game
 
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
+		const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 
 		for (auto& entity : entities)
 		{
@@ -81,7 +84,6 @@ namespace game
 
 			const auto& transform = character.transform;
 
-			const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 			const bool hovered = characterUpdateInfo.GetIsHovered(character);
 			const bool menuOpen = mouseAction ? entity.menuUpdateInfo.opened ? false : hovered : entity.menuUpdateInfo.opened;
 
@@ -267,17 +269,17 @@ namespace game
 									jlb::String str{};
 									str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
 
-									TextRenderTask textTask{};
-									textTask.center = true;
-									textTask.origin = screenPos;
-									textTask.origin.y += cardRenderTask.scale.y * .5f;
-									textTask.text = str;
-									textTask.scale = vke::PIXEL_SIZE_ENTITY;
-									textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
-									result = textRenderSys->TryAdd(info, textTask);
+									TextRenderTask textCostTask{};
+									textCostTask.center = true;
+									textCostTask.origin = screenPos;
+									textCostTask.origin.y += cardRenderTask.scale.y * .5f;
+									textCostTask.text = str;
+									textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
+									textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
+									result = textRenderSys->TryAdd(info, textCostTask);
 									assert(result != SIZE_MAX);
 
-									cardTextRenderTask = textTask;
+									cardTextRenderTask = textCostTask;
 									cardTextRenderTask.origin = screenPos;
 									cardTextRenderTask.origin.y += .5f;
 									cardTextRenderTask.text = hoveredCard.text;
