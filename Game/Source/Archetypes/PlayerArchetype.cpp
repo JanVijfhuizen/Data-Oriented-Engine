@@ -58,12 +58,14 @@ namespace game
 
 		CharacterInput characterInput{};
 
+		// Calculate movement direction, if any.
 		if (turnSys->GetIfTickEvent())
 		{
 			auto& dir = characterInput.movementDir;
 			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
 			dir.y = static_cast<int32_t>(_movementInput[2].valid) - _movementInput[0].valid;
 
+			// Reset input.
 			for (auto& input : _movementInput)
 			{
 				input.pressedSinceStartOfFrame = input.pressed;
@@ -73,6 +75,7 @@ namespace game
 
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
+		const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 
 		for (auto& entity : entities)
 		{
@@ -81,7 +84,6 @@ namespace game
 
 			const auto& transform = character.transform;
 
-			const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 			const bool hovered = characterUpdateInfo.GetIsHovered(character);
 			const bool menuOpen = mouseAction ? entity.menuUpdateInfo.opened ? false : hovered : entity.menuUpdateInfo.opened;
 
@@ -133,8 +135,8 @@ namespace game
 				bool changePage = false;
 				bool close = false;
 
-				TextRenderTask cardTextRenderTask{};
-				bool renderCardText = false;
+				TextBoxCreateInfo cardTextBox{};
+				bool renderCardTextBox = false;
 
 				// Handle interaction.
 				switch (entity.menuIndex)
@@ -267,24 +269,19 @@ namespace game
 									jlb::String str{};
 									str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
 
-									TextRenderTask textTask{};
-									textTask.center = true;
-									textTask.origin = screenPos;
-									textTask.origin.y += cardRenderTask.scale.y * .5f;
-									textTask.text = str;
-									textTask.scale = vke::PIXEL_SIZE_ENTITY;
-									textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
-									result = textRenderSys->TryAdd(info, textTask);
+									TextRenderTask textCostTask{};
+									textCostTask.center = true;
+									textCostTask.origin = screenPos;
+									textCostTask.origin.y += cardRenderTask.scale.y * .5f;
+									textCostTask.text = str;
+									textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
+									textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
+									result = textRenderSys->TryAdd(info, textCostTask);
 									assert(result != SIZE_MAX);
 
-									cardTextRenderTask = textTask;
-									cardTextRenderTask.origin = screenPos;
-									cardTextRenderTask.origin.y += .5f;
-									cardTextRenderTask.text = hoveredCard.text;
-									cardTextRenderTask.maxWidth = 24;
-									cardTextRenderTask.scale = 12;
-									cardTextRenderTask.padding = static_cast<int32_t>(cardTextRenderTask.scale) / -2;
-									renderCardText = true;
+									cardTextBox.origin = screenPos + glm::vec2(0, .5f);
+									cardTextBox.text = hoveredCard.text;
+									renderCardTextBox = true;
 								}
 								
 								_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
@@ -316,27 +313,8 @@ namespace game
 					entity.menuUpdateInfo.Reset();
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
-				if(renderCardText)
-				{
-					const auto& pixelSize = uiRenderSys->camera.pixelSize;
-					const auto scale = pixelSize * cardTextRenderTask.scale;
-					const auto lineCount = cardTextRenderTask.GetLineCount();
-					const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
-
-					vke::UIRenderTask backgroundRenderTask{};
-					backgroundRenderTask.position = cardTextRenderTask.origin;
-					backgroundRenderTask.scale.x = aspectFix * (scale * cardTextRenderTask.GetWidth());
-					backgroundRenderTask.scale.y = scale * lineCount;
-					backgroundRenderTask.scale += glm::vec2(16, 8) * pixelSize;
-					backgroundRenderTask.color = glm::vec4(0, 0, 0, 1);
-					backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
-					backgroundRenderTask.position.y += scale * .5f * lineCount - scale * .5f;
-					auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
-					assert(result != SIZE_MAX);
-
-					result = textRenderSys->TryAdd(info, cardTextRenderTask);
-					assert(result != SIZE_MAX);
-				}
+				if (renderCardTextBox)
+					MenuSystem::CreateTextBox(info, systems, cardTextBox);
 			}
 			else
 				entity.menuUpdateInfo.Reset();
