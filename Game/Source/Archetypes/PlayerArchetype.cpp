@@ -130,8 +130,8 @@ namespace game
 				bool changePage = false;
 				bool close = false;
 
-				TextBoxCreateInfo cardTextBox{};
-				bool renderCardTextBox = false;
+				size_t cardIndex = SIZE_MAX;
+				bool renderCard = false;
 
 				// Handle interaction.
 				switch (entity.menuIndex)
@@ -148,9 +148,11 @@ namespace game
 					close = rightPressedThisTurn;
 					break;
 				case Player::MenuIndex::inventory:
+					renderCard = true;
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					break;
 				case Player::MenuIndex::deck:
+					renderCard = true;
 					// Get what cards are being used in the deck.
 					size_t deckSize = 0;
 					for (size_t i = 0; i < inventory.length; ++i)
@@ -175,9 +177,8 @@ namespace game
 					const auto& menuUpdateInfo = entity.menuUpdateInfo;
 					const auto& deckMenuUpdateInfo = entity.deckMenuUpdateInfo;
 
-					bool deckResized = false;
-
 					// Try and add a card to the deck.
+					bool deckResized = false;
 					if (leftPressedThisTurn && entity.menuUpdateInfo.hovered)
 					{
 						const size_t interactIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
@@ -214,6 +215,7 @@ namespace game
 						deckMenuCreateInfo.interactIds = entity.deckMenuInteractIds;
 						deckMenuCreateInfo.capacity = SIZE_MAX;
 						deckMenuCreateInfo.usedSpace = SIZE_MAX;
+						deckMenuCreateInfo.xOffset = 1;
 
 						// Try and remove a card from the deck.
 						if (leftPressedThisTurn && entity.deckMenuUpdateInfo.hovered && deckSize > 0)
@@ -233,70 +235,8 @@ namespace game
 							const size_t inventoryCardIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
 							size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
 							deckCardIndex = deckCardIndex == SIZE_MAX ? SIZE_MAX : cardIndexes[deckCardIndex];
-							size_t cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
-								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
-
-							const auto worldPos = transform.position - entityRenderSys->camera.position;
-							const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
-
-							const size_t oldCardHovered = entity.cardHovered;
-							entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
-							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
-
-							// Draw card.
-							{
-								_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
-								entity.cardHovered = cardIndex;
-								
-								menuCreateInfo.xOffset = 1;
-								deckMenuCreateInfo.xOffset = 1;
-
-								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
-								const auto& pixelSize = cardRenderSys->camera.pixelSize;
-
-								vke::UIRenderTask cardRenderTask{};
-								cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
-								cardRenderTask.subTexture = cardBorder;
-								cardRenderTask.position = screenPos;
-								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
-								assert(result != SIZE_MAX);
-
-								vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
-								if (cardIndex != SIZE_MAX)
-								{
-									const Card hoveredCard = cardSystem->GetCard(cardIndex);
-									cardSubTexture = hoveredCard.art;
-
-									jlb::String str{};
-									str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
-
-									TextRenderTask textCostTask{};
-									textCostTask.center = true;
-									textCostTask.origin = screenPos;
-									textCostTask.origin.y += cardRenderTask.scale.y * .5f;
-									textCostTask.text = str;
-									textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
-									textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
-									result = textRenderSys->TryAdd(info, textCostTask);
-									assert(result != SIZE_MAX);
-
-									cardTextBox.origin = screenPos + glm::vec2(0, .5f);
-									cardTextBox.text = hoveredCard.text;
-									renderCardTextBox = true;
-								}
-								
-								_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
-								_animLerp = fmodf(_animLerp, 1);
-
-								vke::Animation cardAnim{};
-								cardAnim.lerp = _animLerp;
-								cardAnim.width = CARD_ANIM_LENGTH;
-								auto sub = cardAnim.Evaluate(cardSubTexture, 0);
-
-								cardRenderTask.subTexture = sub;
-								result = cardRenderSys->TryAdd(info, cardRenderTask);
-								assert(result != SIZE_MAX);
-							}
+							cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX :
+								inventory[inventoryCardIndex].index : deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 						}
 
 						if (changePage || rightPressedThisTurn || close || deckResized)
@@ -312,10 +252,72 @@ namespace game
 				
 				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
+				if(renderCard)
+					menuCreateInfo.xOffset = 1;
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
-				if (renderCardTextBox)
-					MenuSystem::CreateTextBox(info, systems, cardTextBox);
+				if (renderCard)
+				{
+					const auto worldPos = transform.position - entityRenderSys->camera.position;
+					const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
+
+					const size_t oldCardHovered = entity.cardHovered;
+					entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
+					cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
+
+					// Draw card.
+					{
+						_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
+						entity.cardHovered = cardIndex;
+						
+						const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
+						const auto& pixelSize = cardRenderSys->camera.pixelSize;
+
+						vke::UIRenderTask cardRenderTask{};
+						cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+						cardRenderTask.subTexture = cardBorder;
+						cardRenderTask.position = screenPos;
+						auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+						assert(result != SIZE_MAX);
+
+						vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
+						if (cardIndex != SIZE_MAX)
+						{
+							const Card hoveredCard = cardSystem->GetCard(cardIndex);
+							cardSubTexture = hoveredCard.art;
+
+							jlb::String str{};
+							str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
+
+							TextRenderTask textCostTask{};
+							textCostTask.center = true;
+							textCostTask.origin = screenPos;
+							textCostTask.origin.y += cardRenderTask.scale.y * .5f;
+							textCostTask.text = str;
+							textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
+							textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
+							result = textRenderSys->TryAdd(info, textCostTask);
+							assert(result != SIZE_MAX);
+
+							TextBoxCreateInfo cardTextBox;
+							cardTextBox.origin = screenPos + glm::vec2(0, .5f);
+							cardTextBox.text = hoveredCard.text;
+							MenuSystem::CreateTextBox(info, systems, cardTextBox);
+						}
+
+						_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
+						_animLerp = fmodf(_animLerp, 1);
+
+						vke::Animation cardAnim{};
+						cardAnim.lerp = _animLerp;
+						cardAnim.width = CARD_ANIM_LENGTH;
+						auto sub = cardAnim.Evaluate(cardSubTexture, 0);
+
+						cardRenderTask.subTexture = sub;
+						result = cardRenderSys->TryAdd(info, cardRenderTask);
+						assert(result != SIZE_MAX);
+					}
+				}
 			}
 			else
 				entity.menuUpdateInfo.Reset();
