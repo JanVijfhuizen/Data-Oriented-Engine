@@ -96,6 +96,9 @@ namespace game
 				menuCreateInfo.origin = transform.position;
 				menuCreateInfo.entityCamera = &entityRenderSys->camera;
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
+				menuCreateInfo.interactIds = entity.menuInteractIds;
+				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
+				menuCreateInfo.width = 7;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
@@ -104,11 +107,13 @@ namespace game
 				switch (entity.menuIndex)
 				{
 				case Player::MenuIndex::main:
-					content.Allocate(dumpAllocator, 2);
+					content.Allocate(dumpAllocator, 3);
 					content[0].string = "player";
 					content[1].string = "inventory";
+					content[2].string = "deck";
 					break;
-				case Player::MenuIndex::cards:
+				case Player::MenuIndex::inventory:
+				case Player::MenuIndex::deck:
 					content.Allocate(dumpAllocator, inventory.length + 1);
 					content[0].string = "inventory";
 					for (size_t i = 0; i < inventory.length; ++i)
@@ -120,10 +125,7 @@ namespace game
 					break;
 				}
 
-				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
-				menuCreateInfo.interactIds = entity.menuInteractIds;
-				menuCreateInfo.width = 7;
 
 				bool changePage = false;
 				bool close = false;
@@ -135,12 +137,20 @@ namespace game
 				switch (entity.menuIndex)
 				{
 				case Player::MenuIndex::main:
-					// If cards tab is pressed, go to card menu.
-					changePage = uiHoveredObj == entity.menuInteractIds[0] && leftPressedThisTurn;
-					entity.menuIndex = changePage ? Player::MenuIndex::cards : entity.menuIndex;
+					if (leftPressedThisTurn)
+						for (size_t i = 0; i < 2; ++i)
+						{
+							const bool columnHovered = uiHoveredObj == entity.menuInteractIds[i];
+							changePage = changePage ? true : columnHovered;
+							entity.menuIndex = changePage ? static_cast<Player::MenuIndex>(i + 1) : entity.menuIndex;
+							i = changePage ? 2 : i;
+						}
 					close = rightPressedThisTurn;
 					break;
-				case Player::MenuIndex::cards:
+				case Player::MenuIndex::inventory:
+					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					break;
+				case Player::MenuIndex::deck:
 					// Get what cards are being used in the deck.
 					size_t deckSize = 0;
 					for (size_t i = 0; i < inventory.length; ++i)
@@ -233,6 +243,7 @@ namespace game
 							entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
 							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
 
+							// Draw card.
 							{
 								_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
 								entity.cardHovered = cardIndex;
@@ -293,9 +304,9 @@ namespace game
 						if (!close)
 							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.deckMenuUpdateInfo);
 					}
+
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					cardIndexes.Free(tempAllocator);
-
 					break;
 				}
 				

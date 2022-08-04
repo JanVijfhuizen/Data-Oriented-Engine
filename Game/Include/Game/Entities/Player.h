@@ -34,7 +34,8 @@ namespace game
 		enum class MenuIndex
 		{
 			main,
-			cards
+			inventory,
+			deck
 		};
 
 		Character character{};
