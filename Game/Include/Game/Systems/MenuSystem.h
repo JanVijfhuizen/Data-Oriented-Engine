@@ -11,6 +11,8 @@ namespace vke
 
 namespace game
 {
+	struct MenuUpdateInfo;
+
 	struct MenuCreateInfo final
 	{
 		struct Content final
@@ -34,9 +36,14 @@ namespace game
 		bool interactable = false;
 		vke::EntityCamera* entityCamera = nullptr;
 		vke::UICamera* uiCamera = nullptr;
+		// Gets updated from this system as well.
+		jlb::ArrayView<size_t> interactIds{};
 
-		jlb::ArrayView<size_t> outInteractIds{};
-		size_t interactedIndex = SIZE_MAX;
+		// Returns the amount of columns rendered.
+		[[nodiscard]] size_t GetColumnCount() const;
+		// Excluding title.
+		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuUpdateInfo& updateInfo) const;
+		[[nodiscard]] size_t GetContentIndex(const MenuUpdateInfo& updateInfo, size_t columnIndex) const;
 	};
 
 	struct MenuUpdateInfo final
@@ -49,6 +56,7 @@ namespace game
 		size_t scrollIdx = 0;
 		float scrollPos = 0;
 		float scrollArrowsLerp[2]{1, 1};
+		size_t interactedIndex = SIZE_MAX;
 
 		void Reset();
 	};
@@ -76,7 +84,7 @@ namespace game
 			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;
 		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		static void CreateTextBox(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-		                          const TextBoxCreateInfo& createInfo);
+			const TextBoxCreateInfo& createInfo);
 
 	private:
 		float _scrollDir = 0;

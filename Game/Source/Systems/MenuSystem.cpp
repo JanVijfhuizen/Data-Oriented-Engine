@@ -12,6 +12,21 @@
 
 namespace game
 {
+	size_t MenuCreateInfo::GetColumnCount() const
+	{
+		return jlb::math::Min<size_t>(maxLength, content.length) - 1;
+	}
+
+	size_t MenuCreateInfo::GetInteractedColumnIndex(const MenuUpdateInfo& updateInfo) const
+	{
+		return updateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX : GetContentIndex(updateInfo, updateInfo.interactedIndex);
+	}
+
+	size_t MenuCreateInfo::GetContentIndex(const MenuUpdateInfo& updateInfo, const size_t columnIndex) const
+	{
+		return (updateInfo.scrollIdx + columnIndex) % (content.length - 1);
+	}
+
 	void MenuUpdateInfo::Reset()
 	{
 		opened = false;
@@ -30,7 +45,7 @@ namespace game
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto uiInteractionSys = systems.GetSystem<UIInteractionSystem>();
+		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
 		auto& dumpAllocator = *info.dumpAllocator;
 		auto& tempAllocator = *info.tempAllocator;
@@ -41,7 +56,18 @@ namespace game
 		const size_t contentLength = createInfo.content.length;
 		const size_t length = jlb::math::Min(contentLength, createInfo.maxLength);
 		assert(length > 0);
-		assert(createInfo.outInteractIds.length >= length - 1);
+		assert(createInfo.interactIds.length >= length - 1);
+
+		// Update interactions.
+		if (updateInfo.opened)
+		{
+			const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
+			auto& idx = updateInfo.interactedIndex;
+			idx = SIZE_MAX;
+			const auto length = createInfo.GetColumnCount();
+			for (size_t i = 0; i < length; ++i)
+				idx = uiHoveredObj == createInfo.interactIds[i] ? i : idx;
+		}
 
 		// Update open duration.
 		updateInfo.duration += info.deltaTime * 1e-2f;
@@ -135,9 +161,9 @@ namespace game
 				{
 					UIInteractionTask interactionTask{};
 					interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, textTask.origin.y), tabSize * glm::vec2(rAspectFix, 1));
-					auto result = uiInteractionSys->TryAdd(info, interactionTask);
+					auto result = uiInteractSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
-					createInfo.outInteractIds[i - 1] = result;
+					createInfo.interactIds[i - 1] = result;
 				}
 
 				auto result = uiRenderSys->TryAdd(info, renderTask);
@@ -145,7 +171,7 @@ namespace game
 
 				if(i > 0)
 				{
-					const bool interacted = i - 1 == createInfo.interactedIndex && updateInfo.opened;
+					const bool interacted = i - 1 == updateInfo.interactedIndex && updateInfo.opened;
 					if (interacted)
 					{
 						vke::UIRenderTask enabledRenderTask = renderTask;

@@ -96,58 +96,67 @@ namespace game
 				menuCreateInfo.origin = transform.position;
 				menuCreateInfo.entityCamera = &entityRenderSys->camera;
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
+				menuCreateInfo.interactIds = entity.menuInteractIds;
+				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
+				menuCreateInfo.width = 7;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
-				Card card;
 
 				// Create menu content.
 				switch (entity.menuIndex)
 				{
 				case Player::MenuIndex::main:
-					content.Allocate(dumpAllocator, 2);
+					content.Allocate(dumpAllocator, 3);
 					content[0].string = "player";
 					content[1].string = "inventory";
+					content[2].string = "deck";
 					break;
-				case Player::MenuIndex::cards:
+				case Player::MenuIndex::inventory:
+				case Player::MenuIndex::deck:
 					content.Allocate(dumpAllocator, inventory.length + 1);
 					content[0].string = "inventory";
 					for (size_t i = 0; i < inventory.length; ++i)
 					{
-						card = cardSystem->GetCard(inventory[i].index);
+						const auto card = cardSystem->GetCard(inventory[i].index);
 						content[i + 1].string = card.name;
-						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 					}
 					break;
 				}
+				if(entity.menuIndex == Player::MenuIndex::deck)
+					for (size_t i = 0; i < inventory.length; ++i)
+						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 
-				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
-				menuCreateInfo.outInteractIds = entity.menuInteractIds;
-				menuCreateInfo.width = 7;
-
-				auto& idx = menuCreateInfo.interactedIndex;
-				idx = SIZE_MAX;
-				const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
-				for (size_t i = 0; i < length; ++i)
-					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 
 				bool changePage = false;
 				bool close = false;
 
-				TextBoxCreateInfo cardTextBox{};
-				bool renderCardTextBox = false;
+				size_t cardIndex = SIZE_MAX;
+				bool renderCard = false;
 
 				// Handle interaction.
 				switch (entity.menuIndex)
 				{
 				case Player::MenuIndex::main:
-					// If cards tab is pressed, go to card menu.
-					changePage = uiHoveredObj == entity.menuInteractIds[0] && leftPressedThisTurn;
-					entity.menuIndex = changePage ? Player::MenuIndex::cards : entity.menuIndex;
+					if (leftPressedThisTurn)
+						for (size_t i = 0; i < 2; ++i)
+						{
+							const bool columnHovered = uiHoveredObj == entity.menuInteractIds[i];
+							changePage = changePage ? true : columnHovered;
+							entity.menuIndex = changePage ? static_cast<Player::MenuIndex>(i + 1) : entity.menuIndex;
+							i = changePage ? 2 : i;
+						}
 					close = rightPressedThisTurn;
 					break;
-				case Player::MenuIndex::cards:
+				case Player::MenuIndex::inventory:
+					renderCard = true;
+					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					cardIndex = menuCreateInfo.GetInteractedColumnIndex(entity.menuUpdateInfo);
+					cardIndex = cardIndex == SIZE_MAX ? SIZE_MAX : inventory[cardIndex].index;
+					break;
+				case Player::MenuIndex::deck:
+					renderCard = true;
 					// Get what cards are being used in the deck.
 					size_t deckSize = 0;
 					for (size_t i = 0; i < inventory.length; ++i)
@@ -169,32 +178,20 @@ namespace game
 							cardIndexes.Add(i);
 					}
 
-					bool deckResized = false;
-					if(leftPressedThisTurn)
-					{
-						// Try and add a card to the deck.
-						if(entity.menuUpdateInfo.hovered)
-							for (size_t i = 0; i < length; ++i)
-							{
-								const bool pressed = uiHoveredObj == entity.menuInteractIds[i];
-								auto& slot = inventory[(entity.menuUpdateInfo.scrollIdx + i) % inventory.length];
-								slot.amount = jlb::math::Min(slot.amount + pressed, MAX_COPIES_CARD_IN_DECK);
-								i = pressed ? length : i;
-								deckResized = deckResized ? true : pressed && slot.amount == 1;
-							}
+					const auto& menuUpdateInfo = entity.menuUpdateInfo;
+					const auto& deckMenuUpdateInfo = entity.secondMenuUpdateInfo;
 
-						// Try and remove a card from the deck.
-						if(entity.deckMenuUpdateInfo.hovered)
-							for (size_t i = 0; i < deckSize; ++i)
-							{
-								const bool pressed = uiHoveredObj == entity.deckMenuInteractIds[i];
-								const size_t scrollId = (entity.deckMenuUpdateInfo.scrollIdx + i) % deckSize;
-								auto& slot = inventory[cardIndexes[scrollId]];
-								slot.amount = slot.amount - pressed;
-								slot.amount = slot.amount == SIZE_MAX ? 0 : slot.amount;
-								i = pressed ? deckSize : i;
-								deckResized = deckResized ? true : pressed && slot.amount == 0;
-							}
+					// Try and add a card to the deck.
+					bool deckResized = false;
+					if (leftPressedThisTurn && entity.menuUpdateInfo.hovered)
+					{
+						const size_t interactIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
+						if (interactIndex != SIZE_MAX)
+						{
+							auto& slot = inventory[interactIndex];
+							slot.amount = jlb::math::Min(slot.amount + 1, MAX_COPIES_CARD_IN_DECK);
+							deckResized = slot.amount == 1;
+						}
 					}
 						
 					// Create deck menu.
@@ -219,102 +216,112 @@ namespace game
 						MenuCreateInfo deckMenuCreateInfo = menuCreateInfo;
 						deckMenuCreateInfo.reverseXAxis = true;
 						deckMenuCreateInfo.content = deckContent;
-						deckMenuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
-						deckMenuCreateInfo.interactedIndex = SIZE_MAX;
+						deckMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
 						deckMenuCreateInfo.capacity = SIZE_MAX;
 						deckMenuCreateInfo.usedSpace = SIZE_MAX;
+						deckMenuCreateInfo.xOffset = 1;
 
-						auto& deckIdx = deckMenuCreateInfo.interactedIndex;
-						const auto deckLength = jlb::math::Min<size_t>(deckMenuCreateInfo.maxLength, deckContent.GetLength()) - 1;
-						for (size_t i = 0; i < deckLength; ++i)
-							deckIdx = uiHoveredObj == entity.deckMenuInteractIds[i] ? i : deckIdx;
-
-						// Draw card, if applicable.
+						// Try and remove a card from the deck.
+						if (leftPressedThisTurn && entity.secondMenuUpdateInfo.hovered && deckSize > 0)
 						{
-							const size_t inventoryCardIndex = (entity.menuUpdateInfo.scrollIdx + idx) % inventory.length;
-							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[(entity.deckMenuUpdateInfo.scrollIdx + deckIdx) % deckSize];
-							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
-								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
-
-							const auto worldPos = transform.position - entityRenderSys->camera.position;
-							const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
-
-							const size_t oldCardHovered = entity.cardHovered;
-							entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
-							cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
-
+							const size_t interactIndex = deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
+							if(interactIndex != SIZE_MAX)
 							{
-								_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
-								entity.cardHovered = cardIndex;
-								
-								menuCreateInfo.xOffset = 1;
-								deckMenuCreateInfo.xOffset = 1;
-
-								const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
-								const auto& pixelSize = cardRenderSys->camera.pixelSize;
-
-								vke::UIRenderTask cardRenderTask{};
-								cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
-								cardRenderTask.subTexture = cardBorder;
-								cardRenderTask.position = screenPos;
-								auto result = cardRenderSys->TryAdd(info, cardRenderTask);
-								assert(result != SIZE_MAX);
-
-								vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
-								if (cardIndex != SIZE_MAX)
-								{
-									const Card hoveredCard = cardSystem->GetCard(cardIndex);
-									cardSubTexture = hoveredCard.art;
-
-									jlb::String str{};
-									str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
-
-									TextRenderTask textCostTask{};
-									textCostTask.center = true;
-									textCostTask.origin = screenPos;
-									textCostTask.origin.y += cardRenderTask.scale.y * .5f;
-									textCostTask.text = str;
-									textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
-									textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
-									result = textRenderSys->TryAdd(info, textCostTask);
-									assert(result != SIZE_MAX);
-
-									cardTextBox.origin = screenPos + glm::vec2(0, .5f);
-									cardTextBox.text = hoveredCard.text;
-									renderCardTextBox = true;
-								}
-								
-								_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
-								_animLerp = fmodf(_animLerp, 1);
-
-								vke::Animation cardAnim{};
-								cardAnim.lerp = _animLerp;
-								cardAnim.width = CARD_ANIM_LENGTH;
-								auto sub = cardAnim.Evaluate(cardSubTexture, 0);
-
-								cardRenderTask.subTexture = sub;
-								result = cardRenderSys->TryAdd(info, cardRenderTask);
-								assert(result != SIZE_MAX);
+								auto& slot = inventory[cardIndexes[interactIndex]];
+								--slot.amount;
+								slot.amount = slot.amount == SIZE_MAX ? 0 : slot.amount;
+								deckResized = slot.amount == 0;
 							}
 						}
 
+						// Draw card, if applicable.
+						{
+							const size_t inventoryCardIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
+							size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
+							deckCardIndex = deckCardIndex == SIZE_MAX ? SIZE_MAX : cardIndexes[deckCardIndex];
+							cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX :
+								inventory[inventoryCardIndex].index : deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
+						}
+
 						if (changePage || rightPressedThisTurn || close || deckResized)
-							entity.deckMenuUpdateInfo.Reset();
+							entity.secondMenuUpdateInfo.Reset();
 						if (!close)
-							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.deckMenuUpdateInfo);
+							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.secondMenuUpdateInfo);
 					}
+
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					cardIndexes.Free(tempAllocator);
-
 					break;
 				}
 				
 				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo.Reset();
+				if(renderCard)
+					menuCreateInfo.xOffset = 1;
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
-				if (renderCardTextBox)
-					MenuSystem::CreateTextBox(info, systems, cardTextBox);
+				if (renderCard)
+				{
+					const auto worldPos = transform.position - entityRenderSys->camera.position;
+					const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
+
+					const size_t oldCardHovered = entity.cardHovered;
+					entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
+					cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
+
+					// Draw card.
+					{
+						_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
+						entity.cardHovered = cardIndex;
+						
+						const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
+						const auto& pixelSize = cardRenderSys->camera.pixelSize;
+
+						vke::UIRenderTask cardRenderTask{};
+						cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+						cardRenderTask.subTexture = cardBorder;
+						cardRenderTask.position = screenPos;
+						auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+						assert(result != SIZE_MAX);
+
+						vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
+						if (cardIndex != SIZE_MAX)
+						{
+							const Card hoveredCard = cardSystem->GetCard(cardIndex);
+							cardSubTexture = hoveredCard.art;
+
+							jlb::String str{};
+							str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
+
+							TextRenderTask textCostTask{};
+							textCostTask.center = true;
+							textCostTask.origin = screenPos;
+							textCostTask.origin.y += cardRenderTask.scale.y * .5f;
+							textCostTask.text = str;
+							textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
+							textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
+							result = textRenderSys->TryAdd(info, textCostTask);
+							assert(result != SIZE_MAX);
+
+							TextBoxCreateInfo cardTextBox;
+							cardTextBox.origin = screenPos + glm::vec2(0, .5f);
+							cardTextBox.text = hoveredCard.text;
+							MenuSystem::CreateTextBox(info, systems, cardTextBox);
+						}
+
+						_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
+						_animLerp = fmodf(_animLerp, 1);
+
+						vke::Animation cardAnim{};
+						cardAnim.lerp = _animLerp;
+						cardAnim.width = CARD_ANIM_LENGTH;
+						auto sub = cardAnim.Evaluate(cardSubTexture, 0);
+
+						cardRenderTask.subTexture = sub;
+						result = cardRenderSys->TryAdd(info, cardRenderTask);
+						assert(result != SIZE_MAX);
+					}
+				}
 			}
 			else
 				entity.menuUpdateInfo.Reset();

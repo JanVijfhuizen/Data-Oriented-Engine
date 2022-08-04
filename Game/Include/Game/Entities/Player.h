@@ -34,7 +34,8 @@ namespace game
 		enum class MenuIndex
 		{
 			main,
-			cards
+			inventory,
+			deck
 		};
 
 		Character character{};
@@ -42,8 +43,8 @@ namespace game
 
 		MenuUpdateInfo menuUpdateInfo{};
 		jlb::StackArray<size_t, 6> menuInteractIds{};
-		MenuUpdateInfo deckMenuUpdateInfo{};
-		jlb::StackArray<size_t, 6> deckMenuInteractIds{};
+		MenuUpdateInfo secondMenuUpdateInfo{};
+		jlb::StackArray<size_t, 6> secondMenuInteractIds{};
 		MenuIndex menuIndex = MenuIndex::main;
 		size_t cardHovered = SIZE_MAX;
 	};
