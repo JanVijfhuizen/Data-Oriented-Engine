@@ -29,9 +29,11 @@ namespace game
 		return _isUIBlocking;
 	}
 
-	void MouseSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void MouseSystem::OnPreUpdate(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
+		const jlb::NestedVector<jlb::TBounds<float>>& tasks)
 	{
-		vke::GameSystem::PreUpdate(info, systems);
+		TaskSystem<jlb::TBounds<float>>::OnPreUpdate(info, systems, tasks);
 
 		for (auto& key : _keys)
 			key.pressedThisTurn = false;
@@ -70,9 +72,11 @@ namespace game
 		}
 	}
 
-	void MouseSystem::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void MouseSystem::OnPostUpdate(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
+		const jlb::NestedVector<jlb::TBounds<float>>& tasks)
 	{
-		System<vke::EngineData>::PostUpdate(info, systems);
+		TaskSystem<jlb::TBounds<float>>::OnPostUpdate(info, systems, tasks);
 
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
