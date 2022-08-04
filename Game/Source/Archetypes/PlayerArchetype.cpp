@@ -99,7 +99,6 @@ namespace game
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
-				Card card;
 
 				// Create menu content.
 				switch (entity.menuIndex)
@@ -114,7 +113,7 @@ namespace game
 					content[0].string = "inventory";
 					for (size_t i = 0; i < inventory.length; ++i)
 					{
-						card = cardSystem->GetCard(inventory[i].index);
+						const auto card = cardSystem->GetCard(inventory[i].index);
 						content[i + 1].string = card.name;
 						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 					}
@@ -123,14 +122,8 @@ namespace game
 
 				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.content = content;
-				menuCreateInfo.outInteractIds = entity.menuInteractIds;
+				menuCreateInfo.interactIds = entity.menuInteractIds;
 				menuCreateInfo.width = 7;
-
-				auto& idx = menuCreateInfo.interactedIndex;
-				idx = SIZE_MAX;
-				const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
-				for (size_t i = 0; i < length; ++i)
-					idx = uiHoveredObj == entity.menuInteractIds[i] ? i : idx;
 
 				bool changePage = false;
 				bool close = false;
@@ -172,6 +165,8 @@ namespace game
 					bool deckResized = false;
 					if(leftPressedThisTurn)
 					{
+						const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
+
 						// Try and add a card to the deck.
 						if(entity.menuUpdateInfo.hovered)
 							for (size_t i = 0; i < length; ++i)
@@ -219,21 +214,18 @@ namespace game
 						MenuCreateInfo deckMenuCreateInfo = menuCreateInfo;
 						deckMenuCreateInfo.reverseXAxis = true;
 						deckMenuCreateInfo.content = deckContent;
-						deckMenuCreateInfo.outInteractIds = entity.deckMenuInteractIds;
-						deckMenuCreateInfo.interactedIndex = SIZE_MAX;
+						deckMenuCreateInfo.interactIds = entity.deckMenuInteractIds;
 						deckMenuCreateInfo.capacity = SIZE_MAX;
 						deckMenuCreateInfo.usedSpace = SIZE_MAX;
 
-						auto& deckIdx = deckMenuCreateInfo.interactedIndex;
-						const auto deckLength = jlb::math::Min<size_t>(deckMenuCreateInfo.maxLength, deckContent.GetLength()) - 1;
-						for (size_t i = 0; i < deckLength; ++i)
-							deckIdx = uiHoveredObj == entity.deckMenuInteractIds[i] ? i : deckIdx;
-
 						// Draw card, if applicable.
 						{
-							const size_t inventoryCardIndex = (entity.menuUpdateInfo.scrollIdx + idx) % inventory.length;
-							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[(entity.deckMenuUpdateInfo.scrollIdx + deckIdx) % deckSize];
-							size_t cardIndex = deckIdx == SIZE_MAX ? idx == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
+							const auto& menuUpdateInfo = entity.menuUpdateInfo;
+							const auto& deckMenuUpdateInfo = entity.deckMenuUpdateInfo;
+
+							const size_t inventoryCardIndex = (menuUpdateInfo.scrollIdx + menuUpdateInfo.interactedIndex) % inventory.length;
+							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[(deckMenuUpdateInfo.scrollIdx + deckMenuUpdateInfo.interactedIndex) % deckSize];
+							size_t cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
 								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 
 							const auto worldPos = transform.position - entityRenderSys->camera.position;
