@@ -12,6 +12,11 @@
 
 namespace game
 {
+	size_t MenuCreateInfo::GetColumnCount() const
+	{
+		return jlb::math::Min<size_t>(maxLength, content.length) - 1;
+	}
+
 	void MenuUpdateInfo::Reset()
 	{
 		opened = false;

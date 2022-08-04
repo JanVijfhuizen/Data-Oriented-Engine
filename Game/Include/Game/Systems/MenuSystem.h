@@ -36,6 +36,9 @@ namespace game
 		vke::UICamera* uiCamera = nullptr;
 		// Gets updated from this system as well.
 		jlb::ArrayView<size_t> interactIds{};
+
+		// Returns the amount of columns rendered.
+		[[nodiscard]] size_t GetColumnCount() const;
 	};
 
 	struct MenuUpdateInfo final

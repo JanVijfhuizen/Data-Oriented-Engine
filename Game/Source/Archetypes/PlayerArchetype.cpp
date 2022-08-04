@@ -165,7 +165,7 @@ namespace game
 					bool deckResized = false;
 					if(leftPressedThisTurn)
 					{
-						const auto length = jlb::math::Min<size_t>(menuCreateInfo.maxLength, content.GetLength()) - 1;
+						const auto length = menuCreateInfo.GetColumnCount();
 
 						// Try and add a card to the deck.
 						if(entity.menuUpdateInfo.hovered)
