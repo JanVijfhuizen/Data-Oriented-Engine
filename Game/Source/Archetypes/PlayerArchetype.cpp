@@ -120,10 +120,12 @@ namespace game
 					{
 						const auto card = cardSystem->GetCard(inventory[i].index);
 						content[i + 1].string = card.name;
-						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 					}
 					break;
 				}
+				if(entity.menuIndex == Player::MenuIndex::deck)
+					for (size_t i = 0; i < inventory.length; ++i)
+						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 
 				menuCreateInfo.content = content;
 
@@ -150,6 +152,8 @@ namespace game
 				case Player::MenuIndex::inventory:
 					renderCard = true;
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					cardIndex = menuCreateInfo.GetInteractedColumnIndex(entity.menuUpdateInfo);
+					cardIndex = cardIndex == SIZE_MAX ? SIZE_MAX : inventory[cardIndex].index;
 					break;
 				case Player::MenuIndex::deck:
 					renderCard = true;
@@ -175,7 +179,7 @@ namespace game
 					}
 
 					const auto& menuUpdateInfo = entity.menuUpdateInfo;
-					const auto& deckMenuUpdateInfo = entity.deckMenuUpdateInfo;
+					const auto& deckMenuUpdateInfo = entity.secondMenuUpdateInfo;
 
 					// Try and add a card to the deck.
 					bool deckResized = false;
@@ -212,13 +216,13 @@ namespace game
 						MenuCreateInfo deckMenuCreateInfo = menuCreateInfo;
 						deckMenuCreateInfo.reverseXAxis = true;
 						deckMenuCreateInfo.content = deckContent;
-						deckMenuCreateInfo.interactIds = entity.deckMenuInteractIds;
+						deckMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
 						deckMenuCreateInfo.capacity = SIZE_MAX;
 						deckMenuCreateInfo.usedSpace = SIZE_MAX;
 						deckMenuCreateInfo.xOffset = 1;
 
 						// Try and remove a card from the deck.
-						if (leftPressedThisTurn && entity.deckMenuUpdateInfo.hovered && deckSize > 0)
+						if (leftPressedThisTurn && entity.secondMenuUpdateInfo.hovered && deckSize > 0)
 						{
 							const size_t interactIndex = deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
 							if(interactIndex != SIZE_MAX)
@@ -240,9 +244,9 @@ namespace game
 						}
 
 						if (changePage || rightPressedThisTurn || close || deckResized)
-							entity.deckMenuUpdateInfo.Reset();
+							entity.secondMenuUpdateInfo.Reset();
 						if (!close)
-							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.deckMenuUpdateInfo);
+							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.secondMenuUpdateInfo);
 					}
 
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
