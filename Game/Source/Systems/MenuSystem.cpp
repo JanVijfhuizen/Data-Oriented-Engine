@@ -19,7 +19,7 @@ namespace game
 
 	size_t MenuCreateInfo::GetInteractedColumnIndex(const MenuUpdateInfo& updateInfo) const
 	{
-		return GetContentIndex(updateInfo, updateInfo.interactedIndex);
+		return updateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX : GetContentIndex(updateInfo, updateInfo.interactedIndex);
 	}
 
 	size_t MenuCreateInfo::GetContentIndex(const MenuUpdateInfo& updateInfo, const size_t columnIndex) const

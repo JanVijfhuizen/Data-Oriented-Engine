@@ -162,34 +162,21 @@ namespace game
 							cardIndexes.Add(i);
 					}
 
+					const auto& menuUpdateInfo = entity.menuUpdateInfo;
+					const auto& deckMenuUpdateInfo = entity.deckMenuUpdateInfo;
+
 					bool deckResized = false;
-					if(leftPressedThisTurn)
+
+					// Try and add a card to the deck.
+					if (leftPressedThisTurn && entity.menuUpdateInfo.hovered)
 					{
-						const auto length = menuCreateInfo.GetColumnCount();
-
-						// Try and add a card to the deck.
-						if(entity.menuUpdateInfo.hovered)
-							for (size_t i = 0; i < length; ++i)
-							{
-								const bool pressed = uiHoveredObj == entity.menuInteractIds[i];
-								auto& slot = inventory[(entity.menuUpdateInfo.scrollIdx + i) % inventory.length];
-								slot.amount = jlb::math::Min(slot.amount + pressed, MAX_COPIES_CARD_IN_DECK);
-								i = pressed ? length : i;
-								deckResized = deckResized ? true : pressed && slot.amount == 1;
-							}
-
-						// Try and remove a card from the deck.
-						if(entity.deckMenuUpdateInfo.hovered)
-							for (size_t i = 0; i < deckSize; ++i) // todo fix.
-							{
-								const bool pressed = uiHoveredObj == entity.deckMenuInteractIds[i];
-								const size_t scrollId = (entity.deckMenuUpdateInfo.scrollIdx + i) % deckSize;
-								auto& slot = inventory[cardIndexes[scrollId]];
-								slot.amount = slot.amount - pressed;
-								slot.amount = slot.amount == SIZE_MAX ? 0 : slot.amount;
-								i = pressed ? deckSize : i;
-								deckResized = deckResized ? true : pressed && slot.amount == 0;
-							}
+						const size_t interactIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
+						if (interactIndex != SIZE_MAX)
+						{
+							auto& slot = inventory[interactIndex];
+							slot.amount = jlb::math::Min(slot.amount + 1, MAX_COPIES_CARD_IN_DECK);
+							deckResized = slot.amount == 1;
+						}
 					}
 						
 					// Create deck menu.
@@ -218,13 +205,24 @@ namespace game
 						deckMenuCreateInfo.capacity = SIZE_MAX;
 						deckMenuCreateInfo.usedSpace = SIZE_MAX;
 
+						// Try and remove a card from the deck.
+						if (leftPressedThisTurn && entity.deckMenuUpdateInfo.hovered && deckSize > 0)
+						{
+							const size_t interactIndex = deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
+							if(interactIndex != SIZE_MAX)
+							{
+								auto& slot = inventory[cardIndexes[interactIndex]];
+								--slot.amount;
+								slot.amount = slot.amount == SIZE_MAX ? 0 : slot.amount;
+								deckResized = slot.amount == 0;
+							}
+						}
+
 						// Draw card, if applicable.
 						{
-							const auto& menuUpdateInfo = entity.menuUpdateInfo;
-							const auto& deckMenuUpdateInfo = entity.deckMenuUpdateInfo;
-
 							const size_t inventoryCardIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
-							const size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : cardIndexes[deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo)];
+							size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
+							deckCardIndex = deckCardIndex == SIZE_MAX ? SIZE_MAX : cardIndexes[deckCardIndex];
 							size_t cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX : inventory[inventoryCardIndex].index :
 								deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 
