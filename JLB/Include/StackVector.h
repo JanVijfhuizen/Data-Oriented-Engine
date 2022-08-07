@@ -1,4 +1,5 @@
 #pragma once
+#include "ArrayUtils.h"
 #include "StackArray.h"
 
 namespace jlb
@@ -9,40 +10,47 @@ namespace jlb
 	{
 		T& Add(T& value);
 		T& Add(T&& value);
-		void Erase(size_t index);
+		virtual void Erase(size_t index);
+		void SetCount(size_t i);
 
 		[[nodiscard]] size_t GetCount() const;
 		[[nodiscard]] Iterator<T> end() override;
+		[[nodiscard]] ArrayView<T> GetView() override;
 
-		[[nodiscard]] operator ArrayView<T>();
-
+	protected:
+		[[nodiscard]] virtual T& OnAdd(T& value);
 	private:
 		size_t _count = 0;
-
-		[[nodiscard]] T& _Add(T& value);
 	};
 
 	template <typename T, size_t S>
 	T& StackVector<T, S>::Add(T& value)
 	{
-		return _Add(value);
+		return OnAdd(value);
 	}
 
 	template <typename T, size_t S>
 	T& StackVector<T, S>::Add(T&& value)
 	{
-		return _Add(value);
+		return OnAdd(value);
 	}
 
 	template <typename T, size_t S>
 	void StackVector<T, S>::Erase(const size_t index)
 	{
 		assert(index < _count);
-		StackArray<T, S>::Swap(index, _count--);
+		jlb::Swap(GetView(), index, _count--);
 	}
 
 	template <typename T, size_t S>
-	T& StackVector<T, S>::_Add(T& value)
+	void StackVector<T, S>::SetCount(const size_t i)
+	{
+		assert(i < S);
+		_count = i;
+	}
+
+	template <typename T, size_t S>
+	T& StackVector<T, S>::OnAdd(T& value)
 	{
 		return StackArray<T, S>::operator[](_count++) = value;
 	}
@@ -64,7 +72,7 @@ namespace jlb
 	}
 
 	template <typename T, size_t S>
-	StackVector<T, S>::operator ArrayView<T>()
+	ArrayView<T> StackVector<T, S>::GetView()
 	{
 		ArrayView<T> view{};
 		view.data = StackArray<T, S>::GetData();

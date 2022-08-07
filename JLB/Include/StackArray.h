@@ -15,6 +15,7 @@ namespace jlb
 
 		[[nodiscard]] T* GetData();
 		[[nodiscard]] static size_t GetLength();
+		[[nodiscard]] virtual ArrayView<T> GetView();
 
 		[[nodiscard]] virtual T& operator[](size_t index);
 		[[nodiscard]] virtual Iterator<T> begin();
@@ -51,6 +52,12 @@ namespace jlb
 	}
 
 	template <typename T, size_t S>
+	ArrayView<T> StackArray<T, S>::GetView()
+	{
+		return ArrayView<T>{_memory, S};
+	}
+
+	template <typename T, size_t S>
 	T& StackArray<T, S>::operator[](const size_t index)
 	{
 		assert(index < S);
@@ -80,6 +87,6 @@ namespace jlb
 	template <typename T, size_t S>
 	StackArray<T, S>::operator ArrayView<T>()
 	{
-		return ArrayView<T>{_memory, S};
+		return GetView();
 	}
 }

@@ -7,25 +7,20 @@ namespace game
 {
 	constexpr size_t PLAYER_INVENTORY_SIZE = 32;
 
-	constexpr Inventory<PLAYER_INVENTORY_SIZE> CreatePlayerStarterDeck()
+	inline Inventory<PLAYER_INVENTORY_SIZE> CreatePlayerStarterDeck()
 	{
 		// Test.
 		Inventory<PLAYER_INVENTORY_SIZE> deck{};
-		auto& fireball = deck.slots[0];
+		deck.SetCount(3);
+		auto& fireball = deck[0];
 		fireball.index = 0;
 		fireball.amount = 0;
-		auto& root = deck.slots[1];
+		auto& root = deck[1];
 		root.index = 1;
 		root.amount = 0;
-		auto& bash = deck.slots[2];
+		auto& bash = deck[2];
 		bash.index = 2;
 		bash.amount = 1;
-		deck.count = 12;
-
-		for (int i = 3; i < 12; ++i)
-		{
-			deck.slots[i] = deck.slots[0];
-		}
 		return deck;
 	}
 
@@ -47,5 +42,6 @@ namespace game
 		jlb::StackArray<size_t, 6> secondMenuInteractIds{};
 		MenuIndex menuIndex = MenuIndex::main;
 		size_t cardHovered = SIZE_MAX;
+		size_t cardActivated = SIZE_MAX;
 	};
 }

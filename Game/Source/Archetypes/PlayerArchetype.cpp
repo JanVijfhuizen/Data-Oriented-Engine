@@ -105,10 +105,13 @@ namespace game
 				secondMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
 				secondMenuCreateInfo.capacity = SIZE_MAX;
 				secondMenuCreateInfo.usedSpace = SIZE_MAX;
-				secondMenuCreateInfo.xOffset = 1;
+				bool drawSecondWindow = false;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
+
+				auto& menuUpdateInfo = entity.menuUpdateInfo;
+				auto& secondMenuUpdateInfo = entity.secondMenuUpdateInfo;
 
 				// Create menu content.
 				switch (entity.menuIndex)
@@ -142,8 +145,8 @@ namespace game
 				size_t cardIndex = SIZE_MAX;
 				bool renderCard = false;
 
-				const auto& menuUpdateInfo = entity.menuUpdateInfo;
-				const auto& secondMenuUpdateInfo = entity.secondMenuUpdateInfo;
+				const auto oldCardActivated = entity.cardActivated;
+				entity.cardActivated = 0;
 
 				// Handle interaction.
 				switch (entity.menuIndex)
@@ -161,9 +164,25 @@ namespace game
 					break;
 				case Player::MenuIndex::inventory:
 					renderCard = true;
-					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					cardIndex = menuCreateInfo.GetInteractedColumnIndex(entity.menuUpdateInfo);
 					cardIndex = cardIndex == SIZE_MAX ? SIZE_MAX : inventory[cardIndex].index;
+					entity.cardActivated = leftPressedThisTurn && menuUpdateInfo.hovered ? entity.cardHovered : oldCardActivated;
+
+					if(entity.cardActivated != SIZE_MAX)
+					{
+						const auto hoveredCard = cardSystem->GetCard(entity.cardActivated);
+
+						jlb::Array<MenuCreateInfo::Content> deckContent{};
+						deckContent.Allocate(dumpAllocator, 3);
+						deckContent[0].string = hoveredCard.name;
+						deckContent[1].string = "use";
+						deckContent[2].string = "drop";
+						secondMenuCreateInfo.content = deckContent;
+						drawSecondWindow = true;
+					}
+					if (entity.cardActivated != oldCardActivated)
+						secondMenuUpdateInfo = {};
+					
 					break;
 				case Player::MenuIndex::deck:
 					renderCard = true;
@@ -244,30 +263,37 @@ namespace game
 								inventory[inventoryCardIndex].index : deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 						}
 
-						if (changePage || rightPressedThisTurn || close || deckResized)
+						if (deckResized)
 							entity.secondMenuUpdateInfo = {};
-						if (!close)
-							menuSys->CreateMenu(info, systems, secondMenuCreateInfo, entity.secondMenuUpdateInfo);
+						drawSecondWindow = true;
 					}
-
-					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					
 					cardIndexes.Free(tempAllocator);
 					break;
 				}
-				
-				if(changePage || rightPressedThisTurn || close)
-					entity.menuUpdateInfo = {};
-				if(renderCard)
+
+				if (renderCard)
+				{
 					menuCreateInfo.xOffset = 1;
+					secondMenuCreateInfo.xOffset = 1;
+				}
+				if (changePage || rightPressedThisTurn || close)
+					entity.secondMenuUpdateInfo = {};
+				if (!close && drawSecondWindow)
+					menuSys->CreateMenu(info, systems, secondMenuCreateInfo, entity.secondMenuUpdateInfo);
+				if(entity.menuIndex != Player::MenuIndex::main)
+					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+				if(changePage || rightPressedThisTurn || close)
+					menuUpdateInfo = {};
 				if(!close)
-					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
+					menuSys->CreateMenu(info, systems, menuCreateInfo, menuUpdateInfo);
 				if (renderCard)
 				{
 					const auto worldPos = transform.position - entityRenderSys->camera.position;
 					const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
 					const size_t oldCardHovered = entity.cardHovered;
-					entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : entity.menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
+					entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
 					cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
 
 					// Draw card.
@@ -288,7 +314,7 @@ namespace game
 						vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
 						if (cardIndex != SIZE_MAX)
 						{
-							const Card hoveredCard = cardSystem->GetCard(cardIndex);
+							const auto hoveredCard = cardSystem->GetCard(cardIndex);
 							cardSubTexture = hoveredCard.art;
 
 							jlb::String str{};

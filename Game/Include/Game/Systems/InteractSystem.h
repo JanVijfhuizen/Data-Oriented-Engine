@@ -14,6 +14,9 @@ namespace game
 		char data[16];
 	};
 
+	/*
+	Used to define interactions between entities.
+	*/
 	class InteractSystem final : public vke::TaskSystem<InteractionTask>
 	{
 	public:
