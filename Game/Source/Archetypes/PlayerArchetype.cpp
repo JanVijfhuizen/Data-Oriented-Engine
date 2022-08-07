@@ -105,7 +105,6 @@ namespace game
 				secondMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
 				secondMenuCreateInfo.capacity = SIZE_MAX;
 				secondMenuCreateInfo.usedSpace = SIZE_MAX;
-				secondMenuCreateInfo.xOffset = 1;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
@@ -161,9 +160,13 @@ namespace game
 					break;
 				case Player::MenuIndex::inventory:
 					renderCard = true;
-					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 					cardIndex = menuCreateInfo.GetInteractedColumnIndex(entity.menuUpdateInfo);
 					cardIndex = cardIndex == SIZE_MAX ? SIZE_MAX : inventory[cardIndex].index;
+
+					if(leftPressedThisTurn)
+					{
+						entity.cardActivated = entity.cardHovered;
+					}
 					break;
 				case Player::MenuIndex::deck:
 					renderCard = true;
@@ -249,16 +252,20 @@ namespace game
 						if (!close)
 							menuSys->CreateMenu(info, systems, secondMenuCreateInfo, entity.secondMenuUpdateInfo);
 					}
-
-					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					
 					cardIndexes.Free(tempAllocator);
 					break;
 				}
-				
+
+				if(entity.menuIndex != Player::MenuIndex::main)
+					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
 				if(changePage || rightPressedThisTurn || close)
 					entity.menuUpdateInfo = {};
 				if(renderCard)
+				{
 					menuCreateInfo.xOffset = 1;
+					secondMenuCreateInfo.xOffset = 1;
+				}
 				if(!close)
 					menuSys->CreateMenu(info, systems, menuCreateInfo, entity.menuUpdateInfo);
 				if (renderCard)

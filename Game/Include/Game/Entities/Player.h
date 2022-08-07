@@ -47,5 +47,6 @@ namespace game
 		jlb::StackArray<size_t, 6> secondMenuInteractIds{};
 		MenuIndex menuIndex = MenuIndex::main;
 		size_t cardHovered = SIZE_MAX;
+		size_t cardActivated = SIZE_MAX;
 	};
 }
