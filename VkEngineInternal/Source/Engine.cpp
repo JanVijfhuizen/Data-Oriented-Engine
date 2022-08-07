@@ -4,6 +4,8 @@
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkSwapChain.h"
 #include <chrono>
+
+#include "JlbMath.h"
 #include "VkRenderer/VkStackAllocator.h"
 #include "SystemManager.h"
 
@@ -99,6 +101,7 @@ namespace vke
 			// Update (delta)time.
 			auto newTime = std::chrono::high_resolution_clock::now();
 			outData.deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(newTime - oldTime).count() * 0.001f;
+			outData.deltaTime = jlb::math::Min(outData.deltaTime, 1000.f - 1e-5f);
 			outData.time += outData.deltaTime;
 			oldTime = newTime;
 

@@ -100,6 +100,13 @@ namespace game
 				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
 				menuCreateInfo.width = 7;
 
+				MenuCreateInfo secondMenuCreateInfo = menuCreateInfo;
+				secondMenuCreateInfo.reverseXAxis = true;
+				secondMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
+				secondMenuCreateInfo.capacity = SIZE_MAX;
+				secondMenuCreateInfo.usedSpace = SIZE_MAX;
+				secondMenuCreateInfo.xOffset = 1;
+
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
 
@@ -134,6 +141,9 @@ namespace game
 
 				size_t cardIndex = SIZE_MAX;
 				bool renderCard = false;
+
+				const auto& menuUpdateInfo = entity.menuUpdateInfo;
+				const auto& secondMenuUpdateInfo = entity.secondMenuUpdateInfo;
 
 				// Handle interaction.
 				switch (entity.menuIndex)
@@ -178,9 +188,6 @@ namespace game
 							cardIndexes.Add(i);
 					}
 
-					const auto& menuUpdateInfo = entity.menuUpdateInfo;
-					const auto& deckMenuUpdateInfo = entity.secondMenuUpdateInfo;
-
 					// Try and add a card to the deck.
 					bool deckResized = false;
 					if (leftPressedThisTurn && entity.menuUpdateInfo.hovered)
@@ -213,18 +220,12 @@ namespace game
 							}
 						}
 
-						MenuCreateInfo deckMenuCreateInfo = menuCreateInfo;
-						deckMenuCreateInfo.reverseXAxis = true;
-						deckMenuCreateInfo.content = deckContent;
-						deckMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
-						deckMenuCreateInfo.capacity = SIZE_MAX;
-						deckMenuCreateInfo.usedSpace = SIZE_MAX;
-						deckMenuCreateInfo.xOffset = 1;
+						secondMenuCreateInfo.content = deckContent;
 
 						// Try and remove a card from the deck.
-						if (leftPressedThisTurn && entity.secondMenuUpdateInfo.hovered && deckSize > 0)
+						if (leftPressedThisTurn && secondMenuUpdateInfo.hovered && deckSize > 0)
 						{
-							const size_t interactIndex = deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
+							const size_t interactIndex = secondMenuCreateInfo.GetInteractedColumnIndex(secondMenuUpdateInfo);
 							if(interactIndex != SIZE_MAX)
 							{
 								auto& slot = inventory[cardIndexes[interactIndex]];
@@ -234,19 +235,19 @@ namespace game
 							}
 						}
 
-						// Draw card, if applicable.
+						// Define what card to draw, if hovered over the deck menu.
 						{
 							const size_t inventoryCardIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
-							size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : deckMenuCreateInfo.GetInteractedColumnIndex(deckMenuUpdateInfo);
+							size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : secondMenuCreateInfo.GetInteractedColumnIndex(secondMenuUpdateInfo);
 							deckCardIndex = deckCardIndex == SIZE_MAX ? SIZE_MAX : cardIndexes[deckCardIndex];
-							cardIndex = deckMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX :
+							cardIndex = secondMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX :
 								inventory[inventoryCardIndex].index : deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 						}
 
 						if (changePage || rightPressedThisTurn || close || deckResized)
-							entity.secondMenuUpdateInfo.Reset();
+							entity.secondMenuUpdateInfo = {};
 						if (!close)
-							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.secondMenuUpdateInfo);
+							menuSys->CreateMenu(info, systems, secondMenuCreateInfo, entity.secondMenuUpdateInfo);
 					}
 
 					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
@@ -255,7 +256,7 @@ namespace game
 				}
 				
 				if(changePage || rightPressedThisTurn || close)
-					entity.menuUpdateInfo.Reset();
+					entity.menuUpdateInfo = {};
 				if(renderCard)
 					menuCreateInfo.xOffset = 1;
 				if(!close)
@@ -324,10 +325,12 @@ namespace game
 				}
 			}
 			else
-				entity.menuUpdateInfo.Reset();
+				entity.menuUpdateInfo = {};
 
+			// Calculate the average camera center.
 			cameraCenter += character.transform.position;
 
+			// Draw the directional arrows based on where the player wants to go.
 			vke::EntityRenderTask renderTask{};
 			renderTask.subTexture = subTextureDirArrow;
 			for (size_t i = 0; i < 4; ++i)
