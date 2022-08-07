@@ -1,4 +1,5 @@
 #pragma once
+#include "StackVector.h"
 
 namespace game
 {
@@ -11,28 +12,43 @@ namespace game
 	};
 
 	template <size_t S>
-	struct Inventory final
+	struct Inventory final : jlb::StackVector<InventorySlot, S>
 	{
-		[[nodiscard]] operator jlb::ArrayView<InventorySlot>();
-
-		InventorySlot slots[S];
-		size_t count = 0;
-
-		[[nodiscard]] static size_t GetLength();
+		void Erase(size_t index) override;
+	private:
+		[[nodiscard]] InventorySlot& OnAdd(InventorySlot& value) override;
 	};
-	
+
 	template <size_t S>
-	Inventory<S>::operator jlb::ArrayView<InventorySlot>()
+	void Inventory<S>::Erase(const size_t index)
 	{
-		jlb::ArrayView<InventorySlot> view{};
-		view.length = count;
-		view.data = slots;
-		return view;
+		const size_t count = jlb::StackVector<InventorySlot, S>::GetCount();
+		assert(count >= 1);
+		for (size_t i = index + 1; i < count; ++i)
+			jlb::StackVector<InventorySlot, S>::operator[](i - 1) = jlb::StackVector<InventorySlot, S>::operator[](i);
+		jlb::StackVector<InventorySlot, S>::SetCount(count - 1);
 	}
 
 	template <size_t S>
-	size_t Inventory<S>::GetLength()
+	InventorySlot& Inventory<S>::OnAdd(InventorySlot& value)
 	{
-		return S;
+		const size_t count = jlb::StackVector<InventorySlot, S>::GetCount();
+		assert(count < S);
+
+		jlb::StackVector<InventorySlot, S>::SetCount(count + 1);
+		const auto& idx = value.index;
+		size_t i = count;
+		bool placed = false;
+
+		while(i > 0 && !placed)
+		{
+			--i;
+			const auto& src = jlb::StackVector<InventorySlot, S>::operator[](i);
+			auto& dst = jlb::StackVector<InventorySlot, S>::operator[](i + 1);
+			placed = src.index < idx;
+			dst = placed ? dst : src;
+		}
+
+		return jlb::StackVector<InventorySlot, S>::operator[](i) = value;
 	}
 }
