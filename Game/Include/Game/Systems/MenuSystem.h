@@ -57,8 +57,6 @@ namespace game
 		float scrollPos = 0;
 		float scrollArrowsLerp[2]{1, 1};
 		size_t interactedIndex = SIZE_MAX;
-
-		void Reset();
 	};
 
 	struct TextBoxCreateInfo final

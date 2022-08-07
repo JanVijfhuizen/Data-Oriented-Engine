@@ -27,16 +27,6 @@ namespace game
 		return (updateInfo.scrollIdx + columnIndex) % (content.length - 1);
 	}
 
-	void MenuUpdateInfo::Reset()
-	{
-		opened = false;
-		duration = 0;
-		scrollIdx = 0;
-		scrollPos = 0;
-		for (float& lerp : scrollArrowsLerp)
-			lerp = 1;
-	}
-
 	void MenuSystem::CreateMenu(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
 		const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const

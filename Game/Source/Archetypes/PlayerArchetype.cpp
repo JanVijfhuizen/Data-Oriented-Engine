@@ -244,7 +244,7 @@ namespace game
 						}
 
 						if (changePage || rightPressedThisTurn || close || deckResized)
-							entity.secondMenuUpdateInfo.Reset();
+							entity.secondMenuUpdateInfo = {};
 						if (!close)
 							menuSys->CreateMenu(info, systems, deckMenuCreateInfo, entity.secondMenuUpdateInfo);
 					}
@@ -255,7 +255,7 @@ namespace game
 				}
 				
 				if(changePage || rightPressedThisTurn || close)
-					entity.menuUpdateInfo.Reset();
+					entity.menuUpdateInfo = {};
 				if(renderCard)
 					menuCreateInfo.xOffset = 1;
 				if(!close)
@@ -324,7 +324,7 @@ namespace game
 				}
 			}
 			else
-				entity.menuUpdateInfo.Reset();
+				entity.menuUpdateInfo = {};
 
 			cameraCenter += character.transform.position;
 
