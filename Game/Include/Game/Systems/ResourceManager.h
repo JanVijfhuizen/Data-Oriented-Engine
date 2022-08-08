@@ -13,7 +13,8 @@ namespace game
 		{
 			mouse,
 			humanoid,
-			directionalArrow
+			directionalArrow,
+			pickup
 		};
 
 		// Subtextures available for the tile renderer.

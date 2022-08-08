@@ -20,8 +20,21 @@ namespace game::demo
 				const auto pos = glm::vec2(i - dummyCount / 2 - dummyCount, j - dummyCount / 2 - dummyCount);
 				_dummies[i * dummyCount + j].character.transform.position = pos;
 			}
-			
 		}
+		
+		auto& deck = _player.inventory;
+		deck.SetCount(3);
+		auto& fireball = deck[0];
+		fireball.index = 0;
+		fireball.amount = 0;
+		auto& root = deck[1];
+		root.index = 1;
+		root.amount = 0;
+		auto& bash = deck[2];
+		bash.index = 2;
+		bash.amount = 1;
+
+		_pickup.transform.position = glm::vec2{ 2, -1 };
 	}
 
 	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
@@ -34,6 +47,7 @@ namespace game::demo
 	{
 		Scene::PreUpdate(info, systems);
 		_playerArchetype.PreUpdate(info, systems, _player);
+		_pickupArchetype.PreUpdate(info, systems, _pickup);
 		_dummyArchetype.PreUpdate(info, systems, _dummies);
 
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
@@ -66,6 +80,7 @@ namespace game::demo
 	{
 		Scene::PostUpdate(info, systems);
 		_playerArchetype.PostUpdate(info, systems, _player);
+		_pickupArchetype.PostUpdate(info, systems, _pickup);
 		_dummyArchetype.PostUpdate(info, systems, _dummies);
 	}
 

@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include "Archetypes/DummyArchetype.h"
+#include "Archetypes/PickupArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Entities/DummyEntity.h"
+#include "Entities/Pickup.h"
 #include "VkEngine/Systems/SceneSystem.h"
 
 namespace game::demo
@@ -10,10 +12,12 @@ namespace game::demo
 	class DemoScene final : public vke::Scene
 	{
 		Player _player{};
+		Pickup _pickup{};
 		jlb::Array<DummyEntity> _dummies{};
 
 		DummyArchetype _dummyArchetype{};
 		PlayerArchetype _playerArchetype{};
+		PickupArchetype _pickupArchetype{};
 
 		void Allocate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void Free(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;

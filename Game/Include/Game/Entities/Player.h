@@ -7,23 +7,6 @@ namespace game
 {
 	constexpr size_t PLAYER_INVENTORY_SIZE = 32;
 
-	inline Inventory<PLAYER_INVENTORY_SIZE> CreatePlayerStarterDeck()
-	{
-		// Test.
-		Inventory<PLAYER_INVENTORY_SIZE> deck{};
-		deck.SetCount(3);
-		auto& fireball = deck[0];
-		fireball.index = 0;
-		fireball.amount = 0;
-		auto& root = deck[1];
-		root.index = 1;
-		root.amount = 0;
-		auto& bash = deck[2];
-		bash.index = 2;
-		bash.amount = 1;
-		return deck;
-	}
-
 	struct Player final
 	{
 		enum class MenuIndex
@@ -34,7 +17,7 @@ namespace game
 		};
 
 		Character character{};
-		Inventory<PLAYER_INVENTORY_SIZE> inventory = CreatePlayerStarterDeck();
+		Inventory<PLAYER_INVENTORY_SIZE> inventory{};
 
 		MenuUpdateInfo menuUpdateInfo{};
 		jlb::StackArray<size_t, 6> menuInteractIds{};
