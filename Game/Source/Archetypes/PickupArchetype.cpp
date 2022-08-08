@@ -76,7 +76,8 @@ namespace game
 				jlb::Array<MenuCreateInfo::Content> content{};
 				content.Allocate(dumpAllocator, 2);
 				content[0].string = card.name;
-				content[1].string = "pickup";
+				content[1].string = "pick up";
+				content[1].interactable = false;
 				menuCreateInfo.content = content;
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);

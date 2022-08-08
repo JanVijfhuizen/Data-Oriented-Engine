@@ -173,7 +173,7 @@ namespace game
 						assert(result != SIZE_MAX);
 					}
 
-					if(content.active)
+					if(content.interactable)
 					{
 						renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
 						renderTask.color = glm::vec4(glm::vec3(1 - interacted), 1);
@@ -287,7 +287,7 @@ namespace game
 
 		TextRenderTask cardTextRenderTask{};
 		cardTextRenderTask.center = createInfo.center;
-		cardTextRenderTask.origin = createInfo.origin;
+		cardTextRenderTask.origin = createInfo.screenOrigin;
 		cardTextRenderTask.text = createInfo.text;
 		cardTextRenderTask.maxWidth = createInfo.maxWidth;
 		cardTextRenderTask.scale = createInfo.scale;
@@ -307,10 +307,8 @@ namespace game
 		backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 		backgroundRenderTask.position.y += scale * .5f * lineCount - scale * .5f;
 		auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
-		assert(result != SIZE_MAX);
 
 		result = textRenderSys->TryAdd(info, cardTextRenderTask);
-		assert(result != SIZE_MAX);
 	}
 
 	void MenuSystem::CreateCardMenu(const vke::EngineData& info, 
@@ -356,8 +354,7 @@ namespace game
 			textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
 			result = textRenderSys->TryAdd(info, textCostTask);
 
-			TextBoxCreateInfo cardTextBox;
-			cardTextBox.origin = screenPos + glm::vec2(0, .5f);
+			TextBoxCreateInfo cardTextBox{};
 			cardTextBox.text = card.text;
 			CreateTextBox(info, systems, cardTextBox);
 		}

@@ -19,7 +19,7 @@ namespace game
 		struct Content final
 		{
 			jlb::StringView string{};
-			bool active = true;
+			bool interactable = true;
 			size_t amount = SIZE_MAX;
 		};
 
@@ -62,7 +62,7 @@ namespace game
 
 	struct TextBoxCreateInfo final
 	{
-		glm::vec2 origin{};
+		glm::vec2 screenOrigin{0, .6f};
 		jlb::StringView text{};
 		size_t maxWidth = 24;
 		size_t scale = 12;
