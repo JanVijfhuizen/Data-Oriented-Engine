@@ -34,6 +34,7 @@ namespace game::demo
 		bash.index = 2;
 		bash.amount = 1;
 
+		_pickup.cardId = 1;
 		_pickup.transform.position = glm::vec2{ 2, -1 };
 	}
 

@@ -24,7 +24,7 @@ namespace game
 		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
-		const auto cardSystem = systems.GetSystem<CardSystem>();
+		const auto cardSys = systems.GetSystem<CardSystem>();
 		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
@@ -130,7 +130,7 @@ namespace game
 					content[0].string = "inventory";
 					for (size_t i = 0; i < inventory.length; ++i)
 					{
-						const auto card = cardSystem->GetCard(inventory[i].index);
+						const auto card = cardSys->GetCard(inventory[i].index);
 						content[i + 1].string = card.name;
 					}
 					break;
@@ -172,7 +172,7 @@ namespace game
 
 					if(_cardActivated != SIZE_MAX)
 					{
-						const auto hoveredCard = cardSystem->GetCard(_cardActivated);
+						const auto hoveredCard = cardSys->GetCard(_cardActivated);
 
 						jlb::Array<MenuCreateInfo::Content> deckContent{};
 						deckContent.Allocate(dumpAllocator, 3);
@@ -300,55 +300,15 @@ namespace game
 
 					// Draw card.
 					{
-						_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
+						const bool newCardHovered = oldCardHovered != cardIndex;
 						_cardHovered = cardIndex;
-						
-						const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
-						const auto& pixelSize = cardRenderSys->camera.pixelSize;
+						_cardMenuUpdateInfo = newCardHovered ? CardMenuUpdateInfo() : _cardMenuUpdateInfo;
 
-						vke::UIRenderTask cardRenderTask{};
-						cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
-						cardRenderTask.subTexture = cardBorder;
-						cardRenderTask.position = screenPos;
-						auto result = cardRenderSys->TryAdd(info, cardRenderTask);
-						assert(result != SIZE_MAX);
+						CardMenuCreateInfo createInfo{};
+						createInfo.origin = transform.position;
+						createInfo.cardIndex = cardIndex;
 
-						vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
-						if (cardIndex != SIZE_MAX)
-						{
-							const auto hoveredCard = cardSystem->GetCard(cardIndex);
-							cardSubTexture = hoveredCard.art;
-
-							jlb::String str{};
-							str.AllocateFromNumber(dumpAllocator, hoveredCard.cost);
-
-							TextRenderTask textCostTask{};
-							textCostTask.center = true;
-							textCostTask.origin = screenPos;
-							textCostTask.origin.y += cardRenderTask.scale.y * .5f;
-							textCostTask.text = str;
-							textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
-							textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
-							result = textRenderSys->TryAdd(info, textCostTask);
-							assert(result != SIZE_MAX);
-
-							TextBoxCreateInfo cardTextBox;
-							cardTextBox.origin = screenPos + glm::vec2(0, .5f);
-							cardTextBox.text = hoveredCard.text;
-							MenuSystem::CreateTextBox(info, systems, cardTextBox);
-						}
-
-						_animLerp += info.deltaTime * 0.001f * _animSpeed / CARD_ANIM_LENGTH;
-						_animLerp = fmodf(_animLerp, 1);
-
-						vke::Animation cardAnim{};
-						cardAnim.lerp = _animLerp;
-						cardAnim.width = CARD_ANIM_LENGTH;
-						auto sub = cardAnim.Evaluate(cardSubTexture, 0);
-
-						cardRenderTask.subTexture = sub;
-						result = cardRenderSys->TryAdd(info, cardRenderTask);
-						assert(result != SIZE_MAX);
+						menuSys->CreateCardMenu(info, systems, createInfo, _cardMenuUpdateInfo);
 					}
 				}
 			}

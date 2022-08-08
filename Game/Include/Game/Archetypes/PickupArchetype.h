@@ -16,6 +16,7 @@ namespace game
 
 	private:
 		MenuUpdateInfo _menuUpdateInfo{};
+		CardMenuUpdateInfo _cardMenuUpdateInfo{};
 		jlb::StackArray<size_t, 1> _menuInteractIds{};
 	};
 }

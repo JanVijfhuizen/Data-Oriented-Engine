@@ -33,9 +33,8 @@ namespace game
 
 		Input _movementInput[4]{};
 		const float _scalingOnSelected = 0.5f;
-		float _animLerp = 0;
-		float _animSpeed = 5;
 
+		CardMenuUpdateInfo _cardMenuUpdateInfo{};
 		MenuUpdateInfo _menuUpdateInfo{};
 		jlb::StackArray<size_t, 6> _menuInteractIds{};
 		MenuUpdateInfo _secondMenuUpdateInfo{};

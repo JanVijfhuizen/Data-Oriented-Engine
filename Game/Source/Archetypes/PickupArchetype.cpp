@@ -2,6 +2,7 @@
 #include "Archetypes/PickupArchetype.h"
 #include "Bounds.h"
 #include "JlbMath.h"
+#include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
@@ -18,6 +19,7 @@ namespace game
 	{
 		Archetype<Pickup>::PreUpdate(info, systems, entities);
 
+		const auto cardSys = systems.GetSystem<CardSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
@@ -39,6 +41,8 @@ namespace game
 
 		for (auto& entity : entities)
 		{
+			assert(entity.cardId != SIZE_MAX);
+
 			const auto& transform = entity.transform;
 			const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
 			entity.mouseTaskId = SIZE_MAX;
@@ -58,6 +62,8 @@ namespace game
 			const bool menuOpen = leftPressedThisTurn ? _menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
 			if(menuOpen)
 			{
+				const auto card = cardSys->GetCard(entity.cardId);
+
 				MenuCreateInfo menuCreateInfo{};
 				menuCreateInfo.interactable = true;
 				menuCreateInfo.origin = transform.position;
@@ -65,19 +71,26 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 				menuCreateInfo.interactIds = _menuInteractIds;
 				menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
+				menuCreateInfo.xOffset += 1;
 
 				jlb::Array<MenuCreateInfo::Content> content{};
 				content.Allocate(dumpAllocator, 2);
-				content[0].string = "item name";
+				content[0].string = card.name;
 				content[1].string = "pickup";
 				menuCreateInfo.content = content;
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
+				
+				CardMenuCreateInfo cardMenuCreateInfo{};
+				cardMenuCreateInfo.origin = transform.position;
+				cardMenuCreateInfo.cardIndex = entity.cardId;
+				menuSys->CreateCardMenu(info, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
 				resetMenu = false;
 			}
 		}
 
 		_menuUpdateInfo = resetMenu ? MenuUpdateInfo() : _menuUpdateInfo;
+		_cardMenuUpdateInfo = resetMenu ? CardMenuUpdateInfo() : _cardMenuUpdateInfo;
 
 		if(turnSys->GetIfTickEvent())
 		{

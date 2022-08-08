@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Bounds.h"
+#include "CardSystem.h"
 #include "StringView.h"
 #include "VkEngine/Systems/GameSystem.h"
 
@@ -69,20 +70,34 @@ namespace game
 		bool center = true;
 	};
 
+	struct CardMenuCreateInfo final
+	{
+		size_t cardIndex = SIZE_MAX;
+		glm::vec2 origin{};
+	};
+
+	struct CardMenuUpdateInfo final
+	{
+		float animLerp = 0;
+	};
+
 	class MenuSystem final : public vke::GameSystem
 	{
-	public:;
+	public:
 		float openDuration = 1.f;
 		float openTabDelay = .4f;
 		float openWriteTextDuration = 2;
 		float scrollAnimDuration = 1;
 		float scrollAnimScaleMultiplier = .4f;
+		float cardAnimSpeed = 5;
 
 		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
 			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;
 		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		static void CreateTextBox(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			const TextBoxCreateInfo& createInfo);
+		void CreateCardMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
+			const CardMenuCreateInfo& createInfo, CardMenuUpdateInfo& updateInfo) const;
 
 	private:
 		float _scrollDir = 0;
