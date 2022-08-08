@@ -34,6 +34,8 @@ namespace game
 		initializer.DefineSystem<TurnThreadPoolSystem>();
 		
 		// Game systems.
+		initializer.DefineSystem<EntitySystem>();
+		initializer.DefineSystem<InteractSystem>();
 		initializer.DefineSystem<CollisionSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<CardSystem>();
@@ -43,8 +45,6 @@ namespace game
 		initializer.DefineSystem<CameraSystem>();
 		initializer.DefineSystem<MenuSystem>();
 		initializer.DefineSystem<UIInteractionSystem>();
-		initializer.DefineSystem<InteractSystem>();
-		initializer.DefineSystem<EntitySystem>();
 
 		// Core engine Post update.
 		initializer.DefineSystem<vke::TileRenderSystem>();

@@ -13,5 +13,9 @@ namespace game
 	{
 	public:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
+	private:
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+			const jlb::NestedVector<Entity>& tasks) override;
+		[[nodiscard]] bool AutoClearOnFrameEnd() override;
 	};
 }

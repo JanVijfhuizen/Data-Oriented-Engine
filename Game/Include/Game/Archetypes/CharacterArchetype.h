@@ -9,18 +9,21 @@
 #include "VkEngine/Graphics/SubTexture.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "JlbMath.h"
+#include "Systems/EntitySystem.h"
 #include "VkEngine/Graphics/CameraUtils.h"
 
 namespace game
 {
 	struct Character final
 	{
+		Entity entity{};
 		vke::Transform transform{};
 		MovementComponent movementComponent{};
 
-		size_t movementTaskId = SIZE_MAX;
 		size_t collisionTaskId = SIZE_MAX;
+		size_t entityTaskId = SIZE_MAX;
 		size_t mouseTaskId = SIZE_MAX;
+		size_t movementTaskId = SIZE_MAX;
 		size_t movementTileReservation = SIZE_MAX;
 	};
 
@@ -38,6 +41,7 @@ namespace game
 		struct CharacterUpdateInfo final
 		{
 			CollisionSystem* collisionSys = nullptr;
+			EntitySystem* entitySys = nullptr;
 			vke::EntityRenderSystem* entityRenderSys = nullptr;
 			MouseSystem* mouseSys = nullptr;
 			MovementSystem* movementSys = nullptr;
@@ -65,6 +69,7 @@ namespace game
 	{
 		CharacterUpdateInfo updateInfo{};
 		updateInfo.collisionSys = systems.GetSystem<CollisionSystem>();
+		updateInfo.entitySys = systems.GetSystem<EntitySystem>();
 		updateInfo.entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		updateInfo.mouseSys = systems.GetSystem<MouseSystem>();
 		updateInfo.movementSys = systems.GetSystem<MovementSystem>();
@@ -78,6 +83,7 @@ namespace game
 		const CharacterUpdateInfo& updateInfo, const vke::SubTexture& subTexture, const CharacterInput& input)
 	{
 		const auto collisionSys = updateInfo.collisionSys;
+		const auto entitySys = updateInfo.entitySys;
 		const auto entityRenderSys = updateInfo.entityRenderSys;
 		const auto mouseSys = updateInfo.mouseSys;
 		const auto movementSys = updateInfo.movementSys;
@@ -110,6 +116,8 @@ namespace game
 		if(turnSys->GetIfTickEvent())
 		{
 			const auto& movementSystemDefined = movementComponent.systemDefined;
+			// No need to store this since we assume the player is always the first entity.
+			character.entityTaskId = entitySys->TryAdd(info, character.entity);
 			
 			// Update movement task with new input.
 			if (movementSystemDefined.remaining <= 1)

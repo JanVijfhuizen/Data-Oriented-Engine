@@ -2,6 +2,7 @@
 #include "Archetypes/PickupArchetype.h"
 #include "Bounds.h"
 #include "JlbMath.h"
+#include "Systems/CameraSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
@@ -19,6 +20,7 @@ namespace game
 	{
 		Archetype<Pickup>::PreUpdate(info, systems, entities);
 
+		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
@@ -38,6 +40,8 @@ namespace game
 
 		const auto hoveredObj = mouseSys->GetHoveredObject();
 		bool resetMenu = true;
+
+		const auto& camTarget = cameraSys->settings.target;
 
 		for (auto& entity : entities)
 		{
@@ -73,11 +77,14 @@ namespace game
 				menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
 				menuCreateInfo.xOffset += 1;
 
+				const float dis = glm::distance(camTarget, transform.position);
+				const bool inRange = dis < 1.25f;
+
 				jlb::Array<MenuCreateInfo::Content> content{};
 				content.Allocate(dumpAllocator, 2);
 				content[0].string = card.name;
 				content[1].string = "pick up";
-				content[1].interactable = false;
+				content[1].interactable = inRange;
 				menuCreateInfo.content = content;
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);

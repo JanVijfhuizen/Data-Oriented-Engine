@@ -11,7 +11,6 @@
 #include "Systems/TextRenderHandler.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
-#include "VkEngine/Graphics/Animation.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
@@ -77,7 +76,8 @@ namespace game
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 		const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 
-		assert(entities.length <= 1);
+		// Assure that the player is always present.
+		assert(entities.length == 1);
 
 		for (auto& entity : entities)
 		{
