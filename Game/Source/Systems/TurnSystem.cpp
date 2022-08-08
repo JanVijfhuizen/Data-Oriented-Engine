@@ -1,8 +1,5 @@
 ﻿#include "pch.h"
 #include "Systems/TurnSystem.h"
-
-#include <iostream>
-
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
@@ -161,9 +158,6 @@ namespace game
 			result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 		}
-
-		if(_endTickCalled)
-		std::cout << _endTickCalled << std::endl;
 
 		_tickCalled = false;
 		

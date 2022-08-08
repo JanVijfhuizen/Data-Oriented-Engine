@@ -42,10 +42,9 @@ namespace game
 		TaskSystem<TurnThreadPoolTask>::OnPreUpdate(info, systems, tasks);
 
 		const auto turnSys = systems.GetSystem<TurnSystem>();
-		const bool isTickEvent = turnSys->GetIfTickEvent();
-		_takesTasks = isTickEvent;
+		_takesTasks = turnSys->GetIfTickEvent();
 
-		if(isTickEvent)
+		if(turnSys->GetIfEndTickEvent())
 		{
 			// Wait for the threads to finish.
 			while (_tasksUnfinished > 0)
