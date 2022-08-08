@@ -5,7 +5,6 @@
 #include "Systems/CameraSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
-#include "Systems/EntitySystem.h"
 #include "Systems/InteractSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
@@ -16,7 +15,7 @@
 
 namespace game
 {
-	static void TryPickup(Entity& target, Entity& src, void* userPtr)
+	static void TryPickup(EntityData& target, EntityData& src, void* userPtr)
 	{
 		// TODO: Add to inventory.
 		target.markedForDelete = true;
@@ -30,7 +29,6 @@ namespace game
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto entitySys = systems.GetSystem<EntitySystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto interactSys = systems.GetSystem<InteractSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
@@ -59,7 +57,6 @@ namespace game
 
 			for (auto& entity : entities)
 			{
-				entity.entityTaskId = entitySys->TryAdd(info, entity.entity);
 				const auto& transform = entity.transform;
 
 				// Collision task.
@@ -68,6 +65,8 @@ namespace game
 				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
 				entity.collisionTaskId = collisionSys->TryAdd(collisionTask);
 				assert(entity.collisionTaskId != SIZE_MAX);
+				
+				entity.interacted = false;
 			}
 		}
 
@@ -116,7 +115,7 @@ namespace game
 				content[1].interactable = inRange;
 				menuCreateInfo.content = content;
 
-				if (_menuUpdateInfo.hovered && leftPressedThisTurn)
+				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn)
 				{
 					// There is only one column so we know the pick up option is pressed.
 					InteractionTask interactionTask{};
@@ -126,6 +125,7 @@ namespace game
 
 					result = interactSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
+					entity.interacted = true;
 				}
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);

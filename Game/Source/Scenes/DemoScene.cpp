@@ -20,7 +20,7 @@ namespace game::demo
 			for (int32_t j = 0; j < dummyCount; ++j)
 			{
 				const auto pos = glm::vec2(i - dummyCount / 2 - dummyCount, j - dummyCount / 2 - dummyCount);
-				_dummies[i * dummyCount + j].character.transform.position = pos;
+				_dummies[i * dummyCount + j].transform.position = pos;
 			}
 		}
 
