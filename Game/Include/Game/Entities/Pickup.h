@@ -4,14 +4,12 @@
 
 namespace game
 {
-	struct Pickup final
+	struct Pickup final : Entity
 	{
-		Entity entity{};
 		size_t cardId = SIZE_MAX;
 		vke::Transform transform{};
 
 		size_t collisionTaskId = SIZE_MAX;
-		size_t entityTaskId = SIZE_MAX;
 		size_t mouseTaskId = SIZE_MAX;
 	};
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Entities/Entity.h"
 #include "Systems/EntitySystem.h"
+#include "Systems/TurnSystem.h"
 
 namespace game
 {
@@ -20,21 +21,26 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<T>& entities)
 	{
-		const auto& entitySys = systems.GetSystem<EntitySystem>();
+		const auto turnSys = systems.GetSystem<TurnSystem>();
 
-		const auto count = static_cast<int32_t>(entities.GetCount());
-		for (int32_t i = count - 1; i >= 0; --i)
+		if(turnSys->GetIfTickEvent())
 		{
-			const auto base = reinterpret_cast<Entity*>(&entities[i]);
-			if (const auto& data = base->data; data.markedForDelete)
-				entities.RemoveAt(i);
-		}
+			const auto entitySys = systems.GetSystem<EntitySystem>();
 
-		for (auto& entity : entities)
-		{
-			const auto base = reinterpret_cast<Entity*>(&entity);
-			base->entityTaskId = entitySys->TryAdd(info, base->data);
-			assert(base->entityTaskId != SIZE_MAX);
+			const auto count = static_cast<int32_t>(entities.GetCount());
+			for (int32_t i = count - 1; i >= 0; --i)
+			{
+				const auto base = reinterpret_cast<Entity*>(&entities[i]);
+				if (const auto& data = base->data; data.markedForDelete)
+					entities.RemoveAt(i);
+			}
+
+			for (auto& entity : entities)
+			{
+				const auto base = reinterpret_cast<Entity*>(&entity);
+				base->entityTaskId = entitySys->TryAdd(info, base->data);
+				assert(base->entityTaskId != SIZE_MAX);
+			}
 		}
 	}
 
