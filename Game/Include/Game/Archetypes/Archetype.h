@@ -26,11 +26,14 @@ namespace game
 		if(turnSys->GetIfTickEvent())
 		{
 			const auto entitySys = systems.GetSystem<EntitySystem>();
+			const auto& entityTasks = entitySys->GetTasks();
 
 			const auto count = static_cast<int32_t>(entities.GetCount());
 			for (int32_t i = count - 1; i >= 0; --i)
 			{
 				const auto base = reinterpret_cast<Entity*>(&entities[i]);
+				base->data = base->entityTaskId == SIZE_MAX ? base->data : entityTasks[base->entityTaskId];
+
 				if (const auto& data = base->data; data.markedForDelete)
 					entities.RemoveAt(i);
 			}

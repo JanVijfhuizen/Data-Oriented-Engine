@@ -65,6 +65,8 @@ namespace game
 				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
 				entity.collisionTaskId = collisionSys->TryAdd(collisionTask);
 				assert(entity.collisionTaskId != SIZE_MAX);
+				
+				entity.interacted = false;
 			}
 		}
 
@@ -113,7 +115,7 @@ namespace game
 				content[1].interactable = inRange;
 				menuCreateInfo.content = content;
 
-				if (_menuUpdateInfo.hovered && leftPressedThisTurn)
+				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn)
 				{
 					// There is only one column so we know the pick up option is pressed.
 					InteractionTask interactionTask{};
@@ -123,6 +125,7 @@ namespace game
 
 					result = interactSys->TryAdd(info, interactionTask);
 					assert(result != SIZE_MAX);
+					entity.interacted = true;
 				}
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);

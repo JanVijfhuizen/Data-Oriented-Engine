@@ -11,5 +11,6 @@ namespace game
 
 		size_t collisionTaskId = SIZE_MAX;
 		size_t mouseTaskId = SIZE_MAX;
+		bool interacted = false;
 	};
 }

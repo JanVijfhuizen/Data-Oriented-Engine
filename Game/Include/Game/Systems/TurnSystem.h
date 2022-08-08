@@ -47,6 +47,7 @@ namespace game
 
 		float _time = 0;
 		bool _tickCalled = true;
+		bool _endTickCalled = false;
 		float _lerp = 0;
 		bool _pauseAtEndOfTick = false;
 		bool _forwardToNextTick = false;
