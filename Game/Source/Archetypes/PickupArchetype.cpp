@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Archetypes/PickupArchetype.h"
-
 #include "Bounds.h"
 #include "JlbMath.h"
 #include "Systems/CollisionSystem.h"
@@ -9,6 +8,7 @@
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Graphics/CameraUtils.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
+#include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
@@ -19,14 +19,23 @@ namespace game
 		Archetype<Pickup>::PreUpdate(info, systems, entities);
 
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
+		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto& camera = entityRenderSys->camera;
 
+		auto& dumpAllocator = *info.dumpAllocator;
+
+		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
+		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::pickup);
 		vke::EntityRenderTask task{};
 		task.subTexture = subTexture;
+
+		const auto hoveredObj = mouseSys->GetHoveredObject();
+		bool resetMenu = true;
 
 		for (auto& entity : entities)
 		{
@@ -39,9 +48,36 @@ namespace game
 				entity.mouseTaskId = mouseSys->TryAdd(info, bounds);
 			}
 
+			// Render.
 			task.transform = transform;
+			const bool hovered = hoveredObj == entity.mouseTaskId && hoveredObj != SIZE_MAX;
+			task.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 			const auto result = entityRenderSys->TryAdd(info, task);
+
+			// Update menu if available.
+			const bool menuOpen = leftPressedThisTurn ? _menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
+			if(menuOpen)
+			{
+				MenuCreateInfo menuCreateInfo{};
+				menuCreateInfo.interactable = true;
+				menuCreateInfo.origin = transform.position;
+				menuCreateInfo.entityCamera = &entityRenderSys->camera;
+				menuCreateInfo.uiCamera = &uiRenderSys->camera;
+				menuCreateInfo.interactIds = _menuInteractIds;
+				menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
+
+				jlb::Array<MenuCreateInfo::Content> content{};
+				content.Allocate(dumpAllocator, 2);
+				content[0].string = "item name";
+				content[1].string = "pickup";
+				menuCreateInfo.content = content;
+
+				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
+				resetMenu = false;
+			}
 		}
+
+		_menuUpdateInfo = resetMenu ? MenuUpdateInfo() : _menuUpdateInfo;
 
 		if(turnSys->GetIfTickEvent())
 		{

@@ -77,6 +77,8 @@ namespace game
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 		const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 
+		assert(entities.length <= 1);
+
 		for (auto& entity : entities)
 		{
 			auto& character = entity.character;
@@ -85,10 +87,10 @@ namespace game
 			const auto& transform = character.transform;
 
 			const bool hovered = characterUpdateInfo.GetIsHovered(character);
-			const bool menuOpen = mouseAction ? entity.menuUpdateInfo.opened ? false : hovered : entity.menuUpdateInfo.opened;
+			const bool menuOpen = mouseAction ? _menuUpdateInfo.opened ? false : hovered : _menuUpdateInfo.opened;
 
 			// Render Player Menu.
-			entity.menuIndex = menuOpen ? entity.menuIndex : Player::MenuIndex::main;
+			_menuIndex = menuOpen ? _menuIndex : MenuIndex::main;
 			if (menuOpen)
 			{
 				MenuCreateInfo menuCreateInfo{};
@@ -96,13 +98,13 @@ namespace game
 				menuCreateInfo.origin = transform.position;
 				menuCreateInfo.entityCamera = &entityRenderSys->camera;
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
-				menuCreateInfo.interactIds = entity.menuInteractIds;
-				menuCreateInfo.maxLength = entity.menuInteractIds.GetLength() + 1;
+				menuCreateInfo.interactIds = _menuInteractIds;
+				menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
 				menuCreateInfo.width = 7;
 
 				MenuCreateInfo secondMenuCreateInfo = menuCreateInfo;
 				secondMenuCreateInfo.reverseXAxis = true;
-				secondMenuCreateInfo.interactIds = entity.secondMenuInteractIds;
+				secondMenuCreateInfo.interactIds = _secondMenuInteractIds;
 				secondMenuCreateInfo.capacity = SIZE_MAX;
 				secondMenuCreateInfo.usedSpace = SIZE_MAX;
 				bool drawSecondWindow = false;
@@ -110,20 +112,20 @@ namespace game
 				jlb::Array<MenuCreateInfo::Content> content{};
 				const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
 
-				auto& menuUpdateInfo = entity.menuUpdateInfo;
-				auto& secondMenuUpdateInfo = entity.secondMenuUpdateInfo;
+				auto& menuUpdateInfo = _menuUpdateInfo;
+				auto& secondMenuUpdateInfo = _secondMenuUpdateInfo;
 
 				// Create menu content.
-				switch (entity.menuIndex)
+				switch (_menuIndex)
 				{
-				case Player::MenuIndex::main:
+				case MenuIndex::main:
 					content.Allocate(dumpAllocator, 3);
 					content[0].string = "player";
 					content[1].string = "inventory";
 					content[2].string = "deck";
 					break;
-				case Player::MenuIndex::inventory:
-				case Player::MenuIndex::deck:
+				case MenuIndex::inventory:
+				case MenuIndex::deck:
 					content.Allocate(dumpAllocator, inventory.length + 1);
 					content[0].string = "inventory";
 					for (size_t i = 0; i < inventory.length; ++i)
@@ -133,7 +135,7 @@ namespace game
 					}
 					break;
 				}
-				if(entity.menuIndex == Player::MenuIndex::deck)
+				if(_menuIndex == MenuIndex::deck)
 					for (size_t i = 0; i < inventory.length; ++i)
 						content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 
@@ -145,32 +147,32 @@ namespace game
 				size_t cardIndex = SIZE_MAX;
 				bool renderCard = false;
 
-				const auto oldCardActivated = entity.cardActivated;
-				entity.cardActivated = 0;
+				const auto oldCardActivated = _cardActivated;
+				_cardActivated = 0;
 
 				// Handle interaction.
-				switch (entity.menuIndex)
+				switch (_menuIndex)
 				{
-				case Player::MenuIndex::main:
+				case MenuIndex::main:
 					if (leftPressedThisTurn)
 						for (size_t i = 0; i < 2; ++i)
 						{
-							const bool columnHovered = uiHoveredObj == entity.menuInteractIds[i];
+							const bool columnHovered = uiHoveredObj == _menuInteractIds[i];
 							changePage = changePage ? true : columnHovered;
-							entity.menuIndex = changePage ? static_cast<Player::MenuIndex>(i + 1) : entity.menuIndex;
+							_menuIndex = changePage ? static_cast<MenuIndex>(i + 1) : _menuIndex;
 							i = changePage ? 2 : i;
 						}
 					close = rightPressedThisTurn;
 					break;
-				case Player::MenuIndex::inventory:
+				case MenuIndex::inventory:
 					renderCard = true;
-					cardIndex = menuCreateInfo.GetInteractedColumnIndex(entity.menuUpdateInfo);
+					cardIndex = menuCreateInfo.GetInteractedColumnIndex(_menuUpdateInfo);
 					cardIndex = cardIndex == SIZE_MAX ? SIZE_MAX : inventory[cardIndex].index;
-					entity.cardActivated = leftPressedThisTurn && menuUpdateInfo.hovered ? entity.cardHovered : oldCardActivated;
+					_cardActivated = leftPressedThisTurn && menuUpdateInfo.hovered ? _cardHovered : oldCardActivated;
 
-					if(entity.cardActivated != SIZE_MAX)
+					if(_cardActivated != SIZE_MAX)
 					{
-						const auto hoveredCard = cardSystem->GetCard(entity.cardActivated);
+						const auto hoveredCard = cardSystem->GetCard(_cardActivated);
 
 						jlb::Array<MenuCreateInfo::Content> deckContent{};
 						deckContent.Allocate(dumpAllocator, 3);
@@ -180,11 +182,11 @@ namespace game
 						secondMenuCreateInfo.content = deckContent;
 						drawSecondWindow = true;
 					}
-					if (entity.cardActivated != oldCardActivated)
+					if (_cardActivated != oldCardActivated)
 						secondMenuUpdateInfo = {};
 					
 					break;
-				case Player::MenuIndex::deck:
+				case MenuIndex::deck:
 					renderCard = true;
 					// Get what cards are being used in the deck.
 					size_t deckSize = 0;
@@ -209,7 +211,7 @@ namespace game
 
 					// Try and add a card to the deck.
 					bool deckResized = false;
-					if (leftPressedThisTurn && entity.menuUpdateInfo.hovered)
+					if (leftPressedThisTurn && _menuUpdateInfo.hovered)
 					{
 						const size_t interactIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
 						if (interactIndex != SIZE_MAX)
@@ -264,7 +266,7 @@ namespace game
 						}
 
 						if (deckResized)
-							entity.secondMenuUpdateInfo = {};
+							_secondMenuUpdateInfo = {};
 						drawSecondWindow = true;
 					}
 					
@@ -278,11 +280,11 @@ namespace game
 					secondMenuCreateInfo.xOffset = 1;
 				}
 				if (changePage || rightPressedThisTurn || close)
-					entity.secondMenuUpdateInfo = {};
+					_secondMenuUpdateInfo = {};
 				if (!close && drawSecondWindow)
-					menuSys->CreateMenu(info, systems, secondMenuCreateInfo, entity.secondMenuUpdateInfo);
-				if(entity.menuIndex != Player::MenuIndex::main)
-					entity.menuIndex = rightPressedThisTurn ? Player::MenuIndex::main : entity.menuIndex;
+					menuSys->CreateMenu(info, systems, secondMenuCreateInfo, _secondMenuUpdateInfo);
+				if(_menuIndex != MenuIndex::main)
+					_menuIndex = rightPressedThisTurn ? MenuIndex::main : _menuIndex;
 				if(changePage || rightPressedThisTurn || close)
 					menuUpdateInfo = {};
 				if(!close)
@@ -292,14 +294,14 @@ namespace game
 					const auto worldPos = transform.position - entityRenderSys->camera.position;
 					const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
-					const size_t oldCardHovered = entity.cardHovered;
-					entity.cardHovered = entity.cardHovered == SIZE_MAX ? SIZE_MAX : menuUpdateInfo.centerHovered ? entity.cardHovered : SIZE_MAX;
-					cardIndex = cardIndex == SIZE_MAX ? entity.cardHovered : cardIndex;
+					const size_t oldCardHovered = _cardHovered;
+					_cardHovered = _cardHovered == SIZE_MAX ? SIZE_MAX : menuUpdateInfo.centerHovered ? _cardHovered : SIZE_MAX;
+					cardIndex = cardIndex == SIZE_MAX ? _cardHovered : cardIndex;
 
 					// Draw card.
 					{
 						_animLerp = oldCardHovered == cardIndex ? _animLerp : 0;
-						entity.cardHovered = cardIndex;
+						_cardHovered = cardIndex;
 						
 						const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
 						const auto& pixelSize = cardRenderSys->camera.pixelSize;
@@ -351,7 +353,7 @@ namespace game
 				}
 			}
 			else
-				entity.menuUpdateInfo = {};
+				_menuUpdateInfo = {};
 
 			// Calculate the average camera center.
 			cameraCenter += character.transform.position;
