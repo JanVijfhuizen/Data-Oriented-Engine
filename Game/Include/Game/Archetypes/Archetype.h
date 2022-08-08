@@ -34,7 +34,7 @@ namespace game
 		{
 			const auto base = reinterpret_cast<Entity*>(&entity);
 			base->entityTaskId = entitySys->TryAdd(info, base->data);
-			assert(base->entityTaskId);
+			assert(base->entityTaskId != SIZE_MAX);
 		}
 	}
 

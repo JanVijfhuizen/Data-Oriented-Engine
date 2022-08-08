@@ -20,11 +20,6 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<Player>& entities)
 	{
-		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
-
-		// Assure that the player is always present.
-		assert(entities.GetCount() == 1);
-
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
 		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
@@ -32,31 +27,16 @@ namespace game
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
 
-		auto& dumpAllocator = *info.dumpAllocator;
-		auto& tempAllocator = *info.tempAllocator;
+		// Assure that the player is always present.
+		assert(entities.GetCount() == 1);
 
-		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
-		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
-		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-		
-		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
-		glm::vec2 inputDirs[4]
-		{
-			glm::vec2(0, -1),
-			glm::vec2(-1, 0),
-			glm::vec2(0, 1),
-			glm::vec2(1, 0)
-		};
-		
-		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
-		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
+		auto& entity = entities[0];
 
-		CharacterInput characterInput{};
+		auto& characterInput = entity.input;
 
 		// Calculate movement direction, if any.
 		if (turnSys->GetIfTickEvent())
@@ -73,18 +53,30 @@ namespace game
 			}
 		}
 
+		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
+
+		auto& dumpAllocator = *info.dumpAllocator;
+		auto& tempAllocator = *info.tempAllocator;
+		
+		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
+		glm::vec2 inputDirs[4]
+		{
+			glm::vec2(0, -1),
+			glm::vec2(-1, 0),
+			glm::vec2(0, 1),
+			glm::vec2(1, 0)
+		};
+		
+		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
+
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 		const bool mouseAction = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
 
-		auto& entity = entities[0];
+		const auto& transform = entity.transform;
 
-		auto& character = entity.character;
-		PreUpdateCharacter(info, character, characterUpdateInfo, subTexturesDivided[0], characterInput);
-
-		const auto& transform = character.transform;
-
-		const bool hovered = characterUpdateInfo.GetIsHovered(character);
+		const auto hoveredObj = mouseSys->GetHoveredObject();
+		const bool hovered = hoveredObj == entity.mouseTaskId && hoveredObj != SIZE_MAX;
 		const bool menuOpen = mouseAction ? _menuUpdateInfo.opened ? false : hovered : _menuUpdateInfo.opened;
 
 		// Render Player Menu.
@@ -324,22 +316,7 @@ namespace game
 			input.valid ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
 		}
 
-		cameraSys->settings.target = character.transform.position;
-	}
-
-	void PlayerArchetype::PostUpdate(const vke::EngineData& info,
-		const jlb::Systems<vke::EngineData> systems,
-		jlb::Vector<Player>& entities)
-	{
-		Archetype<Player>::PostUpdate(info, systems, entities);
-
-		const auto characterUpdateInfo = CreateCharacterPreUpdateInfo(info, systems);
-
-		for (auto& entity : entities)
-		{
-			auto& character = entity.character;
-			PostUpdateCharacter(info, character, characterUpdateInfo);
-		}
+		cameraSys->settings.target = transform.position;
 	}
 
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
@@ -358,6 +335,15 @@ namespace game
 	void PlayerArchetype::OnMouseInput(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
 	{
+	}
+
+	vke::SubTexture PlayerArchetype::DefineSubTexture(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
+		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
+		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
+		return subTexturesDivided[0];
 	}
 
 	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input, Input& opposite)

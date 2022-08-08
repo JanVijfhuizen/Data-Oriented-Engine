@@ -8,6 +8,8 @@ namespace game::demo
 	{
 	public:
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::Vector<DummyEntity>& entities) override;
-		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::Vector<DummyEntity>& entities) override;
+	private:
+		[[nodiscard]] vke::SubTexture DefineSubTexture(const vke::EngineData& info,
+			jlb::Systems<vke::EngineData> systems) override;
 	};
 }

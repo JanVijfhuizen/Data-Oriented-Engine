@@ -11,8 +11,6 @@ namespace game
 	public:
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			jlb::Vector<Player>& entities) override;
-		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			jlb::Vector<Player>& entities) override;
 		void OnKeyInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action);
 		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action);
 
@@ -43,6 +41,7 @@ namespace game
 		size_t _cardHovered = SIZE_MAX;
 		size_t _cardActivated = SIZE_MAX;
 
+		[[nodiscard]] vke::SubTexture DefineSubTexture(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
 	};
 }

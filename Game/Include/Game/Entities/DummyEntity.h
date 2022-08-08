@@ -2,9 +2,8 @@
 
 namespace game::demo
 {
-	struct DummyEntity final
+	struct DummyEntity final : Character
 	{
-		Entity entity{};
-		Character character{};
+		
 	};
 }
