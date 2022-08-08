@@ -10,8 +10,8 @@ namespace game
 		size_t target = SIZE_MAX;
 		size_t src = SIZE_MAX;
 
-		void (*interaction)(Entity& target, Entity& src, void* data);
-		char data[16];
+		void (*interaction)(Entity& target, Entity& src, void* userPtr);
+		void* userPtr = nullptr;
 	};
 
 	/*

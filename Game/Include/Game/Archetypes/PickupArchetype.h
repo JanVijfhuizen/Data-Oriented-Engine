@@ -12,7 +12,7 @@ namespace game
 		float scalingOnSelected = 0.5f;
 
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			jlb::ArrayView<Pickup> entities) override;
+			jlb::Vector<Pickup>& entities) override;
 
 	private:
 		MenuUpdateInfo _menuUpdateInfo{};

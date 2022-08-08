@@ -11,8 +11,10 @@ namespace game::demo
 		Scene::Allocate(info, systems);
 
 		const int32_t dummyCount = 6;
+		_players.Allocate(*info.allocator, 1);
+		_pickups.Allocate(*info.allocator, 1);
 		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
-
+		_dummies.SetCount(_dummies.GetLength());
 		for (int32_t i = 0; i < dummyCount; ++i)
 		{
 			for (int32_t j = 0; j < dummyCount; ++j)
@@ -21,8 +23,9 @@ namespace game::demo
 				_dummies[i * dummyCount + j].character.transform.position = pos;
 			}
 		}
-		
-		auto& deck = _player.inventory;
+
+		_players.SetCount(1);
+		auto& deck = _players[0].inventory;
 		deck.SetCount(3);
 		auto& fireball = deck[0];
 		fireball.index = 0;
@@ -34,21 +37,25 @@ namespace game::demo
 		bash.index = 2;
 		bash.amount = 1;
 
-		_pickup.cardId = 1;
-		_pickup.transform.position = glm::vec2{ 2, -1 };
+		_pickups.SetCount(1);
+		_pickups[0].cardId = 1;
+		_pickups[0].transform.position = glm::vec2{2, -1};
 	}
 
 	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		_dummies.Free(*info.allocator);
+		_pickups.Free(*info.allocator);
+		_players.Free(*info.allocator);
 		Scene::Free(info, systems);
 	}
 
 	void DemoScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PreUpdate(info, systems);
-		_playerArchetype.PreUpdate(info, systems, _player);
-		_pickupArchetype.PreUpdate(info, systems, _pickup);
+
+		_playerArchetype.PreUpdate(info, systems, _players);
+		_pickupArchetype.PreUpdate(info, systems, _pickups);
 		_dummyArchetype.PreUpdate(info, systems, _dummies);
 
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
@@ -80,8 +87,8 @@ namespace game::demo
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PostUpdate(info, systems);
-		_playerArchetype.PostUpdate(info, systems, _player);
-		_pickupArchetype.PostUpdate(info, systems, _pickup);
+		_playerArchetype.PostUpdate(info, systems, _players);
+		_pickupArchetype.PostUpdate(info, systems, _pickups);
 		_dummyArchetype.PostUpdate(info, systems, _dummies);
 	}
 

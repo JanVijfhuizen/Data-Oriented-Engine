@@ -9,7 +9,8 @@ namespace game
 		return ENTITY_CAPACITY;
 	}
 
-	void EntitySystem::OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+	void EntitySystem::OnPreUpdate(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<Entity>& tasks)
 	{
 		TaskSystem<Entity>::OnPreUpdate(info, systems, tasks);

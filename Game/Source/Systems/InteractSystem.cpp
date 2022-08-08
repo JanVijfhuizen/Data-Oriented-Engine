@@ -19,8 +19,6 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		if (turnSys->GetIfTickEvent())
 		{
-			ClearTasks();
-
 			TurnThreadPoolTask task{};
 			task.userPtr = this;
 			task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
@@ -30,12 +28,14 @@ namespace game
 				auto& entities = systems.GetSystem<EntitySystem>()->GetTasks();
 				auto& tasks = sys->GetTasks();
 
-				for (auto& task : tasks)
+				for (const auto& task : tasks)
 				{
 					auto& target = entities[task.target];
 					auto& src = entities[task.src];
-					task.interaction(target, src, task.data);
+					task.interaction(target, src, task.userPtr);
 				}
+
+				sys->ClearTasks();
 			};
 
 			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();

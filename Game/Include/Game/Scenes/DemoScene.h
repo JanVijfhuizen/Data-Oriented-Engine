@@ -11,9 +11,9 @@ namespace game::demo
 	// Silly little scene I use to prototype and test.
 	class DemoScene final : public vke::Scene
 	{
-		Player _player{};
-		Pickup _pickup{};
-		jlb::Array<DummyEntity> _dummies{};
+		jlb::Vector<Player> _players{};
+		jlb::Vector<Pickup> _pickups{};
+		jlb::Vector<DummyEntity> _dummies{};
 
 		DummyArchetype _dummyArchetype{};
 		PlayerArchetype _playerArchetype{};

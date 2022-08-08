@@ -7,7 +7,7 @@ namespace game::demo
 {
 	void DummyArchetype::PreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::ArrayView<DummyEntity> entities)
+		jlb::Vector<DummyEntity>& entities)
 	{
 		CharacterArchetype<DummyEntity>::PreUpdate(info, systems, entities);
 
@@ -32,7 +32,7 @@ namespace game::demo
 
 	void DummyArchetype::PostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::ArrayView<DummyEntity> entities)
+		jlb::Vector<DummyEntity>& entities)
 	{
 		CharacterArchetype<DummyEntity>::PostUpdate(info, systems, entities);
 

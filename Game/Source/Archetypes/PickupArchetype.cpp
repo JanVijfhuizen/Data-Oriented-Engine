@@ -5,6 +5,8 @@
 #include "Systems/CameraSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/EntitySystem.h"
+#include "Systems/InteractSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
@@ -14,15 +16,23 @@
 
 namespace game
 {
+	static void TryPickup(Entity& target, Entity& src, void* userPtr)
+	{
+		// TODO: Add to inventory.
+		target.markedForDelete = true;
+	}
+
 	void PickupArchetype::PreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::ArrayView<Pickup> entities)
+		jlb::Vector<Pickup>& entities)
 	{
 		Archetype<Pickup>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
+		const auto entitySys = systems.GetSystem<EntitySystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
+		const auto interactSys = systems.GetSystem<InteractSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
@@ -32,7 +42,7 @@ namespace game
 
 		auto& dumpAllocator = *info.dumpAllocator;
 
-		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left) && !mouseSys->GetIsUIBlocking();
+		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::pickup);
 		vke::EntityRenderTask task{};
@@ -42,6 +52,24 @@ namespace game
 		bool resetMenu = true;
 
 		const auto& camTarget = cameraSys->settings.target;
+
+		if (turnSys->GetIfTickEvent())
+		{
+			const auto collisionSys = systems.GetSystem<CollisionSystem>();
+
+			for (auto& entity : entities)
+			{
+				entity.entityTaskId = entitySys->TryAdd(info, entity.entity);
+				const auto& transform = entity.transform;
+
+				// Collision task.
+				CollisionTask collisionTask{};
+				collisionTask.bounds = jlb::math::RoundNearest(transform.position);
+				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
+				entity.collisionTaskId = collisionSys->TryAdd(collisionTask);
+				assert(entity.collisionTaskId != SIZE_MAX);
+			}
+		}
 
 		for (auto& entity : entities)
 		{
@@ -60,10 +88,11 @@ namespace game
 			task.transform = transform;
 			const bool hovered = hoveredObj == entity.mouseTaskId && hoveredObj != SIZE_MAX;
 			task.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
-			const auto result = entityRenderSys->TryAdd(info, task);
+			auto result = entityRenderSys->TryAdd(info, task);
 
 			// Update menu if available.
-			const bool menuOpen = leftPressedThisTurn ? _menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
+			const bool menuOpen = leftPressedThisTurn && !mouseSys->GetIsUIBlocking() ? 
+				_menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
 			if(menuOpen)
 			{
 				const auto card = cardSys->GetCard(entity.cardId);
@@ -87,6 +116,18 @@ namespace game
 				content[1].interactable = inRange;
 				menuCreateInfo.content = content;
 
+				if (_menuUpdateInfo.hovered && leftPressedThisTurn)
+				{
+					// There is only one column so we know the pick up option is pressed.
+					InteractionTask interactionTask{};
+					interactionTask.src = 0; // Picked up by the player.
+					interactionTask.target = entity.entityTaskId;
+					interactionTask.interaction = TryPickup;
+
+					result = interactSys->TryAdd(info, interactionTask);
+					assert(result != SIZE_MAX);
+				}
+
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
 				
 				CardMenuCreateInfo cardMenuCreateInfo{};
@@ -99,22 +140,5 @@ namespace game
 
 		_menuUpdateInfo = resetMenu ? MenuUpdateInfo() : _menuUpdateInfo;
 		_cardMenuUpdateInfo = resetMenu ? CardMenuUpdateInfo() : _cardMenuUpdateInfo;
-
-		if(turnSys->GetIfTickEvent())
-		{
-			const auto collisionSys = systems.GetSystem<CollisionSystem>();
-
-			for (auto& entity : entities)
-			{
-				const auto& transform = entity.transform;
-
-				// Collision task.
-				CollisionTask collisionTask{};
-				collisionTask.bounds = jlb::math::RoundNearest(transform.position);
-				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
-				entity.collisionTaskId = collisionSys->TryAdd(collisionTask);
-				assert(entity.collisionTaskId != SIZE_MAX);
-			}
-		}
 	}
 }
