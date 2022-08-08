@@ -28,6 +28,8 @@ namespace game
 
 		// Gets if a new turn has been started this frame.
 		[[nodiscard]] bool GetIfTickEvent() const;
+		// Gets if a turn has been finished this frame.
+		[[nodiscard]] bool GetIfEndTickEvent() const;
 		// The linear interpolation between 0 and 1 of the time between turns.
 		[[nodiscard]] float GetTickLerp() const;
 		[[nodiscard]] size_t GetTicksPerSecond() const;

@@ -15,6 +15,11 @@ namespace game
 		return _tickCalled;
 	}
 
+	bool TurnSystem::GetIfEndTickEvent() const
+	{
+		return _endTickCalled;
+	}
+
 	float TurnSystem::GetTickLerp() const
 	{
 		return _lerp;
@@ -49,9 +54,7 @@ namespace game
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		vke::GameSystem::PreUpdate(info, systems);
-
-		_tickCalled = false;
-
+		
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
 
@@ -160,6 +163,8 @@ namespace game
 		{
 			if (_pauseAtEndOfTick && !_forwardToNextTick)
 			{
+				// Call end tick here ONLY if paused.
+				_endTickCalled = _pauseAtEndOfTick;
 				_paused = true;
 				_pauseAtEndOfTick = false;
 				_lerp = 1;
@@ -171,6 +176,7 @@ namespace game
 			{
 				_time = fmodf(_time, dTicksPerSecond);
 				_tickCalled = true;
+				_endTickCalled = !_endTickCalled;
 				_previousTicksPerSecond = _ticksPerSecond;
 				_forwardToNextTick = false;
 			}
@@ -179,6 +185,11 @@ namespace game
 				_lerp = 1;
 				_time = dTicksPerSecond + 1e-5f;
 			}
+		}
+		else
+		{
+			_tickCalled = false;
+			_endTickCalled = false;
 		}
 	}
 
