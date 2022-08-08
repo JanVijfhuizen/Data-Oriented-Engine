@@ -3,14 +3,14 @@
 
 namespace game
 {
-	struct Entity;
+	struct EntityData;
 
 	struct InteractionTask final
 	{
 		size_t target = SIZE_MAX;
 		size_t src = SIZE_MAX;
 
-		void (*interaction)(Entity& target, Entity& src, void* userPtr);
+		void (*interaction)(EntityData& target, EntityData& src, void* userPtr);
 		void* userPtr = nullptr;
 	};
 

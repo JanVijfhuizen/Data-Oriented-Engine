@@ -1,13 +1,13 @@
 ﻿#pragma once
+#include "Character.h"
 #include "Components/Inventory.h"
 
 namespace game
 {
-	constexpr size_t PLAYER_INVENTORY_SIZE = 32;
+	constexpr size_t PLAYER_INVENTORY_SIZE = 16;
 
-	struct Player final
+	struct Player final : Character
 	{
-		Character character{};
 		Inventory<PLAYER_INVENTORY_SIZE> inventory{};
 	};
 }

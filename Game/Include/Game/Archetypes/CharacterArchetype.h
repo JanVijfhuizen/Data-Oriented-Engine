@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Archetype.h"
-#include "Components/MovementComponent.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
@@ -14,22 +13,15 @@
 
 namespace game
 {
-	struct Character final
-	{
-		Entity entity{};
-		vke::Transform transform{};
-		MovementComponent movementComponent{};
-
-		size_t collisionTaskId = SIZE_MAX;
-		size_t entityTaskId = SIZE_MAX;
-		size_t mouseTaskId = SIZE_MAX;
-		size_t movementTaskId = SIZE_MAX;
-		size_t movementTileReservation = SIZE_MAX;
-	};
-
 	template <typename T>
 	class CharacterArchetype : public Archetype<T>
 	{
+	public:
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+			jlb::Vector<T>& entities) override;
+		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
+			jlb::Vector<T>& entities) override;
+
 	protected:
 		float scalingOnSelected = 0.5f;
 
@@ -55,6 +47,22 @@ namespace game
 			const vke::SubTexture& subTexture, const CharacterInput& input);
 		void PostUpdateCharacter(const vke::EngineData& info, Character& character, const CharacterUpdateInfo& updateInfo);
 	};
+
+	template <typename T>
+	void CharacterArchetype<T>::PreUpdate(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
+		jlb::Vector<T>& entities)
+	{
+		Archetype<T>::PreUpdate(info, systems, entities);
+	}
+
+	template <typename T>
+	void CharacterArchetype<T>::PostUpdate(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
+		jlb::Vector<T>& entities)
+	{
+		Archetype<T>::PostUpdate(info, systems, entities);
+	}
 
 	template <typename T>
 	bool CharacterArchetype<T>::CharacterUpdateInfo::GetIsHovered(const Character& character) const

@@ -11,9 +11,9 @@ namespace game
 
 	void EntitySystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<Entity>& tasks)
+		const jlb::NestedVector<EntityData>& tasks)
 	{
-		TaskSystem<Entity>::OnPreUpdate(info, systems, tasks);
+		TaskSystem<EntityData>::OnPreUpdate(info, systems, tasks);
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		if (turnSys->GetIfTickEvent())
 			ClearTasks();

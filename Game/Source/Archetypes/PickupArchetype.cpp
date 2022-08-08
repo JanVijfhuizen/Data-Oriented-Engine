@@ -5,7 +5,6 @@
 #include "Systems/CameraSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
-#include "Systems/EntitySystem.h"
 #include "Systems/InteractSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
@@ -16,7 +15,7 @@
 
 namespace game
 {
-	static void TryPickup(Entity& target, Entity& src, void* userPtr)
+	static void TryPickup(EntityData& target, EntityData& src, void* userPtr)
 	{
 		// TODO: Add to inventory.
 		target.markedForDelete = true;
@@ -30,7 +29,6 @@ namespace game
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto entitySys = systems.GetSystem<EntitySystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto interactSys = systems.GetSystem<InteractSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
@@ -59,7 +57,6 @@ namespace game
 
 			for (auto& entity : entities)
 			{
-				entity.entityTaskId = entitySys->TryAdd(info, entity.entity);
 				const auto& transform = entity.transform;
 
 				// Collision task.
