@@ -1,5 +1,8 @@
 ﻿#include "pch.h"
 #include "Systems/TurnSystem.h"
+
+#include <iostream>
+
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
@@ -158,17 +161,23 @@ namespace game
 			result = uiSys->TryAdd(info, renderTask);
 			assert(result != SIZE_MAX);
 		}
+
+		if(_endTickCalled)
+		std::cout << _endTickCalled << std::endl;
+
+		_tickCalled = false;
 		
 		if (_time > dTicksPerSecond)
 		{
 			if (_pauseAtEndOfTick && !_forwardToNextTick)
 			{
 				// Call end tick here ONLY if paused.
-				_endTickCalled = _pauseAtEndOfTick;
+				_endTickCalled = true;
 				_paused = true;
 				_pauseAtEndOfTick = false;
 				_lerp = 1;
 				_time = dTicksPerSecond + 1e-5f;
+				_pausedAtEndOfTick = true;
 				return;
 			}
 
@@ -176,21 +185,19 @@ namespace game
 			{
 				_time = fmodf(_time, dTicksPerSecond);
 				_tickCalled = true;
-				_endTickCalled = !_endTickCalled;
+				_endTickCalled = !_pausedAtEndOfTick;
 				_previousTicksPerSecond = _ticksPerSecond;
 				_forwardToNextTick = false;
+				_pausedAtEndOfTick = false;
+				return;
 			}
-			else
-			{
-				_lerp = 1;
-				_time = dTicksPerSecond + 1e-5f;
-			}
+
+			// Make sure that the turn time doesn't increase.
+			_lerp = 1;
+			_time = dTicksPerSecond + 1e-5f;
 		}
-		else
-		{
-			_tickCalled = false;
-			_endTickCalled = false;
-		}
+
+		_endTickCalled = false;
 	}
 
 	void TurnSystem::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 

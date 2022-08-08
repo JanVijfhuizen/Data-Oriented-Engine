@@ -53,6 +53,8 @@ namespace game
 		float _lerp = 0;
 		bool _pauseAtEndOfTick = false;
 		bool _forwardToNextTick = false;
+		// Was the turn paused at the end of the tick.
+		bool _pausedAtEndOfTick = false;
 		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
