@@ -3,15 +3,15 @@
 
 namespace game
 {
-	struct Entity;
+	struct EntityData;
 
 	struct InteractionTask final
 	{
 		size_t target = SIZE_MAX;
 		size_t src = SIZE_MAX;
 
-		void (*interaction)(Entity& target, Entity& src, void* data);
-		char data[16];
+		void (*interaction)(EntityData& target, EntityData& src, void* userPtr);
+		void* userPtr = nullptr;
 	};
 
 	/*
@@ -21,7 +21,9 @@ namespace game
 	{
 	public:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
-		void OnUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
+	private:
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
 			const jlb::NestedVector<InteractionTask>& tasks) override;
+		[[nodiscard]] bool AutoClearOnFrameEnd() override;
 	};
 }

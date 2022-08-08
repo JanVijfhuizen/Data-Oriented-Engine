@@ -3,9 +3,11 @@
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
+#include "Systems/CardRenderSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
+#include "VkEngine/Graphics/Animation.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -171,7 +173,7 @@ namespace game
 						assert(result != SIZE_MAX);
 					}
 
-					if(content.active)
+					if(content.interactable)
 					{
 						renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
 						renderTask.color = glm::vec4(glm::vec3(1 - interacted), 1);
@@ -285,7 +287,7 @@ namespace game
 
 		TextRenderTask cardTextRenderTask{};
 		cardTextRenderTask.center = createInfo.center;
-		cardTextRenderTask.origin = createInfo.origin;
+		cardTextRenderTask.origin = createInfo.screenOrigin;
 		cardTextRenderTask.text = createInfo.text;
 		cardTextRenderTask.maxWidth = createInfo.maxWidth;
 		cardTextRenderTask.scale = createInfo.scale;
@@ -305,10 +307,68 @@ namespace game
 		backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
 		backgroundRenderTask.position.y += scale * .5f * lineCount - scale * .5f;
 		auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
-		assert(result != SIZE_MAX);
 
 		result = textRenderSys->TryAdd(info, cardTextRenderTask);
-		assert(result != SIZE_MAX);
+	}
+
+	void MenuSystem::CreateCardMenu(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems,
+		const CardMenuCreateInfo& createInfo, CardMenuUpdateInfo& updateInfo) const
+	{
+		const auto cardSys = systems.GetSystem<CardSystem>();
+		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
+		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
+		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
+
+		auto& dumpAllocator = *info.dumpAllocator;
+
+		const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
+		const auto& pixelSize = cardRenderSys->camera.pixelSize;
+
+		const auto worldPos = createInfo.origin - entityRenderSys->camera.position;
+		const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
+
+		vke::UIRenderTask cardRenderTask{};
+		cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+		cardRenderTask.subTexture = cardBorder;
+		cardRenderTask.position = screenPos;
+		auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+
+		vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
+
+		if(createInfo.cardIndex != SIZE_MAX)
+		{
+			const auto card = cardSys->GetCard(createInfo.cardIndex);
+			cardSubTexture = card.art;
+
+			jlb::String str{};
+			str.AllocateFromNumber(dumpAllocator, card.cost);
+
+			TextRenderTask textCostTask{};
+			textCostTask.center = true;
+			textCostTask.origin = screenPos;
+			textCostTask.origin.y += cardRenderTask.scale.y * .5f;
+			textCostTask.text = str;
+			textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
+			textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
+			result = textRenderSys->TryAdd(info, textCostTask);
+
+			TextBoxCreateInfo cardTextBox{};
+			cardTextBox.text = card.text;
+			CreateTextBox(info, systems, cardTextBox);
+		}
+
+		auto& animLerp = updateInfo.animLerp;
+		animLerp += info.deltaTime * 0.001f * cardAnimSpeed / CARD_ANIM_LENGTH;
+		animLerp = fmodf(animLerp, 1);
+		vke::Animation cardAnim{};
+		cardAnim.lerp = animLerp;
+		cardAnim.width = CARD_ANIM_LENGTH;
+		auto sub = cardAnim.Evaluate(cardSubTexture, 0);
+
+		cardRenderTask.subTexture = sub;
+		result = cardRenderSys->TryAdd(info, cardRenderTask);
 	}
 
 	void MenuSystem::OnScrollInput(const vke::EngineData& info, 
