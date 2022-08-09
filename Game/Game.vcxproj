@@ -159,7 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Game\Archetypes\Archetype.h" />
+    <ClInclude Include="Include\Game\Archetypes\EntityArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\CharacterArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\DummyArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\PickupArchetype.h" />

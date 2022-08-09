@@ -25,7 +25,7 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<Pickup>& entities)
 	{
-		Archetype<Pickup>::PreUpdate(info, systems, entities);
+		EntityArchetype<Pickup>::PreUpdate(info, systems, entities);
 
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();

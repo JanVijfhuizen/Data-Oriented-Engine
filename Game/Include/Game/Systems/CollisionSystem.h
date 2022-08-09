@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "BVH.h"
-#include "VkEngine/Systems/TaskSystem.h"
 #include <DistanceTree.h>
 #include "SwapChain.h"
+#include "VkEngine/Systems/GameSystem.h"
 
 namespace game
 {

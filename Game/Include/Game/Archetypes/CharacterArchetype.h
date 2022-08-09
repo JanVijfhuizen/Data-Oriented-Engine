@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Archetype.h"
+#include "EntityArchetype.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
@@ -14,7 +14,7 @@
 namespace game
 {
 	template <typename T>
-	class CharacterArchetype : public Archetype<T>
+	class CharacterArchetype : public EntityArchetype<T>
 	{
 	public:
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
@@ -38,7 +38,7 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<T>& entities)
 	{
-		Archetype<T>::PreUpdate(info, systems, entities);
+		EntityArchetype<T>::PreUpdate(info, systems, entities);
 
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
@@ -139,7 +139,7 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<T>& entities)
 	{
-		Archetype<T>::PostUpdate(info, systems, entities);
+		EntityArchetype<T>::PostUpdate(info, systems, entities);
 
 		const auto movementSys = systems.GetSystem<MovementSystem>();
 

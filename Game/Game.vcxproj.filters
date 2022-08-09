@@ -45,7 +45,7 @@
     <ClInclude Include="Include\Game\Entities\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Game\Archetypes\Archetype.h">
+    <ClInclude Include="Include\Game\Archetypes\EntityArchetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h">
