@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Character.h"
-#include "Components/Inventory.h"
+#include <Components/Inventory.h>
 
 namespace game
 {
@@ -8,6 +8,7 @@ namespace game
 
 	struct Player final : Character
 	{
-		Inventory<PLAYER_INVENTORY_SIZE> inventory{};
+		Inventory inventory{};
+		jlb::StackArray<InventorySlot, PLAYER_INVENTORY_SIZE> inventorySrc{};
 	};
 }

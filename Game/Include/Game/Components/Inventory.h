@@ -1,5 +1,4 @@
 #pragma once
-#include "StackVector.h"
 
 namespace game
 {
@@ -8,47 +7,78 @@ namespace game
 	struct InventorySlot final
 	{
 		size_t index = SIZE_MAX;
-		size_t amount = 1;
+		size_t amount = 0;
 	};
 
-	template <size_t S>
-	struct Inventory final : jlb::StackVector<InventorySlot, S>
+	struct Inventory final
 	{
-		void Erase(size_t index) override;
+		jlb::ArrayView<InventorySlot> src{};
+
+		[[nodiscard]] InventorySlot& operator[](size_t i) const;
+
+		InventorySlot& Insert(size_t index);
+		void Erase(size_t index);
+
+		[[nodiscard]] size_t GetCount() const;
+		[[nodiscard]] size_t GetLength() const;
+		[[nodiscard]] jlb::Iterator<InventorySlot> begin() const;
+		[[nodiscard]] jlb::Iterator<InventorySlot> end() const;
 	private:
-		[[nodiscard]] InventorySlot& OnAdd(InventorySlot& value) override;
+		size_t _count = 0;
 	};
 
-	template <size_t S>
-	void Inventory<S>::Erase(const size_t index)
+	inline InventorySlot& Inventory::operator[](const size_t i) const
 	{
-		const size_t count = jlb::StackVector<InventorySlot, S>::GetCount();
-		assert(count >= 1);
-		for (size_t i = index + 1; i < count; ++i)
-			jlb::StackVector<InventorySlot, S>::operator[](i - 1) = jlb::StackVector<InventorySlot, S>::operator[](i);
-		jlb::StackVector<InventorySlot, S>::SetCount(count - 1);
+		return src[i];
 	}
 
-	template <size_t S>
-	InventorySlot& Inventory<S>::OnAdd(InventorySlot& value)
+	inline size_t Inventory::GetCount() const
 	{
-		const size_t count = jlb::StackVector<InventorySlot, S>::GetCount();
-		assert(count < S);
+		return _count;
+	}
 
-		jlb::StackVector<InventorySlot, S>::SetCount(count + 1);
-		const auto& idx = value.index;
-		size_t i = count;
+	inline size_t Inventory::GetLength() const
+	{
+		return src.length;
+	}
+
+	inline jlb::Iterator<InventorySlot> Inventory::begin() const
+	{
+		return src.begin();
+	}
+
+	inline jlb::Iterator<InventorySlot> Inventory::end() const
+	{
+		return src.end();
+	}
+
+	inline InventorySlot& Inventory::Insert(const size_t index)
+	{
+		assert(_count < src.length);
+		++_count;
+
+		size_t i = _count;
 		bool placed = false;
 
-		while(i > 0 && !placed)
+		while (i > 0 && !placed)
 		{
 			--i;
-			const auto& src = jlb::StackVector<InventorySlot, S>::operator[](i);
-			auto& dst = jlb::StackVector<InventorySlot, S>::operator[](i + 1);
-			placed = src.index < idx;
-			dst = placed ? dst : src;
+			const auto& a = src[i];
+			auto& b = src[i + 1];
+			placed = a.index < index || a.index == SIZE_MAX;
+			b = a;
 		}
 
-		return jlb::StackVector<InventorySlot, S>::operator[](i) = value;
+		auto& slot = src[i] = {};
+		slot.index = index;
+		return slot;
+	}
+
+	inline void Inventory::Erase(const size_t index)
+	{
+		assert(_count >= 1);
+		for (size_t i = index + 1; i < _count; ++i)
+			src[i - 1] = src[i];
+		--_count;
 	}
 }

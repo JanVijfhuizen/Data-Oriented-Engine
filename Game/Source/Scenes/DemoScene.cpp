@@ -25,17 +25,11 @@ namespace game::demo
 		}
 
 		_players.SetCount(1);
-		auto& deck = _players[0].inventory;
-		deck.SetCount(3);
-		auto& fireball = deck[0];
-		fireball.index = 0;
-		fireball.amount = 0;
-		auto& root = deck[1];
-		root.index = 1;
-		root.amount = 0;
-		auto& bash = deck[2];
-		bash.index = 2;
-		bash.amount = 1;
+		_players[0].inventory.src = _players[0].inventorySrc;
+		auto& inventory = _players[0].inventory;
+		auto& fireball = inventory.Insert(0);
+		auto& root = inventory.Insert(1);
+		auto& bash = inventory.Insert(2);
 
 		_pickups.SetCount(1);
 		_pickups[0].cardId = 1;
