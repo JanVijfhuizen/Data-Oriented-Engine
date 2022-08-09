@@ -100,7 +100,8 @@ namespace game
 			bool drawSecondWindow = false;
 
 			jlb::Array<MenuCreateInfo::Content> content{};
-			const jlb::ArrayView<InventorySlot> inventory = entity.inventory;
+			const auto& inventory = entity.data.character.inventory;
+			const size_t inventoryCount = inventory.GetCount();
 
 			auto& menuUpdateInfo = _menuUpdateInfo;
 			auto& secondMenuUpdateInfo = _secondMenuUpdateInfo;
@@ -116,9 +117,9 @@ namespace game
 				break;
 			case MenuIndex::inventory:
 			case MenuIndex::deck:
-				content.Allocate(dumpAllocator, inventory.length + 1);
+				content.Allocate(dumpAllocator, inventoryCount + 1);
 				content[0].string = "inventory";
-				for (size_t i = 0; i < inventory.length; ++i)
+				for (size_t i = 0; i < inventoryCount; ++i)
 				{
 					const auto card = cardSys->GetCard(inventory[i].index);
 					content[i + 1].string = card.name;
@@ -126,7 +127,7 @@ namespace game
 				break;
 			}
 			if (_menuIndex == MenuIndex::deck)
-				for (size_t i = 0; i < inventory.length; ++i)
+				for (size_t i = 0; i < inventoryCount; ++i)
 					content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 
 			menuCreateInfo.content = content;
@@ -180,19 +181,19 @@ namespace game
 				renderCard = true;
 				// Get what cards are being used in the deck.
 				size_t deckSize = 0;
-				for (size_t i = 0; i < inventory.length; ++i)
+				for (size_t i = 0; i < inventoryCount; ++i)
 				{
 					const auto& src = content[i + 1];
 					deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
 				}
 
-				menuCreateInfo.usedSpace = inventory.length;
-				menuCreateInfo.capacity = entity.inventory.GetLength();
+				menuCreateInfo.usedSpace = inventoryCount;
+				menuCreateInfo.capacity = inventory.GetLength();
 
 				// Get all cards in deck.
 				jlb::Vector<size_t> cardIndexes{};
 				cardIndexes.Allocate(tempAllocator, deckSize);
-				for (size_t i = 0; i < inventory.length; ++i)
+				for (size_t i = 0; i < inventoryCount; ++i)
 				{
 					const auto& src = content[i + 1];
 					if (src.amount != MAX_COPIES_CARD_IN_DECK)
@@ -219,7 +220,7 @@ namespace game
 					deckContent[0].string = "deck";
 
 					size_t deckIndex = 1;
-					for (size_t i = 0; i < inventory.length; ++i)
+					for (size_t i = 0; i < inventoryCount; ++i)
 					{
 						const auto& src = content[i + 1];
 						if (src.amount != MAX_COPIES_CARD_IN_DECK)

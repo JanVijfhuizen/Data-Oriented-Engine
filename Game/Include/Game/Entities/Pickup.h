@@ -6,7 +6,6 @@ namespace game
 {
 	struct Pickup final : Entity
 	{
-		size_t cardId = SIZE_MAX;
 		vke::Transform transform{};
 
 		size_t collisionTaskId = SIZE_MAX;

@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include "Archetype.h"
+#include "EntityArchetype.h"
 #include "StackArray.h"
 #include "Entities/Pickup.h"
 #include "Systems/MenuSystem.h"
 
 namespace game
 {
-	class PickupArchetype final : public Archetype<Pickup>
+	class PickupArchetype final : public EntityArchetype<Pickup>
 	{
 	public:
 		float scalingOnSelected = 0.5f;

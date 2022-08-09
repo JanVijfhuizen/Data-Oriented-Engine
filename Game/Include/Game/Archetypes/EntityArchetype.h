@@ -9,7 +9,7 @@ namespace game
 	Archetypes are used to execute behaviour for entities.
 	*/
 	template <typename T>
-	class Archetype
+	class EntityArchetype
 	{
 	public:
 		virtual void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::Vector<T>& entities);
@@ -17,7 +17,7 @@ namespace game
 	};
 
 	template <typename T>
-	void Archetype<T>::PreUpdate(const vke::EngineData& info, 
+	void EntityArchetype<T>::PreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<T>& entities)
 	{
@@ -45,7 +45,7 @@ namespace game
 	}
 
 	template <typename T>
-	void Archetype<T>::PostUpdate(const vke::EngineData& info, 
+	void EntityArchetype<T>::PostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<T>& entities)
 	{
