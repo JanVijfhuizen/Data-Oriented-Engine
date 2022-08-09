@@ -25,14 +25,13 @@ namespace game::demo
 		}
 
 		_players.SetCount(1);
-		_players[0].inventory.src = _players[0].inventorySrc;
-		auto& inventory = _players[0].inventory;
+		auto& inventory = _players[0].data.character.inventory;
+		inventory.src = _players[0].inventorySrc;
 		auto& fireball = inventory.Insert(0);
-		auto& root = inventory.Insert(1);
 		auto& bash = inventory.Insert(2);
 
 		_pickups.SetCount(1);
-		_pickups[0].cardId = 1;
+		_pickups[0].data.pickup.cardId = 1;
 		_pickups[0].transform.position = glm::vec2{2, -1};
 	}
 

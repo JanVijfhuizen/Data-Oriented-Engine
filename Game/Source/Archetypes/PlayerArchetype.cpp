@@ -100,7 +100,7 @@ namespace game
 			bool drawSecondWindow = false;
 
 			jlb::Array<MenuCreateInfo::Content> content{};
-			const auto& inventory = entity.inventory;
+			const auto& inventory = entity.data.character.inventory;
 			const size_t inventoryCount = inventory.GetCount();
 
 			auto& menuUpdateInfo = _menuUpdateInfo;

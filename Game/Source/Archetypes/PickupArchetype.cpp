@@ -17,8 +17,11 @@ namespace game
 {
 	static void TryPickup(EntityData& target, EntityData& src, void* userPtr)
 	{
-		// TODO: Add to inventory.
+		auto& inventory = src.character.inventory;
+		if(inventory.GetLength() == inventory.GetCount())
+			return;
 		target.markedForDelete = true;
+		inventory.Insert(target.pickup.cardId);
 	}
 
 	void PickupArchetype::PreUpdate(const vke::EngineData& info, 
@@ -72,7 +75,8 @@ namespace game
 
 		for (auto& entity : entities)
 		{
-			assert(entity.cardId != SIZE_MAX);
+			const auto cardId = entity.data.pickup.cardId;
+			assert(cardId != SIZE_MAX);
 
 			const auto& transform = entity.transform;
 			const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
@@ -94,7 +98,7 @@ namespace game
 				_menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
 			if(menuOpen)
 			{
-				const auto card = cardSys->GetCard(entity.cardId);
+				const auto card = cardSys->GetCard(cardId);
 
 				MenuCreateInfo menuCreateInfo{};
 				menuCreateInfo.interactable = true;
@@ -132,7 +136,7 @@ namespace game
 				
 				CardMenuCreateInfo cardMenuCreateInfo{};
 				cardMenuCreateInfo.origin = transform.position;
-				cardMenuCreateInfo.cardIndex = entity.cardId;
+				cardMenuCreateInfo.cardIndex = cardId;
 				menuSys->CreateCardMenu(info, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
 				resetMenu = false;
 			}

@@ -8,7 +8,6 @@ namespace game
 
 	struct Player final : Character
 	{
-		Inventory inventory{};
 		jlb::StackArray<InventorySlot, PLAYER_INVENTORY_SIZE> inventorySrc{};
 	};
 }
