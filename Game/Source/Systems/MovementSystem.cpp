@@ -19,7 +19,7 @@ namespace game
 			const auto self = static_cast<MovementSystem*>(userPtr);
 			const auto turnSys = systems.GetSystem<TurnSystem>();
 
-			const bool isEndTickEvent = turnSys->GetIfEndTickEvent();
+			const bool isTickEvent = turnSys->GetIfTickEvent();
 			const float tickLerp = turnSys->GetTickLerp();
 
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
@@ -30,7 +30,7 @@ namespace game
 
 			for (auto& task : tasks)
 			{
-				task.remaining -= isEndTickEvent;
+				task.remaining -= isTickEvent;
 
 				const auto durationF = static_cast<float>(task.duration);
 				// Smoothly move between grid positions.
