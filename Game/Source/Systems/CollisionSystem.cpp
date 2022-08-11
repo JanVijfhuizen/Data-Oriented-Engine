@@ -62,7 +62,7 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		// If the previous frame was for adding tasks.
-		if (turnSys->GetIfTickEvent())
+		if (turnSys->GetIfBeginTickEvent())
 		{
 			_collisionFrames.Swap();
 			auto& previous = _collisionFrames.GetPrevious();

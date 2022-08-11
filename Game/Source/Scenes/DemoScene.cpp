@@ -15,7 +15,6 @@ namespace game::demo
 		_pickups.Allocate(*info.allocator, 1);
 		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
 		_dummies.SetCount(_dummies.GetLength());
-
 		for (int32_t i = 0; i < dummyCount; ++i)
 		{
 			for (int32_t j = 0; j < dummyCount; ++j)
@@ -62,7 +61,7 @@ namespace game::demo
 		tileTask.position = glm::ivec2(3, 5);
 		auto result = tileSys->TryAdd(info, tileTask);
 
-		if(turnSys->GetIfTickEvent())
+		if(turnSys->GetIfBeginTickEvent())
 		{
 			CollisionTask collisionTask{};
 			auto& bounds = collisionTask.bounds;

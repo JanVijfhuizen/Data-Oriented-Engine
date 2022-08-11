@@ -15,7 +15,7 @@ namespace game
 	{
 		TaskSystem<EntityData>::OnPreUpdate(info, systems, tasks);
 		const auto turnSys = systems.GetSystem<TurnSystem>();
-		if (turnSys->GetIfTickEvent())
+		if (turnSys->GetIfBeginTickEvent())
 			ClearTasks();
 	}
 

@@ -39,7 +39,7 @@ namespace game
 		auto& characterInput = entity.input;
 
 		// Calculate movement direction, if any.
-		if (turnSys->GetIfTickEvent())
+		if (turnSys->GetIfBeginTickEvent())
 		{
 			auto& dir = characterInput.movementDir;
 			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;

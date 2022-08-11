@@ -50,7 +50,7 @@ namespace game
 
 		const auto subTexture = DefineSubTexture(info, systems);
 
-		if (turnSys->GetIfTickEvent())
+		if (turnSys->GetIfBeginTickEvent())
 			for (auto& entity : entities)
 			{
 				const auto base = reinterpret_cast<Character*>(&entity);
@@ -63,17 +63,16 @@ namespace game
 				// Update movement task with new input.
 				if (movementComponent.remaining == 0 || movementComponent.remaining == SIZE_MAX)
 				{
-					base->movementTaskId = SIZE_MAX;
-					movementComponent.remaining = SIZE_MAX;
-
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
-
-					base->movementTileReservation = SIZE_MAX;
-
-					const glm::vec2 from = glm::vec2(jlb::math::RoundNearest(base->transform.position));
+					
+					const glm::vec2 from = jlb::math::RoundNearest(base->transform.position);
 					const glm::vec2 delta = glm::vec2(dir);
 					glm::vec2 to = from + delta;
+
+					base->movementTaskId = SIZE_MAX;
+					base->movementTileReservation = SIZE_MAX;
+					movementComponent.remaining = SIZE_MAX;
 
 					if (dir.x != 0 || dir.y != 0)
 					{
