@@ -19,7 +19,7 @@ namespace game
 			const auto self = static_cast<MovementSystem*>(userPtr);
 			const auto turnSys = systems.GetSystem<TurnSystem>();
 
-			const bool isTickEvent = turnSys->GetIfTickEvent();
+			const bool isEndTickEvent = turnSys->GetIfEndTickEvent();
 			const float tickLerp = turnSys->GetTickLerp();
 
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
@@ -30,11 +30,11 @@ namespace game
 
 			for (auto& task : tasks)
 			{
-				task.remaining -= isTickEvent;
+				task.remaining -= isEndTickEvent;
 
 				const auto durationF = static_cast<float>(task.duration);
 				// Smoothly move between grid positions.
-				const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(task.remaining + 1) / durationF;
+				const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(task.remaining) / durationF;
 				task.position = jlb::math::LerpPct(task.from, task.to, pct);
 
 				// Bobbing.
@@ -45,6 +45,10 @@ namespace game
 				// Movement rotation.
 				const float toAngle = jlb::math::GetAngle(task.from, task.to);
 				const float pctRotation = jlb::math::Min<float>(pct / self->rotationDuration, 1);
+
+				const bool finished = task.remaining == 0;
+				task.position = finished ? task.to : task.position;
+				task.rotation = finished ? toAngle : task.rotation;
 
 				task.rotation = jlb::math::SmoothAngle(task.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
 				tasksOutput.Add(dumpAllocator, task);

@@ -27,7 +27,7 @@ namespace game
 		} visuals{};
 
 		// Gets if a new turn has been started this frame.
-		[[nodiscard]] bool GetIfTickEvent() const;
+		[[nodiscard]] bool GetIfBeginTickEvent() const;
 		// Gets if a turn has been finished this frame.
 		[[nodiscard]] bool GetIfEndTickEvent() const;
 		// The linear interpolation between 0 and 1 of the time between turns.
@@ -48,13 +48,12 @@ namespace game
 		const size_t _maxTicksPerSecond = 16;
 
 		float _time = 0;
-		bool _tickCalled = true;
+		bool _beginTickCalled = true;
 		bool _endTickCalled = false;
 		float _lerp = 0;
 		bool _pauseAtEndOfTick = false;
 		bool _forwardToNextTick = false;
-		// Was the turn paused at the end of the tick.
-		bool _pausedAtEndOfTick = false;
+		bool _tickEnded = false;
 		
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;

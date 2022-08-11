@@ -43,7 +43,7 @@ namespace game
 
 		const auto& camTarget = cameraSys->settings.target;
 
-		if (turnSys->GetIfTickEvent())
+		if (turnSys->GetIfBeginTickEvent())
 		{
 			const auto collisionSys = systems.GetSystem<CollisionSystem>();
 

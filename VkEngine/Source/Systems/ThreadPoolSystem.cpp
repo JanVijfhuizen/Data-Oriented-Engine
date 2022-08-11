@@ -56,7 +56,7 @@ namespace vke
 		const jlb::Systems<EngineData> systems,
 		const jlb::NestedVector<ThreadPoolTask>& tasks)
 	{
-		TaskSystem<ThreadPoolTask>::OnPreUpdate(info, systems, tasks);
+		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
 
 		// Continue the threads.
 		_threadSharedInfo.info = &info;
@@ -68,7 +68,7 @@ namespace vke
 		const jlb::Systems<EngineData> systems,
 		const jlb::NestedVector<ThreadPoolTask>& tasks)
 	{
-		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
+		TaskSystem<ThreadPoolTask>::OnPostUpdate(info, systems, tasks);
 		
 		// Wait for the threads to finish.
 		while (_tasksUnfinished > 0)

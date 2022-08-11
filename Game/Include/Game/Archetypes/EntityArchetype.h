@@ -35,7 +35,7 @@ namespace game
 					entities.RemoveAt(i);
 			}
 
-		if(turnSys->GetIfTickEvent())
+		if(turnSys->GetIfBeginTickEvent())
 			for (auto& entity : entities)
 			{
 				const auto base = reinterpret_cast<Entity*>(&entity);

@@ -10,9 +10,9 @@
 
 namespace game
 {
-	bool TurnSystem::GetIfTickEvent() const
+	bool TurnSystem::GetIfBeginTickEvent() const
 	{
-		return _tickCalled;
+		return _beginTickCalled;
 	}
 
 	bool TurnSystem::GetIfEndTickEvent() const
@@ -159,39 +159,37 @@ namespace game
 			assert(result != SIZE_MAX);
 		}
 
-		_tickCalled = false;
-		
+		_beginTickCalled = false;
+		_endTickCalled = false;
+
 		if (_time > dTicksPerSecond)
 		{
-			if (_pauseAtEndOfTick && !_forwardToNextTick)
+			_endTickCalled = !_tickEnded;
+			_tickEnded = true;
+
+			if (_pauseAtEndOfTick)
 			{
-				// Call end tick here ONLY if paused.
-				_endTickCalled = true;
 				_paused = true;
 				_pauseAtEndOfTick = false;
+			}
+
+			if(_paused && !_forwardToNextTick)
+			{
 				_lerp = 1;
 				_time = dTicksPerSecond + 1e-5f;
-				_pausedAtEndOfTick = true;
 				return;
 			}
 
-			if (!_paused || _forwardToNextTick)
-			{
-				_time = fmodf(_time, dTicksPerSecond);
-				_tickCalled = true;
-				_endTickCalled = !_pausedAtEndOfTick;
-				_previousTicksPerSecond = _ticksPerSecond;
-				_forwardToNextTick = false;
-				_pausedAtEndOfTick = false;
+			if (_endTickCalled)
 				return;
-			}
 
-			// Make sure that the turn time doesn't increase.
-			_lerp = 1;
-			_time = dTicksPerSecond + 1e-5f;
+			// Reset turn.
+			_time = fmodf(_time, dTicksPerSecond);
+			_beginTickCalled = true;
+			_previousTicksPerSecond = _ticksPerSecond;
+			_forwardToNextTick = false;
+			_tickEnded = false;
 		}
-
-		_endTickCalled = false;
 	}
 
 	void TurnSystem::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
