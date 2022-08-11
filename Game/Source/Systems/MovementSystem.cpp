@@ -46,11 +46,11 @@ namespace game
 				const float toAngle = jlb::math::GetAngle(task.from, task.to);
 				const float pctRotation = jlb::math::Min<float>(pct / self->rotationDuration, 1);
 
+				task.rotation = jlb::math::SmoothAngle(task.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
+
 				const bool finished = task.remaining == 0;
 				task.position = finished ? task.to : task.position;
 				task.rotation = finished ? toAngle : task.rotation;
-
-				task.rotation = jlb::math::SmoothAngle(task.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
 				tasksOutput.Add(dumpAllocator, task);
 			}
 		};

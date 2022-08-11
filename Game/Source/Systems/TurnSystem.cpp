@@ -167,17 +167,20 @@ namespace game
 			_endTickCalled = !_tickEnded;
 			_tickEnded = true;
 
-			if (_pauseAtEndOfTick)
+			if(!_forwardToNextTick)
 			{
-				_paused = true;
-				_pauseAtEndOfTick = false;
-			}
+				if (_pauseAtEndOfTick)
+				{
+					_paused = true;
+					_pauseAtEndOfTick = false;
+				}
 
-			if(_paused && !_forwardToNextTick)
-			{
-				_lerp = 1;
-				_time = dTicksPerSecond + 1e-5f;
-				return;
+				if (_paused)
+				{
+					_lerp = 1;
+					_time = dTicksPerSecond + 1e-5f;
+					return;
+				}
 			}
 
 			if (_endTickCalled)
@@ -199,22 +202,22 @@ namespace game
 
 		if (_pauseAtEndOfTick)
 			return;
-
-		// Adjust is paused.
-		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-		{
-			_paused = !_paused;
-			PressKey(1);
-		}
 			
 		// Go to the next tick.
 		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
 		{
-			_forwardToNextTick = true;
+			_forwardToNextTick = _time > 1.f / static_cast<float>(_previousTicksPerSecond);
 			_pauseAtEndOfTick = true;
 			_paused = false;
 			PressKey(1);
 			PressKey(3);
+		}
+
+		// Adjust is paused.
+		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && !_pauseAtEndOfTick)
+		{
+			_paused = !_paused;
+			PressKey(1);
 		}
 
 		// Adjust turn speed.
