@@ -9,11 +9,11 @@
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/GameManager.h"
-#include "Systems/InteractSystem.h"
 #include "Systems/MenuSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
+#include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/TurnThreadPoolSystem.h"
@@ -35,9 +35,9 @@ namespace game
 		
 		// Game systems.
 		initializer.DefineSystem<EntitySystem>();
-		initializer.DefineSystem<InteractSystem>();
 		initializer.DefineSystem<CollisionSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
+		initializer.DefineSystem<PlayerSystem>();
 		initializer.DefineSystem<CardSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
