@@ -202,7 +202,6 @@
     <ClCompile Include="Source\Archetypes\DummyArchetype.cpp" />
     <ClCompile Include="Source\Systems\MenuSystem.cpp" />
     <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />
-    <ClCompile Include="Source\Components\MovementComponent.cpp" />
     <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp" />
     <ClCompile Include="Source\Systems\CameraSystem.cpp" />
     <ClCompile Include="Source\Systems\CollisionSystem.cpp" />

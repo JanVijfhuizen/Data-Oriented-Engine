@@ -155,9 +155,6 @@
     <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Components\MovementComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Systems\UIInteractionSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

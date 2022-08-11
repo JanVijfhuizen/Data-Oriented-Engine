@@ -50,35 +50,6 @@ namespace game
 
 		const auto subTexture = DefineSubTexture(info, systems);
 
-		for (auto& entity : entities)
-		{
-			const auto base = reinterpret_cast<Character*>(&entity);
-
-			auto& movementComponent = base->movementComponent;
-			const auto& transform = base->transform;
-
-			vke::EntityRenderTask renderTask{};
-			renderTask.subTexture = subTexture;
-			renderTask.transform = transform;
-			renderTask.transform.scale *= movementComponent.systemDefined.scaleMultiplier;
-			const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
-			renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
-
-			const auto result = entityRenderSys->TryAdd(info, renderTask);
-			base->movementTaskId = movementSys->TryAdd(info, movementComponent);
-
-			{
-				const auto& camera = entityRenderSys->camera;
-				const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
-				base->mouseTaskId = SIZE_MAX;
-				if (!culls)
-				{
-					jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
-					base->mouseTaskId = mouseSys->TryAdd(info, bounds);
-				}
-			}
-		}
-
 		if (turnSys->GetIfTickEvent())
 			for (auto& entity : entities)
 			{
@@ -87,16 +58,18 @@ namespace game
 				auto& movementComponent = base->movementComponent;
 				const auto& transform = base->transform;
 
-				const auto& movementSystemDefined = movementComponent.systemDefined;
+				glm::vec2 collisionPos = transform.position;
 
 				// Update movement task with new input.
-				if (movementSystemDefined.remaining <= 1)
+				if (movementComponent.remaining == 0 || movementComponent.remaining == SIZE_MAX)
 				{
+					base->movementTaskId = SIZE_MAX;
+					movementComponent.remaining = SIZE_MAX;
+
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
 
 					base->movementTileReservation = SIZE_MAX;
-					movementComponent.Finish();
 
 					const glm::vec2 from = glm::vec2(jlb::math::RoundNearest(base->transform.position));
 					const glm::vec2 delta = glm::vec2(dir);
@@ -115,23 +88,52 @@ namespace game
 						else
 						{
 							base->movementTileReservation = collisionSys->ReserveTiles(toRounded);
-							movementComponent.Build();
+							movementComponent.remaining = movementComponent.duration;
 						}
 					}
 
-					auto& movementUserDefined = movementComponent.userDefined;
-					movementUserDefined.from = from;
-					movementUserDefined.to = to;
-					movementUserDefined.rotation = transform.rotation;
+					movementComponent.from = from;
+					movementComponent.to = to;
+					movementComponent.rotation = transform.rotation;
+					collisionPos = to;
+				}
 
-					// Collision task.
-					CollisionTask collisionTask{};
-					collisionTask.bounds = jlb::math::RoundNearest(to);
-					collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
-					base->collisionTaskId = collisionSys->TryAdd(collisionTask);
-					assert(base->collisionTaskId != SIZE_MAX);
+				// Collision task.
+				CollisionTask collisionTask{};
+				collisionTask.bounds = jlb::math::RoundNearest(collisionPos);
+				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
+				base->collisionTaskId = collisionSys->TryAdd(collisionTask);
+				assert(base->collisionTaskId != SIZE_MAX);
+			}
+
+		for (auto& entity : entities)
+		{
+			const auto base = reinterpret_cast<Character*>(&entity);
+
+			auto& movementComponent = base->movementComponent;
+			const auto& transform = base->transform;
+
+			vke::EntityRenderTask renderTask{};
+			renderTask.subTexture = subTexture;
+			renderTask.transform = transform;
+			renderTask.transform.scale *= movementComponent.scaleMultiplier;
+			const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
+			renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
+
+			const auto result = entityRenderSys->TryAdd(info, renderTask);
+			base->movementTaskId = movementSys->TryAdd(info, movementComponent);
+
+			{
+				const auto& camera = entityRenderSys->camera;
+				const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
+				base->mouseTaskId = SIZE_MAX;
+				if (!culls)
+				{
+					jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
+					base->mouseTaskId = mouseSys->TryAdd(info, bounds);
 				}
 			}
+		}
 	}
 
 	template <typename T>
@@ -151,7 +153,7 @@ namespace game
 				auto& movementOutputs = movementSys->GetOutput();
 				const auto& movementOutput = movementOutputs[base->movementTaskId];
 
-				base->movementComponent.Update(movementOutput);
+				base->movementComponent = movementOutput;
 
 				auto& transform = base->transform;
 				transform.position = movementOutput.position;
