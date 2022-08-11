@@ -52,6 +52,10 @@ namespace game
 		};
 		threadTask.userPtr = this;
 
+		auto& tasksOutput = GetOutputEditable();
+		auto& dumpAllocator = *info.dumpAllocator;
+		tasksOutput.PreAllocateNested(dumpAllocator, GetCount());
+
 		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, threadTask);
 		assert(result != SIZE_MAX);
