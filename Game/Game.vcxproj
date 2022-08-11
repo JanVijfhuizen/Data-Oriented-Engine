@@ -181,10 +181,11 @@
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
-    <ClInclude Include="Include\Game\Systems\InteractSystem.h" />
     <ClInclude Include="Include\Game\Systems\MenuSystem.h" />
     <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
+    <ClInclude Include="Include\Game\Systems\PickupSystem.h" />
+    <ClInclude Include="Include\Game\Systems\PlayerSystem.h" />
     <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
@@ -192,15 +193,15 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\PickupSystem.cpp" />
+    <ClCompile Include="Source\Systems\PlayerSystem.cpp" />
     <ClCompile Include="Source\Archetypes\PickupArchetype.cpp" />
     <ClCompile Include="Source\Systems\CardRenderSystem.cpp" />
     <ClCompile Include="Source\Systems\CardSystem.cpp" />
-    <ClCompile Include="Source\Systems\InteractSystem.cpp" />
     <ClCompile Include="Source\Systems\EntitySystem.cpp" />
     <ClCompile Include="Source\Archetypes\DummyArchetype.cpp" />
     <ClCompile Include="Source\Systems\MenuSystem.cpp" />
     <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />
-    <ClCompile Include="Source\Components\MovementComponent.cpp" />
     <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp" />
     <ClCompile Include="Source\Systems\CameraSystem.cpp" />
     <ClCompile Include="Source\Systems\CollisionSystem.cpp" />

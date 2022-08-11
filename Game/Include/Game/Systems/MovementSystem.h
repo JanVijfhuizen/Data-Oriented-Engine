@@ -7,20 +7,8 @@ namespace game
 {
 	typedef MovementComponent MovementTask;
 
-	struct MovementTaskOutput final
-	{
-		// Remaining active turns.
-		size_t remaining = 0;
-		// Current linearly interpolated position.
-		glm::vec2 position{};
-		// Current linearly interpolated rotation.
-		float rotation = 0;
-		// Current non-linearly interpolated scale multiplier for the bobbing effect.
-		float scaleMultiplier = 0;
-	};
-
 	// Handles the movement of characters. Also handles the corresponding animation (by scaling) and rotations.
-	class MovementSystem final : public vke::TaskSystemWithOutput<MovementTask, MovementTaskOutput>
+	class MovementSystem final : public vke::TaskSystemWithOutput<MovementTask, MovementTask>
 	{
 	public:
 		// Object scaling during movement.

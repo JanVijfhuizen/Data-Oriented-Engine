@@ -7,27 +7,15 @@ namespace game
 	// Component related to the movement system.
 	struct MovementComponent final
 	{
-		struct Settings final
-		{
-			float bobbingAmount = 2;
-		} settings;
+		float bobbingAmount = 2;
 
-		struct UserDefinedOnTick final
-		{
-			glm::vec2 from{};
-			glm::vec2 to{};
-			float rotation;
-			size_t duration = 1;
-		} userDefined;
-		
-		struct SystemDefined final
-		{
-			float scaleMultiplier = 1;
-			size_t remaining = 0;
-		} systemDefined;
+		glm::vec2 from{};
+		glm::vec2 to{};
+		glm::vec2 position{};
+		float rotation;
+		size_t duration = 1;
 
-		void Build();
-		void Finish();
-		void Update(const MovementTaskOutput& output);
+		float scaleMultiplier = 1;
+		size_t remaining = SIZE_MAX;
 	};
 }

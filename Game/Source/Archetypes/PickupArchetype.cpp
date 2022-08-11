@@ -5,7 +5,6 @@
 #include "Systems/CameraSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
-#include "Systems/InteractSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
@@ -15,15 +14,6 @@
 
 namespace game
 {
-	static void TryPickup(EntityData& target, EntityData& src, void* userPtr)
-	{
-		auto& inventory = src.character.inventory;
-		if(inventory.GetLength() == inventory.GetCount())
-			return;
-		target.markedForDelete = true;
-		inventory.Insert(target.pickup.cardId);
-	}
-
 	void PickupArchetype::PreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
 		jlb::Vector<Pickup>& entities)
@@ -33,7 +23,6 @@ namespace game
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto interactSys = systems.GetSystem<InteractSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
@@ -121,15 +110,7 @@ namespace game
 
 				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn)
 				{
-					// There is only one column so we know the pick up option is pressed.
-					InteractionTask interactionTask{};
-					interactionTask.src = 0; // Picked up by the player.
-					interactionTask.target = entity.entityTaskId;
-					interactionTask.interaction = TryPickup;
-
-					result = interactSys->TryAdd(info, interactionTask);
-					assert(result != SIZE_MAX);
-					entity.interacted = true;
+					// Todo stuff.
 				}
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
