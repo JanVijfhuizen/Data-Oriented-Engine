@@ -15,6 +15,7 @@ namespace game::demo
 		_pickups.Allocate(*info.allocator, 1);
 		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
 		_dummies.SetCount(_dummies.GetLength());
+
 		for (int32_t i = 0; i < dummyCount; ++i)
 		{
 			for (int32_t j = 0; j < dummyCount; ++j)

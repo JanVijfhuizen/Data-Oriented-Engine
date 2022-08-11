@@ -49,6 +49,8 @@ namespace jlb
 		void RemoveNested(StackAllocator& allocator);
 		// Sets the count to 0, as well as for all the nested vectors.
 		void Clear();
+		// Allocates a nested based on the capacity - root.capacity.
+		void PreAllocateNested(StackAllocator& allocator, size_t capacity);
 
 		T& Add(StackAllocator& allocator, T& value);
 		T& Add(StackAllocator& allocator, const T& value = {});
@@ -164,6 +166,26 @@ namespace jlb
 		while (node)
 		{
 			node->SetCount(0);
+			node = node->_next;
+		}
+	}
+
+	template <typename T>
+	void NestedVector<T>::PreAllocateNested(StackAllocator& allocator, size_t capacity)
+	{
+		Node* node = _root;
+		while (node)
+		{
+			const size_t length = node->GetLength();
+			capacity = capacity > length ? capacity - length : 0;
+
+			if (!node->_next && capacity > 0)
+			{
+				assert(_nestableCapacity > 0);
+				auto newNode = node->_next = allocator.New<Node>();
+				newNode.ptr->Allocate(allocator, _nestableCapacity);
+			}
+
 			node = node->_next;
 		}
 	}
