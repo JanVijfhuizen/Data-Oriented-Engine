@@ -9,6 +9,11 @@ namespace game
 		return _entities[index].instance;
 	}
 
+	bool EntitySystem::Contains(const EntityId& id)
+	{
+		return id ? _entities.Contains(id.index) : false;
+	}
+
 	void EntitySystem::CreateEntity(Entity& entity)
 	{
 		auto& id = entity.id;

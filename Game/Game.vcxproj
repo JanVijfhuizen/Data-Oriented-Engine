@@ -193,6 +193,7 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Entities\Entity.cpp" />
     <ClCompile Include="Source\Systems\PickupSystem.cpp" />
     <ClCompile Include="Source\Systems\PlayerSystem.cpp" />
     <ClCompile Include="Source\Archetypes\PickupArchetype.cpp" />

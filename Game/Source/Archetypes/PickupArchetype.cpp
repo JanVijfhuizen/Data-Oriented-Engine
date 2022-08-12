@@ -109,7 +109,7 @@ namespace game
 				content[1].interactable = inRange;
 				menuCreateInfo.content = content;
 
-				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn)
+				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn && inRange)
 				{
 					playerSys->pickupEntity = entity.id;
 					turnSys->SkipToNextTick();

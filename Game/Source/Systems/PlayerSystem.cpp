@@ -2,16 +2,23 @@
 #include "Systems/PlayerSystem.h"
 #include "JlbMath.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 
 namespace game
 {
+	bool PlayerSystem::IsPlayerOccupied() const
+	{
+		return pickupEntity;
+	}
+
 	void PlayerSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		System<vke::EngineData>::PreUpdate(info, systems);
 
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto turnSys = systems.GetSystem<TurnSystem>();
 		
 		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
 		constexpr glm::ivec2 inputDirs[4]
@@ -34,6 +41,19 @@ namespace game
 			const auto result = input ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
 		}
 
+		if(turnSys->GetIfBeginTickEvent())
+			Reset();
+	}
+
+	void PlayerSystem::OnKeyInput(const vke::EngineData& info, 
+		const jlb::Systems<vke::EngineData> systems, 
+		const int key, const int action)
+	{
+		System<vke::EngineData>::OnKeyInput(info, systems, key, action);
+	}
+
+	void PlayerSystem::Reset()
+	{
 		pickupEntity = {};
 	}
 }

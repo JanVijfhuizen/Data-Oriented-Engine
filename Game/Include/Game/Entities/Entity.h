@@ -17,12 +17,6 @@ namespace game
 				size_t cardId = SIZE_MAX;
 			} pickup;
 		};
-
-		enum class Type
-		{
-			character,
-			pickup
-		} type = Type::character;
 		
 		bool markedForDelete = false;
 	};
@@ -31,6 +25,10 @@ namespace game
 	{
 		size_t index = SIZE_MAX;
 		size_t id = SIZE_MAX;
+
+		[[nodiscard]] bool operator==(const EntityId& other) const;
+		[[nodiscard]] bool operator!=(const EntityId& other) const;
+		[[nodiscard]] operator bool() const;
 	};
 
 	struct Entity

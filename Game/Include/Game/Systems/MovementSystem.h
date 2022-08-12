@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Components/MovementComponent.h"
-#include "VkEngine/Systems/GameSystem.h"
 #include "VkEngine/Systems/TaskSystemWithOutput.h"
 
 namespace game

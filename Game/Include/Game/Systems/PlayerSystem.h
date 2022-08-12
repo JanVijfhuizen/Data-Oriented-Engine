@@ -15,6 +15,8 @@ namespace game
 	public:
 		EntityId pickupEntity{};
 
+		[[nodiscard]] bool IsPlayerOccupied() const;
+
 	private:
 		struct UpdateInfo final
 		{
@@ -22,6 +24,8 @@ namespace game
 			bool keyArrowInput[4];
 		} _updateInfo;
 		
-		void PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		void OnKeyInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action) override;
+		void Reset();
 	};
 }

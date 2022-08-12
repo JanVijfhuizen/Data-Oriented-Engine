@@ -7,9 +7,9 @@
 #include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/PickupSystem.h"
 #include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
-#include "Systems/TextRenderHandler.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
@@ -28,6 +28,7 @@ namespace game
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto playerSys = systems.GetSystem<PlayerSystem>();
+		const auto pickupSys = systems.GetSystem<PickupSystem>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
@@ -36,8 +37,21 @@ namespace game
 		assert(entities.GetCount() == 1);
 
 		auto& entity = entities[0];
-
 		auto& characterInput = entity.input;
+
+		const bool occupied = playerSys->IsPlayerOccupied();
+		if (occupied)
+		{
+			Reset();
+			if (playerSys->pickupEntity)
+			{
+				PickupTask task{};
+				task.instance = entity.id;
+				task.pickup = playerSys->pickupEntity;
+				const auto result = pickupSys->TryAdd(info, task);
+				assert(result != SIZE_MAX);
+			}
+		}
 
 		// Calculate movement direction, if any.
 		if (turnSys->GetIfBeginTickEvent())
@@ -315,9 +329,8 @@ namespace game
 		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2], _movementInput[0]);
 		HandleKeyDirectionInput(GLFW_KEY_D, key, action, _movementInput[3], _movementInput[1]);
 
-		if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-			for (auto& movementInput : _movementInput)
-				movementInput.valid = movementInput.pressed;
+		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+			Reset();
 	}
 
 	void PlayerArchetype::OnMouseInput(const vke::EngineData& info, 
@@ -354,5 +367,11 @@ namespace game
 				input.valid = false;
 			input.pressedSinceStartOfFrame = false;
 		}
+	}
+
+	void PlayerArchetype::Reset()
+	{
+		for (auto& movementInput : _movementInput)
+			movementInput.valid = movementInput.pressed;
 	}
 }
