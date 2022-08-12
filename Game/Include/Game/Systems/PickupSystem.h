@@ -1,25 +1,19 @@
 ﻿#pragma once
+#include "Entities/Entity.h"
 #include "VkEngine/Systems/TaskSystem.h"
 
 namespace game
 {
 	struct PickupTask final
 	{
-		struct Hand final
-		{
-			glm::vec2 position{};
-			float rotation = 0;
-		} hands[2];
-
-		glm::vec2 origin{};
-		glm::vec2 itemOrigin{};
-		size_t item = SIZE_MAX;
+		EntityId instance{};
+		EntityId pickup{};
 	};
 
 	class PickupSystem : public vke::TaskSystem<PickupTask>
 	{
-	public:
-
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
+			const jlb::NestedVector<PickupTask>& tasks) override;
 	};
 }
 

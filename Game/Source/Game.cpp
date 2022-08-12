@@ -13,6 +13,7 @@
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/MovementSystem.h"
+#include "Systems/PickupSystem.h"
 #include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
@@ -39,6 +40,7 @@ namespace game
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<MovementSystem>();
 		initializer.DefineSystem<PlayerSystem>();
+		initializer.DefineSystem<PickupSystem>();
 		initializer.DefineSystem<CardSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();

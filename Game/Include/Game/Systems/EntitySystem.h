@@ -14,6 +14,7 @@ namespace game
 	{
 	public:
 		[[nodiscard]] EntityData& operator[](size_t index) const;
+		[[nodiscard]] bool Contains(const EntityId& id);
 
 		void CreateEntity(Entity& entity);
 		void DestroyEntity(Entity& entity);

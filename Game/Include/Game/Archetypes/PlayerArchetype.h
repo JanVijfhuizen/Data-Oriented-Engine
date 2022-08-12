@@ -43,5 +43,6 @@ namespace game
 
 		[[nodiscard]] vke::SubTexture DefineSubTexture(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
+		void Reset();
 	};
 }
