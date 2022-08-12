@@ -16,8 +16,12 @@ namespace game
 		EntityId pickupEntity{};
 
 	private:
-		glm::ivec2 movementDir{};
-
+		struct UpdateInfo final
+		{
+			glm::vec2 position{};
+			bool keyArrowInput[4];
+		} _updateInfo;
+		
 		void PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
 	};
 }
