@@ -18,10 +18,16 @@ namespace game
 		return current.bvh.GetIntersections(bounds, current.tasks, outArray);
 	}
 
-	size_t CollisionSystem::ReserveTiles(const jlb::Bounds& bounds)
+	size_t CollisionSystem::ReserveTilesThisTurn(const jlb::Bounds& bounds)
 	{
 		auto& current = _collisionFrames.GetCurrent();
 		return current.distanceTree.Add(bounds);
+	}
+
+	size_t CollisionSystem::ReserveTilesNextTurn(const jlb::Bounds& bounds)
+	{
+		auto& previous = _collisionFrames.GetPrevious();
+		return previous.distanceTree.Add(bounds);
 	}
 
 	size_t CollisionSystem::CheckIfTilesAreReserved(const jlb::Bounds& bounds)

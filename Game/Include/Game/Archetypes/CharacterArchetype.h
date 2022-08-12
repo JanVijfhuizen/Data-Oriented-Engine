@@ -86,7 +86,7 @@ namespace game
 						}
 						else
 						{
-							base->movementTileReservation = collisionSys->ReserveTiles(toRounded);
+							base->movementTileReservation = collisionSys->ReserveTilesThisTurn(toRounded);
 							movementComponent.remaining = movementComponent.duration;
 						}
 					}

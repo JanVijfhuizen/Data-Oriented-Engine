@@ -41,30 +41,21 @@ namespace game::demo
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
-			CollisionTask task{};
-			task.bounds = toRounded;
-			task.entityIndex = entity.id;
-			entity.collisionTaskId = collisionSys->TryAdd(task);
+			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
 			
 		for (auto& entity : _players)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
-			CollisionTask task{};
-			task.bounds = toRounded;
-			task.entityIndex = entity.id;
-			entity.collisionTaskId = collisionSys->TryAdd(task);
+			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
 			
 		for (auto& entity : _pickups)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
-			CollisionTask task{};
-			task.bounds = toRounded;
-			task.entityIndex = entity.id;
-			entity.collisionTaskId = collisionSys->TryAdd(task);
+			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
 	}
 
