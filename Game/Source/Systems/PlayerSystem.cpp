@@ -50,9 +50,6 @@ namespace game
 		const int key, const int action)
 	{
 		System<vke::EngineData>::OnKeyInput(info, systems, key, action);
-
-		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-			Reset();
 	}
 
 	void PlayerSystem::Reset()
