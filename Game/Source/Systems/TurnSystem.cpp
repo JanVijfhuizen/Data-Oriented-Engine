@@ -47,8 +47,14 @@ namespace game
 
 	void TurnSystem::SkipToNextTick()
 	{
-		_forwardToNextTick = true;
-		_pauseAtEndOfTick = true;
+		if(_paused)
+		{
+			_forwardToNextTick = _time > 1.f / static_cast<float>(_previousTicksPerSecond);
+			_pauseAtEndOfTick = true;
+			_paused = false;
+			PressKey(1);
+			PressKey(3);
+		}
 	}
 
 	void TurnSystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
@@ -204,14 +210,8 @@ namespace game
 			return;
 			
 		// Go to the next tick.
-		if (key == GLFW_KEY_UP && action == GLFW_PRESS && _paused)
-		{
-			_forwardToNextTick = _time > 1.f / static_cast<float>(_previousTicksPerSecond);
-			_pauseAtEndOfTick = true;
-			_paused = false;
-			PressKey(1);
-			PressKey(3);
-		}
+		if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+			SkipToNextTick();
 
 		// Adjust is paused.
 		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && !_pauseAtEndOfTick)

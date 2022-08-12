@@ -17,15 +17,14 @@ namespace game
 
 		void CreateEntity(Entity& entity);
 		void DestroyEntity(Entity& entity);
-		void Add(const Entity& entity);
+		void UpdateEntity(const Entity& entity) const;
 
 	private:
 		jlb::SparseSet<EntityData> _entities{};
 		jlb::Heap<size_t> _open{};
+		size_t _globalId = 0;
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;
-
-		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 	};
 }

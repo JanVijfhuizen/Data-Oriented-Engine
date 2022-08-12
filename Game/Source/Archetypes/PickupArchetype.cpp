@@ -6,6 +6,7 @@
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Graphics/CameraUtils.h"
@@ -25,6 +26,7 @@ namespace game
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
+		const auto playerSys = systems.GetSystem<PlayerSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
@@ -96,7 +98,6 @@ namespace game
 				menuCreateInfo.uiCamera = &uiRenderSys->camera;
 				menuCreateInfo.interactIds = _menuInteractIds;
 				menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
-				menuCreateInfo.xOffset += 1;
 
 				const float dis = glm::distance(camTarget, transform.position);
 				const bool inRange = dis < 1.25f;
@@ -110,13 +111,14 @@ namespace game
 
 				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn)
 				{
-					// Todo stuff.
+					playerSys->pickupEntity = entity.id;
+					turnSys->SkipToNextTick();
 				}
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
 				
 				CardMenuCreateInfo cardMenuCreateInfo{};
-				cardMenuCreateInfo.origin = transform.position;
+				cardMenuCreateInfo.origin = transform.position + glm::vec2(1.75f, 0) * (static_cast<float>(!_menuUpdateInfo.right) * 2 - 1);
 				cardMenuCreateInfo.cardIndex = cardId;
 				menuSys->CreateCardMenu(info, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
 				resetMenu = false;

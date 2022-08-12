@@ -11,18 +11,23 @@ namespace game
 
 	void EntitySystem::CreateEntity(Entity& entity)
 	{
-		entity.id = _open.GetCount() > 0 ? _open.Pop() : _entities.GetCount();
-		Add(entity);
+		auto& id = entity.id;
+		id.index = _open.GetCount() > 0 ? _open.Pop() : _entities.GetCount();
+		id.id = _globalId++;
+		_entities.Insert(id.index, entity.data);
 	}
 
 	void EntitySystem::DestroyEntity(Entity& entity)
 	{
-		_open.Insert(entity.id, entity.id);
+		auto& id = entity.id;
+		_open.Insert(id.index, id.index);
+		_entities.RemoveAt(id.index);
 	}
 
-	void EntitySystem::Add(const Entity& entity)
+	void EntitySystem::UpdateEntity(const Entity& entity) const
 	{
-		_entities.Insert(entity.id, entity.data);
+		auto& id = entity.id;
+		_entities[id.index].instance = entity.data;
 	}
 
 	void EntitySystem::Allocate(const vke::EngineData& info)
@@ -37,14 +42,5 @@ namespace game
 		_open.Free(*info.allocator);
 		_entities.Free(*info.allocator);
 		System<vke::EngineData>::Free(info);
-	}
-
-	void EntitySystem::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
-	{
-		System<vke::EngineData>::PreUpdate(info, systems);
-
-		const auto turnSys = systems.GetSystem<TurnSystem>();
-		if (turnSys->GetIfBeginTickEvent())
-			_entities.Clear();
 	}
 }

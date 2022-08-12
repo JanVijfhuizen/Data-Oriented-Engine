@@ -27,9 +27,15 @@ namespace game
 		bool markedForDelete = false;
 	};
 
+	struct EntityId final
+	{
+		size_t index = SIZE_MAX;
+		size_t id = SIZE_MAX;
+	};
+
 	struct Entity
 	{
 		EntityData data{};
-		size_t id = SIZE_MAX;
+		EntityId id{};
 	};
 }

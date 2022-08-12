@@ -7,6 +7,7 @@
 #include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/TurnSystem.h"
@@ -26,7 +27,7 @@ namespace game
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto playerSys = systems.GetSystem<PlayerSystem>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
@@ -57,15 +58,6 @@ namespace game
 
 		auto& dumpAllocator = *info.dumpAllocator;
 		auto& tempAllocator = *info.tempAllocator;
-		
-		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
-		glm::vec2 inputDirs[4]
-		{
-			glm::vec2(0, -1),
-			glm::vec2(-1, 0),
-			glm::vec2(0, 1),
-			glm::vec2(1, 0)
-		};
 		
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 
@@ -306,18 +298,13 @@ namespace game
 		else
 			_menuUpdateInfo = {};
 
-		// Draw the directional arrows based on where the player wants to go.
-		vke::EntityRenderTask renderTask{};
-		renderTask.subTexture = subTextureDirArrow;
-		for (size_t i = 0; i < 4; ++i)
-		{
-			auto& input = _movementInput[i];
-			renderTask.transform.position = transform.position + inputDirs[i];
-			renderTask.transform.rotation = -jlb::math::PI * i * .5f;
-			input.valid ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
-		}
-
 		cameraSys->settings.target = transform.position;
+
+		// Update player system.
+		auto& playerSysUpdateInfo = playerSys->_updateInfo;
+		for (size_t i = 0; i < 4; ++i)
+			playerSysUpdateInfo.keyArrowInput[i] = _movementInput[i].valid;
+		playerSysUpdateInfo.position = transform.position;
 	}
 
 	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
