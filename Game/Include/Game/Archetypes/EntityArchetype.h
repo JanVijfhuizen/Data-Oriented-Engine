@@ -29,7 +29,7 @@ namespace game
 			for (int32_t i = count - 1; i >= 0; --i)
 			{
 				const auto base = reinterpret_cast<Entity*>(&entities[i]);
-				base->data = entitySys->operator[](base->id);
+				base->data = entitySys->operator[](base->id.index);
 				if (const auto& data = base->data; data.markedForDelete)
 				{
 					entitySys->DestroyEntity(*base);

@@ -22,6 +22,7 @@ namespace game
 	private:
 		jlb::SparseSet<EntityData> _entities{};
 		jlb::Heap<size_t> _open{};
+		size_t _globalId = 0;
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;

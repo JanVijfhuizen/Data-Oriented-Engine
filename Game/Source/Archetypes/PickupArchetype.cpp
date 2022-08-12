@@ -6,6 +6,7 @@
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
+#include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Graphics/CameraUtils.h"
@@ -25,6 +26,7 @@ namespace game
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
+		const auto playerSys = systems.GetSystem<PlayerSystem>();
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
@@ -109,7 +111,8 @@ namespace game
 
 				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn)
 				{
-					// Todo stuff.
+					playerSys->pickupEntity = entity.id;
+					turnSys->SkipToNextTick();
 				}
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
