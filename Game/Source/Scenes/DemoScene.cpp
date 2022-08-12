@@ -1,5 +1,9 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
+
+#include <iostream>
+
+#include "SparseSet.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
@@ -9,6 +13,21 @@ namespace game::demo
 	void DemoScene::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::Allocate(info, systems);
+
+		jlb::SparseSet<int> s{};
+		s.Allocate(*info.dumpAllocator, 12);
+		for (int i = 12 - 1; i >= 0; --i)
+		{
+			s.Insert(i, 24 - i * 2);
+		}
+
+		s.RemoveAt(4);
+		s.RemoveAt(8);
+
+		for (auto& node : s)
+		{
+			std::cout << node.instance << " " << node.sparseIndex << std::endl;
+		}
 
 		const int32_t dummyCount = 6;
 		_players.Allocate(*info.allocator, 1);

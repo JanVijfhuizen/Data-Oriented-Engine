@@ -122,5 +122,8 @@
     <ClInclude Include="Include\JlbString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\SparseSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
