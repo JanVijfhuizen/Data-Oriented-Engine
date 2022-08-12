@@ -22,7 +22,8 @@ namespace game
 		[[nodiscard]] size_t GetIntersections(const jlb::Bounds& bounds,
 			jlb::ArrayView<uint32_t> outArray);
 
-		size_t ReserveTiles(const jlb::Bounds& bounds);
+		size_t ReserveTilesThisTurn(const jlb::Bounds& bounds);
+		size_t ReserveTilesNextTurn(const jlb::Bounds& bounds);
 		[[nodiscard]] size_t CheckIfTilesAreReserved(const jlb::Bounds& bounds);
 
 	private:

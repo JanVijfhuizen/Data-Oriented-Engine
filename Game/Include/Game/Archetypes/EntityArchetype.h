@@ -23,24 +23,25 @@ namespace game
 	{
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto entitySys = systems.GetSystem<EntitySystem>();
-		const auto& entityTasks = entitySys->GetTasks();
 		const auto count = static_cast<int32_t>(entities.GetCount());
 
 		if(turnSys->GetIfEndTickEvent())
 			for (int32_t i = count - 1; i >= 0; --i)
 			{
 				const auto base = reinterpret_cast<Entity*>(&entities[i]);
-				base->data = base->entityTaskId == SIZE_MAX ? base->data : entityTasks[base->entityTaskId];
+				base->data = entitySys->operator[](base->id);
 				if (const auto& data = base->data; data.markedForDelete)
+				{
+					entitySys->DestroyEntity(*base);
 					entities.RemoveAt(i);
+				}
 			}
 
 		if(turnSys->GetIfBeginTickEvent())
 			for (auto& entity : entities)
 			{
 				const auto base = reinterpret_cast<Entity*>(&entity);
-				base->entityTaskId = entitySys->TryAdd(info, base->data);
-				assert(base->entityTaskId != SIZE_MAX);
+				entitySys->Add(*base);
 			}
 	}
 

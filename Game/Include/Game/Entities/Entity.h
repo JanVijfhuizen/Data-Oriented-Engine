@@ -30,6 +30,6 @@ namespace game
 	struct Entity
 	{
 		EntityData data{};
-		size_t entityTaskId = SIZE_MAX;
+		size_t id = SIZE_MAX;
 	};
 }

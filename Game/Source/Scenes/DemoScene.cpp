@@ -10,6 +10,9 @@ namespace game::demo
 	{
 		Scene::Allocate(info, systems);
 
+		const auto collisionSys = systems.GetSystem<CollisionSystem>();
+		const auto entitySys = systems.GetSystem<EntitySystem>();
+
 		const int32_t dummyCount = 6;
 		_players.Allocate(*info.allocator, 1);
 		_pickups.Allocate(*info.allocator, 1);
@@ -33,6 +36,27 @@ namespace game::demo
 		_pickups.SetCount(1);
 		_pickups[0].data.pickup.cardId = 1;
 		_pickups[0].transform.position = glm::vec2{2, -1};
+
+		for (auto& entity : _dummies)
+		{
+			entitySys->CreateEntity(entity);
+			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
+			collisionSys->ReserveTilesNextTurn(toRounded);
+		}
+			
+		for (auto& entity : _players)
+		{
+			entitySys->CreateEntity(entity);
+			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
+			collisionSys->ReserveTilesNextTurn(toRounded);
+		}
+			
+		for (auto& entity : _pickups)
+		{
+			entitySys->CreateEntity(entity);
+			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
+			collisionSys->ReserveTilesNextTurn(toRounded);
+		}
 	}
 
 	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
@@ -46,10 +70,6 @@ namespace game::demo
 	void DemoScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PreUpdate(info, systems);
-
-		_playerArchetype.PreUpdate(info, systems, _players);
-		_pickupArchetype.PreUpdate(info, systems, _pickups);
-		_dummyArchetype.PreUpdate(info, systems, _dummies);
 
 		const auto collisionSys = systems.GetSystem<CollisionSystem>();
 		const auto tileSys = systems.GetSystem<vke::TileRenderSystem>();
@@ -70,11 +90,11 @@ namespace game::demo
 			bounds.layers = 0b11;
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
-
-			jlb::Bounds b = glm::ivec2(2);
-			b.layers = 0b1;
-			collisionSys->ReserveTiles(b);
 		}
+
+		_playerArchetype.PreUpdate(info, systems, _players);
+		_pickupArchetype.PreUpdate(info, systems, _pickups);
+		_dummyArchetype.PreUpdate(info, systems, _dummies);
 	}
 
 	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)

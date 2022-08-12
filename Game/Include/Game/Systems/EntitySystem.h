@@ -1,21 +1,31 @@
 ﻿#pragma once
 #include "VkEngine/Systems/TaskSystem.h"
 #include <Entities/Entity.h>
+#include "Heap.h"
+#include "SparseSet.h"
 
 namespace game
 {
-	
 	/*
 	Entities can be added here to be interacted with.
 	The interaction system will use this entity system to update their variables based on interactions.
 	*/
-	class EntitySystem final : public vke::TaskSystem<EntityData>
+	class EntitySystem final : public vke::GameSystem
 	{
 	public:
-		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
+		[[nodiscard]] EntityData& operator[](size_t index) const;
+
+		void CreateEntity(Entity& entity);
+		void DestroyEntity(Entity& entity);
+		void Add(const Entity& entity);
+
 	private:
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::NestedVector<EntityData>& tasks) override;
-		[[nodiscard]] bool AutoClearOnFrameEnd() override;
+		jlb::SparseSet<EntityData> _entities{};
+		jlb::Heap<size_t> _open{};
+
+		void Allocate(const vke::EngineData& info) override;
+		void Free(const vke::EngineData& info) override;
+
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 	};
 }
