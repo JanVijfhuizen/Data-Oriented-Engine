@@ -3,13 +3,20 @@
 
 namespace game
 {
+	struct PickupTask final
+	{
+		
+	};
 
-	/*
-	class PickupSystem : public vke::TaskSystemWithOutput
+	struct PickupTaskOutput final
+	{
+		size_t item = SIZE_MAX;
+	};
+
+	class PickupSystem : public vke::TaskSystemWithOutput<PickupTask, PickupTaskOutput>
 	{
 	public:
 
 	};
-	*/
 }
 

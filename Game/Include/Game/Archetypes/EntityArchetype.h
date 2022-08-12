@@ -41,7 +41,7 @@ namespace game
 			for (auto& entity : entities)
 			{
 				const auto base = reinterpret_cast<Entity*>(&entity);
-				entitySys->Add(*base);
+				entitySys->UpdateEntity(*base);
 			}
 	}
 
