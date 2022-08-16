@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include "Components/MovementComponent.h"
-#include "VkEngine/Components/Transform.h"
+#include "Components/PickupComponent.h"
 
 namespace game
 {
@@ -12,8 +12,8 @@ namespace game
 			glm::ivec2 movementDir{};
 		};
 
-		vke::Transform transform{};
 		MovementComponent movementComponent{};
+		PickupComponent pickupComponent{};
 
 		Input input{};
 
@@ -21,5 +21,6 @@ namespace game
 		size_t mouseTaskId = SIZE_MAX;
 		size_t movementTaskId = SIZE_MAX;
 		size_t movementTileReservation = SIZE_MAX;
+		size_t pickupTaskId = SIZE_MAX;
 	};
 }

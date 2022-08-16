@@ -1,5 +1,6 @@
 #pragma once
 #include "Components/Inventory.h"
+#include "VkEngine/Components/Transform.h"
 
 namespace game
 {
@@ -19,6 +20,7 @@ namespace game
 		};
 		
 		bool markedForDelete = false;
+		glm::vec2 position{};
 	};
 
 	struct EntityId final
@@ -33,7 +35,13 @@ namespace game
 
 	struct Entity
 	{
+		friend class EntitySystem;
+
 		EntityData data{};
 		EntityId id{};
+		vke::Transform transform{};
+
+	private:
+		void BuildData();
 	};
 }

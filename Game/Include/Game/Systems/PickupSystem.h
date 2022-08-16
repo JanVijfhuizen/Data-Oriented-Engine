@@ -1,19 +1,13 @@
 ﻿#pragma once
-#include "Entities/Entity.h"
-#include "VkEngine/Systems/TaskSystem.h"
+#include "Components/PickupComponent.h"
+#include "VkEngine/Systems/TaskSystemWithOutput.h"
 
 namespace game
 {
-	struct PickupTask final
-	{
-		EntityId instance{};
-		EntityId pickup{};
-	};
-
-	class PickupSystem : public vke::TaskSystem<PickupTask>
+	class PickupSystem : public vke::TaskSystemWithOutput<PickupComponent, PickupComponent>
 	{
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
-			const jlb::NestedVector<PickupTask>& tasks) override;
+			const jlb::NestedVector<PickupComponent>& tasks) override;
 	};
 }
 

@@ -3,7 +3,6 @@
 #include "JlbMath.h"
 #include "JlbString.h"
 #include "Systems/CameraSystem.h"
-#include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
@@ -23,12 +22,10 @@ namespace game
 	{
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto playerSys = systems.GetSystem<PlayerSystem>();
-		const auto pickupSys = systems.GetSystem<PickupSystem>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
@@ -39,22 +36,34 @@ namespace game
 		auto& entity = entities[0];
 		auto& characterInput = entity.input;
 
-		const bool occupied = playerSys->IsPlayerOccupied();
-		if (occupied)
+		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
+		const bool occupiedNextTurn = playerSys->IsPlayerOccupiedNextTurn();
+		if (occupiedNextTurn)
 		{
 			Reset();
-			if (playerSys->pickupEntity)
+			if (playerSys->pickupEntity && ifBeginTickEvent)
 			{
-				PickupTask task{};
-				task.instance = entity.id;
-				task.pickup = playerSys->pickupEntity;
-				const auto result = pickupSys->TryAdd(info, task);
-				assert(result != SIZE_MAX);
+				auto& pickupComponent = entity.pickupComponent;
+				pickupComponent.instance = entity.id;
+				pickupComponent.pickup = playerSys->pickupEntity;
+				pickupComponent.active = true;
 			}
 		}
 
+		bool occupied = false;
+		if (entity.movementComponent.active)
+			occupied = true;
+		if (entity.pickupComponent.active)
+			occupied = true;
+
+		if(occupied)
+		{
+			_menuUpdateInfo = {};
+			_secondMenuUpdateInfo = {};
+		}
+
 		// Calculate movement direction, if any.
-		if (turnSys->GetIfBeginTickEvent())
+		if (ifBeginTickEvent)
 		{
 			auto& dir = characterInput.movementDir;
 			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;
@@ -87,7 +96,7 @@ namespace game
 
 		// Render Player Menu.
 		_menuIndex = menuOpen ? _menuIndex : MenuIndex::main;
-		if (menuOpen)
+		if (!occupied && menuOpen)
 		{
 			MenuCreateInfo menuCreateInfo{};
 			menuCreateInfo.interactable = true;
@@ -288,9 +297,6 @@ namespace game
 				menuSys->CreateMenu(info, systems, menuCreateInfo, menuUpdateInfo);
 			if (renderCard)
 			{
-				const auto worldPos = transform.position - entityRenderSys->camera.position;
-				const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
-
 				const size_t oldCardHovered = _cardHovered;
 				_cardHovered = _cardHovered == SIZE_MAX ? SIZE_MAX : menuUpdateInfo.centerHovered ? _cardHovered : SIZE_MAX;
 				cardIndex = cardIndex == SIZE_MAX ? _cardHovered : cardIndex;
@@ -338,13 +344,11 @@ namespace game
 	{
 	}
 
-	vke::SubTexture PlayerArchetype::DefineSubTexture(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	vke::SubTexture PlayerArchetype::DefineSubTextureSet(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
-		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
-		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-		return subTexturesDivided[0];
+		return subTexture;
 	}
 
 	void PlayerArchetype::HandleKeyDirectionInput(const int targetKey, const int activatedKey, const int action, Input& input, Input& opposite)

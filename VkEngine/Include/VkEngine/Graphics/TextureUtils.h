@@ -40,6 +40,7 @@ namespace vke
 		[[nodiscard]] glm::vec2 GetCenter(const SubTexture& subTexture);
 		[[nodiscard]] SubTexture MirrorHorizontally(const SubTexture& subTexture);
 		[[nodiscard]] SubTexture ToSubTexture(const glm::vec2& position, const glm::vec2& scale);
+		[[nodiscard]] SubTexture GetSubTexture(const SubTexture& subTexture, size_t amount, size_t index);
 
 		[[nodiscard]] Texture Load(const EngineData& info, jlb::StringView path);
 		void Free(const EngineData& info, const Texture& texture);

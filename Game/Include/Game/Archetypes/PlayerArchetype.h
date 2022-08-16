@@ -41,7 +41,7 @@ namespace game
 		size_t _cardHovered = SIZE_MAX;
 		size_t _cardActivated = SIZE_MAX;
 
-		[[nodiscard]] vke::SubTexture DefineSubTexture(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+		[[nodiscard]] vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
 		void Reset();
 	};

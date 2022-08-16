@@ -11,7 +11,7 @@ namespace game
 
 	bool EntitySystem::Contains(const EntityId& id)
 	{
-		return id ? _entities.Contains(id.index) : false;
+		return id ? _entities.Contains(id.index) && _entities[id.index].sparseIndex == id.id : false;
 	}
 
 	void EntitySystem::CreateEntity(Entity& entity)
@@ -29,10 +29,12 @@ namespace game
 		_entities.RemoveAt(id.index);
 	}
 
-	void EntitySystem::UpdateEntity(const Entity& entity) const
+	void EntitySystem::UpdateEntity(Entity& entity) const
 	{
 		auto& id = entity.id;
-		_entities[id.index].instance = entity.data;
+		auto& instance = _entities[id.index];
+		entity.BuildData();
+		instance.instance = entity.data;
 	}
 
 	void EntitySystem::Allocate(const vke::EngineData& info)
