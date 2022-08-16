@@ -7,7 +7,7 @@
 
 namespace game
 {
-	bool PlayerSystem::IsPlayerOccupied() const
+	bool PlayerSystem::IsPlayerOccupiedNextTurn() const
 	{
 		return pickupEntity;
 	}

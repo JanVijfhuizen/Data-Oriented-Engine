@@ -15,7 +15,7 @@ namespace game
 	public:
 		EntityId pickupEntity{};
 
-		[[nodiscard]] bool IsPlayerOccupied() const;
+		[[nodiscard]] bool IsPlayerOccupiedNextTurn() const;
 
 	private:
 		struct UpdateInfo final

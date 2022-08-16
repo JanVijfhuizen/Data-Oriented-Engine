@@ -36,8 +36,8 @@ namespace game
 		auto& entity = entities[0];
 		auto& characterInput = entity.input;
 
-		const bool occupied = playerSys->IsPlayerOccupied();
-		if (occupied)
+		const bool occupiedNextTurn = playerSys->IsPlayerOccupiedNextTurn();
+		if (occupiedNextTurn)
 		{
 			Reset();
 			if (playerSys->pickupEntity)
@@ -47,6 +47,15 @@ namespace game
 				pickupComponent.pickup = playerSys->pickupEntity;
 				pickupComponent.active = true;
 			}
+		}
+
+		bool occupied = false;
+		occupied = occupied ? true : entity.movementComponent.active;
+		occupied = occupied ? true : entity.pickupComponent.active;
+		if(occupied)
+		{
+			_menuUpdateInfo = {};
+			_secondMenuUpdateInfo = {};
 		}
 
 		// Calculate movement direction, if any.
@@ -83,7 +92,7 @@ namespace game
 
 		// Render Player Menu.
 		_menuIndex = menuOpen ? _menuIndex : MenuIndex::main;
-		if (menuOpen)
+		if (!occupied && menuOpen)
 		{
 			MenuCreateInfo menuCreateInfo{};
 			menuCreateInfo.interactable = true;

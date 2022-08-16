@@ -122,7 +122,9 @@ namespace game
 			{
 				const auto base = reinterpret_cast<Character*>(&entity);
 
-				auto& movementComponent = base->movementComponent;
+				const auto& movementComponent = base->movementComponent;
+				const auto& pickupComponent = base->pickupComponent;
+
 				const auto& transform = base->transform;
 				base->movementTaskId = movementSys->TryAdd(info, movementComponent);
 
@@ -136,22 +138,24 @@ namespace game
 						base->mouseTaskId = mouseSys->TryAdd(info, bounds);
 
 						vke::EntityRenderTask renderTask{};
-						renderTask.subTexture = headSubTexture;
 						renderTask.transform = transform;
 						renderTask.transform.scale *= movementComponent.scaleMultiplier;
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
-						auto result = entityRenderSys->TryAdd(info, renderTask);
 
 						glm::vec2 v = transform.position;
 						v.x = v.x + cos(transform.rotation) * handOffset;
 						v.y = v.y + sin(transform.rotation) * handOffset;
 
-						renderTask.transform.position = v;
+						renderTask.transform.position = pickupComponent.active ? pickupComponent.handPositions[0] : v;
 						renderTask.subTexture = handSubTexture;
+						auto result = entityRenderSys->TryAdd(info, renderTask);
+
+						renderTask.transform.position = pickupComponent.active ? pickupComponent.handPositions[1] : transform.position * 2.f - v;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = transform.position * 2.f - v;
+						renderTask.transform.position = transform.position;
+						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(info, renderTask);
 					}
 				}
