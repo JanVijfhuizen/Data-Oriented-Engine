@@ -45,7 +45,7 @@ namespace game
 			Reset();
 			if (playerSys->pickupEntity)
 			{
-				PickupTask task{};
+				PickupComponent task{};
 				task.instance = entity.id;
 				task.pickup = playerSys->pickupEntity;
 				const auto result = pickupSys->TryAdd(info, task);

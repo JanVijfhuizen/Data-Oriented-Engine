@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Systems/PickupSystem.h"
-
 #include "Curve.h"
 #include "JlbMath.h"
 #include "Systems/EntitySystem.h"
@@ -11,9 +10,9 @@ namespace game
 {
 	void PickupSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<PickupTask>& tasks)
+		const jlb::NestedVector<PickupComponent>& tasks)
 	{
-		TaskSystemWithOutput<PickupTask, PickupTaskOutput>::OnPreUpdate(info, systems, tasks);
+		TaskSystemWithOutput<PickupComponent, PickupComponent>::OnPreUpdate(info, systems, tasks);
 
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
@@ -33,12 +32,14 @@ namespace game
 
 			for (auto& task : tasks)
 			{
-				const auto pos = jlb::math::LerpPct(task._position, task._pickupPosition, eval);
-
-				PickupTaskOutput output{};
-				output.lHandPosition = pos;
-				output.rHandPosition = pos;
-				tasksOutput.Add(dumpAllocator, output);
+				if (task.valid)
+				{
+					const auto pos = jlb::math::LerpPct(task._instancePosition, task._pickupPosition, eval);
+					task.handPositions[0] = pos;
+					task.handPositions[1] = pos;
+				}
+				
+				tasksOutput.Add(dumpAllocator, task);
 			}
 		};
 
@@ -58,14 +59,17 @@ namespace game
 			for (auto& task : tasks)
 			{
 				if (!entitySys->Contains(task.instance) || !entitySys->Contains(task.pickup))
+				{
+					task.valid = false;
 					continue;
+				}
 
 				auto& instance = entitySys->operator[](task.instance.index);
 				auto& pickup = entitySys->operator[](task.pickup.index);
 				instance.character.inventory.Insert(pickup.pickup.cardId);
 				pickup.markedForDelete = true;
 
-				task._position = instance.position;
+				task._instancePosition = instance.position;
 				task._pickupPosition = pickup.position;
 			}
 	}

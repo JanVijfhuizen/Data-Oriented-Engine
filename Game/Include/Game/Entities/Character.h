@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include "Components/MovementComponent.h"
+#include "Components/PickupComponent.h"
 
 namespace game
 {
@@ -10,8 +11,9 @@ namespace game
 		{
 			glm::ivec2 movementDir{};
 		};
-		
+
 		MovementComponent movementComponent{};
+		PickupComponent pickupComponent{};
 
 		Input input{};
 
