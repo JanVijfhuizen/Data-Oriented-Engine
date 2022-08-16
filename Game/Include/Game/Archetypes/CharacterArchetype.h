@@ -50,8 +50,9 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		const size_t hoveredObj = mouseSys->GetHoveredObject();
+		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
 
-		if (turnSys->GetIfBeginTickEvent())
+		if (ifBeginTickEvent)
 			for (auto& entity : entities)
 			{
 				const auto base = static_cast<Character*>(&entity);
@@ -62,12 +63,8 @@ namespace game
 				glm::vec2 collisionPos = transform.position;
 
 				bool occupied = false;
-				if(!occupied && base->pickupComponent.active)
-				{
+				if(base->pickupComponent.active)
 					occupied = true;
-					base->pickupTaskId = pickupSystem->TryAdd(info, base->pickupComponent);
-					assert(base->pickupTaskId != SIZE_MAX);
-				}
 
 				// Update movement task with new input.
 				if (!occupied && movementComponent.remaining == 0)
@@ -127,6 +124,12 @@ namespace game
 
 				const auto& transform = base->transform;
 				base->movementTaskId = movementSys->TryAdd(info, movementComponent);
+				
+				if (base->pickupComponent.active)
+				{
+					base->pickupTaskId = pickupSystem->TryAdd(info, base->pickupComponent);
+					assert(base->pickupTaskId != SIZE_MAX);
+				}
 
 				{
 					const auto& camera = entityRenderSys->camera;
@@ -147,11 +150,12 @@ namespace game
 						v.x = v.x + cos(transform.rotation) * handOffset;
 						v.y = v.y + sin(transform.rotation) * handOffset;
 
-						renderTask.transform.position = pickupComponent.active ? pickupComponent.handPositions[0] : v;
+						const bool pickupOngoing = pickupComponent.active && !ifBeginTickEvent;
+						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[0] : v;
 						renderTask.subTexture = handSubTexture;
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = pickupComponent.active ? pickupComponent.handPositions[1] : transform.position * 2.f - v;
+						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[1] : transform.position * 2.f - v;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
 						renderTask.transform.position = transform.position;

@@ -36,11 +36,12 @@ namespace game
 		auto& entity = entities[0];
 		auto& characterInput = entity.input;
 
+		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
 		const bool occupiedNextTurn = playerSys->IsPlayerOccupiedNextTurn();
 		if (occupiedNextTurn)
 		{
 			Reset();
-			if (playerSys->pickupEntity)
+			if (playerSys->pickupEntity && ifBeginTickEvent)
 			{
 				auto& pickupComponent = entity.pickupComponent;
 				pickupComponent.instance = entity.id;
@@ -50,8 +51,11 @@ namespace game
 		}
 
 		bool occupied = false;
-		occupied = occupied ? true : entity.movementComponent.active;
-		occupied = occupied ? true : entity.pickupComponent.active;
+		if (entity.movementComponent.active)
+			occupied = true;
+		if (entity.pickupComponent.active)
+			occupied = true;
+
 		if(occupied)
 		{
 			_menuUpdateInfo = {};
@@ -59,7 +63,7 @@ namespace game
 		}
 
 		// Calculate movement direction, if any.
-		if (turnSys->GetIfBeginTickEvent())
+		if (ifBeginTickEvent)
 		{
 			auto& dir = characterInput.movementDir;
 			dir.x = static_cast<int32_t>(_movementInput[3].valid) - _movementInput[1].valid;

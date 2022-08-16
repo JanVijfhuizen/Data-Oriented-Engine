@@ -64,6 +64,12 @@ namespace game
 			}
 		}
 
+		if(playerSys->IsPlayerOccupiedNextTurn())
+		{
+			_menuUpdateInfo = {};
+			_cardMenuUpdateInfo = {};
+		}
+
 		for (auto& entity : entities)
 		{
 			const auto cardId = entity.data.pickup.cardId;
