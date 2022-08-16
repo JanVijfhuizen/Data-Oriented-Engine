@@ -18,7 +18,7 @@ namespace game
 
 		void CreateEntity(Entity& entity);
 		void DestroyEntity(Entity& entity);
-		void UpdateEntity(const Entity& entity) const;
+		void UpdateEntity(Entity& entity) const;
 
 	private:
 		jlb::SparseSet<EntityData> _entities{};

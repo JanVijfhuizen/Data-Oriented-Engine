@@ -10,14 +10,14 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<PickupTask>& tasks)
 	{
-		TaskSystem<PickupTask>::OnPreUpdate(info, systems, tasks);
+		TaskSystemWithOutput<PickupTask, PickupTaskOutput>::OnPreUpdate(info, systems, tasks);
 
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		vke::ThreadPoolTask threadTask{};
 		threadTask.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
-			// TODO fancy animations.
+			const auto self = static_cast<PickupSystem*>(userPtr);
 		};
 
 		threadTask.userPtr = this;
@@ -38,6 +38,9 @@ namespace game
 				auto& pickup = entitySys->operator[](task.pickup.index);
 				instance.character.inventory.Insert(pickup.pickup.cardId);
 				pickup.markedForDelete = true;
+
+				task._position = instance.position;
+				task._pickupPosition = pickup.position;
 			}
 	}
 }

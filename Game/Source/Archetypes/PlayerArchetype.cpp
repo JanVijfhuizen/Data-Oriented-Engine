@@ -288,9 +288,6 @@ namespace game
 				menuSys->CreateMenu(info, systems, menuCreateInfo, menuUpdateInfo);
 			if (renderCard)
 			{
-				const auto worldPos = transform.position - entityRenderSys->camera.position;
-				const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
-
 				const size_t oldCardHovered = _cardHovered;
 				_cardHovered = _cardHovered == SIZE_MAX ? SIZE_MAX : menuUpdateInfo.centerHovered ? _cardHovered : SIZE_MAX;
 				cardIndex = cardIndex == SIZE_MAX ? _cardHovered : cardIndex;

@@ -17,4 +17,9 @@ namespace game
 	{
 		return id != SIZE_MAX;
 	}
+
+	void Entity::BuildData()
+	{
+		data.position = transform.position;
+	}
 }

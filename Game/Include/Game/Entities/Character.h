@@ -1,7 +1,6 @@
 #pragma once
 #include "Entity.h"
 #include "Components/MovementComponent.h"
-#include "VkEngine/Components/Transform.h"
 
 namespace game
 {
@@ -11,8 +10,7 @@ namespace game
 		{
 			glm::ivec2 movementDir{};
 		};
-
-		vke::Transform transform{};
+		
 		MovementComponent movementComponent{};
 
 		Input input{};

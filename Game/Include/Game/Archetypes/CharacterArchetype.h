@@ -53,7 +53,7 @@ namespace game
 		if (turnSys->GetIfBeginTickEvent())
 			for (auto& entity : entities)
 			{
-				const auto base = reinterpret_cast<Character*>(&entity);
+				const auto base = static_cast<Character*>(&entity);
 
 				auto& movementComponent = base->movementComponent;
 				const auto& transform = base->transform;
@@ -66,7 +66,7 @@ namespace game
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
 					
-					const glm::vec2 from = jlb::math::RoundNearest(base->transform.position);
+					const glm::vec2 from = jlb::math::RoundNearest(transform.position);
 					const glm::vec2 delta = glm::vec2(dir);
 					glm::vec2 to = from + delta;
 
