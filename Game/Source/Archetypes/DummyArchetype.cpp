@@ -26,12 +26,10 @@ namespace game::demo
 		// todo something.
 	}
 
-	vke::SubTexture DummyArchetype::DefineSubTexture(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
+	vke::SubTexture DummyArchetype::DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
 	{
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
-		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
-		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-		return subTexturesDivided[0];
+		return subTexture;
 	}
 }

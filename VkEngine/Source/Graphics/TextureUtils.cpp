@@ -354,6 +354,15 @@ namespace vke::texture
 		return ret;
 	}
 
+	SubTexture GetSubTexture(const SubTexture& subTexture, const size_t amount, const size_t index)
+	{
+		SubTexture ret = subTexture;
+		const float chunkSize = GetChunkSize(subTexture, amount);
+		ret.lTop.x += chunkSize * static_cast<float>(index);
+		ret.rBot.x = ret.lTop.x + chunkSize;
+		return ret;
+	}
+
 	Texture Load(const EngineData& info, const jlb::StringView path)
 	{
 		// Load pixels.

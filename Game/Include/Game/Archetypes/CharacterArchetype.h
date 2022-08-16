@@ -31,7 +31,8 @@ namespace game
 
 		float scalingOnSelected = 0.5f;
 		
-		[[nodiscard]] virtual vke::SubTexture DefineSubTexture(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) = 0;
+		[[nodiscard]] virtual vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) = 0;
+		[[nodiscard]] virtual size_t DefineSubTextureSetLength() const;
 	};
 
 	template <typename T>
@@ -49,8 +50,6 @@ namespace game
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 
 		const size_t hoveredObj = mouseSys->GetHoveredObject();
-
-		const auto subTexture = DefineSubTexture(info, systems);
 
 		if (turnSys->GetIfBeginTickEvent())
 			for (auto& entity : entities)
@@ -111,30 +110,42 @@ namespace game
 				assert(base->collisionTaskId != SIZE_MAX);
 			}
 
-		for (auto& entity : entities)
 		{
-			const auto base = reinterpret_cast<Character*>(&entity);
+			const auto subTexture = DefineSubTextureSet(info, systems);
+			const size_t subTextureLength = DefineSubTextureSetLength();
 
-			auto& movementComponent = base->movementComponent;
-			const auto& transform = base->transform;
-			base->movementTaskId = movementSys->TryAdd(info, movementComponent);
+			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
+			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
 
+			for (auto& entity : entities)
 			{
-				const auto& camera = entityRenderSys->camera;
-				const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
-				base->mouseTaskId = SIZE_MAX;
-				if (!culls)
-				{
-					jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
-					base->mouseTaskId = mouseSys->TryAdd(info, bounds);
+				const auto base = reinterpret_cast<Character*>(&entity);
 
-					vke::EntityRenderTask renderTask{};
-					renderTask.subTexture = subTexture;
-					renderTask.transform = transform;
-					renderTask.transform.scale *= movementComponent.scaleMultiplier;
-					const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
-					renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
-					const auto result = entityRenderSys->TryAdd(info, renderTask);
+				auto& movementComponent = base->movementComponent;
+				const auto& transform = base->transform;
+				base->movementTaskId = movementSys->TryAdd(info, movementComponent);
+
+				{
+					const auto& camera = entityRenderSys->camera;
+					const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
+					base->mouseTaskId = SIZE_MAX;
+					if (!culls)
+					{
+						jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
+						base->mouseTaskId = mouseSys->TryAdd(info, bounds);
+
+						vke::EntityRenderTask renderTask{};
+						renderTask.subTexture = headSubTexture;
+						renderTask.transform = transform;
+						renderTask.transform.scale *= movementComponent.scaleMultiplier;
+						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
+						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
+						auto result = entityRenderSys->TryAdd(info, renderTask);
+
+						renderTask.transform.position.y += 1;
+						renderTask.subTexture = handSubTexture;
+						result = entityRenderSys->TryAdd(info, renderTask);
+					}
 				}
 			}
 		}
@@ -170,5 +181,11 @@ namespace game
 				base->pickupComponent = output;
 			}
 		}
+	}
+
+	template <typename T>
+	size_t CharacterArchetype<T>::DefineSubTextureSetLength() const
+	{
+		return 2;
 	}
 }
