@@ -116,6 +116,7 @@ namespace game
 
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
 			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
+			const float handOffset = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY) * 8;
 
 			for (auto& entity : entities)
 			{
@@ -142,8 +143,15 @@ namespace game
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position.y += 1;
+						glm::vec2 v = transform.position;
+						v.x = v.x + cos(transform.rotation) * handOffset;
+						v.y = v.y + sin(transform.rotation) * handOffset;
+
+						renderTask.transform.position = v;
 						renderTask.subTexture = handSubTexture;
+						result = entityRenderSys->TryAdd(info, renderTask);
+
+						renderTask.transform.position = transform.position * 2.f - v;
 						result = entityRenderSys->TryAdd(info, renderTask);
 					}
 				}
