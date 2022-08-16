@@ -11,7 +11,7 @@ namespace game
 		EntityId pickup{};
 
 		glm::vec2 handPositions[2]{};
-		bool valid = true;
+		bool active = false;
 
 	private:
 		glm::vec2 _instancePosition{};

@@ -3,7 +3,6 @@
 #include "JlbMath.h"
 #include "JlbString.h"
 #include "Systems/CameraSystem.h"
-#include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/MenuSystem.h"
 #include "Systems/MouseSystem.h"
@@ -23,12 +22,10 @@ namespace game
 	{
 		const auto cameraSys = systems.GetSystem<CameraSystem>();
 		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
 		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
 		const auto menuSys = systems.GetSystem<MenuSystem>();
 		const auto mouseSys = systems.GetSystem<MouseSystem>();
 		const auto playerSys = systems.GetSystem<PlayerSystem>();
-		const auto pickupSys = systems.GetSystem<PickupSystem>();
 		const auto turnSys = systems.GetSystem<TurnSystem>();
 		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
 		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
@@ -45,11 +42,10 @@ namespace game
 			Reset();
 			if (playerSys->pickupEntity)
 			{
-				PickupComponent task{};
-				task.instance = entity.id;
-				task.pickup = playerSys->pickupEntity;
-				const auto result = pickupSys->TryAdd(info, task);
-				assert(result != SIZE_MAX);
+				auto& pickupComponent = entity.pickupComponent;
+				pickupComponent.instance = entity.id;
+				pickupComponent.pickup = playerSys->pickupEntity;
+				pickupComponent.active = true;
 			}
 		}
 

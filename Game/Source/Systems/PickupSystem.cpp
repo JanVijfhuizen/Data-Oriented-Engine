@@ -22,6 +22,8 @@ namespace game
 			const auto self = static_cast<PickupSystem*>(userPtr);
 			const auto turnSys = systems.GetSystem<TurnSystem>();
 
+			const bool isEndTickEvent = turnSys->GetIfEndTickEvent();
+
 			const auto& tasks = self->GetTasks();
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
 			auto& tasksOutput = self->GetOutputEditable();
@@ -32,11 +34,12 @@ namespace game
 
 			for (auto& task : tasks)
 			{
-				if (task.valid)
+				if (task.active)
 				{
 					const auto pos = jlb::math::LerpPct(task._instancePosition, task._pickupPosition, eval);
 					task.handPositions[0] = pos;
 					task.handPositions[1] = pos;
+					task.active = !isEndTickEvent;
 				}
 				
 				tasksOutput.Add(dumpAllocator, task);
@@ -58,11 +61,9 @@ namespace game
 		if(turnSys->GetIfBeginTickEvent())
 			for (auto& task : tasks)
 			{
-				if (!entitySys->Contains(task.instance) || !entitySys->Contains(task.pickup))
-				{
-					task.valid = false;
+				task.active = entitySys->Contains(task.instance) && entitySys->Contains(task.pickup);
+				if (!task.active)
 					continue;
-				}
 
 				auto& instance = entitySys->operator[](task.instance.index);
 				auto& pickup = entitySys->operator[](task.pickup.index);

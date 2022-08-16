@@ -16,6 +16,8 @@ namespace game
 		size_t duration = 1;
 
 		float scaleMultiplier = 1;
-		size_t remaining = SIZE_MAX;
+		size_t remaining = 0;
+
+		bool active = false;
 	};
 }

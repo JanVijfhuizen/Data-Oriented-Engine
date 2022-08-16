@@ -21,5 +21,6 @@ namespace game
 		size_t mouseTaskId = SIZE_MAX;
 		size_t movementTaskId = SIZE_MAX;
 		size_t movementTileReservation = SIZE_MAX;
+		size_t pickupTaskId = SIZE_MAX;
 	};
 }

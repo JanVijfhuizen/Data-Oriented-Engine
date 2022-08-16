@@ -51,6 +51,8 @@ namespace game
 				const bool finished = task.remaining == 0;
 				task.position = finished ? task.to : task.position;
 				task.rotation = finished ? toAngle : task.rotation;
+
+				task.active = !finished;
 				tasksOutput.Add(dumpAllocator, task);
 			}
 		};
@@ -72,6 +74,6 @@ namespace game
 
 	bool MovementSystem::ValidateOnTryAdd(const MovementTask& task)
 	{
-		return task.remaining == SIZE_MAX ? false : TaskSystemWithOutput<MovementTask, MovementTask>::ValidateOnTryAdd(task);
+		return !task.active ? false : TaskSystemWithOutput<MovementTask, MovementTask>::ValidateOnTryAdd(task);
 	}
 }
