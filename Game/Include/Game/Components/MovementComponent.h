@@ -11,7 +11,7 @@ namespace game
 		glm::vec2 outPosition;
 		float outRotation;
 		float outScaleMultiplier = 1;
-		size_t outRemaining = 0;
+		size_t outRemaining;
 
 		bool active = false;
 	};

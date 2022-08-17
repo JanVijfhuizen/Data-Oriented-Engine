@@ -69,7 +69,7 @@ namespace game
 					occupied = true;
 
 				// Update movement task with new input.
-				if (!occupied && movementComponent.outRemaining == 0)
+				if (!occupied && !movementComponent.active)
 				{
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
@@ -98,7 +98,6 @@ namespace game
 
 					movementComponent.inFrom = from;
 					movementComponent.inTo = to;
-					movementComponent.outRotation = transform.rotation;
 				}
 
 				// Collision task.
@@ -115,13 +114,10 @@ namespace game
 
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
 			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
-			const float hPi = jlb::math::PI * .5f;
-			const float dPi = jlb::math::PI * 2;
-
 			const float tickLerp = turnSys->GetTickLerp();
 			auto curve = jlb::CreateCurveOvershooting();
 			const auto handOffset = GetRightHandOffset();
-			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve, curve) * dPi * .1f;
+			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve, curve) * jlb::math::PI * 2 * .1f;
 
 			for (auto& entity : entities)
 			{
@@ -164,11 +160,11 @@ namespace game
 
 						// Render the hands.
 						const bool pickupOngoing = pickupComponent.active && !ifBeginTickEvent;
-						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[0] : v1;
+						renderTask.transform.position = pickupOngoing ? pickupComponent.outHandPositions[0] : v1;
 						renderTask.subTexture = handSubTexture;
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[1] : v2;
+						renderTask.transform.position = pickupOngoing ? pickupComponent.outHandPositions[1] : v2;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
 						// Render the head.

@@ -37,8 +37,8 @@ namespace game
 				if (task.active)
 				{
 					const auto pos = jlb::math::LerpPct(task._instancePosition, task._pickupPosition, eval);
-					task.handPositions[0] = pos;
-					task.handPositions[1] = pos;
+					task.outHandPositions[0] = pos;
+					task.outHandPositions[1] = pos;
 					task.active = !isEndTickEvent;
 				}
 				
@@ -61,12 +61,12 @@ namespace game
 		if(turnSys->GetIfBeginTickEvent())
 			for (auto& task : tasks)
 			{
-				task.active = entitySys->Contains(task.instance) && entitySys->Contains(task.pickup);
+				task.active = entitySys->Contains(task.inInstanceId) && entitySys->Contains(task.inPickupId);
 				if (!task.active)
 					continue;
 
-				auto& instance = entitySys->operator[](task.instance.index);
-				auto& pickup = entitySys->operator[](task.pickup.index);
+				auto& instance = entitySys->operator[](task.inInstanceId.index);
+				auto& pickup = entitySys->operator[](task.inPickupId.index);
 				instance.character.inventory.Insert(pickup.pickup.cardId);
 				pickup.markedForDelete = true;
 

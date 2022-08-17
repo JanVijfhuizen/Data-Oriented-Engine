@@ -7,10 +7,10 @@ namespace game
 	{
 		friend class PickupSystem;
 
-		EntityId instance{};
-		EntityId pickup{};
+		EntityId inInstanceId{};
+		EntityId inPickupId{};
 
-		glm::vec2 handPositions[2]{};
+		glm::vec2 outHandPositions[2]{};
 		bool active = false;
 
 	private:
