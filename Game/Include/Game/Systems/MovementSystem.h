@@ -13,7 +13,7 @@ namespace game
 		// Object scaling during movement.
 		float bobbingScaling = 0.1f;
 		// Percent (0-1) of the turn spend on rotation.
-		float rotationDuration = .25f;
+		float rotationDuration = 1;
 		
 	private:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;

@@ -44,6 +44,18 @@ namespace jlb::math
 		return clampable;
 	}
 
+	glm::vec2 GetDir(const float angle)
+	{
+		return { cosf(angle), sinf(angle)};
+	}
+
+	glm::vec2 Rotate(const glm::vec2 v, const float angle)
+	{
+		float newX = v.x * cosf(angle) - v.y * sinf(angle);
+		float newY = v.x * sinf(angle) + v.y * cosf(angle);
+		return { newX, newY };
+	}
+
 	float Lerp(const float a, const float b, const float delta)
 	{
 		return a + delta * ((b > a) * 2 - 1);

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Curve.h"
 #include "EntityArchetype.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
@@ -33,6 +34,7 @@ namespace game
 		
 		[[nodiscard]] virtual vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) = 0;
 		[[nodiscard]] virtual size_t DefineSubTextureSetLength() const;
+		[[nodiscard]] virtual glm::vec2 GetRightHandOffset() const;
 	};
 
 	template <typename T>
@@ -113,7 +115,13 @@ namespace game
 
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
 			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
-			const float handOffset = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY) * 8;
+			const float hPi = jlb::math::PI * .5f;
+			const float dPi = jlb::math::PI * 2;
+
+			const float tickLerp = turnSys->GetTickLerp();
+			auto curve = jlb::CreateCurveOvershooting();
+			auto handOffset = GetRightHandOffset();
+			handOffset = jlb::math::Rotate(handOffset, DoubleCurveEvaluate(tickLerp, curve, curve) * dPi * .1f);
 
 			for (auto& entity : entities)
 			{
@@ -146,18 +154,22 @@ namespace game
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
-						glm::vec2 v = transform.position;
-						v.x = v.x + cos(transform.rotation) * handOffset;
-						v.y = v.y + sin(transform.rotation) * handOffset;
+						glm::vec2 v1 = jlb::math::Rotate(handOffset, transform.rotation);
+						glm::vec2 v2 = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
 
+						v1 += transform.position;
+						v2 += transform.position;
+
+						// Render the hands.
 						const bool pickupOngoing = pickupComponent.active && !ifBeginTickEvent;
-						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[0] : v;
+						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[0] : v1;
 						renderTask.subTexture = handSubTexture;
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[1] : transform.position * 2.f - v;
+						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[1] : v2;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
+						// Render the head.
 						renderTask.transform.position = transform.position;
 						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(info, renderTask);
@@ -203,5 +215,12 @@ namespace game
 	size_t CharacterArchetype<T>::DefineSubTextureSetLength() const
 	{
 		return 2;
+	}
+
+	template <typename T>
+	glm::vec2 CharacterArchetype<T>::GetRightHandOffset() const
+	{
+		const float pct = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
+		return {pct * 6, pct * 2};
 	}
 }
