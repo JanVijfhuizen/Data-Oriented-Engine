@@ -120,8 +120,8 @@ namespace game
 
 			const float tickLerp = turnSys->GetTickLerp();
 			auto curve = jlb::CreateCurveOvershooting();
-			auto handOffset = GetRightHandOffset();
-			handOffset = jlb::math::Rotate(handOffset, DoubleCurveEvaluate(tickLerp, curve, curve) * dPi * .1f);
+			const auto handOffset = GetRightHandOffset();
+			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve, curve) * dPi * .1f;
 
 			for (auto& entity : entities)
 			{
@@ -156,6 +156,8 @@ namespace game
 
 						glm::vec2 v1 = jlb::math::Rotate(handOffset, transform.rotation);
 						glm::vec2 v2 = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
+						v1 = movementComponent.active ? jlb::math::Rotate(v1, handLerpAngle) : v1;
+						v2 = movementComponent.active ? jlb::math::Rotate(v2, handLerpAngle) : v2;
 
 						v1 += transform.position;
 						v2 += transform.position;
