@@ -30,27 +30,27 @@ namespace game
 
 			for (auto& task : tasks)
 			{
-				task.remaining -= isEndTickEvent;
+				task.outRemaining -= isEndTickEvent;
 
-				const auto durationF = static_cast<float>(task.duration);
+				const auto durationF = static_cast<float>(task.inDuration);
 				// Smoothly move between grid positions.
-				const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(task.remaining) / durationF;
-				task.position = jlb::math::LerpPct(task.from, task.to, pct);
+				const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(task.outRemaining) / durationF;
+				task.outPosition = jlb::math::LerpPct(task.inFrom, task.inTo, pct);
 
 				// Bobbing.
-				const float bobbingPct = fmodf(pct * task.bobbingAmount, 1);
+				const float bobbingPct = fmodf(pct * self->bobbingAmount, 1);
 				const float eval = jlb::DoubleCurveEvaluate(bobbingPct, curveOvershoot, curveOvershoot);
-				task.scaleMultiplier = 1.f + eval * self->bobbingScaling;
+				task.outScaleMultiplier = 1.f + eval * self->bobbingScaling;
 
 				// Movement rotation.
-				const float toAngle = jlb::math::GetAngle(task.from, task.to);
+				const float toAngle = jlb::math::GetAngle(task.inFrom, task.inTo);
 				const float pctRotation = jlb::math::Min<float>(pct / self->rotationDuration, 1);
 
-				task.rotation = jlb::math::SmoothAngle(task.rotation, toAngle, curveOvershoot.Evaluate(pctRotation));
+				task.outRotation = jlb::math::SmoothAngle(task.outRotation, toAngle, curveOvershoot.Evaluate(pctRotation));
 
-				const bool finished = task.remaining == 0;
-				task.position = finished ? task.to : task.position;
-				task.rotation = finished ? toAngle : task.rotation;
+				const bool finished = task.outRemaining == 0;
+				task.outPosition = finished ? task.inTo : task.outPosition;
+				task.outRotation = finished ? toAngle : task.outRotation;
 
 				task.active = !finished;
 				tasksOutput.Add(dumpAllocator, task);

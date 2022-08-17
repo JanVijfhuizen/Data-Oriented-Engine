@@ -10,6 +10,8 @@ namespace game
 	class MovementSystem final : public vke::TaskSystemWithOutput<MovementTask, MovementTask>
 	{
 	public:
+		// How many times bobbing happens during a tick.
+		float bobbingAmount = 2;
 		// Object scaling during movement.
 		float bobbingScaling = 0.1f;
 		// Percent (0-1) of the turn spend on rotation.

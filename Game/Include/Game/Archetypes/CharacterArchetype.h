@@ -69,7 +69,7 @@ namespace game
 					occupied = true;
 
 				// Update movement task with new input.
-				if (!occupied && movementComponent.remaining == 0)
+				if (!occupied && movementComponent.outRemaining == 0)
 				{
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
@@ -90,15 +90,15 @@ namespace game
 							!collisionSys->GetIntersections(toRounded, outCollision))
 						{
 							base->movementTileReservation = collisionSys->ReserveTilesThisTurn(toRounded);
-							movementComponent.remaining = movementComponent.duration;
+							movementComponent.outRemaining = movementComponent.inDuration;
 							movementComponent.active = true;
 							collisionPos = to;
 						}
 					}
 
-					movementComponent.from = from;
-					movementComponent.to = to;
-					movementComponent.rotation = transform.rotation;
+					movementComponent.inFrom = from;
+					movementComponent.inTo = to;
+					movementComponent.outRotation = transform.rotation;
 				}
 
 				// Collision task.
@@ -150,7 +150,7 @@ namespace game
 
 						vke::EntityRenderTask renderTask{};
 						renderTask.transform = transform;
-						renderTask.transform.scale *= movementComponent.scaleMultiplier;
+						renderTask.transform.scale *= movementComponent.outScaleMultiplier;
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
@@ -201,8 +201,8 @@ namespace game
 				base->movementComponent = output;
 
 				auto& transform = base->transform;
-				transform.position = output.position;
-				transform.rotation = output.rotation;
+				transform.position = output.outPosition;
+				transform.rotation = output.outRotation;
 			}
 			if(base->pickupTaskId != SIZE_MAX)
 			{
