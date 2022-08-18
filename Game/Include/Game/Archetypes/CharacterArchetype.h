@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Curve.h"
 #include "EntityArchetype.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
@@ -33,6 +34,9 @@ namespace game
 		
 		[[nodiscard]] virtual vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) = 0;
 		[[nodiscard]] virtual size_t DefineSubTextureSetLength() const;
+		[[nodiscard]] virtual glm::vec2 GetRightHandOffset() const;
+		[[nodiscard]] virtual float GetHandAngleMultiplier() const;
+		[[nodiscard]] virtual float GetHandMoveSpeed() const;
 	};
 
 	template <typename T>
@@ -67,7 +71,7 @@ namespace game
 					occupied = true;
 
 				// Update movement task with new input.
-				if (!occupied && movementComponent.remaining == 0)
+				if (!occupied && !movementComponent.active)
 				{
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
@@ -88,15 +92,14 @@ namespace game
 							!collisionSys->GetIntersections(toRounded, outCollision))
 						{
 							base->movementTileReservation = collisionSys->ReserveTilesThisTurn(toRounded);
-							movementComponent.remaining = movementComponent.duration;
+							movementComponent.outRemaining = movementComponent.inDuration;
 							movementComponent.active = true;
 							collisionPos = to;
 						}
 					}
 
-					movementComponent.from = from;
-					movementComponent.to = to;
-					movementComponent.rotation = transform.rotation;
+					movementComponent.inFrom = from;
+					movementComponent.inTo = to;
 				}
 
 				// Collision task.
@@ -113,7 +116,13 @@ namespace game
 
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
 			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
-			const float handOffset = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY) * 8;
+			const float tickLerp = turnSys->GetTickLerp();
+			auto curve1 = jlb::CreateCurveDecelerate();
+			auto curve2 = jlb::CreateCurveOvershooting();
+			const auto handOffset = GetRightHandOffset();
+			const float handLerpMultiplier = (turnSys->GetTickIndex() % 2 == 0) * 2 - 1;
+			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve1, curve2) * jlb::math::PI * 2 * GetHandAngleMultiplier() * handLerpMultiplier;
+			const float handMoveSpeed = info.deltaTime * 0.01f * GetHandMoveSpeed();
 
 			for (auto& entity : entities)
 			{
@@ -123,6 +132,7 @@ namespace game
 				const auto& pickupComponent = base->pickupComponent;
 
 				const auto& transform = base->transform;
+				const auto& position = transform.position;
 				base->movementTaskId = movementSys->TryAdd(info, movementComponent);
 				
 				if (base->pickupComponent.active)
@@ -133,35 +143,60 @@ namespace game
 
 				{
 					const auto& camera = entityRenderSys->camera;
-					const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
+					const bool culls = vke::Culls(camera.position, camera.pixelSize, position, glm::vec2(transform.scale));
 					base->mouseTaskId = SIZE_MAX;
 					if (!culls)
 					{
-						jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
+						jlb::FBounds bounds{ position, glm::vec2(transform.scale) };
 						base->mouseTaskId = mouseSys->TryAdd(info, bounds);
 
 						vke::EntityRenderTask renderTask{};
 						renderTask.transform = transform;
-						renderTask.transform.scale *= movementComponent.scaleMultiplier;
+						renderTask.transform.scale *= movementComponent.outScaleMultiplier;
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
-						glm::vec2 v = transform.position;
-						v.x = v.x + cos(transform.rotation) * handOffset;
-						v.y = v.y + sin(transform.rotation) * handOffset;
+						auto& lHandPos = base->lHandPosPile;
+						auto& rHandPos = base->rHandPosPile;
 
-						const bool pickupOngoing = pickupComponent.active && !ifBeginTickEvent;
-						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[0] : v;
+						const glm::vec2 rCenter = jlb::math::Rotate(handOffset, transform.rotation);
+						const glm::vec2 lCenter = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
+
+						// Add idle hand position.
+						const bool idling = !movementComponent.active && !pickupComponent.active || ifBeginTickEvent;
+						lHandPos.Add(lCenter, idling);
+						rHandPos.Add(rCenter, idling);
+
+						if(!ifBeginTickEvent)
+						{
+							// Add movement hand animation.
+							lHandPos.Add(jlb::math::Rotate(lCenter, handLerpAngle), movementComponent.active);
+							rHandPos.Add(jlb::math::Rotate(rCenter, handLerpAngle), movementComponent.active);
+
+							// Add pickup hand animation.
+							lHandPos.Add(pickupComponent.outHandPosition - position, pickupComponent.active);
+							rHandPos.Add(pickupComponent.outHandPosition - position, pickupComponent.active);
+						}
+						
+						base->lHandPos = jlb::math::LerpClamped(base->lHandPos, lHandPos, handMoveSpeed);
+						base->rHandPos = jlb::math::LerpClamped(base->rHandPos, rHandPos, handMoveSpeed);
+
+						// Render the hands.
+						renderTask.transform.position = position + base->lHandPos;
 						renderTask.subTexture = handSubTexture;
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = pickupOngoing ? pickupComponent.handPositions[1] : transform.position * 2.f - v;
+						renderTask.transform.position = position + base->rHandPos;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = transform.position;
+						// Render the head.
+						renderTask.transform.position = position;
 						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(info, renderTask);
 					}
+
+					base->lHandPosPile = {};
+					base->rHandPosPile = {};
 				}
 			}
 		}
@@ -187,8 +222,8 @@ namespace game
 				base->movementComponent = output;
 
 				auto& transform = base->transform;
-				transform.position = output.position;
-				transform.rotation = output.rotation;
+				transform.position = output.outPosition;
+				transform.rotation = output.outRotation;
 			}
 			if(base->pickupTaskId != SIZE_MAX)
 			{
@@ -203,5 +238,24 @@ namespace game
 	size_t CharacterArchetype<T>::DefineSubTextureSetLength() const
 	{
 		return 2;
+	}
+
+	template <typename T>
+	glm::vec2 CharacterArchetype<T>::GetRightHandOffset() const
+	{
+		const float pct = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
+		return {pct * 6, pct * 2};
+	}
+
+	template <typename T>
+	float CharacterArchetype<T>::GetHandAngleMultiplier() const
+	{
+		return .1f;
+	}
+
+	template <typename T>
+	float CharacterArchetype<T>::GetHandMoveSpeed() const
+	{
+		return 1;
 	}
 }

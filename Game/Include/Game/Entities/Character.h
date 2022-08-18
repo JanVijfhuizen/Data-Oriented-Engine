@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Components/MovementComponent.h"
 #include "Components/PickupComponent.h"
+#include <Pile.h>
 
 namespace game
 {
@@ -14,6 +15,11 @@ namespace game
 
 		MovementComponent movementComponent{};
 		PickupComponent pickupComponent{};
+
+		jlb::Pile<glm::vec2> lHandPosPile{};
+		jlb::Pile<glm::vec2> rHandPosPile{};
+		glm::vec2 lHandPos{};
+		glm::vec2 rHandPos{};
 
 		Input input{};
 

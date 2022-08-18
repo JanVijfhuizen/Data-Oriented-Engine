@@ -44,8 +44,8 @@ namespace game
 			if (playerSys->pickupEntity && ifBeginTickEvent)
 			{
 				auto& pickupComponent = entity.pickupComponent;
-				pickupComponent.instance = entity.id;
-				pickupComponent.pickup = playerSys->pickupEntity;
+				pickupComponent.inInstanceId = entity.id;
+				pickupComponent.inPickupId = playerSys->pickupEntity;
 				pickupComponent.active = true;
 			}
 		}

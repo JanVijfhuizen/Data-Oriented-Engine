@@ -10,6 +10,11 @@
 
 namespace game
 {
+	size_t TurnSystem::GetTickIndex() const
+	{
+		return _tickIndex;
+	}
+
 	bool TurnSystem::GetIfBeginTickEvent() const
 	{
 		return _beginTickCalled;
@@ -198,6 +203,7 @@ namespace game
 			_previousTicksPerSecond = _ticksPerSecond;
 			_forwardToNextTick = false;
 			_tickEnded = false;
+			++_tickIndex;
 		}
 	}
 

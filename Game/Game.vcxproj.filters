@@ -114,6 +114,9 @@
     <ClInclude Include="Include\Game\Components\PickupComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Game\Systems\ThreadedTaskSystemWithOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\dllmain.cpp">

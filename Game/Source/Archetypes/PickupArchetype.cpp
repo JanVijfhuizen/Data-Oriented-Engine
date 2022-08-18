@@ -59,8 +59,6 @@ namespace game
 				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
 				entity.collisionTaskId = collisionSys->TryAdd(collisionTask);
 				assert(entity.collisionTaskId != SIZE_MAX);
-				
-				entity.interacted = false;
 			}
 		}
 
@@ -93,7 +91,7 @@ namespace game
 			// Update menu if available.
 			const bool menuOpen = leftPressedThisTurn && !mouseSys->GetIsUIBlocking() ? 
 				_menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
-			if(menuOpen)
+			if(menuOpen && !entity.interacted)
 			{
 				const auto card = cardSys->GetCard(cardId);
 
@@ -115,10 +113,11 @@ namespace game
 				content[1].interactable = inRange;
 				menuCreateInfo.content = content;
 
-				if (!entity.interacted && _menuUpdateInfo.hovered && leftPressedThisTurn && inRange)
+				if (_menuUpdateInfo.hovered && leftPressedThisTurn && inRange)
 				{
 					playerSys->pickupEntity = entity.id;
 					turnSys->SkipToNextTick();
+					entity.interacted = true;
 				}
 
 				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);

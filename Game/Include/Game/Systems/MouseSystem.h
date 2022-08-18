@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Bounds.h"
-#include "VkEngine/Systems/GameSystem.h"
 #include "VkEngine/Systems/TaskSystem.h"
 
 namespace game

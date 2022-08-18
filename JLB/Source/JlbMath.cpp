@@ -1,5 +1,7 @@
 ﻿#include "JlbMath.h"
 
+#include <glm/geometric.hpp>
+
 namespace jlb::math
 {
 	float GetAngle(const glm::vec2& a, const glm::vec2& b)
@@ -44,6 +46,18 @@ namespace jlb::math
 		return clampable;
 	}
 
+	glm::vec2 GetDir(const float angle)
+	{
+		return { cosf(angle), sinf(angle)};
+	}
+
+	glm::vec2 Rotate(const glm::vec2 v, const float angle)
+	{
+		float newX = v.x * cosf(angle) - v.y * sinf(angle);
+		float newY = v.x * sinf(angle) + v.y * cosf(angle);
+		return { newX, newY };
+	}
+
 	float Lerp(const float a, const float b, const float delta)
 	{
 		return a + delta * ((b > a) * 2 - 1);
@@ -61,6 +75,13 @@ namespace jlb::math
 			LerpPct(a.x, b.x, pct),
 			LerpPct(a.y, b.y, pct),
 		};
+	}
+
+	glm::vec2 LerpClamped(const glm::vec2& a, const glm::vec2& b, const float delta)
+	{
+		const glm::vec2 offset = b - a;
+		const glm::vec2 ret = a + offset * Min<float>(delta, glm::distance(a, b));
+		return ret;
 	}
 
 	bool IsZero(const glm::ivec2& v)

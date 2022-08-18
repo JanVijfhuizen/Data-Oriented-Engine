@@ -162,6 +162,7 @@
     <ClInclude Include="Include\DistanceTree.h" />
     <ClInclude Include="Include\Map.h" />
     <ClInclude Include="Include\NestedVector.h" />
+    <ClInclude Include="Include\Pile.h" />
     <ClInclude Include="Include\SparseSet.h" />
     <ClInclude Include="Include\StackQueue.h" />
     <ClInclude Include="Include\StackAllocator.h" />
