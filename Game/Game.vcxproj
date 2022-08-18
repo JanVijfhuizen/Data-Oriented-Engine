@@ -164,7 +164,6 @@
     <ClInclude Include="Include\Game\Archetypes\DummyArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\PickupArchetype.h" />
     <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
-    <ClInclude Include="Include\Game\Components\HandComponent.h" />
     <ClInclude Include="Include\Game\Components\Inventory.h" />
     <ClInclude Include="Include\Game\Components\MovementComponent.h" />
     <ClInclude Include="Include\Game\Components\PickupComponent.h" />
@@ -183,7 +182,6 @@
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
-    <ClInclude Include="Include\Game\Systems\HandSystem.h" />
     <ClInclude Include="Include\Game\Systems\MenuSystem.h" />
     <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
@@ -197,7 +195,6 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Systems\HandSystem.cpp" />
     <ClCompile Include="Source\Entities\Entity.cpp" />
     <ClCompile Include="Source\Systems\PickupSystem.cpp" />
     <ClCompile Include="Source\Systems\PlayerSystem.cpp" />

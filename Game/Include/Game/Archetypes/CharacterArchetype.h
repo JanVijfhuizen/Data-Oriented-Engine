@@ -35,6 +35,7 @@ namespace game
 		[[nodiscard]] virtual vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) = 0;
 		[[nodiscard]] virtual size_t DefineSubTextureSetLength() const;
 		[[nodiscard]] virtual glm::vec2 GetRightHandOffset() const;
+		[[nodiscard]] virtual float GetHandAngleMultiplier() const;
 	};
 
 	template <typename T>
@@ -115,9 +116,11 @@ namespace game
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
 			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
 			const float tickLerp = turnSys->GetTickLerp();
-			auto curve = jlb::CreateCurveOvershooting();
+			auto curve1 = jlb::CreateCurveDecelerate();
+			auto curve2 = jlb::CreateCurveOvershooting();
 			const auto handOffset = GetRightHandOffset();
-			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve, curve) * jlb::math::PI * 2 * .1f;
+			const float handLerpMultiplier = (turnSys->GetTickIndex() % 2 == 0) * 2 - 1;
+			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve1, curve2) * jlb::math::PI * 2 * GetHandAngleMultiplier() * handLerpMultiplier;
 
 			for (auto& entity : entities)
 			{
@@ -150,21 +153,37 @@ namespace game
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
-						glm::vec2 v1 = jlb::math::Rotate(handOffset, transform.rotation);
-						glm::vec2 v2 = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
-						v1 = movementComponent.active ? jlb::math::Rotate(v1, handLerpAngle) : v1;
-						v2 = movementComponent.active ? jlb::math::Rotate(v2, handLerpAngle) : v2;
+						auto& lHandPos = base->lHandPos;
+						auto& rHandPos = base->rHandPos;
 
-						v1 += transform.position;
-						v2 += transform.position;
+						const glm::vec2 rCenter = jlb::math::Rotate(handOffset, transform.rotation);
+						const glm::vec2 lCenter = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
+
+						// Add idle hand position.
+						const bool idling = !movementComponent.active && !pickupComponent.active;
+						lHandPos.Add(lCenter, idling);
+						rHandPos.Add(rCenter, idling);
+
+						if(!ifBeginTickEvent)
+						{
+							// Add movement hand animation.
+							lHandPos.Add(jlb::math::Rotate(lCenter, handLerpAngle), movementComponent.active);
+							rHandPos.Add(jlb::math::Rotate(rCenter, handLerpAngle), movementComponent.active);
+
+							// Add pickup hand animation.
+							lHandPos.Add(pickupComponent.outHandPositions[0] - transform.position + lCenter * (1.f - tickLerp), pickupComponent.active);
+							rHandPos.Add(pickupComponent.outHandPositions[1] - transform.position + rCenter * (1.f - tickLerp), pickupComponent.active);
+						}
+						
+						glm::vec2 v1 = transform.position + glm::vec2(lHandPos);
+						glm::vec2 v2 = transform.position + glm::vec2(rHandPos);
 
 						// Render the hands.
-						const bool pickupOngoing = pickupComponent.active && !ifBeginTickEvent;
-						renderTask.transform.position = pickupOngoing ? pickupComponent.outHandPositions[0] : v1;
+						renderTask.transform.position = v1;
 						renderTask.subTexture = handSubTexture;
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = pickupOngoing ? pickupComponent.outHandPositions[1] : v2;
+						renderTask.transform.position = v2;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
 						// Render the head.
@@ -172,6 +191,9 @@ namespace game
 						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(info, renderTask);
 					}
+
+					base->lHandPos = {};
+					base->rHandPos = {};
 				}
 			}
 		}
@@ -220,5 +242,11 @@ namespace game
 	{
 		const float pct = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 		return {pct * 6, pct * 2};
+	}
+
+	template <typename T>
+	float CharacterArchetype<T>::GetHandAngleMultiplier() const
+	{
+		return .1f;
 	}
 }

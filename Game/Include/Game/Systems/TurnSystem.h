@@ -26,6 +26,8 @@ namespace game
 			float onPressedTimeVerticalOffsetMultiplier = .1f;
 		} visuals{};
 
+		// Get how many ticks have happened since the start of the game.
+		[[nodiscard]] size_t GetTickIndex() const;
 		// Gets if a new turn has been started this frame.
 		[[nodiscard]] bool GetIfBeginTickEvent() const;
 		// Gets if a turn has been finished this frame.
@@ -46,6 +48,7 @@ namespace game
 		size_t _ticksPerSecond = 1;
 		size_t _previousTicksPerSecond = 1;
 		const size_t _maxTicksPerSecond = 16;
+		size_t _tickIndex = 0;
 
 		float _time = 0;
 		bool _beginTickCalled = true;

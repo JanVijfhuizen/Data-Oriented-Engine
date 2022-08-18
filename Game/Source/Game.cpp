@@ -9,7 +9,6 @@
 #include "VkEngine/Systems/SceneSystem.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/GameManager.h"
-#include "Systems/HandSystem.h"
 #include "Systems/MenuSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 #include "Systems/MouseSystem.h"
@@ -40,7 +39,6 @@ namespace game
 		initializer.DefineSystem<CollisionSystem>();
 		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<MovementSystem>();
-		initializer.DefineSystem<HandSystem>();
 		initializer.DefineSystem<PlayerSystem>();
 		initializer.DefineSystem<PickupSystem>();
 		initializer.DefineSystem<CardSystem>();
