@@ -37,8 +37,7 @@ namespace game
 				if (task.active)
 				{
 					const auto pos = jlb::math::LerpPct(task._instancePosition, task._pickupPosition, eval);
-					task.outHandPositions[0] = pos;
-					task.outHandPositions[1] = pos;
+					task.outHandPosition = pos;
 					task.active = !isEndTickEvent;
 				}
 				

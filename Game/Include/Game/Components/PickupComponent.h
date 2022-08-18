@@ -10,7 +10,7 @@ namespace game
 		EntityId inInstanceId{};
 		EntityId inPickupId{};
 
-		glm::vec2 outHandPositions[2]{};
+		glm::vec2 outHandPosition{};
 		bool active = false;
 
 	private:

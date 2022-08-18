@@ -174,8 +174,8 @@ namespace game
 							rHandPos.Add(jlb::math::Rotate(rCenter, handLerpAngle), movementComponent.active);
 
 							// Add pickup hand animation.
-							lHandPos.Add(pickupComponent.outHandPositions[0] - position, pickupComponent.active);
-							rHandPos.Add(pickupComponent.outHandPositions[1] - position, pickupComponent.active);
+							lHandPos.Add(pickupComponent.outHandPosition - position, pickupComponent.active);
+							rHandPos.Add(pickupComponent.outHandPosition - position, pickupComponent.active);
 						}
 						
 						base->lHandPos = jlb::math::LerpClamped(base->lHandPos, lHandPos, handMoveSpeed);
