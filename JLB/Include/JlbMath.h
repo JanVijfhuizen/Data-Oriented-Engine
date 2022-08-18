@@ -31,6 +31,8 @@ namespace jlb::math
 
 	// Linearly interpolates between to vectors from 0 to 1.
 	[[nodiscard]] glm::vec2 LerpPct(const glm::vec2& a, const glm::vec2& b, float pct);
+	// Linearly interpolates between two values by a flat value, but clamped.
+	[[nodiscard]] glm::vec2 LerpClamped(const glm::vec2& a, const glm::vec2& b, float delta);
 
 	// Checks if the length of the vector is zero.
 	[[nodiscard]] bool IsZero(const glm::ivec2& v);

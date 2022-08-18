@@ -36,6 +36,7 @@ namespace game
 		[[nodiscard]] virtual size_t DefineSubTextureSetLength() const;
 		[[nodiscard]] virtual glm::vec2 GetRightHandOffset() const;
 		[[nodiscard]] virtual float GetHandAngleMultiplier() const;
+		[[nodiscard]] virtual float GetHandMoveSpeed() const;
 	};
 
 	template <typename T>
@@ -121,6 +122,7 @@ namespace game
 			const auto handOffset = GetRightHandOffset();
 			const float handLerpMultiplier = (turnSys->GetTickIndex() % 2 == 0) * 2 - 1;
 			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve1, curve2) * jlb::math::PI * 2 * GetHandAngleMultiplier() * handLerpMultiplier;
+			const float handMoveSpeed = info.deltaTime * 0.01f * GetHandMoveSpeed();
 
 			for (auto& entity : entities)
 			{
@@ -130,6 +132,7 @@ namespace game
 				const auto& pickupComponent = base->pickupComponent;
 
 				const auto& transform = base->transform;
+				const auto& position = transform.position;
 				base->movementTaskId = movementSys->TryAdd(info, movementComponent);
 				
 				if (base->pickupComponent.active)
@@ -140,11 +143,11 @@ namespace game
 
 				{
 					const auto& camera = entityRenderSys->camera;
-					const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
+					const bool culls = vke::Culls(camera.position, camera.pixelSize, position, glm::vec2(transform.scale));
 					base->mouseTaskId = SIZE_MAX;
 					if (!culls)
 					{
-						jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
+						jlb::FBounds bounds{ position, glm::vec2(transform.scale) };
 						base->mouseTaskId = mouseSys->TryAdd(info, bounds);
 
 						vke::EntityRenderTask renderTask{};
@@ -153,14 +156,14 @@ namespace game
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
-						auto& lHandPos = base->lHandPos;
-						auto& rHandPos = base->rHandPos;
+						auto& lHandPos = base->lHandPosPile;
+						auto& rHandPos = base->rHandPosPile;
 
 						const glm::vec2 rCenter = jlb::math::Rotate(handOffset, transform.rotation);
 						const glm::vec2 lCenter = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
 
 						// Add idle hand position.
-						const bool idling = !movementComponent.active && !pickupComponent.active;
+						const bool idling = !movementComponent.active && !pickupComponent.active || ifBeginTickEvent;
 						lHandPos.Add(lCenter, idling);
 						rHandPos.Add(rCenter, idling);
 
@@ -171,29 +174,29 @@ namespace game
 							rHandPos.Add(jlb::math::Rotate(rCenter, handLerpAngle), movementComponent.active);
 
 							// Add pickup hand animation.
-							lHandPos.Add(pickupComponent.outHandPositions[0] - transform.position + lCenter * (1.f - tickLerp), pickupComponent.active);
-							rHandPos.Add(pickupComponent.outHandPositions[1] - transform.position + rCenter * (1.f - tickLerp), pickupComponent.active);
+							lHandPos.Add(pickupComponent.outHandPositions[0] - position, pickupComponent.active);
+							rHandPos.Add(pickupComponent.outHandPositions[1] - position, pickupComponent.active);
 						}
 						
-						glm::vec2 v1 = transform.position + glm::vec2(lHandPos);
-						glm::vec2 v2 = transform.position + glm::vec2(rHandPos);
+						base->lHandPos = jlb::math::LerpClamped(base->lHandPos, lHandPos, handMoveSpeed);
+						base->rHandPos = jlb::math::LerpClamped(base->rHandPos, rHandPos, handMoveSpeed);
 
 						// Render the hands.
-						renderTask.transform.position = v1;
+						renderTask.transform.position = position + base->lHandPos;
 						renderTask.subTexture = handSubTexture;
 						auto result = entityRenderSys->TryAdd(info, renderTask);
 
-						renderTask.transform.position = v2;
+						renderTask.transform.position = position + base->rHandPos;
 						result = entityRenderSys->TryAdd(info, renderTask);
 
 						// Render the head.
-						renderTask.transform.position = transform.position;
+						renderTask.transform.position = position;
 						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(info, renderTask);
 					}
 
-					base->lHandPos = {};
-					base->rHandPos = {};
+					base->lHandPosPile = {};
+					base->rHandPosPile = {};
 				}
 			}
 		}
@@ -248,5 +251,11 @@ namespace game
 	float CharacterArchetype<T>::GetHandAngleMultiplier() const
 	{
 		return .1f;
+	}
+
+	template <typename T>
+	float CharacterArchetype<T>::GetHandMoveSpeed() const
+	{
+		return 1;
 	}
 }
