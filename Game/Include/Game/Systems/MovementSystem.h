@@ -16,6 +16,8 @@ namespace game
 		float bobbingScaling = 0.1f;
 		// Percent (0-1) of the turn spend on rotation.
 		float rotationDuration = 1;
+		// How much a character moves when the path is obstructed before moving back.
+		float obstructedMovementDistance = .2f;
 		
 	private:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;

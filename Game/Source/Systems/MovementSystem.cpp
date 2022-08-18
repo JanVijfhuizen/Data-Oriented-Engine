@@ -27,15 +27,19 @@ namespace game
 		const float tickLerp = turnSys->GetTickLerp();
 
 		auto curveOvershoot = jlb::CreateCurveOvershooting();
+		auto curveDecelerate = jlb::CreateCurveDecelerate();
 
 		for (auto& task : tasks)
 		{
-			task.outRemaining -= isEndTickEvent;
+			task.remaining -= isEndTickEvent;
 
 			const auto durationF = static_cast<float>(task.inDuration);
 			// Smoothly move between grid positions.
-			const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(task.outRemaining) / durationF;
-			task.outPosition = jlb::math::LerpPct(task.inFrom, task.inTo, pct);
+			const float pct = 1.f / durationF * tickLerp + 1.f - static_cast<float>(task.remaining) / durationF;
+
+			const float movePct = task.inIsObstructed ? jlb::DoubleCurveEvaluate(tickLerp, curveOvershoot, curveDecelerate) * 
+				selfPtr->obstructedMovementDistance : pct;
+			task.outPosition = jlb::math::LerpPct(task.inFrom, task.inTo, movePct);
 
 			// Bobbing.
 			const float bobbingPct = fmodf(pct * selfPtr->bobbingAmount, 1);
@@ -48,8 +52,8 @@ namespace game
 
 			task.outRotation = jlb::math::SmoothAngle(task.outRotation, toAngle, curveOvershoot.Evaluate(pctRotation));
 
-			const bool finished = task.outRemaining == 0;
-			task.outPosition = finished ? task.inTo : task.outPosition;
+			const bool finished = task.remaining == 0;
+			task.outPosition = finished ? task.inIsObstructed ? task.inFrom : task.inTo : task.outPosition;
 			task.outRotation = finished ? toAngle : task.outRotation;
 
 			task.active = !finished;

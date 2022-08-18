@@ -88,14 +88,17 @@ namespace game
 
 						collisionPos = from;
 						uint32_t outCollision;
+						movementComponent.inIsObstructed = true;
 						if (collisionSys->CheckIfTilesAreReserved(toRounded) == SIZE_MAX &&
 							!collisionSys->GetIntersections(toRounded, outCollision))
 						{
 							base->movementTileReservation = collisionSys->ReserveTilesThisTurn(toRounded);
-							movementComponent.outRemaining = movementComponent.inDuration;
-							movementComponent.active = true;
 							collisionPos = to;
+							movementComponent.inIsObstructed = false;
 						}
+
+						movementComponent.active = true;
+						movementComponent.remaining = movementComponent.inDuration;
 					}
 
 					movementComponent.inFrom = from;
