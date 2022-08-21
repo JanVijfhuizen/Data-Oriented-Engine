@@ -36,7 +36,7 @@ namespace game
 
 		auto& entity = entities[0];
 		auto& characterInput = entity.input;
-
+		
 		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
 		const bool occupiedNextTurn = playerSys->IsPlayerOccupiedNextTurn();
 		if (occupiedNextTurn)

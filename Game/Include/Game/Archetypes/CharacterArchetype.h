@@ -223,7 +223,6 @@ namespace game
 				auto& outputs = movementSys->GetOutput();
 				const auto& output = outputs[base->movementTaskId];
 				base->movementComponent = output;
-
 				auto& transform = base->transform;
 				transform.position = output.outPosition;
 				transform.rotation = output.outRotation;

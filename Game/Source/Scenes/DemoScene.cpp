@@ -22,6 +22,21 @@ namespace game::demo
 		auto& pickups = entityArchetypes.Get<PickupArchetype>()->GetEntities();
 		auto& dummies = entityArchetypes.Get<DummyArchetype>()->GetEntities();
 
+		{
+			auto& player = players.Add(sceneAllocator);
+			auto& inventory = player.data.character.inventory;
+			inventory.src = player.inventorySrc;
+			auto& fireball = inventory.Insert(0);
+			auto& bash = inventory.Insert(2);
+		}
+
+		{
+			Pickup pickup{};
+			pickup.data.pickup.cardId = 1;
+			pickup.transform.position = glm::vec2{ 2, -1 };
+			pickups.Add(sceneAllocator, pickup);
+		}
+
 		constexpr int32_t dummyCount = 6;
 		for (int32_t i = 0; i < dummyCount; ++i)
 			for (int32_t j = 0; j < dummyCount; ++j)
@@ -33,37 +48,21 @@ namespace game::demo
 				dummies.Add(sceneAllocator, entity);
 			}
 
-		{
-			Player player{};
-			auto& inventory = player.data.character.inventory;
-			inventory.src = player.inventorySrc;
-			auto& fireball = inventory.Insert(0);
-			auto& bash = inventory.Insert(2);
-			players.Add(sceneAllocator, player);
-		}
-
-		{
-			Pickup pickup{};
-			pickup.data.pickup.cardId = 1;
-			pickup.transform.position = glm::vec2{ 2, -1 };
-			pickups.Add(sceneAllocator, pickup);
-		}
-
-		for (auto& entity : dummies)
-		{
-			entitySys->CreateEntity(entity);
-			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
-			collisionSys->ReserveTilesNextTurn(toRounded);
-		}
-			
 		for (auto& entity : players)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
 			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
-			
+
 		for (auto& entity : pickups)
+		{
+			entitySys->CreateEntity(entity);
+			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
+			collisionSys->ReserveTilesNextTurn(toRounded);
+		}
+
+		for (auto& entity : dummies)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
