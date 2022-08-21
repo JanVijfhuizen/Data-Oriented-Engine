@@ -27,8 +27,7 @@ namespace game
 			jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities);
 		virtual void OnPostUpdate(const EntityArchetypeInfo& info,
 			jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities);
-
-		[[nodiscard]] virtual T DefinePrototype(const EntityArchetypeInfo& info);
+		
 		[[nodiscard]] virtual size_t DefineCapacity() const;
 		[[nodiscard]] virtual size_t DefineNestedCapacity() const;
 
@@ -100,12 +99,6 @@ namespace game
 	{
 		System<EntityArchetypeInfo>::PostUpdate(info, archetypes);
 		OnPostUpdate(info, archetypes, _entities);
-	}
-
-	template <typename T>
-	T EntityArchetype<T>::DefinePrototype(const EntityArchetypeInfo& info)
-	{
-		return T();
 	}
 
 	template <typename T>
