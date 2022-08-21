@@ -14,6 +14,9 @@ namespace game
 
 		[[nodiscard]] jlb::Systems<EntityArchetypeInfo> GetEntityArchetypes();
 		[[nodiscard]] jlb::StackAllocator& GetAllocator();
+
+		void OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
+		void OnMouseInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, int key, int action) override;
 		
 	private:
 		[[nodiscard]] EntityArchetypeInfo CreateInfo(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems);

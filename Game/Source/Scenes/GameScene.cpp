@@ -43,6 +43,20 @@ namespace game
 		return _allocator;
 	}
 
+	void GameScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
+		const int key, const int action)
+	{
+		Scene::OnKeyInput(info, systems, key, action);
+		_archetypeManager.OnKeyInput(CreateInfo(info, systems), key, action);
+	}
+
+	void GameScene::OnMouseInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
+		const int key, const int action)
+	{
+		Scene::OnMouseInput(info, systems, key, action);
+		_archetypeManager.OnMouseInput(CreateInfo(info, systems), key, action);
+	}
+
 	EntityArchetypeInfo GameScene::CreateInfo(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		EntityArchetypeInfo ret{};
