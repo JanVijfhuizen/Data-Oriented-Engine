@@ -6,9 +6,7 @@ namespace game::demo
 {
 	class DummyArchetype final : public CharacterArchetype<DummyEntity> 
 	{
-	public:
-		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, jlb::Vector<DummyEntity>& entities) override;
-	private:
+		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<DummyEntity>& entities) override;
 		[[nodiscard]] vke::SubTexture DefineSubTextureSet(const vke::EngineData& info,
 			jlb::Systems<vke::EngineData> systems) override;
 	};

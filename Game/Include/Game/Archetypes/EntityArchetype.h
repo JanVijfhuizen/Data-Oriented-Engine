@@ -8,7 +8,7 @@ namespace game
 {
 	struct EntityArchetypeInfo final
 	{
-		vke::EngineData const* info = nullptr;
+		vke::EngineData const* vkeInfo = nullptr;
 		jlb::StackAllocator* sceneAllocator = nullptr;
 		jlb::Systems<vke::EngineData> systems{};
 	};

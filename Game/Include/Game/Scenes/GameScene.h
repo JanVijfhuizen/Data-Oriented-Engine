@@ -10,7 +10,7 @@ namespace game
 		void Allocate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		void Free(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		virtual void DefineSystems(jlb::SystemsInitializer<EntityArchetypeInfo> initializer) = 0;
-		void PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
+		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		
 	private:
 		[[nodiscard]] EntityArchetypeInfo CreateInfo(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems);

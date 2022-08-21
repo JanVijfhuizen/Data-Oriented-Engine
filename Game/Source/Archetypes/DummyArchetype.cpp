@@ -5,10 +5,10 @@
 
 namespace game::demo
 {
-	void DummyArchetype::PreUpdate(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems,
-		jlb::Vector<DummyEntity>& entities)
+	void DummyArchetype::OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+		jlb::NestedVector<DummyEntity>& entities)
 	{
+		auto& systems = info.systems;
 		const auto resourceSys = systems.GetSystem<ResourceManager>();
 
 		for (auto& entity : entities)
@@ -18,12 +18,11 @@ namespace game::demo
 			characterInput.movementDir.y = rand() % 3 - 1;
 		}
 
-		CharacterArchetype<DummyEntity>::PreUpdate(info, systems, entities);
+		CharacterArchetype<DummyEntity>::OnPreUpdate(info, archetypes, entities);
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		jlb::StackArray<vke::SubTexture, 2> subTexturesDivided{};
 		vke::texture::Subdivide(subTexture, 2, subTexturesDivided);
-		// todo something.
 	}
 
 	vke::SubTexture DummyArchetype::DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)

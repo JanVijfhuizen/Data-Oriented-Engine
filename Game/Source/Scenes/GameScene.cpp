@@ -38,7 +38,7 @@ namespace game
 		EntityArchetypeInfo ret{};
 		ret.systems = systems;
 		ret.sceneAllocator = &_sceneAllocator;
-		ret.info = &info;
+		ret.vkeInfo = &info;
 		return ret;
 	}
 }

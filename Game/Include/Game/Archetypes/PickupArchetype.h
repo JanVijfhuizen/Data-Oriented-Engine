@@ -8,12 +8,11 @@ namespace game
 {
 	class PickupArchetype final : public EntityArchetype<Pickup>
 	{
-	public:
-		float scalingOnSelected = 0.5f;
+	protected:
+		const float scalingOnSelected = 0.5f;
 
-		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			jlb::Vector<Pickup>& entities) override;
-
+		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+			jlb::NestedVector<Pickup>& entities) override;
 	private:
 		MenuUpdateInfo _menuUpdateInfo{};
 		CardMenuUpdateInfo _cardMenuUpdateInfo{};
