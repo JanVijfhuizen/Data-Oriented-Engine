@@ -44,7 +44,7 @@ namespace game
 		{
 			jlb::StackArray<vke::texture::TextureAtlasPartition, ATLAS_LENGTH> partitions{};
 			partitions[0].path = "Textures/humanoid.png";
-			partitions[0].width = 4;
+			partitions[0].width = 3;
 			partitions[1].path = "Textures/directional-arrow.png";
 			partitions[2].path = "Textures/pickup.png";
 

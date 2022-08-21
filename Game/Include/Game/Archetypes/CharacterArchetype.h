@@ -25,7 +25,7 @@ namespace game
 		};
 
 		const float scalingOnSelected = 0.5f;
-		const size_t headOffsetInPixels = 2;
+		const float headRotationSpeed = .05f;
 
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
 			jlb::NestedVector<T>& entities) override;
@@ -128,7 +128,8 @@ namespace game
 			const float handLerpMultiplier = (turnSys->GetTickIndex() % 2 == 0) * 2 - 1;
 			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve1, curve2) * jlb::math::PI * 2 * GetHandAngleMultiplier() * handLerpMultiplier;
 			const float handMoveSpeed = vkeInfo.deltaTime * 0.01f * GetHandMoveSpeed();
-			const float pixelHeadOffset = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY) * static_cast<float>(headOffsetInPixels);
+
+			const float pixelHeadOffset = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
 			
 			for (auto& entity : entities)
 			{
@@ -195,15 +196,20 @@ namespace game
 						renderTask.transform.position = position + base->rHandPos;
 						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 
-						const auto bodyOffset = jlb::math::GetDir(transform.rotation + jlb::math::PI * .5f) * pixelHeadOffset * (.8f + sin(vkeInfo.time * .01f) * .2f);
-
 						// Render the body.
-						renderTask.transform.position = position - bodyOffset;
+						renderTask.transform.position = position;
 						renderTask.subTexture = bodySubTexture;
 						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 
+						float headDelta = 0;
+						headDelta += (base->movementComponent.outScaleMultiplier - 1.f) * (base->movementTaskId != SIZE_MAX);
+
+						const auto headOffset = jlb::math::GetDir(transform.rotation + jlb::math::PI * .5f) * headDelta;
+						base->headRotation = jlb::math::SmoothAngle(base->headRotation, transform.rotation, headRotationSpeed);
+
 						// Render the head.
-						renderTask.transform.position = position;
+						renderTask.transform.position += headOffset;
+						renderTask.transform.rotation = base->headRotation;
 						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 					}
@@ -249,7 +255,7 @@ namespace game
 	template <typename T>
 	size_t CharacterArchetype<T>::DefineSubTextureSetLength() const
 	{
-		return 4;
+		return 3;
 	}
 
 	template <typename T>

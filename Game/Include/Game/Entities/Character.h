@@ -20,6 +20,7 @@ namespace game
 		jlb::Pile<glm::vec2> rHandPosPile{};
 		glm::vec2 lHandPos{};
 		glm::vec2 rHandPos{};
+		float headRotation{};
 
 		Input input{};
 
