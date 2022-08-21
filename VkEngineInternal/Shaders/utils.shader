@@ -20,6 +20,15 @@ vec2 Rotate(in vec2 pos, in float rotation)
 	return vec2(newX, newY);
 }
 
+SubTexture GetSubTexture(in SubTexture subTexture, in uint index, in uint length)
+{
+    SubTexture ret = subTexture;
+    float part = (ret.rBot.x - ret.lTop.x) / length;
+    ret.lTop.x += part;
+    ret.rBot.x = ret.lTop.x + part;
+    return ret;
+}
+
 vec2 CalculateTextureCoordinates(in SubTexture subTexture, in vec2 texCoords)
 {
     return subTexture.lTop + (subTexture.rBot - subTexture.lTop) * texCoords;
