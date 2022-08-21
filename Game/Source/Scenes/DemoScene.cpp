@@ -3,6 +3,7 @@
 #include "Archetypes/DummyArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
@@ -75,14 +76,39 @@ namespace game::demo
 		GameScene::PreUpdate(info, systems);
 
 		const auto collisionSys = systems.Get<CollisionSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
 		const auto tileSys = systems.Get<vke::TileRenderSystem>();
 		const auto turnSys = systems.Get<TurnSystem>();
 
-		// Tile test.
+		const auto tileSubTexture = resourceSys->GetSubTexture(ResourceManager::TileSubTextures::tile);
+
+		// Background.
 		vke::TileRenderTask tileTask{};
+		tileTask.shape = glm::ivec2(25, 25);
+		tileTask.position = glm::ivec2(0, 0);
+		tileTask.subTexture = vke::texture::GetSubTexture(tileSubTexture, 7, 0);
+		auto result = tileSys->TryAdd(info, tileTask);
+
+		srand(0);
+		for (int i = -20; i < 20; ++i)
+			for (int j = -20; j < 20; ++j)
+			{
+				if (rand() % 2 == 0)
+					continue;
+				size_t idx = rand() % 6;
+				tileTask = {};
+				tileTask.position = glm::ivec2(i, j);
+				tileTask.subTexture = vke::texture::GetSubTexture(tileSubTexture, 7, idx);
+				result = tileSys->TryAdd(info, tileTask);
+			}
+		srand(info.time);
+
+		// Tile test.
+		tileTask = {};
 		tileTask.shape = glm::ivec2(3, 5);
 		tileTask.position = glm::ivec2(3, 5);
-		auto result = tileSys->TryAdd(info, tileTask);
+		tileTask.subTexture = vke::texture::GetSubTexture(tileSubTexture, 7, 6);
+		result = tileSys->TryAdd(info, tileTask);
 
 		if(turnSys->GetIfBeginTickEvent())
 		{
