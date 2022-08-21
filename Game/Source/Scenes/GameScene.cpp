@@ -27,10 +27,28 @@ namespace game
 		Scene::Free(info, systems);
 	}
 
+	void GameScene::BeginFrame(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		Scene::BeginFrame(info, systems);
+		_archetypeManager.BeginFrame(CreateInfo(info, systems));
+	}
+
+	void GameScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		Scene::PostUpdate(info, systems);
+		_archetypeManager.PostUpdate(CreateInfo(info, systems));
+	}
+
+	void GameScene::EndFrame(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	{
+		Scene::EndFrame(info, systems);
+		_archetypeManager.EndFrame(CreateInfo(info, systems));
+	}
+
 	void GameScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PreUpdate(info, systems);
-		_archetypeManager.Update(CreateInfo(info, systems));
+		_archetypeManager.PreUpdate(CreateInfo(info, systems));
 	}
 
 	jlb::Systems<EntityArchetypeInfo> GameScene::GetEntityArchetypes()

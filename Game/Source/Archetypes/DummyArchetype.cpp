@@ -9,8 +9,6 @@ namespace game::demo
 	{
 		for (auto& entity : entities)
 		{
-			// temp
-			continue;
 			auto& characterInput = entity.input;
 			characterInput.movementDir.x = rand() % 3 - 1;
 			characterInput.movementDir.y = rand() % 3 - 1;

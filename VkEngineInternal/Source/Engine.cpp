@@ -124,7 +124,11 @@ namespace vke
 			}
 
 			// Update the game.
+			systemManager.BeginFrame(outData);
+			systemManager.PreUpdate(outData);
 			systemManager.Update(outData);
+			systemManager.PostUpdate(outData);
+			systemManager.EndFrame(outData);
 
 			// Submit for presentation to the screen.
 			const auto presentResult = swapChain.EndFrame(allocator, app);
