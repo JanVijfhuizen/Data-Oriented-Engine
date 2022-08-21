@@ -173,6 +173,7 @@
     <ClInclude Include="Include\Game\Entities\Pickup.h" />
     <ClInclude Include="Include\Game\Entities\Player.h" />
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
+    <ClInclude Include="Include\Game\Scenes\GameScene.h" />
     <ClInclude Include="Include\Game\Systems\CameraSystem.h" />
     <ClInclude Include="Include\Game\Systems\CardRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\CardSystem.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Scenes\GameScene.cpp" />
     <ClCompile Include="Source\Entities\Entity.cpp" />
     <ClCompile Include="Source\Systems\PickupSystem.cpp" />
     <ClCompile Include="Source\Systems\PlayerSystem.cpp" />

@@ -66,8 +66,8 @@ namespace game
 	{
 		vke::GameSystem::PreUpdate(info, systems);
 		
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto uiSys = systems.Get<vke::UIRenderSystem>();
 
 		const auto& cameraPixelSize = uiSys->camera.pixelSize;
 		const float scale = cameraPixelSize * vke::PIXEL_SIZE_ENTITY;
@@ -107,7 +107,7 @@ namespace game
 
 			// Draw time multiplier.
 			{
-				const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
+				const auto textRenderSys = systems.Get<TextRenderHandler>();
 
 				const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[4], curveOvershoot, curveDecelerate);
 				const float offset = -eval * visuals.onPressedTimeVerticalOffsetMultiplier;

@@ -19,7 +19,7 @@ namespace game
 	{
 		System<vke::EngineData>::Start(info, systems);
 
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceManager>();
 
 		// Temp.
 		_cards[0].name = "fireball";

@@ -21,7 +21,7 @@ namespace game
 		const jlb::NestedVector<MovementComponent>& tasks, jlb::NestedVector<MovementComponent>& output, 
 		jlb::StackAllocator& dumpAllocator, MovementSystem* selfPtr)
 	{
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 
 		const bool isEndTickEvent = turnSys->GetIfEndTickEvent();
 		const float tickLerp = turnSys->GetTickLerp();

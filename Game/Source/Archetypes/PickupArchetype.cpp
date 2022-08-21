@@ -15,24 +15,25 @@
 
 namespace game
 {
-	void PickupArchetype::PreUpdate(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems,
-		jlb::Vector<Pickup>& entities)
+	void PickupArchetype::OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+		jlb::NestedVector<Pickup>& entities)
 	{
-		EntityArchetype<Pickup>::PreUpdate(info, systems, entities);
+		EntityArchetype<Pickup>::OnPreUpdate(info, archetypes, entities);
 
-		const auto cameraSys = systems.GetSystem<CameraSystem>();
-		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto menuSys = systems.GetSystem<MenuSystem>();
-		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto playerSys = systems.GetSystem<PlayerSystem>();
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
-		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
+		auto& systems = info.systems;
+		auto& vkeInfo = *info.vkeInfo;
+		const auto cameraSys = systems.Get<CameraSystem>();
+		const auto cardSys = systems.Get<CardSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto menuSys = systems.Get<MenuSystem>();
+		const auto mouseSys = systems.Get<MouseSystem>();
+		const auto playerSys = systems.Get<PlayerSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto turnSys = systems.Get<TurnSystem>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
 		const auto& camera = entityRenderSys->camera;
 
-		auto& dumpAllocator = *info.dumpAllocator;
+		auto& dumpAllocator = *vkeInfo.dumpAllocator;
 
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
@@ -47,7 +48,7 @@ namespace game
 
 		if (turnSys->GetIfBeginTickEvent())
 		{
-			const auto collisionSys = systems.GetSystem<CollisionSystem>();
+			const auto collisionSys = systems.Get<CollisionSystem>();
 
 			for (auto& entity : entities)
 			{
@@ -62,7 +63,7 @@ namespace game
 			}
 		}
 
-		if(playerSys->IsPlayerOccupiedNextTurn())
+		if (playerSys->IsPlayerOccupiedNextTurn())
 		{
 			_menuUpdateInfo = {};
 			_cardMenuUpdateInfo = {};
@@ -79,19 +80,19 @@ namespace game
 			if (!culls)
 			{
 				jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
-				entity.mouseTaskId = mouseSys->TryAdd(info, bounds);
+				entity.mouseTaskId = mouseSys->TryAdd(vkeInfo, bounds);
 			}
 
 			// Render.
 			task.transform = transform;
 			const bool hovered = hoveredObj == entity.mouseTaskId && hoveredObj != SIZE_MAX;
 			task.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
-			auto result = entityRenderSys->TryAdd(info, task);
+			auto result = entityRenderSys->TryAdd(vkeInfo, task);
 
 			// Update menu if available.
-			const bool menuOpen = leftPressedThisTurn && !mouseSys->GetIsUIBlocking() ? 
+			const bool menuOpen = leftPressedThisTurn && !mouseSys->GetIsUIBlocking() ?
 				_menuUpdateInfo.opened ? false : hovered : rightPressedThisTurn ? false : _menuUpdateInfo.opened;
-			if(menuOpen && !entity.interacted)
+			if (menuOpen && !entity.interacted)
 			{
 				const auto card = cardSys->GetCard(cardId);
 
@@ -120,12 +121,12 @@ namespace game
 					entity.interacted = true;
 				}
 
-				menuSys->CreateMenu(info, systems, menuCreateInfo, _menuUpdateInfo);
-				
+				menuSys->CreateMenu(vkeInfo, systems, menuCreateInfo, _menuUpdateInfo);
+
 				CardMenuCreateInfo cardMenuCreateInfo{};
 				cardMenuCreateInfo.origin = transform.position + glm::vec2(1.75f, 0) * (static_cast<float>(!_menuUpdateInfo.right) * 2 - 1);
 				cardMenuCreateInfo.cardIndex = cardId;
-				menuSys->CreateCardMenu(info, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
+				menuSys->CreateCardMenu(vkeInfo, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
 				resetMenu = false;
 			}
 		}

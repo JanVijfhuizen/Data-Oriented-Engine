@@ -40,9 +40,9 @@ namespace game
 			return;
 
 		const auto& mousePos = info.mousePos;
-		const auto entitySys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
+		const auto entitySys = systems.Get<vke::EntityRenderSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto uiSys = systems.Get<vke::UIRenderSystem>();
 
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::mouse);
 		jlb::StackArray<vke::SubTexture, 2> subTextures{};
@@ -77,7 +77,7 @@ namespace game
 	{
 		TaskSystem<jlb::TBounds<float>>::OnPostUpdate(info, systems, tasks);
 
-		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
+		const auto uiInteractSys = systems.Get<UIInteractionSystem>();
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 		_hoveredObject = uiHoveredObj == SIZE_MAX ? _hoveredObject : SIZE_MAX;
 		_isUIBlocking = uiHoveredObj != SIZE_MAX;

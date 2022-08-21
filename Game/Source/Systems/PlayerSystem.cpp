@@ -16,9 +16,9 @@ namespace game
 	{
 		System<vke::EngineData>::PreUpdate(info, systems);
 
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto turnSys = systems.Get<TurnSystem>();
 		
 		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
 		constexpr glm::ivec2 inputDirs[4]

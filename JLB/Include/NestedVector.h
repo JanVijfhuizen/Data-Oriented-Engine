@@ -54,6 +54,7 @@ namespace jlb
 
 		T& Add(StackAllocator& allocator, T& value);
 		T& Add(StackAllocator& allocator, const T& value = {});
+		void RemoveAt(size_t index);
 
 		[[nodiscard]] const Node& GetRoot() const;
 		[[nodiscard]] size_t GetVectorCount() const;
@@ -200,6 +201,26 @@ namespace jlb
 	T& NestedVector<T>::Add(StackAllocator& allocator, const T& value)
 	{
 		return IntAdd(allocator, value);
+	}
+
+	template <typename T>
+	void NestedVector<T>::RemoveAt(size_t index)
+	{
+		assert(index < GetCount());
+
+		Node* node = _root;
+		while (node)
+		{
+			const size_t length = node->GetLength();
+			if (index < length)
+			{
+				node->RemoveAt(index);
+				break;
+			}
+				
+			node = node->_next;
+			index -= length;
+		}
 	}
 
 	template <typename T>

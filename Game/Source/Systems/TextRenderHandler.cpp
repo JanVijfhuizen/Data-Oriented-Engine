@@ -22,8 +22,8 @@ namespace game
 	{
 		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
 
-		const auto uiSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto resourceSys = systems.GetSystem<game::ResourceManager>();
+		const auto uiSys = systems.Get<vke::UIRenderSystem>();
+		const auto resourceSys = systems.Get<game::ResourceManager>();
 
 		const float pixelSize = uiSys->camera.pixelSize;
 

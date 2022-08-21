@@ -14,13 +14,13 @@ namespace game
 	{
 		TaskSystemWithOutput<PickupComponent, PickupComponent>::OnPreUpdate(info, systems, tasks);
 
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 
 		vke::ThreadPoolTask threadTask{};
 		threadTask.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto self = static_cast<PickupSystem*>(userPtr);
-			const auto turnSys = systems.GetSystem<TurnSystem>();
+			const auto turnSys = systems.Get<TurnSystem>();
 
 			const bool isEndTickEvent = turnSys->GetIfEndTickEvent();
 
@@ -51,11 +51,11 @@ namespace game
 		auto& dumpAllocator = *info.dumpAllocator;
 		tasksOutput.PreAllocateNested(dumpAllocator, GetCount());
 
-		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
+		const auto threadSys = systems.Get<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, threadTask);
 		assert(result != SIZE_MAX);
 
-		const auto entitySys = systems.GetSystem<EntitySystem>();
+		const auto entitySys = systems.Get<EntitySystem>();
 
 		if(turnSys->GetIfBeginTickEvent())
 			for (auto& task : tasks)

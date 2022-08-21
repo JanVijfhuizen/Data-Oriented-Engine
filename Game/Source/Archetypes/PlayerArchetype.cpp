@@ -16,26 +16,27 @@
 
 namespace game
 {
-	void PlayerArchetype::PreUpdate(const vke::EngineData& info,
-		const jlb::Systems<vke::EngineData> systems,
-		jlb::Vector<Player>& entities)
+	void PlayerArchetype::OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+		jlb::NestedVector<Player>& entities)
 	{
-		const auto cameraSys = systems.GetSystem<CameraSystem>();
-		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto menuSys = systems.GetSystem<MenuSystem>();
-		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto playerSys = systems.GetSystem<PlayerSystem>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
-		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
+		auto& systems = info.systems;
+		auto& vkeInfo = *info.vkeInfo;
+		const auto cameraSys = systems.Get<CameraSystem>();
+		const auto cardSys = systems.Get<CardSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto menuSys = systems.Get<MenuSystem>();
+		const auto mouseSys = systems.Get<MouseSystem>();
+		const auto playerSys = systems.Get<PlayerSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
+		const auto uiInteractSys = systems.Get<UIInteractionSystem>();
 
 		// Assure that the player is always present.
 		assert(entities.GetCount() == 1);
 
 		auto& entity = entities[0];
 		auto& characterInput = entity.input;
-
+		
 		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
 		const bool occupiedNextTurn = playerSys->IsPlayerOccupiedNextTurn();
 		if (occupiedNextTurn)
@@ -56,7 +57,7 @@ namespace game
 		if (entity.pickupComponent.active)
 			occupied = true;
 
-		if(occupied)
+		if (occupied)
 		{
 			_menuUpdateInfo = {};
 			_secondMenuUpdateInfo = {};
@@ -77,11 +78,11 @@ namespace game
 			}
 		}
 
-		CharacterArchetype<Player>::PreUpdate(info, systems, entities);
+		CharacterArchetype<Player>::OnPreUpdate(info, archetypes, entities);
 
-		auto& dumpAllocator = *info.dumpAllocator;
-		auto& tempAllocator = *info.tempAllocator;
-		
+		auto& dumpAllocator = *vkeInfo.dumpAllocator;
+		auto& tempAllocator = *vkeInfo.tempAllocator;
+
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
@@ -288,13 +289,13 @@ namespace game
 			if (changePage || rightPressedThisTurn || close)
 				_secondMenuUpdateInfo = {};
 			if (!close && drawSecondWindow)
-				menuSys->CreateMenu(info, systems, secondMenuCreateInfo, _secondMenuUpdateInfo);
+				menuSys->CreateMenu(vkeInfo, systems, secondMenuCreateInfo, _secondMenuUpdateInfo);
 			if (_menuIndex != MenuIndex::main)
 				_menuIndex = rightPressedThisTurn ? MenuIndex::main : _menuIndex;
 			if (changePage || rightPressedThisTurn || close)
 				menuUpdateInfo = {};
 			if (!close)
-				menuSys->CreateMenu(info, systems, menuCreateInfo, menuUpdateInfo);
+				menuSys->CreateMenu(vkeInfo, systems, menuCreateInfo, menuUpdateInfo);
 			if (renderCard)
 			{
 				const size_t oldCardHovered = _cardHovered;
@@ -311,7 +312,7 @@ namespace game
 					createInfo.origin = transform.position;
 					createInfo.cardIndex = cardIndex;
 
-					menuSys->CreateCardMenu(info, systems, createInfo, _cardMenuUpdateInfo);
+					menuSys->CreateCardMenu(vkeInfo, systems, createInfo, _cardMenuUpdateInfo);
 				}
 			}
 		}
@@ -327,9 +328,11 @@ namespace game
 		playerSysUpdateInfo.position = transform.position;
 	}
 
-	void PlayerArchetype::OnKeyInput(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
+	void PlayerArchetype::OnKeyInput(const EntityArchetypeInfo& info, const jlb::Systems<EntityArchetypeInfo> systems,
+		const int key, const int action)
 	{
+		CharacterArchetype<Player>::OnKeyInput(info, systems, key, action);
+
 		HandleKeyDirectionInput(GLFW_KEY_W, key, action, _movementInput[0], _movementInput[2]);
 		HandleKeyDirectionInput(GLFW_KEY_A, key, action, _movementInput[1], _movementInput[3]);
 		HandleKeyDirectionInput(GLFW_KEY_S, key, action, _movementInput[2], _movementInput[0]);
@@ -339,14 +342,9 @@ namespace game
 			Reset();
 	}
 
-	void PlayerArchetype::OnMouseInput(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems, const int key, const int action)
-	{
-	}
-
 	vke::SubTexture PlayerArchetype::DefineSubTextureSet(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceManager>();
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		return subTexture;
 	}

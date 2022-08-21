@@ -65,7 +65,7 @@ namespace game
 	void CollisionSystem::PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
 	{
 		System<vke::EngineData>::PreUpdate(info, systems);
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 
 		// If the previous frame was for adding tasks.
 		if (turnSys->GetIfBeginTickEvent())
@@ -88,7 +88,7 @@ namespace game
 					previous.bvh.Build(tasks);
 			};
 
-			const auto turnThreadSys = systems.GetSystem<TurnThreadPoolSystem>();
+			const auto turnThreadSys = systems.Get<TurnThreadPoolSystem>();
 			const auto result = turnThreadSys->TryAdd(info, task);
 			assert(result != SIZE_MAX);
 		}

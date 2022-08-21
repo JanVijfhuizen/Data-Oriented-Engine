@@ -33,11 +33,11 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const
 	{
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
-		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto textRenderSys = systems.Get<TextRenderHandler>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
+		const auto uiInteractSys = systems.Get<UIInteractionSystem>();
 
 		auto& dumpAllocator = *info.dumpAllocator;
 		auto& tempAllocator = *info.tempAllocator;
@@ -281,9 +281,9 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const TextBoxCreateInfo& createInfo)
 	{
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
-		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto textRenderSys = systems.Get<TextRenderHandler>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
 
 		TextRenderTask cardTextRenderTask{};
 		cardTextRenderTask.center = createInfo.center;
@@ -315,11 +315,11 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const CardMenuCreateInfo& createInfo, CardMenuUpdateInfo& updateInfo) const
 	{
-		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto cardRenderSys = systems.GetSystem<CardRenderSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto textRenderSys = systems.GetSystem<TextRenderHandler>();
+		const auto cardSys = systems.Get<CardSystem>();
+		const auto cardRenderSys = systems.Get<CardRenderSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto textRenderSys = systems.Get<TextRenderHandler>();
 
 		auto& dumpAllocator = *info.dumpAllocator;
 

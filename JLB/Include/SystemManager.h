@@ -32,7 +32,7 @@ namespace jlb
 
 	public:
 		template <typename U>
-		[[nodiscard]] U* GetSystem() const;
+		[[nodiscard]] U* Get() const;
 
 		[[nodiscard]] Iterator<System<T>*> begin() const;
 		[[nodiscard]] Iterator<System<T>*> end() const;
@@ -58,7 +58,14 @@ namespace jlb
 
 		void Awake(const T& data);
 		void Start(const T& data);
+
+		// Encompasses all the individual update steps.
+		void BeginFrame(const T& data);
+		void PreUpdate(const T& data);
 		void Update(const T& data);
+		void PostUpdate(const T& data);
+		void EndFrame(const T& data);
+
 		void OnRecreateSwapChainAssets(const T& data);
 		void OnKeyInput(const T& data, int key, int action);
 		void OnMouseInput(const T& data, int key, int action);
@@ -163,13 +170,33 @@ namespace jlb
 	void SystemManager<T>::Update(const T& data)
 	{
 		for (auto& sys : _vector)
+			sys->Update(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::BeginFrame(const T& data)
+	{
+		for (auto& sys : _vector)
 			sys->BeginFrame(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::PreUpdate(const T& data)
+	{
 		for (auto& sys : _vector)
 			sys->PreUpdate(data, *this);
-		for (auto& sys : _vector)
-			sys->Update(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::PostUpdate(const T& data)
+	{
 		for (auto& sys : _vector)
 			sys->PostUpdate(data, *this);
+	}
+
+	template <typename T>
+	void SystemManager<T>::EndFrame(const T& data)
+	{
 		for (auto& sys : _vector)
 			sys->EndFrame(data, *this);
 	}
@@ -226,7 +253,7 @@ namespace jlb
 
 	template <typename T>
 	template <typename U>
-	U* Systems<T>::GetSystem() const
+	U* Systems<T>::Get() const
 	{
 		assert(_src->_allocated);
 		return _src->template GetSystem<U>();

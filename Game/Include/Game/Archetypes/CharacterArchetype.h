@@ -18,19 +18,18 @@ namespace game
 	template <typename T>
 	class CharacterArchetype : public EntityArchetype<T>
 	{
-	public:
-		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			jlb::Vector<T>& entities) override;
-		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			jlb::Vector<T>& entities) override;
-
 	protected:
 		struct CharacterInput final
 		{
 			glm::ivec2 movementDir{};
 		};
 
-		float scalingOnSelected = 0.5f;
+		const float scalingOnSelected = 0.5f;
+
+		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+			jlb::NestedVector<T>& entities) override;
+		void OnPostUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+			jlb::NestedVector<T>& entities) override;
 		
 		[[nodiscard]] virtual vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) = 0;
 		[[nodiscard]] virtual size_t DefineSubTextureSetLength() const;
@@ -40,18 +39,19 @@ namespace game
 	};
 
 	template <typename T>
-	void CharacterArchetype<T>::PreUpdate(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems,
-		jlb::Vector<T>& entities)
+	void CharacterArchetype<T>::OnPreUpdate(const EntityArchetypeInfo& info,
+		jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities)
 	{
-		EntityArchetype<T>::PreUpdate(info, systems, entities);
+		EntityArchetype<T>::OnPreUpdate(info, archetypes, entities);
 
-		const auto collisionSys = systems.GetSystem<CollisionSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto movementSys = systems.GetSystem<MovementSystem>();
-		const auto pickupSystem = systems.GetSystem<PickupSystem>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		auto& systems = info.systems;
+		auto& vkeInfo = *info.vkeInfo;
+		const auto collisionSys = systems.Get<CollisionSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto mouseSys = systems.Get<MouseSystem>();
+		const auto movementSys = systems.Get<MovementSystem>();
+		const auto pickupSystem = systems.Get<PickupSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 
 		const size_t hoveredObj = mouseSys->GetHoveredObject();
 		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
@@ -67,7 +67,7 @@ namespace game
 				glm::vec2 collisionPos = transform.position;
 
 				bool occupied = false;
-				if(base->pickupComponent.active)
+				if (base->pickupComponent.active)
 					occupied = true;
 
 				// Update movement task with new input.
@@ -75,11 +75,11 @@ namespace game
 				{
 					auto& input = base->input;
 					const auto& dir = input.movementDir;
-					
+
 					const glm::vec2 from = jlb::math::RoundNearest(transform.position);
 					const glm::vec2 delta = glm::vec2(dir);
 					glm::vec2 to = from + delta;
-					
+
 					base->movementTileReservation = SIZE_MAX;
 
 					if (dir.x != 0 || dir.y != 0)
@@ -114,7 +114,7 @@ namespace game
 			}
 
 		{
-			const auto subTexture = DefineSubTextureSet(info, systems);
+			const auto subTexture = DefineSubTextureSet(vkeInfo, systems);
 			const size_t subTextureLength = DefineSubTextureSetLength();
 
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
@@ -125,7 +125,7 @@ namespace game
 			const auto handOffset = GetRightHandOffset();
 			const float handLerpMultiplier = (turnSys->GetTickIndex() % 2 == 0) * 2 - 1;
 			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve1, curve2) * jlb::math::PI * 2 * GetHandAngleMultiplier() * handLerpMultiplier;
-			const float handMoveSpeed = info.deltaTime * 0.01f * GetHandMoveSpeed();
+			const float handMoveSpeed = vkeInfo.deltaTime * 0.01f * GetHandMoveSpeed();
 
 			for (auto& entity : entities)
 			{
@@ -136,11 +136,11 @@ namespace game
 
 				const auto& transform = base->transform;
 				const auto& position = transform.position;
-				base->movementTaskId = movementSys->TryAdd(info, movementComponent);
-				
+				base->movementTaskId = movementSys->TryAdd(vkeInfo, movementComponent);
+
 				if (base->pickupComponent.active)
 				{
-					base->pickupTaskId = pickupSystem->TryAdd(info, base->pickupComponent);
+					base->pickupTaskId = pickupSystem->TryAdd(vkeInfo, base->pickupComponent);
 					assert(base->pickupTaskId != SIZE_MAX);
 				}
 
@@ -151,7 +151,7 @@ namespace game
 					if (!culls)
 					{
 						jlb::FBounds bounds{ position, glm::vec2(transform.scale) };
-						base->mouseTaskId = mouseSys->TryAdd(info, bounds);
+						base->mouseTaskId = mouseSys->TryAdd(vkeInfo, bounds);
 
 						vke::EntityRenderTask renderTask{};
 						renderTask.transform = transform;
@@ -167,7 +167,7 @@ namespace game
 						lHandPos.Add({}, idling);
 						rHandPos.Add({}, idling);
 
-						if(!ifBeginTickEvent)
+						if (!ifBeginTickEvent)
 						{
 							const glm::vec2 rCenter = jlb::math::Rotate(handOffset, transform.rotation);
 							const glm::vec2 lCenter = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
@@ -180,22 +180,22 @@ namespace game
 							lHandPos.Add(pickupComponent.outHandPosition - position, pickupComponent.active);
 							rHandPos.Add(pickupComponent.outHandPosition - position, pickupComponent.active);
 						}
-						
+
 						base->lHandPos = jlb::math::LerpClamped(base->lHandPos, lHandPos, handMoveSpeed);
 						base->rHandPos = jlb::math::LerpClamped(base->rHandPos, rHandPos, handMoveSpeed);
 
 						// Render the hands.
 						renderTask.transform.position = position + base->lHandPos;
 						renderTask.subTexture = handSubTexture;
-						auto result = entityRenderSys->TryAdd(info, renderTask);
+						auto result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 
 						renderTask.transform.position = position + base->rHandPos;
-						result = entityRenderSys->TryAdd(info, renderTask);
+						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 
 						// Render the head.
 						renderTask.transform.position = position;
 						renderTask.subTexture = headSubTexture;
-						result = entityRenderSys->TryAdd(info, renderTask);
+						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 					}
 
 					base->lHandPosPile = {};
@@ -206,14 +206,14 @@ namespace game
 	}
 
 	template <typename T>
-	void CharacterArchetype<T>::PostUpdate(const vke::EngineData& info, 
-		const jlb::Systems<vke::EngineData> systems,
-		jlb::Vector<T>& entities)
+	void CharacterArchetype<T>::OnPostUpdate(const EntityArchetypeInfo& info,
+		jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities)
 	{
-		EntityArchetype<T>::PostUpdate(info, systems, entities);
+		EntityArchetype<T>::OnPostUpdate(info, archetypes, entities);
 
-		const auto movementSys = systems.GetSystem<MovementSystem>();
-		const auto pickupSys = systems.GetSystem<PickupSystem>();
+		auto& systems = info.systems;
+		const auto movementSys = systems.Get<MovementSystem>();
+		const auto pickupSys = systems.Get<PickupSystem>();
 
 		for (auto& entity : entities)
 		{
@@ -223,12 +223,11 @@ namespace game
 				auto& outputs = movementSys->GetOutput();
 				const auto& output = outputs[base->movementTaskId];
 				base->movementComponent = output;
-
 				auto& transform = base->transform;
 				transform.position = output.outPosition;
 				transform.rotation = output.outRotation;
 			}
-			if(base->pickupTaskId != SIZE_MAX)
+			if (base->pickupTaskId != SIZE_MAX)
 			{
 				auto& outputs = pickupSys->GetOutput();
 				const auto& output = outputs[base->pickupTaskId];

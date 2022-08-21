@@ -52,7 +52,7 @@ namespace game
 		auto& dumpAllocator = *info.dumpAllocator;
 		tasksOutput.PreAllocateNested(dumpAllocator, vke::TaskSystemWithOutput<Input, Output>::GetCount());
 
-		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
+		const auto threadSys = systems.Get<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, threadTask);
 		assert(result != SIZE_MAX);
 	}

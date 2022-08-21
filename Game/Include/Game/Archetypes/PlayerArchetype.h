@@ -8,13 +8,6 @@ namespace game
 	// Handles player character behaviour and input.
 	class PlayerArchetype final : public CharacterArchetype<Player>
 	{
-	public:
-		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			jlb::Vector<Player>& entities) override;
-		void OnKeyInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action);
-		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action);
-
-	private:
 		struct Input final
 		{
 			bool pressed = false;
@@ -40,6 +33,12 @@ namespace game
 		MenuIndex _menuIndex = MenuIndex::main;
 		size_t _cardHovered = SIZE_MAX;
 		size_t _cardActivated = SIZE_MAX;
+
+		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+			jlb::NestedVector<Player>& entities) override;
+
+		void OnKeyInput(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> systems, int key,
+			int action) override;
 
 		[[nodiscard]] vke::SubTexture DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		static void HandleKeyDirectionInput(int targetKey, int activatedKey, int action, Input& input, Input& opposite);
