@@ -88,14 +88,17 @@ namespace game
 
 						collisionPos = from;
 						uint32_t outCollision;
+						movementComponent.inIsObstructed = true;
 						if (collisionSys->CheckIfTilesAreReserved(toRounded) == SIZE_MAX &&
 							!collisionSys->GetIntersections(toRounded, outCollision))
 						{
 							base->movementTileReservation = collisionSys->ReserveTilesThisTurn(toRounded);
-							movementComponent.outRemaining = movementComponent.inDuration;
-							movementComponent.active = true;
 							collisionPos = to;
+							movementComponent.inIsObstructed = false;
 						}
+
+						movementComponent.active = true;
+						movementComponent.remaining = movementComponent.inDuration;
 					}
 
 					movementComponent.inFrom = from;
@@ -159,16 +162,16 @@ namespace game
 						auto& lHandPos = base->lHandPosPile;
 						auto& rHandPos = base->rHandPosPile;
 
-						const glm::vec2 rCenter = jlb::math::Rotate(handOffset, transform.rotation);
-						const glm::vec2 lCenter = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
-
 						// Add idle hand position.
 						const bool idling = !movementComponent.active && !pickupComponent.active || ifBeginTickEvent;
-						lHandPos.Add(lCenter, idling);
-						rHandPos.Add(rCenter, idling);
+						lHandPos.Add({}, idling);
+						rHandPos.Add({}, idling);
 
 						if(!ifBeginTickEvent)
 						{
+							const glm::vec2 rCenter = jlb::math::Rotate(handOffset, transform.rotation);
+							const glm::vec2 lCenter = jlb::math::Rotate(handOffset * glm::vec2(-1.f, 1.f), transform.rotation);
+
 							// Add movement hand animation.
 							lHandPos.Add(jlb::math::Rotate(lCenter, handLerpAngle), movementComponent.active);
 							rHandPos.Add(jlb::math::Rotate(rCenter, handLerpAngle), movementComponent.active);
