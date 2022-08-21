@@ -25,6 +25,7 @@ namespace game
 		};
 
 		const float scalingOnSelected = 0.5f;
+		const float headRotationSpeed = .05f;
 
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
 			jlb::NestedVector<T>& entities) override;
@@ -118,7 +119,8 @@ namespace game
 			const size_t subTextureLength = DefineSubTextureSetLength();
 
 			const auto headSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 0);
-			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
+			const auto bodySubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 1);
+			const auto handSubTexture = vke::texture::GetSubTexture(subTexture, subTextureLength, 2);
 			const float tickLerp = turnSys->GetTickLerp();
 			auto curve1 = jlb::CreateCurveDecelerate();
 			auto curve2 = jlb::CreateCurveOvershooting();
@@ -127,6 +129,8 @@ namespace game
 			const float handLerpAngle = DoubleCurveEvaluate(tickLerp, curve1, curve2) * jlb::math::PI * 2 * GetHandAngleMultiplier() * handLerpMultiplier;
 			const float handMoveSpeed = vkeInfo.deltaTime * 0.01f * GetHandMoveSpeed();
 
+			const float pixelHeadOffset = 1.f / static_cast<float>(vke::PIXEL_SIZE_ENTITY);
+			
 			for (auto& entity : entities)
 			{
 				const auto base = reinterpret_cast<Character*>(&entity);
@@ -192,8 +196,20 @@ namespace game
 						renderTask.transform.position = position + base->rHandPos;
 						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 
-						// Render the head.
+						// Render the body.
 						renderTask.transform.position = position;
+						renderTask.subTexture = bodySubTexture;
+						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
+
+						float headDelta = 0;
+						headDelta += (base->movementComponent.outScaleMultiplier - 1.f) * (base->movementTaskId != SIZE_MAX);
+
+						const auto headOffset = jlb::math::GetDir(transform.rotation + jlb::math::PI * .5f) * headDelta;
+						base->headRotation = jlb::math::SmoothAngle(base->headRotation, transform.rotation, headRotationSpeed);
+
+						// Render the head.
+						renderTask.transform.position += headOffset;
+						renderTask.transform.rotation = base->headRotation;
 						renderTask.subTexture = headSubTexture;
 						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 					}
@@ -239,7 +255,7 @@ namespace game
 	template <typename T>
 	size_t CharacterArchetype<T>::DefineSubTextureSetLength() const
 	{
-		return 2;
+		return 3;
 	}
 
 	template <typename T>

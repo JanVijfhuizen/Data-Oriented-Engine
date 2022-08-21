@@ -11,7 +11,6 @@ namespace game
 		// Subtextures available for the entity renderer.
 		enum class EntitySubTextures
 		{
-			mouse,
 			humanoid,
 			directionalArrow,
 			pickup

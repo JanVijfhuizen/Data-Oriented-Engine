@@ -22,7 +22,6 @@ namespace game
 	{
 		const auto archetypeInfo = CreateInfo(info, systems);
 		_archetypeManager.Exit(archetypeInfo);
-		_archetypeManager.Free(_allocator, *info.tempAllocator, archetypeInfo);
 		_allocator.Free();
 		Scene::Free(info, systems);
 	}
