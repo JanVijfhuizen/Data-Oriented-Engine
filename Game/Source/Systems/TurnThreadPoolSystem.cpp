@@ -41,7 +41,7 @@ namespace game
 	{
 		TaskSystem<TurnThreadPoolTask>::OnPreUpdate(info, systems, tasks);
 
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 		_takesTasks = turnSys->GetIfBeginTickEvent();
 
 		if(turnSys->GetIfEndTickEvent())

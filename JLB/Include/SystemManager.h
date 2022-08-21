@@ -32,7 +32,7 @@ namespace jlb
 
 	public:
 		template <typename U>
-		[[nodiscard]] U* GetSystem() const;
+		[[nodiscard]] U* Get() const;
 
 		[[nodiscard]] Iterator<System<T>*> begin() const;
 		[[nodiscard]] Iterator<System<T>*> end() const;
@@ -226,7 +226,7 @@ namespace jlb
 
 	template <typename T>
 	template <typename U>
-	U* Systems<T>::GetSystem() const
+	U* Systems<T>::Get() const
 	{
 		assert(_src->_allocated);
 		return _src->template GetSystem<U>();

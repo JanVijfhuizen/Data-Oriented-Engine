@@ -18,7 +18,7 @@ namespace game
 	class EntityArchetype : public jlb::System<EntityArchetypeInfo>
 	{
 	public:
-		[[nodiscard]] const jlb::NestedVector<T>& GetEntities() const;
+		[[nodiscard]] jlb::NestedVector<T>& GetEntities();
 
 	protected:
 		void Allocate(const EntityArchetypeInfo& info) override;
@@ -40,7 +40,7 @@ namespace game
 	};
 
 	template <typename T>
-	const jlb::NestedVector<T>& EntityArchetype<T>::GetEntities() const
+	jlb::NestedVector<T>& EntityArchetype<T>::GetEntities()
 	{
 		return _entities;
 	}
@@ -57,8 +57,8 @@ namespace game
 	void EntityArchetype<T>::OnPreUpdate(const EntityArchetypeInfo& info,
 		const jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities)
 	{
-		const auto turnSys = info.systems.GetSystem<TurnSystem>();
-		const auto entitySys = info.systems.GetSystem<EntitySystem>();
+		const auto turnSys = info.systems.Get<TurnSystem>();
+		const auto entitySys = info.systems.Get<EntitySystem>();
 		const auto count = static_cast<int32_t>(entities.GetCount());
 
 		if (turnSys->GetIfEndTickEvent())

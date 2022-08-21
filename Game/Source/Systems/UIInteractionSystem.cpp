@@ -50,7 +50,7 @@ namespace game
 			}
 		};
 
-		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
+		const auto threadSys = systems.Get<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, task);
 		assert(result != SIZE_MAX);
 	}

@@ -9,7 +9,7 @@ namespace game::demo
 		jlb::NestedVector<DummyEntity>& entities)
 	{
 		auto& systems = info.systems;
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceManager>();
 
 		for (auto& entity : entities)
 		{
@@ -27,7 +27,7 @@ namespace game::demo
 
 	vke::SubTexture DummyArchetype::DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
 	{
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceManager>();
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		return subTexture;
 	}

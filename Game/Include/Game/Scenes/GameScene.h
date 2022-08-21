@@ -11,11 +11,14 @@ namespace game
 		void Free(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
 		virtual void DefineSystems(jlb::SystemsInitializer<EntityArchetypeInfo> initializer) = 0;
 		void PreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
+
+		[[nodiscard]] jlb::Systems<EntityArchetypeInfo> GetEntityArchetypes();
+		[[nodiscard]] jlb::StackAllocator& GetAllocator();
 		
 	private:
 		[[nodiscard]] EntityArchetypeInfo CreateInfo(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems);
 
-		jlb::StackAllocator _sceneAllocator{};
+		jlb::StackAllocator _allocator{};
 		jlb::SystemManager<EntityArchetypeInfo> _archetypeManager{};
 	};
 }

@@ -11,7 +11,7 @@ namespace game
 	{
 		System<vke::EngineData>::PreUpdate(info, systems);
 
-		const auto threadSys = systems.GetSystem<vke::ThreadPoolSystem>();
+		const auto threadSys = systems.Get<vke::ThreadPoolSystem>();
 
 		vke::ThreadPoolTask task{};
 		task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
@@ -64,8 +64,8 @@ namespace game
 	{
 		System<vke::EngineData>::PostUpdate(info, systems);
 		
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto tileRenderSys = systems.GetSystem<vke::TileRenderSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto tileRenderSys = systems.Get<vke::TileRenderSystem>();
 
 		auto& entityCamera = entityRenderSys->camera;
 		entityCamera.position = settings.position;

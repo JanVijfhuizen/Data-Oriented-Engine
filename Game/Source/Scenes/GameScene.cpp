@@ -7,12 +7,12 @@ namespace game
 	{
 		Scene::Allocate(info, systems);
 		auto& tempAllocator = *info.tempAllocator;
-		_sceneAllocator.Allocate();
+		_allocator.Allocate();
 
 		const auto archetypeInfo = CreateInfo(info, systems);
-		const auto systemsInitializer = _archetypeManager.CreateInitializer(_sceneAllocator, tempAllocator, archetypeInfo);
+		const auto systemsInitializer = _archetypeManager.CreateInitializer(_allocator, tempAllocator, archetypeInfo);
 		DefineSystems(systemsInitializer);
-		_archetypeManager.Allocate(_sceneAllocator, tempAllocator);
+		_archetypeManager.Allocate(_allocator, tempAllocator);
 
 		_archetypeManager.Awake(archetypeInfo);
 		_archetypeManager.Start(archetypeInfo);
@@ -22,8 +22,8 @@ namespace game
 	{
 		const auto archetypeInfo = CreateInfo(info, systems);
 		_archetypeManager.Exit(archetypeInfo);
-		_archetypeManager.Free(_sceneAllocator, *info.tempAllocator, archetypeInfo);
-		_sceneAllocator.Free();
+		_archetypeManager.Free(_allocator, *info.tempAllocator, archetypeInfo);
+		_allocator.Free();
 		Scene::Free(info, systems);
 	}
 
@@ -33,11 +33,21 @@ namespace game
 		_archetypeManager.Update(CreateInfo(info, systems));
 	}
 
+	jlb::Systems<EntityArchetypeInfo> GameScene::GetEntityArchetypes()
+	{
+		return _archetypeManager;
+	}
+
+	jlb::StackAllocator& GameScene::GetAllocator()
+	{
+		return _allocator;
+	}
+
 	EntityArchetypeInfo GameScene::CreateInfo(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		EntityArchetypeInfo ret{};
 		ret.systems = systems;
-		ret.sceneAllocator = &_sceneAllocator;
+		ret.sceneAllocator = &_allocator;
 		ret.vkeInfo = &info;
 		return ret;
 	}

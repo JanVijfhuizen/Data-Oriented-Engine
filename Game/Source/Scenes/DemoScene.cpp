@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
+#include "Archetypes/DummyArchetype.h"
+#include "Archetypes/PlayerArchetype.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
@@ -8,72 +10,74 @@ namespace game::demo
 {
 	void DemoScene::Allocate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		Scene::Allocate(info, systems);
+		GameScene::Allocate(info, systems);
 
-		const auto collisionSys = systems.GetSystem<CollisionSystem>();
-		const auto entitySys = systems.GetSystem<EntitySystem>();
+		const auto collisionSys = systems.Get<CollisionSystem>();
+		const auto entitySys = systems.Get<EntitySystem>();
 
-		const int32_t dummyCount = 6;
-		_players.Allocate(*info.allocator, 1);
-		_pickups.Allocate(*info.allocator, 1);
-		_dummies.Allocate(*info.allocator, dummyCount * dummyCount);
-		_dummies.SetCount(_dummies.GetLength());
+		const auto entityArchetypes = GetEntityArchetypes();
+		auto& sceneAllocator = GetAllocator();
+
+		auto& players = entityArchetypes.Get<PlayerArchetype>()->GetEntities();
+		auto& pickups = entityArchetypes.Get<PickupArchetype>()->GetEntities();
+		auto& dummies = entityArchetypes.Get<DummyArchetype>()->GetEntities();
+
+		constexpr int32_t dummyCount = 6;
 		for (int32_t i = 0; i < dummyCount; ++i)
-		{
 			for (int32_t j = 0; j < dummyCount; ++j)
 			{
 				const auto pos = glm::vec2(i - dummyCount / 2 - dummyCount, j - dummyCount / 2 - dummyCount);
-				_dummies[i * dummyCount + j].transform.position = pos;
+
+				DummyEntity entity{};
+				entity.transform.position = pos;
+				dummies.Add(sceneAllocator, entity);
 			}
+
+		{
+			Player player{};
+			auto& inventory = player.data.character.inventory;
+			inventory.src = player.inventorySrc;
+			auto& fireball = inventory.Insert(0);
+			auto& bash = inventory.Insert(2);
+			players.Add(sceneAllocator, player);
 		}
 
-		_players.SetCount(1);
-		auto& inventory = _players[0].data.character.inventory;
-		inventory.src = _players[0].inventorySrc;
-		auto& fireball = inventory.Insert(0);
-		auto& bash = inventory.Insert(2);
+		{
+			Pickup pickup{};
+			pickup.data.pickup.cardId = 1;
+			pickup.transform.position = glm::vec2{ 2, -1 };
+			pickups.Add(sceneAllocator, pickup);
+		}
 
-		_pickups.SetCount(1);
-		_pickups[0].data.pickup.cardId = 1;
-		_pickups[0].transform.position = glm::vec2{2, -1};
-
-		for (auto& entity : _dummies)
+		for (auto& entity : dummies)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
 			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
 			
-		for (auto& entity : _players)
+		for (auto& entity : players)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
 			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
 			
-		for (auto& entity : _pickups)
+		for (auto& entity : pickups)
 		{
 			entitySys->CreateEntity(entity);
 			const glm::ivec2 toRounded = jlb::math::RoundNearest(entity.transform.position);
 			collisionSys->ReserveTilesNextTurn(toRounded);
 		}
-	}
-
-	void DemoScene::Free(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
-	{
-		_dummies.Free(*info.allocator);
-		_pickups.Free(*info.allocator);
-		_players.Free(*info.allocator);
-		Scene::Free(info, systems);
 	}
 
 	void DemoScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		Scene::PreUpdate(info, systems);
+		GameScene::PreUpdate(info, systems);
 
-		const auto collisionSys = systems.GetSystem<CollisionSystem>();
-		const auto tileSys = systems.GetSystem<vke::TileRenderSystem>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto collisionSys = systems.Get<CollisionSystem>();
+		const auto tileSys = systems.Get<vke::TileRenderSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 
 		// Tile test.
 		vke::TileRenderTask tileTask{};
@@ -91,31 +95,12 @@ namespace game::demo
 			result = collisionSys->TryAdd(collisionTask);
 			assert(result != SIZE_MAX);
 		}
-
-		_playerArchetype.PreUpdate(info, systems, _players);
-		_pickupArchetype.PreUpdate(info, systems, _pickups);
-		_dummyArchetype.PreUpdate(info, systems, _dummies);
 	}
 
-	void DemoScene::PostUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
+	void DemoScene::DefineSystems(jlb::SystemsInitializer<EntityArchetypeInfo> initializer)
 	{
-		Scene::PostUpdate(info, systems);
-		_playerArchetype.PostUpdate(info, systems, _players);
-		_pickupArchetype.PostUpdate(info, systems, _pickups);
-		_dummyArchetype.PostUpdate(info, systems, _dummies);
-	}
-
-	void DemoScene::OnKeyInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, 
-		const int key, const int action)
-	{
-		Scene::OnKeyInput(info, systems, key, action);
-		_playerArchetype.OnKeyInput(info, systems, key, action);
-	}
-
-	void DemoScene::OnMouseInput(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems,
-		const int key, const int action)
-	{
-		Scene::OnMouseInput(info, systems, key, action);
-		_playerArchetype.OnMouseInput(info, systems, key, action);
+		initializer.DefineSystem<PlayerArchetype>();
+		initializer.DefineSystem<PickupArchetype>();
+		initializer.DefineSystem<DummyArchetype>();
 	}
 }

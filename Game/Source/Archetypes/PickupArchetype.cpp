@@ -22,15 +22,15 @@ namespace game
 
 		auto& systems = info.systems;
 		auto& vkeInfo = *info.vkeInfo;
-		const auto cameraSys = systems.GetSystem<CameraSystem>();
-		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto menuSys = systems.GetSystem<MenuSystem>();
-		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto playerSys = systems.GetSystem<PlayerSystem>();
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
-		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
+		const auto cameraSys = systems.Get<CameraSystem>();
+		const auto cardSys = systems.Get<CardSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto menuSys = systems.Get<MenuSystem>();
+		const auto mouseSys = systems.Get<MouseSystem>();
+		const auto playerSys = systems.Get<PlayerSystem>();
+		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto turnSys = systems.Get<TurnSystem>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
 		const auto& camera = entityRenderSys->camera;
 
 		auto& dumpAllocator = *vkeInfo.dumpAllocator;
@@ -48,7 +48,7 @@ namespace game
 
 		if (turnSys->GetIfBeginTickEvent())
 		{
-			const auto collisionSys = systems.GetSystem<CollisionSystem>();
+			const auto collisionSys = systems.Get<CollisionSystem>();
 
 			for (auto& entity : entities)
 			{

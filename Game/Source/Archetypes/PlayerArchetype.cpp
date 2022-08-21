@@ -21,15 +21,15 @@ namespace game
 	{
 		auto& systems = info.systems;
 		auto& vkeInfo = *info.vkeInfo;
-		const auto cameraSys = systems.GetSystem<CameraSystem>();
-		const auto cardSys = systems.GetSystem<CardSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto menuSys = systems.GetSystem<MenuSystem>();
-		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto playerSys = systems.GetSystem<PlayerSystem>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
-		const auto uiRenderSys = systems.GetSystem<vke::UIRenderSystem>();
-		const auto uiInteractSys = systems.GetSystem<UIInteractionSystem>();
+		const auto cameraSys = systems.Get<CameraSystem>();
+		const auto cardSys = systems.Get<CardSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto menuSys = systems.Get<MenuSystem>();
+		const auto mouseSys = systems.Get<MouseSystem>();
+		const auto playerSys = systems.Get<PlayerSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
+		const auto uiInteractSys = systems.Get<UIInteractionSystem>();
 
 		// Assure that the player is always present.
 		assert(entities.GetCount() == 1);
@@ -344,7 +344,7 @@ namespace game
 
 	vke::SubTexture PlayerArchetype::DefineSubTextureSet(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		const auto resourceSys = systems.GetSystem<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceManager>();
 		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
 		return subTexture;
 	}

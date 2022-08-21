@@ -46,12 +46,12 @@ namespace game
 
 		auto& systems = info.systems;
 		auto& vkeInfo = *info.vkeInfo;
-		const auto collisionSys = systems.GetSystem<CollisionSystem>();
-		const auto entityRenderSys = systems.GetSystem<vke::EntityRenderSystem>();
-		const auto mouseSys = systems.GetSystem<MouseSystem>();
-		const auto movementSys = systems.GetSystem<MovementSystem>();
-		const auto pickupSystem = systems.GetSystem<PickupSystem>();
-		const auto turnSys = systems.GetSystem<TurnSystem>();
+		const auto collisionSys = systems.Get<CollisionSystem>();
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		const auto mouseSys = systems.Get<MouseSystem>();
+		const auto movementSys = systems.Get<MovementSystem>();
+		const auto pickupSystem = systems.Get<PickupSystem>();
+		const auto turnSys = systems.Get<TurnSystem>();
 
 		const size_t hoveredObj = mouseSys->GetHoveredObject();
 		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
@@ -212,8 +212,8 @@ namespace game
 		EntityArchetype<T>::OnPostUpdate(info, archetypes, entities);
 
 		auto& systems = info.systems;
-		const auto movementSys = systems.GetSystem<MovementSystem>();
-		const auto pickupSys = systems.GetSystem<PickupSystem>();
+		const auto movementSys = systems.Get<MovementSystem>();
+		const auto pickupSys = systems.Get<PickupSystem>();
 
 		for (auto& entity : entities)
 		{
