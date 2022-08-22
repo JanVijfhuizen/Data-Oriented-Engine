@@ -21,6 +21,7 @@ layout(push_constant) uniform PushConstants
 {
     vec2 resolution;
     vec2 cameraPosition;
+    vec3 lightDir;
     float pixelSize;
     int entitySize;
 } pushConstants;
@@ -29,10 +30,15 @@ layout(location = 0) out Data
 {
     vec2 fragTexCoord;
     vec2 fragPos;
+    flat vec3 lightDir;
+    vec2 vertPos;
 } outData;
 
 void HandleInstance(in InstanceData instance)
 {
+    outData.lightDir = pushConstants.lightDir;
+    outData.vertPos = Rotate(inPosition, instance.transform.rotation);
+
     outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
 

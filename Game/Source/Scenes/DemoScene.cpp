@@ -103,6 +103,13 @@ namespace game::demo
 			}
 		srand(info.time);
 
+		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
+		auto& lightDir = entityRenderSys->camera.lightDir;
+		lightDir.x = sin(info.time * .0025f);
+		lightDir.y = cos(info.time * 0.0025f);
+		lightDir.z = .1f;
+		lightDir = glm::normalize(lightDir);
+
 		// Tile test.
 		tileTask = {};
 		tileTask.shape = glm::ivec2(3, 5);
