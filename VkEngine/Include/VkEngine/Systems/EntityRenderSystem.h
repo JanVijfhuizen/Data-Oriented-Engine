@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <glm/vec3.hpp>
+
 #include "VkEngine/Components/Transform.h"
 #include "VkEngine/Graphics/SubTexture.h"
 #include "RenderSystem.h"
@@ -13,6 +15,7 @@ namespace vke
 	struct EntityCamera final
 	{
 		glm::vec2 position{};
+		glm::vec3 lightDir{0, 0, 1};
 		// Size of a pixel, where the window width equals 1.
 		float pixelSize = 0.008f;
 	private:
