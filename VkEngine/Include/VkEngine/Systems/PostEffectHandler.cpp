@@ -1,6 +1,7 @@
 ﻿#include "VkEngine/pch.h"
 #include "VkEngine/Graphics/PostEffectHandler.h"
 
+#include "VkEngine/Graphics/LayoutUtils.h"
 #include "VkRenderer/VkApp.h"
 #include "VkRenderer/VkImageUtils.h"
 #include "VkRenderer/VkMemBlock.h"
@@ -10,14 +11,53 @@
 
 namespace vke
 {
-	void PostEffectHandler::Allocate(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator)
+	void PostEffect::Allocate(const vk::App& app, PostEffectHandler& handler, const Shader& shader)
 	{
-		RecreateFrames(allocator, app, swapChain, vkAllocator);
+		_shader = shader;
+	}
+
+	void PostEffect::Free(const vk::App& app, PostEffectHandler& handler)
+	{
+	}
+
+	void PostEffect::Recreate(const vk::App& app, PostEffectHandler& handler)
+	{
+	}
+
+	void PostEffectHandler::Allocate(const EngineData& info, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator)
+	{
+		// Create descriptor layout.
+		layout::Info::Binding binding{};
+		binding.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		binding.flag = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		layout::Info descriptorLayoutInfo{};
+		descriptorLayoutInfo.bindings = binding;
+		_descriptorLayout = layout::Create(info, descriptorLayoutInfo);
+
+		const uint32_t swapChainImageCount = swapChain.GetLength();
+
+		// Create descriptor pool.
+		VkDescriptorPoolSize poolSize;
+		poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		poolSize.descriptorCount = swapChainImageCount; // todo base on game post effects.
+		VkDescriptorPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		poolInfo.poolSizeCount = 1;
+		poolInfo.pPoolSizes = &poolSize;
+		poolInfo.maxSets = swapChainImageCount;
+
+		const auto result = vkCreateDescriptorPool(info.app->logicalDevice, &poolInfo, nullptr, &_descriptorPool);
+		assert(!result);
+
+		RecreateFrames(*info.allocator, *info.app, swapChain, vkAllocator);
 	}
 
 	void PostEffectHandler::Free(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, const vk::StackAllocator& vkAllocator)
 	{
 		FreeFrames(allocator, app, swapChain, vkAllocator);
+		vkDestroyDescriptorPool(app.logicalDevice, _descriptorPool, nullptr);
+		vkDestroyDescriptorSetLayout(app.logicalDevice, _descriptorLayout, nullptr);
 	}
 
 	void PostEffectHandler::RecreateFrames(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator)
@@ -80,9 +120,9 @@ namespace vke
 		for (int32_t i = static_cast<int32_t>(_frames.GetLength()) - 1; i >= 0; --i)
 		{
 			const auto& frame = _frames[i];
-			for (int32_t i = 1; i >= 0; --i)
+			for (int32_t j = 1; j >= 0; --j)
 			{
-				auto& frameImage = frame.images[i];
+				auto& frameImage = frame.images[j];
 				vkDestroyImageView(logicalDevice, frameImage.view, nullptr);
 				vkDestroyImage(logicalDevice, frameImage.image, nullptr);
 				vkAllocator.FreeBlock(frameImage.memBlock);

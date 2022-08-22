@@ -54,9 +54,6 @@ namespace vke
 		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(app);
 
-		PostEffectHandler postEffectHandler{};
-		postEffectHandler.Allocate(allocator, app, swapChain, vkAllocator);
-
 		const jlb::Systems<EngineData> systems = systemManager;
 
 		// Prepare data to be forwarded to the game.
@@ -90,6 +87,9 @@ namespace vke
 		// Start the game.
 		systemManager.Awake(outData);
 		systemManager.Start(outData);
+
+		PostEffectHandler postEffectHandler{};
+		postEffectHandler.Allocate(outData, swapChain, vkAllocator);
 
 		bool quit = false;
 		while (!quit)
@@ -153,12 +153,12 @@ namespace vke
 		const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 		assert(!idleResult);
 
+		postEffectHandler.Free(allocator, app, swapChain, vkAllocator);
+
 		// Let the game know we're quitting.
 		// Free all the systems.
 		systemManager.Exit(outData);
 		systemManager.Free(allocator, tempAllocator, outData);
-
-		postEffectHandler.Free(allocator, app, swapChain, vkAllocator);
 
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
