@@ -34,9 +34,9 @@ namespace vk
 		_images.Free(allocator);
 	}
 
-	void SwapChain::WaitForImage(App& app)
+	void SwapChain::WaitForImage(const App& app)
 	{
-		auto& frame = _frames[_frameIndex];
+		const auto& frame = _frames[_frameIndex];
 
 		auto result = vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
 		assert(!result);
@@ -54,7 +54,7 @@ namespace vk
 	{
 		WaitForImage(app);
 
-		auto& image = _images[_imageIndex];
+		const auto& image = _images[_imageIndex];
 
 		// Begin render command.
 		auto cmd = cmdBuffer::CreateBeginDefaultInfo();
@@ -73,7 +73,7 @@ namespace vk
 		return image.cmdBuffer;
 	}
 
-	VkResult SwapChain::EndFrame(jlb::StackAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
+	VkResult SwapChain::EndFrame(jlb::StackAllocator& tempAllocator, const App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
 	{
 		auto& frame = _frames[_frameIndex];
 		auto& image = _images[_imageIndex];
