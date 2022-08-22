@@ -26,7 +26,7 @@ namespace vk
 		Recreate(allocator, app, windowHandler);
 	}
 
-	void SwapChain::Free(jlb::StackAllocator& allocator, App& app)
+	void SwapChain::Free(jlb::StackAllocator& allocator, const App& app)
 	{
 		Cleanup(app);
 
@@ -115,7 +115,7 @@ namespace vk
 		return result;
 	}
 
-	void SwapChain::Cleanup(App& app)
+	void SwapChain::Cleanup(const App& app) const
 	{
 		if (!_swapChain)
 			return;
@@ -144,7 +144,7 @@ namespace vk
 		vkDestroySwapchainKHR(app.logicalDevice, _swapChain, nullptr);
 	}
 
-	VkSurfaceFormatKHR SwapChain::ChooseSurfaceFormat(jlb::Array<VkSurfaceFormatKHR>& availableFormats)
+	VkSurfaceFormatKHR SwapChain::ChooseSurfaceFormat(const jlb::Array<VkSurfaceFormatKHR>& availableFormats)
 	{
 		// Preferably go for SRGB, if it's not present just go with the first one found.
 		// We can basically assume that SRGB is supported on most hardware.
@@ -155,7 +155,7 @@ namespace vk
 		return availableFormats[0];
 	}
 
-	VkPresentModeKHR SwapChain::ChoosePresentMode(jlb::Array<VkPresentModeKHR>& availablePresentModes)
+	VkPresentModeKHR SwapChain::ChoosePresentMode(const jlb::Array<VkPresentModeKHR>& availablePresentModes)
 	{
 		// Preferably go for Mailbox, otherwise go for Fifo.
 		// Fifo is traditional VSync, where mailbox is all that and better, but unlike Fifo is not required to be supported by the hardware.
@@ -301,6 +301,11 @@ namespace vk
 
 		cmdBuffers.Free(tempAllocator);
 		vkImages.Free(tempAllocator);
+	}
+
+	VkFormat SwapChain::GetFormat() const
+	{
+		return _surfaceFormat.format;
 	}
 
 	VkRenderPass SwapChain::GetRenderPass() const

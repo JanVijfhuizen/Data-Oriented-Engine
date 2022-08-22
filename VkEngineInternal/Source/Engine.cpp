@@ -8,6 +8,7 @@
 #include "JlbMath.h"
 #include "VkRenderer/VkStackAllocator.h"
 #include "SystemManager.h"
+#include "VkEngine/Graphics/PostEffectHandler.h"
 
 namespace vke
 {
@@ -52,6 +53,9 @@ namespace vke
 		// Set up the Vulkan pool allocator.
 		vk::StackAllocator vkAllocator{};
 		vkAllocator.Allocate(app);
+
+		PostEffectHandler postEffectHandler{};
+		postEffectHandler.Allocate(allocator, app, swapChain, vkAllocator);
 
 		const jlb::Systems<EngineData> systems = systemManager;
 
@@ -153,6 +157,8 @@ namespace vke
 		// Free all the systems.
 		systemManager.Exit(outData);
 		systemManager.Free(allocator, tempAllocator, outData);
+
+		postEffectHandler.Free(allocator, app, swapChain, vkAllocator);
 
 		// Make sure all the Vulkan assets have been deallocated.
 		assert(vkAllocator.IsEmpty());
