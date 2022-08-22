@@ -107,7 +107,7 @@ namespace game::demo
 		auto& lightDir = entityRenderSys->camera.lightDir;
 		lightDir.x = sin(info.time * .0025f);
 		lightDir.y = cos(info.time * 0.0025f);
-		lightDir.z = .1f;
+		lightDir.z = 1.f + sin(info.time * .0001f);
 		lightDir = glm::normalize(lightDir);
 
 		// Tile test.
