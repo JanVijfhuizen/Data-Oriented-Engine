@@ -32,7 +32,8 @@ layout(location = 0) out Data
     vec2 fragPos;
     flat vec3 lightDir;
     vec2 vertPos;
-    int entitySize;
+    flat int entitySize;
+    flat float textureWidth;
 } outData;
 
 void HandleInstance(in InstanceData instance)
@@ -40,6 +41,7 @@ void HandleInstance(in InstanceData instance)
     outData.lightDir = pushConstants.lightDir;
     outData.vertPos = Rotate(inPosition, instance.transform.rotation);
     outData.entitySize = pushConstants.entitySize;
+    outData.textureWidth = instance.subTexture.rBot.x - instance.subTexture.lTop.x;
 
     outData.fragTexCoord = CalculateTextureCoordinates(instance.subTexture, inTexCoords);
     outData.fragPos = inPosition;
