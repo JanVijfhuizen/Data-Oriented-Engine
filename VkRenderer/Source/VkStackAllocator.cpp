@@ -6,7 +6,7 @@
 
 namespace vk
 {
-	void StackAllocator::Allocate(App& app, const size_t pageSize)
+	void StackAllocator::Allocate(const App& app, const size_t pageSize)
 	{
 		_pageSize = pageSize;
 		_cpuAllocator.Allocate();
@@ -23,7 +23,7 @@ namespace vk
 		}
 	}
 
-	void StackAllocator::Free(App& app)
+	void StackAllocator::Free(const App& app)
 	{
 		for (auto& pool : _rootPools)
 		{
@@ -40,7 +40,7 @@ namespace vk
 		_cpuAllocator.Free();
 	}
 
-	MemBlock StackAllocator::AllocateBlock(App& app, const VkDeviceSize size, 
+	MemBlock StackAllocator::AllocateBlock(const App& app, const VkDeviceSize size, 
 		const VkDeviceSize alignment, const uint32_t poolId)
 	{
 		// Try and find a valid sub pool.
@@ -87,7 +87,7 @@ namespace vk
 		return block;
 	}
 
-	void StackAllocator::FreeBlock(const MemBlock& memBlock)
+	void StackAllocator::FreeBlock(const MemBlock& memBlock) const
 	{
 		Pool* current = &_rootPools[memBlock.poolId];
 		while (current)
@@ -103,10 +103,10 @@ namespace vk
 		current->remaining += memBlock.alignedSize;
 	}
 
-	uint32_t StackAllocator::GetPoolId(App& app, const uint32_t typeFilter, const VkMemoryPropertyFlags properties)
+	uint32_t StackAllocator::GetPoolId(const App& app, const uint32_t typeFilter, const VkMemoryPropertyFlags properties) const
 	{
 		int32_t i = -1;
-		for (auto& pool : _rootPools)
+		for (const auto& pool : _rootPools)
 		{
 			++i;
 
@@ -123,7 +123,7 @@ namespace vk
 		return UINT32_MAX;
 	}
 
-	bool StackAllocator::IsEmpty()
+	bool StackAllocator::IsEmpty() const
 	{
 		for (auto& pool : _rootPools)
 		{
@@ -138,7 +138,7 @@ namespace vk
 		return true;
 	}
 
-	void StackAllocator::InitPool(Pool& pool, App& app, const VkDeviceSize size, 
+	void StackAllocator::InitPool(Pool& pool, const App& app, const VkDeviceSize size, 
 		const VkDeviceSize alignment, const uint32_t poolId) const
 	{
 		VkMemoryAllocateInfo allocInfo{};

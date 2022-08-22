@@ -11,9 +11,9 @@ namespace vke
 	class PostEffectHandler final
 	{
 	public:
-		void Allocate(jlb::StackAllocator& allocator, vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator);
-		void Free(jlb::StackAllocator& allocator, vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator);
-		void RecreateFrames(jlb::StackAllocator& allocator, vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator);
+		void Allocate(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator);
+		void Free(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, const vk::StackAllocator& vkAllocator);
+		void RecreateFrames(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator);
 
 	private:
 		struct Frame final
@@ -30,7 +30,8 @@ namespace vke
 		};
 
 		jlb::Array<Frame> _frames{};
+		VkRenderPass _renderPass{};
 
-		void FreeFrames(jlb::StackAllocator& allocator, vk::App& app, vk::SwapChain& swapChain, vk::StackAllocator& vkAllocator);
+		void FreeFrames(jlb::StackAllocator& allocator, const vk::App& app, vk::SwapChain& swapChain, const vk::StackAllocator& vkAllocator);
 	};
 }

@@ -251,16 +251,12 @@ namespace vk
 		subpassDescription.pColorAttachments = &colorAttachmentReference;
 
 		auto subpassDependency = renderPass::CreateSubpassDependencyDefaultInfo();
-		subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		subpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		subpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
 		auto attachmentDescription = renderPass::CreateAttachmentDescriptionDefaultInfo();
 		attachmentDescription.format = _surfaceFormat.format;
 
 		const auto renderPassCreateInfo = renderPass::CreateDefaultInfo(attachmentDescription, subpassDescription, subpassDependency);
-		const auto renderPassresult = vkCreateRenderPass(app.logicalDevice, &renderPassCreateInfo, nullptr, &_renderPass);
-		assert(!renderPassresult);
+		const auto renderPassResult = vkCreateRenderPass(app.logicalDevice, &renderPassCreateInfo, nullptr, &_renderPass);
+		assert(!renderPassResult);
 
 		// Create images.
 		for (uint32_t i = 0; i < length; ++i)
