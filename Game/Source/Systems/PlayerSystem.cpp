@@ -4,6 +4,7 @@
 #include "Systems/ResourceManager.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
+#include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
@@ -19,8 +20,9 @@ namespace game
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
 		const auto resourceSys = systems.Get<ResourceManager>();
 		const auto turnSys = systems.Get<TurnSystem>();
+		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
 		
-		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::directionalArrow);
+		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::UISubTextures::moveArrow);
 		constexpr glm::ivec2 inputDirs[4]
 		{
 			glm::ivec2(0, -1),
@@ -30,15 +32,20 @@ namespace game
 		};
 
 		// Draw the directional arrows based on where the player wants to go.
-		vke::EntityRenderTask renderTask{};
-		renderTask.subTexture = subTextureDirArrow;
+		vke::UIRenderTask renderTask{};
+
+		// Calculate screen position for the render task.
+		const auto& uiCamera = uiRenderSys->camera;
+		const auto worldPos = -entityRenderSys->camera.position;
 
 		for (size_t i = 0; i < 4; ++i)
 		{
 			const auto& input = _updateInfo.keyArrowInput[i];
-			renderTask.transform.position = _updateInfo.position + glm::vec2(inputDirs[i]);
-			renderTask.transform.rotation = -jlb::math::PI * static_cast<float>(i) * .5f;
-			const auto result = input ? entityRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
+			renderTask.position = worldPos + _updateInfo.position + glm::vec2(inputDirs[i]);
+			renderTask.position = vke::UIRenderSystem::WorldToScreenPos(renderTask.position, uiCamera, info.swapChainData->resolution);
+			renderTask.scale = glm::vec2(1.f / vke::PIXEL_SIZE_UI);
+			renderTask.subTexture = vke::texture::GetSubTexture(subTextureDirArrow, 4, i);
+			const auto result = input ? uiRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
 		}
 
 		if(turnSys->GetIfBeginTickEvent())

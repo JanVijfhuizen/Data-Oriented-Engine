@@ -12,7 +12,6 @@ namespace game
 		enum class EntitySubTextures
 		{
 			humanoid,
-			directionalArrow,
 			pickup
 		};
 
@@ -33,7 +32,8 @@ namespace game
 			timerArrow,
 			blank,
 			scrollArrow,
-			symbols
+			symbols,
+			moveArrow
 		};
 
 		// Subtextures available for the Card renderer.

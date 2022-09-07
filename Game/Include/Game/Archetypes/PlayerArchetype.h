@@ -39,7 +39,7 @@ namespace game
 		size_t _cardPreviewTaskId = SIZE_MAX;
 
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
-		                 jlb::NestedVector<Player>& entities) override;
+			jlb::NestedVector<Player>& entities) override;
 		void OnPostUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes, 
 			jlb::NestedVector<Player>& entities) override;
 

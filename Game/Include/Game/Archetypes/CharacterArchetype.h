@@ -24,7 +24,7 @@ namespace game
 			glm::ivec2 movementDir{};
 		};
 
-		const float scalingOnSelected = 0.5f;
+		const float scalingOnSelected = 0.2f;
 		const float headRotationSpeed = .05f;
 
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
