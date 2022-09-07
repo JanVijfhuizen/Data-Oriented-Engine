@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Game.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/CardPreviewSystem.h"
 #include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
 #include "Systems/CollisionSystem.h"
@@ -16,6 +17,7 @@
 #include "Systems/PickupSystem.h"
 #include "Systems/PlayerSystem.h"
 #include "Systems/ResourceManager.h"
+#include "Systems/TextBoxSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/TurnThreadPoolSystem.h"
 #include "Systems/UIInteractionSystem.h"
@@ -42,10 +44,12 @@ namespace game
 		initializer.DefineSystem<PlayerSystem>();
 		initializer.DefineSystem<PickupSystem>();
 		initializer.DefineSystem<CardSystem>();
+		initializer.DefineSystem<MenuSystem>();
+		initializer.DefineSystem<CardPreviewSystem>();
+		initializer.DefineSystem<TextBoxSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 		initializer.DefineSystem<CameraSystem>();
-		initializer.DefineSystem<MenuSystem>();
 		initializer.DefineSystem<UIInteractionSystem>();
 
 		// Core engine Post update.
