@@ -8,6 +8,7 @@
 #include "JlbMath.h"
 #include "VkRenderer/VkStackAllocator.h"
 #include "SystemManager.h"
+#include "VkEngine/Graphics/PostEffectHandler.h"
 
 namespace vke
 {
@@ -87,6 +88,9 @@ namespace vke
 		systemManager.Awake(outData);
 		systemManager.Start(outData);
 
+		PostEffectHandler postEffectHandler{};
+		postEffectHandler.Allocate(outData, swapChain, vkAllocator);
+
 		bool quit = false;
 		while (!quit)
 		{
@@ -148,6 +152,8 @@ namespace vke
 		// Make sure all the graphics related operations are finished before stopping the application.
 		const auto idleResult = vkDeviceWaitIdle(app.logicalDevice);
 		assert(!idleResult);
+
+		postEffectHandler.Free(allocator, app, swapChain, vkAllocator);
 
 		// Let the game know we're quitting.
 		// Free all the systems.

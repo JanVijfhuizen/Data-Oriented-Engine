@@ -10,13 +10,13 @@ namespace vk
 	class StackAllocator final
 	{
 	public:
-		void Allocate(App& app, size_t pageSize = 4096);
-		void Free(App& app);
+		void Allocate(const App& app, size_t pageSize = 4096);
+		void Free(const App& app);
 
-		[[nodiscard]] MemBlock AllocateBlock(App& app, VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
-		void FreeBlock(const MemBlock& memBlock);
-		[[nodiscard]] uint32_t GetPoolId(App& app, uint32_t typeFilter, VkMemoryPropertyFlags properties);
-		[[nodiscard]] bool IsEmpty();
+		[[nodiscard]] MemBlock AllocateBlock(const App& app, VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId);
+		void FreeBlock(const MemBlock& memBlock) const;
+		[[nodiscard]] uint32_t GetPoolId(const App& app, uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+		[[nodiscard]] bool IsEmpty() const;
 
 	private:
 		using CpuAllocator = jlb::StackAllocator;
@@ -37,7 +37,7 @@ namespace vk
 		CpuAllocator _cpuAllocator{};
 		jlb::Array<Pool> _rootPools{};
 
-		void InitPool(Pool& pool, App& app, VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId) const;
+		void InitPool(Pool& pool, const App& app, VkDeviceSize size, VkDeviceSize alignment, uint32_t poolId) const;
 		[[nodiscard]] static VkDeviceSize CalculateBufferSize(VkDeviceSize size, VkDeviceSize alignment);
 	};
 }

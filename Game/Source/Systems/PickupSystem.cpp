@@ -2,6 +2,8 @@
 #include "Systems/PickupSystem.h"
 #include "Curve.h"
 #include "JlbMath.h"
+#include "Entities/Character.h"
+#include "Entities/Pickup.h"
 #include "Systems/EntitySystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/ThreadPoolSystem.h"
@@ -64,13 +66,13 @@ namespace game
 				if (!task.active)
 					continue;
 
-				auto& instance = entitySys->operator[](task.inInstanceId.index);
-				auto& pickup = entitySys->operator[](task.inPickupId.index);
-				instance.character.inventory.Insert(pickup.pickup.cardId);
-				pickup.markedForDelete = true;
+				const auto instance = static_cast<Character*>(entitySys->operator[](task.inInstanceId.index));
+				const auto pickup = static_cast<Pickup*>(entitySys->operator[](task.inPickupId.index));
+				instance->inventory.Insert(pickup->cardId);
+				pickup->markedForDelete = true;
 
-				task._instancePosition = instance.position;
-				task._pickupPosition = pickup.position;
+				task._instancePosition = instance->transform.position;
+				task._pickupPosition = pickup->transform.position;
 			}
 	}
 }

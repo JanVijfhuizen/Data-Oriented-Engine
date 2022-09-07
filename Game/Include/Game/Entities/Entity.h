@@ -1,28 +1,8 @@
 #pragma once
-#include "Components/Inventory.h"
 #include "VkEngine/Components/Transform.h"
 
 namespace game
 {
-	struct EntityData final
-	{
-		union
-		{
-			struct Character final
-			{
-				Inventory inventory{};
-			} character{};
-
-			struct Pickup final
-			{
-				size_t cardId = SIZE_MAX;
-			} pickup;
-		};
-		
-		bool markedForDelete = false;
-		glm::vec2 position{};
-	};
-
 	struct EntityId final
 	{
 		size_t index = SIZE_MAX;
@@ -35,13 +15,8 @@ namespace game
 
 	struct Entity
 	{
-		friend class EntitySystem;
-
-		EntityData data{};
 		EntityId id{};
 		vke::Transform transform{};
-
-	private:
-		void BuildData();
+		bool markedForDelete = false;
 	};
 }

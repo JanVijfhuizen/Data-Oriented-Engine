@@ -26,7 +26,7 @@ namespace vk
 		Recreate(allocator, app, windowHandler);
 	}
 
-	void SwapChain::Free(jlb::StackAllocator& allocator, App& app)
+	void SwapChain::Free(jlb::StackAllocator& allocator, const App& app)
 	{
 		Cleanup(app);
 
@@ -34,9 +34,9 @@ namespace vk
 		_images.Free(allocator);
 	}
 
-	void SwapChain::WaitForImage(App& app)
+	void SwapChain::WaitForImage(const App& app)
 	{
-		auto& frame = _frames[_frameIndex];
+		const auto& frame = _frames[_frameIndex];
 
 		auto result = vkWaitForFences(app.logicalDevice, 1, &frame.inFlightFence, VK_TRUE, UINT64_MAX);
 		assert(!result);
@@ -54,7 +54,7 @@ namespace vk
 	{
 		WaitForImage(app);
 
-		auto& image = _images[_imageIndex];
+		const auto& image = _images[_imageIndex];
 
 		// Begin render command.
 		auto cmd = cmdBuffer::CreateBeginDefaultInfo();
@@ -73,7 +73,7 @@ namespace vk
 		return image.cmdBuffer;
 	}
 
-	VkResult SwapChain::EndFrame(jlb::StackAllocator& tempAllocator, App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
+	VkResult SwapChain::EndFrame(jlb::StackAllocator& tempAllocator, const App& app, const jlb::ArrayView<VkSemaphore> waitSemaphores)
 	{
 		auto& frame = _frames[_frameIndex];
 		auto& image = _images[_imageIndex];
@@ -115,7 +115,7 @@ namespace vk
 		return result;
 	}
 
-	void SwapChain::Cleanup(App& app)
+	void SwapChain::Cleanup(const App& app) const
 	{
 		if (!_swapChain)
 			return;
@@ -144,7 +144,7 @@ namespace vk
 		vkDestroySwapchainKHR(app.logicalDevice, _swapChain, nullptr);
 	}
 
-	VkSurfaceFormatKHR SwapChain::ChooseSurfaceFormat(jlb::Array<VkSurfaceFormatKHR>& availableFormats)
+	VkSurfaceFormatKHR SwapChain::ChooseSurfaceFormat(const jlb::Array<VkSurfaceFormatKHR>& availableFormats)
 	{
 		// Preferably go for SRGB, if it's not present just go with the first one found.
 		// We can basically assume that SRGB is supported on most hardware.
@@ -155,7 +155,7 @@ namespace vk
 		return availableFormats[0];
 	}
 
-	VkPresentModeKHR SwapChain::ChoosePresentMode(jlb::Array<VkPresentModeKHR>& availablePresentModes)
+	VkPresentModeKHR SwapChain::ChoosePresentMode(const jlb::Array<VkPresentModeKHR>& availablePresentModes)
 	{
 		// Preferably go for Mailbox, otherwise go for Fifo.
 		// Fifo is traditional VSync, where mailbox is all that and better, but unlike Fifo is not required to be supported by the hardware.
@@ -251,16 +251,12 @@ namespace vk
 		subpassDescription.pColorAttachments = &colorAttachmentReference;
 
 		auto subpassDependency = renderPass::CreateSubpassDependencyDefaultInfo();
-		subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		subpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		subpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
 		auto attachmentDescription = renderPass::CreateAttachmentDescriptionDefaultInfo();
 		attachmentDescription.format = _surfaceFormat.format;
 
 		const auto renderPassCreateInfo = renderPass::CreateDefaultInfo(attachmentDescription, subpassDescription, subpassDependency);
-		const auto renderPassresult = vkCreateRenderPass(app.logicalDevice, &renderPassCreateInfo, nullptr, &_renderPass);
-		assert(!renderPassresult);
+		const auto renderPassResult = vkCreateRenderPass(app.logicalDevice, &renderPassCreateInfo, nullptr, &_renderPass);
+		assert(!renderPassResult);
 
 		// Create images.
 		for (uint32_t i = 0; i < length; ++i)
@@ -301,6 +297,11 @@ namespace vk
 
 		cmdBuffers.Free(tempAllocator);
 		vkImages.Free(tempAllocator);
+	}
+
+	VkFormat SwapChain::GetFormat() const
+	{
+		return _surfaceFormat.format;
 	}
 
 	VkRenderPass SwapChain::GetRenderPass() const

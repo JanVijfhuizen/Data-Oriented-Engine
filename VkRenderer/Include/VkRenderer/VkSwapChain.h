@@ -23,7 +23,7 @@ namespace vk
 		VkClearValue clearColor = { 1, 1, 1, 1 };
 
 		void Allocate(jlb::StackAllocator& allocator, App& app, IWindowHandler& windowHandler);
-		void Free(jlb::StackAllocator& allocator, App& app);
+		void Free(jlb::StackAllocator& allocator, const App& app);
 
 		/// <summary>
 		/// Begins a new command and render pass.
@@ -35,11 +35,15 @@ namespace vk
 		/// </summary>
 		/// <param name="waitSemaphores">Additional semaphores to wait for.</param>
 		/// <returns>Present result.</returns>
-		[[nodiscard]] VkResult EndFrame(jlb::StackAllocator& tempAllocator, App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
+		[[nodiscard]] VkResult EndFrame(jlb::StackAllocator& tempAllocator, const App& app, jlb::ArrayView<VkSemaphore> waitSemaphores = {});
 		/// <summary>
 		/// Recreates the swap chain. Call this if EndFrame returns something else than VK_SUCCESS.
 		/// </summary>
 		void Recreate(jlb::StackAllocator& tempAllocator, App& app, IWindowHandler& windowHandler);
+		/// <summary>
+		/// Returns the image format.
+		/// </summary>
+		[[nodiscard]] VkFormat GetFormat() const;
 		/// <summary>
 		/// Returns the render pass used to draw to the screen.
 		/// </summary>
@@ -87,13 +91,13 @@ namespace vk
 		jlb::Array<Image> _images{};
 		jlb::Array<Frame> _frames{};
 
-		void WaitForImage(App& app);
-		void Cleanup(App& app);
+		void WaitForImage(const App& app);
+		void Cleanup(const App& app) const;
 
 		// Choose color formatting for the swap chain images, like RGB(A).
-		[[nodiscard]] static VkSurfaceFormatKHR ChooseSurfaceFormat(jlb::Array<VkSurfaceFormatKHR>& availableFormats);
+		[[nodiscard]] static VkSurfaceFormatKHR ChooseSurfaceFormat(const jlb::Array<VkSurfaceFormatKHR>& availableFormats);
 		// Choose the way the swapchain presents the images.
-		[[nodiscard]] static VkPresentModeKHR ChoosePresentMode(jlb::Array<VkPresentModeKHR>& availablePresentModes);
+		[[nodiscard]] static VkPresentModeKHR ChoosePresentMode(const jlb::Array<VkPresentModeKHR>& availablePresentModes);
 		// Choose the resolution for the swap chain images.
 		[[nodiscard]] static VkExtent2D ChooseExtent(const VkSurfaceCapabilitiesKHR& capabilities, glm::ivec2 resolution);
 	};

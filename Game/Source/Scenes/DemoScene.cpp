@@ -25,7 +25,7 @@ namespace game::demo
 
 		{
 			auto& player = players.Add(sceneAllocator);
-			auto& inventory = player.data.character.inventory;
+			auto& inventory = player.inventory;
 			inventory.src = player.inventorySrc;
 			auto& fireball = inventory.Insert(0);
 			auto& bash = inventory.Insert(2);
@@ -33,7 +33,7 @@ namespace game::demo
 
 		{
 			Pickup pickup{};
-			pickup.data.pickup.cardId = 1;
+			pickup.cardId = 1;
 			pickup.transform.position = glm::vec2{ 2, -1 };
 			pickups.Add(sceneAllocator, pickup);
 		}

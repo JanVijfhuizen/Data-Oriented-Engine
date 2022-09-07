@@ -105,6 +105,9 @@
     <ClInclude Include="Include\VkEngine\Graphics\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\VkEngine\Graphics\PostEffectHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Include\VkEngine\Systems\PostEffectHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -27,7 +27,7 @@ namespace game
 			jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities);
 		virtual void OnPostUpdate(const EntityArchetypeInfo& info,
 			jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities);
-		
+
 		[[nodiscard]] virtual size_t DefineCapacity() const;
 		[[nodiscard]] virtual size_t DefineNestedCapacity() const;
 
@@ -53,8 +53,9 @@ namespace game
 	}
 
 	template <typename T>
-	void EntityArchetype<T>::OnPreUpdate(const EntityArchetypeInfo& info,
-		const jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities)
+	void EntityArchetype<T>::OnPreUpdate(const EntityArchetypeInfo& info, 
+		const jlb::Systems<EntityArchetypeInfo> archetypes,
+		jlb::NestedVector<T>& entities)
 	{
 		const auto turnSys = info.systems.Get<TurnSystem>();
 		const auto entitySys = info.systems.Get<EntitySystem>();
@@ -63,28 +64,21 @@ namespace game
 		if (turnSys->GetIfEndTickEvent())
 			for (int32_t i = count - 1; i >= 0; --i)
 			{
-				const auto base = static_cast<Entity*>(&entities[i]);
-				base->data = entitySys->operator[](base->id.index);
-				if (const auto& data = base->data; data.markedForDelete)
+				auto& base = entities[i];
+				if (base.markedForDelete)
 				{
-					entitySys->DestroyEntity(*base);
+					entitySys->DestroyEntity(base);
 					entities.RemoveAt(i);
 				}
-			}
-
-		if (turnSys->GetIfBeginTickEvent())
-			for (auto& entity : entities)
-			{
-				const auto base = reinterpret_cast<Entity*>(&entity);
-				entitySys->UpdateEntity(*base);
 			}
 	}
 
 	template <typename T>
-	void EntityArchetype<T>::OnPostUpdate(const EntityArchetypeInfo& info,
-		const jlb::Systems<EntityArchetypeInfo> archetypes, jlb::NestedVector<T>& entities)
+	void EntityArchetype<T>::OnPostUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+		jlb::NestedVector<T>& entities)
 	{
 	}
+
 
 	template <typename T>
 	void EntityArchetype<T>::PreUpdate(const EntityArchetypeInfo& info, const jlb::Systems<EntityArchetypeInfo> archetypes)
