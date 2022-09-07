@@ -4,7 +4,7 @@
 
 namespace game
 {
-	EntityData& EntitySystem::operator[](const size_t index) const
+	Entity* EntitySystem::operator[](const size_t index) const
 	{
 		return _entities[index].instance;
 	}
@@ -19,7 +19,7 @@ namespace game
 		auto& id = entity.id;
 		id.index = _open.GetCount() > 0 ? _open.Pop() : _entities.GetCount();
 		id.id = _globalId++;
-		_entities.Insert(id.index, entity.data);
+		_entities.Insert(id.index, &entity);
 	}
 
 	void EntitySystem::DestroyEntity(Entity& entity)
@@ -27,14 +27,7 @@ namespace game
 		auto& id = entity.id;
 		_open.Insert(id.index, id.index);
 		_entities.RemoveAt(id.index);
-	}
-
-	void EntitySystem::UpdateEntity(Entity& entity) const
-	{
-		auto& id = entity.id;
-		auto& instance = _entities[id.index];
-		entity.BuildData();
-		instance.instance = entity.data;
+		entity = {};
 	}
 
 	void EntitySystem::Allocate(const vke::EngineData& info)

@@ -13,15 +13,14 @@ namespace game
 	class EntitySystem final : public vke::GameSystem
 	{
 	public:
-		[[nodiscard]] EntityData& operator[](size_t index) const;
+		[[nodiscard]] Entity* operator[](size_t index) const;
 		[[nodiscard]] bool Contains(const EntityId& id);
 
 		void CreateEntity(Entity& entity);
 		void DestroyEntity(Entity& entity);
-		void UpdateEntity(Entity& entity) const;
 
 	private:
-		jlb::SparseSet<EntityData> _entities{};
+		jlb::SparseSet<Entity*> _entities{};
 		jlb::Heap<size_t> _open{};
 		size_t _globalId = 0;
 

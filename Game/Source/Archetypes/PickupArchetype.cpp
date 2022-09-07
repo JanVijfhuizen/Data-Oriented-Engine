@@ -71,7 +71,7 @@ namespace game
 
 		for (auto& entity : entities)
 		{
-			const auto cardId = entity.data.pickup.cardId;
+			const auto cardId = entity.cardId;
 			assert(cardId != SIZE_MAX);
 
 			const auto& transform = entity.transform;

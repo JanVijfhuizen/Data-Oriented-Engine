@@ -3,6 +3,7 @@
 #include "Components/MovementComponent.h"
 #include "Components/PickupComponent.h"
 #include <Pile.h>
+#include "Components/Inventory.h"
 
 namespace game
 {
@@ -12,6 +13,8 @@ namespace game
 		{
 			glm::ivec2 movementDir{};
 		};
+
+		Inventory inventory{};
 
 		MovementComponent movementComponent{};
 		PickupComponent pickupComponent{};
