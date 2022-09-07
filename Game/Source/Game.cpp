@@ -42,10 +42,10 @@ namespace game
 		initializer.DefineSystem<PlayerSystem>();
 		initializer.DefineSystem<PickupSystem>();
 		initializer.DefineSystem<CardSystem>();
+		initializer.DefineSystem<MenuSystem>();
 		initializer.DefineSystem<TextRenderHandler>();
 		initializer.DefineSystem<MouseSystem>();
 		initializer.DefineSystem<CameraSystem>();
-		initializer.DefineSystem<MenuSystem>();
 		initializer.DefineSystem<UIInteractionSystem>();
 
 		// Core engine Post update.

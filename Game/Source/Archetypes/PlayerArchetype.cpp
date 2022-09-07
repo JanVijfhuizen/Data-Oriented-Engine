@@ -38,8 +38,7 @@ namespace game
 		auto& characterInput = entity.input;
 		
 		const bool ifBeginTickEvent = turnSys->GetIfBeginTickEvent();
-		const bool occupiedNextTurn = playerSys->IsPlayerOccupiedNextTurn();
-		if (occupiedNextTurn)
+		if (playerSys->IsPlayerOccupiedNextTurn())
 		{
 			Reset();
 			if (playerSys->pickupEntity && ifBeginTickEvent)
@@ -99,28 +98,25 @@ namespace game
 		_menuIndex = menuOpen ? _menuIndex : MenuIndex::main;
 		if (!occupied && menuOpen)
 		{
-			MenuCreateInfo menuCreateInfo{};
-			menuCreateInfo.interactable = true;
-			menuCreateInfo.origin = transform.position;
-			menuCreateInfo.entityCamera = &entityRenderSys->camera;
-			menuCreateInfo.uiCamera = &uiRenderSys->camera;
-			menuCreateInfo.interactIds = _menuInteractIds;
-			menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
-			menuCreateInfo.width = 7;
+			MenuTask menuTask{};
+			menuTask.interactable = true;
+			menuTask.origin = transform.position;
+			menuTask.entityCamera = &entityRenderSys->camera;
+			menuTask.uiCamera = &uiRenderSys->camera;
+			menuTask.interactIds = _menuInteractIds;
+			menuTask.maxLength = _menuInteractIds.GetLength() + 1;
+			menuTask.width = 7;
 
-			MenuCreateInfo secondMenuCreateInfo = menuCreateInfo;
-			secondMenuCreateInfo.reverseXAxis = true;
-			secondMenuCreateInfo.interactIds = _secondMenuInteractIds;
-			secondMenuCreateInfo.capacity = SIZE_MAX;
-			secondMenuCreateInfo.usedSpace = SIZE_MAX;
+			auto secondMenuTask = menuTask;
+			secondMenuTask.reverseXAxis = true;
+			secondMenuTask.interactIds = _secondMenuInteractIds;
+			secondMenuTask.capacity = SIZE_MAX;
+			secondMenuTask.usedSpace = SIZE_MAX;
 			bool drawSecondWindow = false;
 
-			jlb::Array<MenuCreateInfo::Content> content{};
+			jlb::Array<MenuTask::Content> content{};
 			const auto& inventory = entity.inventory;
 			const size_t inventoryCount = inventory.GetCount();
-
-			auto& menuUpdateInfo = _menuUpdateInfo;
-			auto& secondMenuUpdateInfo = _secondMenuUpdateInfo;
 
 			// Create menu content.
 			switch (_menuIndex)
@@ -146,7 +142,7 @@ namespace game
 				for (size_t i = 0; i < inventoryCount; ++i)
 					content[i + 1].amount = MAX_COPIES_CARD_IN_DECK - inventory[i].amount;
 
-			menuCreateInfo.content = content;
+			menuTask.content = content;
 
 			bool changePage = false;
 			bool close = false;
@@ -173,24 +169,24 @@ namespace game
 				break;
 			case MenuIndex::inventory:
 				renderCard = true;
-				cardIndex = menuCreateInfo.GetInteractedColumnIndex(_menuUpdateInfo);
+				cardIndex = _menuUpdateInfo.GetInteractedColumnIndex(menuTask);
 				cardIndex = cardIndex == SIZE_MAX ? SIZE_MAX : inventory[cardIndex].index;
-				_cardActivated = leftPressedThisTurn && menuUpdateInfo.hovered ? _cardHovered : oldCardActivated;
+				_cardActivated = leftPressedThisTurn && _menuUpdateInfo.hovered ? _cardHovered : oldCardActivated;
 
 				if (_cardActivated != SIZE_MAX)
 				{
 					const auto hoveredCard = cardSys->GetCard(_cardActivated);
 
-					jlb::Array<MenuCreateInfo::Content> deckContent{};
+					jlb::Array<MenuTask::Content> deckContent{};
 					deckContent.Allocate(dumpAllocator, 3);
 					deckContent[0].string = hoveredCard.name;
 					deckContent[1].string = "use";
 					deckContent[2].string = "drop";
-					secondMenuCreateInfo.content = deckContent;
-					drawSecondWindow = true;
+					secondMenuTask.content = deckContent;
+					drawSecondWindow = true; 
 				}
 				if (_cardActivated != oldCardActivated)
-					secondMenuUpdateInfo = {};
+					_secondMenuUpdateInfo = {};
 
 				break;
 			case MenuIndex::deck:
@@ -203,8 +199,8 @@ namespace game
 					deckSize += src.amount != MAX_COPIES_CARD_IN_DECK;
 				}
 
-				menuCreateInfo.usedSpace = inventoryCount;
-				menuCreateInfo.capacity = inventory.GetLength();
+				menuTask.usedSpace = inventoryCount;
+				menuTask.capacity = inventory.GetLength();
 
 				// Get all cards in deck.
 				jlb::Vector<size_t> cardIndexes{};
@@ -220,7 +216,7 @@ namespace game
 				bool deckResized = false;
 				if (leftPressedThisTurn && _menuUpdateInfo.hovered)
 				{
-					const size_t interactIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
+					const size_t interactIndex = _menuUpdateInfo.GetInteractedColumnIndex(menuTask);
 					if (interactIndex != SIZE_MAX)
 					{
 						auto& slot = inventory[interactIndex];
@@ -231,7 +227,7 @@ namespace game
 
 				// Create deck menu.
 				{
-					jlb::Array<MenuCreateInfo::Content> deckContent{};
+					jlb::Array<MenuTask::Content> deckContent{};
 					deckContent.Allocate(dumpAllocator, deckSize + 1);
 					deckContent[0].string = "deck";
 
@@ -248,12 +244,12 @@ namespace game
 						}
 					}
 
-					secondMenuCreateInfo.content = deckContent;
+					secondMenuTask.content = deckContent;
 
 					// Try and remove a card from the deck.
-					if (leftPressedThisTurn && secondMenuUpdateInfo.hovered && deckSize > 0)
+					if (leftPressedThisTurn && _secondMenuUpdateInfo.hovered && deckSize > 0)
 					{
-						const size_t interactIndex = secondMenuCreateInfo.GetInteractedColumnIndex(secondMenuUpdateInfo);
+						const size_t interactIndex = _secondMenuUpdateInfo.GetInteractedColumnIndex(secondMenuTask);
 						if (interactIndex != SIZE_MAX)
 						{
 							auto& slot = inventory[cardIndexes[interactIndex]];
@@ -265,10 +261,10 @@ namespace game
 
 					// Define what card to draw, if hovered over the deck menu.
 					{
-						const size_t inventoryCardIndex = menuCreateInfo.GetInteractedColumnIndex(menuUpdateInfo);
-						size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : secondMenuCreateInfo.GetInteractedColumnIndex(secondMenuUpdateInfo);
+						const size_t inventoryCardIndex = _menuUpdateInfo.GetInteractedColumnIndex(menuTask);
+						size_t deckCardIndex = deckSize == 0 ? SIZE_MAX : _secondMenuUpdateInfo.GetInteractedColumnIndex(secondMenuTask);
 						deckCardIndex = deckCardIndex == SIZE_MAX ? SIZE_MAX : cardIndexes[deckCardIndex];
-						cardIndex = secondMenuUpdateInfo.interactedIndex == SIZE_MAX ? menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX :
+						cardIndex = _secondMenuUpdateInfo.interactedIndex == SIZE_MAX ? _menuUpdateInfo.interactedIndex == SIZE_MAX ? SIZE_MAX :
 							inventory[inventoryCardIndex].index : deckCardIndex == SIZE_MAX ? SIZE_MAX : inventory[deckCardIndex].index;
 					}
 
@@ -283,23 +279,30 @@ namespace game
 
 			if (renderCard)
 			{
-				menuCreateInfo.xOffset = 1;
-				secondMenuCreateInfo.xOffset = 1;
+				menuTask.xOffset = 1;
+				secondMenuTask.xOffset = 1;
 			}
+
 			if (changePage || rightPressedThisTurn || close)
 				_secondMenuUpdateInfo = {};
+
+			secondMenuTask.updateInfo = _secondMenuUpdateInfo;
 			if (!close && drawSecondWindow)
-				menuSys->CreateMenu(vkeInfo, systems, secondMenuCreateInfo, _secondMenuUpdateInfo);
+				_secondMenuTaskId = menuSys->TryAdd(vkeInfo, secondMenuTask);
+
 			if (_menuIndex != MenuIndex::main)
 				_menuIndex = rightPressedThisTurn ? MenuIndex::main : _menuIndex;
 			if (changePage || rightPressedThisTurn || close)
-				menuUpdateInfo = {};
+				_menuUpdateInfo = {};
+
+			menuTask.updateInfo = _menuUpdateInfo;
 			if (!close)
-				menuSys->CreateMenu(vkeInfo, systems, menuCreateInfo, menuUpdateInfo);
+				_menuTaskId = menuSys->TryAdd(vkeInfo, menuTask);
+
 			if (renderCard)
 			{
 				const size_t oldCardHovered = _cardHovered;
-				_cardHovered = _cardHovered == SIZE_MAX ? SIZE_MAX : menuUpdateInfo.centerHovered ? _cardHovered : SIZE_MAX;
+				_cardHovered = _cardHovered == SIZE_MAX ? SIZE_MAX : _menuUpdateInfo.centerHovered ? _cardHovered : SIZE_MAX;
 				cardIndex = cardIndex == SIZE_MAX ? _cardHovered : cardIndex;
 
 				// Draw card.
@@ -312,7 +315,7 @@ namespace game
 					createInfo.origin = transform.position;
 					createInfo.cardIndex = cardIndex;
 
-					menuSys->CreateCardMenu(vkeInfo, systems, createInfo, _cardMenuUpdateInfo);
+					//menuSys->CreateCardMenu(vkeInfo, systems, createInfo, _cardMenuUpdateInfo);
 				}
 			}
 		}
@@ -326,6 +329,27 @@ namespace game
 		for (size_t i = 0; i < 4; ++i)
 			playerSysUpdateInfo.keyArrowInput[i] = _movementInput[i].valid;
 		playerSysUpdateInfo.position = transform.position;
+	}
+
+	void PlayerArchetype::OnPostUpdate(const EntityArchetypeInfo& info, 
+		const jlb::Systems<EntityArchetypeInfo> archetypes,
+		jlb::NestedVector<Player>& entities)
+	{
+		CharacterArchetype<Player>::OnPostUpdate(info, archetypes, entities);
+
+		const auto menuSys = info.systems.Get<MenuSystem>();
+		const auto& menuOutput = menuSys->GetOutput();
+
+		if(_menuTaskId != SIZE_MAX)
+		{
+			_menuUpdateInfo = menuOutput[_menuTaskId];
+			_menuTaskId = SIZE_MAX;
+		}
+		if(_secondMenuTaskId != SIZE_MAX)
+		{
+			_secondMenuUpdateInfo = menuOutput[_secondMenuTaskId];
+			_secondMenuTaskId = SIZE_MAX;
+		}
 	}
 
 	void PlayerArchetype::OnKeyInput(const EntityArchetypeInfo& info, const jlb::Systems<EntityArchetypeInfo> systems,

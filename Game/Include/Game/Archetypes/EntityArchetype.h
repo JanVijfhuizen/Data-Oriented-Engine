@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Entities/Entity.h"
 #include "Systems/EntitySystem.h"
 #include "Systems/TurnSystem.h"
 #include "SystemManager.h"

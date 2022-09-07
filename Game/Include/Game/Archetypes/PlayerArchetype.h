@@ -33,8 +33,12 @@ namespace game
 		MenuIndex _menuIndex = MenuIndex::main;
 		size_t _cardHovered = SIZE_MAX;
 		size_t _cardActivated = SIZE_MAX;
+		size_t _menuTaskId = SIZE_MAX;
+		size_t _secondMenuTaskId = SIZE_MAX;
 
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
+			jlb::NestedVector<Player>& entities) override;
+		void OnPostUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes, 
 			jlb::NestedVector<Player>& entities) override;
 
 		void OnKeyInput(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> systems, int key,

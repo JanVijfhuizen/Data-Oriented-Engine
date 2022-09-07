@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "Bounds.h"
-#include "CardSystem.h"
 #include "StringView.h"
 #include "VkEngine/Systems/GameSystem.h"
+#include "VkEngine/Systems/TaskSystemWithOutput.h"
 
 namespace vke
 {
@@ -12,9 +12,26 @@ namespace vke
 
 namespace game
 {
-	struct MenuUpdateInfo;
+	struct MenuTask;
 
-	struct MenuCreateInfo final
+	struct MenuUpdateInfo final
+	{
+		bool opened = false;
+		bool hovered = false;
+		bool centerHovered = false;
+		float duration = 0;
+		bool right = false;
+		size_t scrollIdx = 0;
+		float scrollPos = 0;
+		float scrollArrowsLerp[2]{ 1, 1 };
+		size_t interactedIndex = SIZE_MAX;
+
+		// Excluding title.
+		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuTask& task) const;
+		[[nodiscard]] size_t GetContentIndex(const MenuTask& task, size_t columnIndex) const;
+	};
+
+	struct MenuTask final
 	{
 		struct Content final
 		{
@@ -42,22 +59,8 @@ namespace game
 
 		// Returns the amount of columns rendered.
 		[[nodiscard]] size_t GetColumnCount() const;
-		// Excluding title.
-		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuUpdateInfo& updateInfo) const;
-		[[nodiscard]] size_t GetContentIndex(const MenuUpdateInfo& updateInfo, size_t columnIndex) const;
-	};
 
-	struct MenuUpdateInfo final
-	{
-		bool opened = false;
-		bool hovered = false;
-		bool centerHovered = false;
-		float duration = 0;
-		bool right = false;
-		size_t scrollIdx = 0;
-		float scrollPos = 0;
-		float scrollArrowsLerp[2]{1, 1};
-		size_t interactedIndex = SIZE_MAX;
+		MenuUpdateInfo updateInfo{};
 	};
 
 	struct TextBoxCreateInfo final
@@ -81,7 +84,7 @@ namespace game
 		float animLerp = 0;
 	};
 
-	class MenuSystem final : public vke::GameSystem
+	class MenuSystem final : public vke::TaskSystemWithOutput<MenuTask, MenuUpdateInfo>
 	{
 	public:
 		float openDuration = 1.f;
@@ -91,13 +94,8 @@ namespace game
 		float scrollAnimScaleMultiplier = .4f;
 		float cardAnimSpeed = 5;
 
-		void CreateMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
-			const MenuCreateInfo& createInfo, MenuUpdateInfo& updateInfo) const;
-		void PostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
-		static void CreateTextBox(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const TextBoxCreateInfo& createInfo);
-		void CreateCardMenu(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
-			const CardMenuCreateInfo& createInfo, CardMenuUpdateInfo& updateInfo) const;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuTask>& tasks) override;
+		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuTask>& tasks) override;
 
 	private:
 		float _scrollDir = 0;

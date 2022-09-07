@@ -95,24 +95,24 @@ namespace game
 			if (menuOpen && !entity.interacted)
 			{
 				const auto card = cardSys->GetCard(cardId);
-
-				MenuCreateInfo menuCreateInfo{};
-				menuCreateInfo.interactable = true;
-				menuCreateInfo.origin = transform.position;
-				menuCreateInfo.entityCamera = &entityRenderSys->camera;
-				menuCreateInfo.uiCamera = &uiRenderSys->camera;
-				menuCreateInfo.interactIds = _menuInteractIds;
-				menuCreateInfo.maxLength = _menuInteractIds.GetLength() + 1;
+				/*
+				MenuTask menuTask{};
+				menuTask.interactable = true;
+				menuTask.origin = transform.position;
+				menuTask.entityCamera = &entityRenderSys->camera;
+				menuTask.uiCamera = &uiRenderSys->camera;
+				menuTask.interactIds = _menuInteractIds;
+				menuTask.maxLength = _menuInteractIds.GetLength() + 1;
 
 				const float dis = glm::distance(camTarget, transform.position);
 				const bool inRange = dis < 1.25f;
 
-				jlb::Array<MenuCreateInfo::Content> content{};
+				jlb::Array<MenuTask::Content> content{};
 				content.Allocate(dumpAllocator, 2);
 				content[0].string = card.name;
 				content[1].string = "pick up";
 				content[1].interactable = inRange;
-				menuCreateInfo.content = content;
+				menuTask.content = content;
 
 				if (_menuUpdateInfo.hovered && leftPressedThisTurn && inRange)
 				{
@@ -121,13 +121,14 @@ namespace game
 					entity.interacted = true;
 				}
 
-				menuSys->CreateMenu(vkeInfo, systems, menuCreateInfo, _menuUpdateInfo);
+				menuSys->CreateMenu(vkeInfo, systems, menuTask, _menuUpdateInfo);
 
 				CardMenuCreateInfo cardMenuCreateInfo{};
 				cardMenuCreateInfo.origin = transform.position + glm::vec2(1.75f, 0) * (static_cast<float>(!_menuUpdateInfo.right) * 2 - 1);
 				cardMenuCreateInfo.cardIndex = cardId;
-				menuSys->CreateCardMenu(vkeInfo, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
+				//menuSys->CreateCardMenu(vkeInfo, systems, cardMenuCreateInfo, _cardMenuUpdateInfo);
 				resetMenu = false;
+				*/
 			}
 		}
 
