@@ -66,7 +66,7 @@ namespace game
 		if (playerSys->IsPlayerOccupiedNextTurn())
 		{
 			_menuUpdateInfo = {};
-			_cardMenuUpdateInfo = {};
+			_cardPreviewUpdateInfo = {};
 		}
 
 		for (auto& entity : entities)
@@ -132,7 +132,7 @@ namespace game
 			}
 		}
 
-		_menuUpdateInfo = resetMenu ? MenuUpdateInfo() : _menuUpdateInfo;
-		_cardMenuUpdateInfo = resetMenu ? CardMenuUpdateInfo() : _cardMenuUpdateInfo;
+		_menuUpdateInfo = resetMenu ? MenuTaskUpdateInfo() : _menuUpdateInfo;
+		_cardPreviewUpdateInfo = resetMenu ? CardPreviewTaskUpdateInfo() : _cardPreviewUpdateInfo;
 	}
 }

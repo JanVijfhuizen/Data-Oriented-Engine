@@ -14,7 +14,7 @@ namespace game
 {
 	struct MenuTask;
 
-	struct MenuUpdateInfo final
+	struct MenuTaskUpdateInfo final
 	{
 		bool opened = false;
 		bool hovered = false;
@@ -60,31 +60,10 @@ namespace game
 		// Returns the amount of columns rendered.
 		[[nodiscard]] size_t GetColumnCount() const;
 
-		MenuUpdateInfo updateInfo{};
+		MenuTaskUpdateInfo updateInfo{};
 	};
 
-	struct TextBoxCreateInfo final
-	{
-		glm::vec2 screenOrigin{0, .6f};
-		jlb::StringView text{};
-		size_t maxWidth = 24;
-		size_t scale = 12;
-		glm::vec2 borderSize{16, 8};
-		bool center = true;
-	};
-
-	struct CardMenuCreateInfo final
-	{
-		size_t cardIndex = SIZE_MAX;
-		glm::vec2 origin{};
-	};
-
-	struct CardMenuUpdateInfo final
-	{
-		float animLerp = 0;
-	};
-
-	class MenuSystem final : public vke::TaskSystemWithOutput<MenuTask, MenuUpdateInfo>
+	class MenuSystem final : public vke::TaskSystemWithOutput<MenuTask, MenuTaskUpdateInfo>
 	{
 	public:
 		float openDuration = 1.f;
@@ -92,7 +71,6 @@ namespace game
 		float openWriteTextDuration = 2;
 		float scrollAnimDuration = 1;
 		float scrollAnimScaleMultiplier = .4f;
-		float cardAnimSpeed = 5;
 
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuTask>& tasks) override;
 		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuTask>& tasks) override;

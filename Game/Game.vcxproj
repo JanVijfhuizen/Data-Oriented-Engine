@@ -175,6 +175,7 @@
     <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
     <ClInclude Include="Include\Game\Scenes\GameScene.h" />
     <ClInclude Include="Include\Game\Systems\CameraSystem.h" />
+    <ClInclude Include="Include\Game\Systems\CardPreviewSystem.h" />
     <ClInclude Include="Include\Game\Systems\CardRenderSystem.h" />
     <ClInclude Include="Include\Game\Systems\CardSystem.h" />
     <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
@@ -190,12 +191,15 @@
     <ClInclude Include="Include\Game\Systems\PlayerSystem.h" />
     <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
     <ClInclude Include="Include\Game\Systems\ThreadedTaskSystemWithOutput.h" />
+    <ClInclude Include="Include\Game\Systems\TextBoxSystem.h" />
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
     <ClInclude Include="Include\Game\Systems\TurnThreadPoolSystem.h" />
     <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\CardPreviewSystem.cpp" />
+    <ClCompile Include="Source\Systems\TextBoxSystem.cpp" />
     <ClCompile Include="Source\Scenes\GameScene.cpp" />
     <ClCompile Include="Source\Entities\Entity.cpp" />
     <ClCompile Include="Source\Systems\PickupSystem.cpp" />

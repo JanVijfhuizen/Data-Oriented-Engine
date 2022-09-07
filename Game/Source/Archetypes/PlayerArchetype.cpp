@@ -22,6 +22,7 @@ namespace game
 		auto& systems = info.systems;
 		auto& vkeInfo = *info.vkeInfo;
 		const auto cameraSys = systems.Get<CameraSystem>();
+		const auto cardPreviewSys = systems.Get<CardPreviewSystem>();
 		const auto cardSys = systems.Get<CardSystem>();
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
 		const auto menuSys = systems.Get<MenuSystem>();
@@ -309,13 +310,14 @@ namespace game
 				{
 					const bool newCardHovered = oldCardHovered != cardIndex;
 					_cardHovered = cardIndex;
-					_cardMenuUpdateInfo = newCardHovered ? CardMenuUpdateInfo() : _cardMenuUpdateInfo;
+					_cardPreviewUpdateInfo = newCardHovered ? CardPreviewTaskUpdateInfo() : _cardPreviewUpdateInfo;
 
-					CardMenuCreateInfo createInfo{};
-					createInfo.origin = transform.position;
-					createInfo.cardIndex = cardIndex;
+					CardPreviewTask cardTask{};
+					cardTask.origin = transform.position;
+					cardTask.cardIndex = cardIndex;
+					cardTask.updateInfo = _cardPreviewUpdateInfo;
 
-					//menuSys->CreateCardMenu(vkeInfo, systems, createInfo, _cardMenuUpdateInfo);
+					_cardPreviewTaskId = cardPreviewSys->TryAdd(vkeInfo, cardTask);
 				}
 			}
 		}
@@ -337,7 +339,10 @@ namespace game
 	{
 		CharacterArchetype<Player>::OnPostUpdate(info, archetypes, entities);
 
+		const auto cardPreviewSys = info.systems.Get<CardPreviewSystem>();
 		const auto menuSys = info.systems.Get<MenuSystem>();
+
+		const auto& cardPreviewOutput = cardPreviewSys->GetOutput();
 		const auto& menuOutput = menuSys->GetOutput();
 
 		if(_menuTaskId != SIZE_MAX)
@@ -349,6 +354,11 @@ namespace game
 		{
 			_secondMenuUpdateInfo = menuOutput[_secondMenuTaskId];
 			_secondMenuTaskId = SIZE_MAX;
+		}
+		if(_cardPreviewTaskId != SIZE_MAX)
+		{
+			_cardPreviewUpdateInfo = cardPreviewOutput[_cardPreviewTaskId];
+			_cardPreviewTaskId = SIZE_MAX;
 		}
 	}
 
