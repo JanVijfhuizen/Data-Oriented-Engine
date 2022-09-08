@@ -12,29 +12,29 @@ namespace vke
 {
 	void ThreadPoolSystem::ThreadObj::operator()(ThreadPoolSystem* sys) const
 	{
-		auto& tasks = sys->GetJobs();
+		auto& jobs = sys->GetJobs();
 
 		while(!sys->_stopThreads)
 		{
-			if(sys->_tasksRemaining == 0)
+			if(sys->_jobssRemaining == 0)
 			{
 				Sleep(0);
 				continue;
 			}
 
-			// Get task.
-			sys->_getNextTaskMutex.lock();
-			// When another thread has stolen the task already.
-			if(sys->_tasksRemaining == 0)
+			// Get job.
+			sys->_getNextJobsMutex.lock();
+			// When another thread has stolen the job already.
+			if(sys->_jobssRemaining == 0)
 			{
-				sys->_getNextTaskMutex.unlock();
+				sys->_getNextJobsMutex.unlock();
 				continue;
 			}
-			const auto task = tasks[--sys->_tasksRemaining];
-			sys->_getNextTaskMutex.unlock();
+			const auto job = jobs[--sys->_jobssRemaining];
+			sys->_getNextJobsMutex.unlock();
 
-			task.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems, task.userPtr);
-			--sys->_tasksUnfinished;
+			job.func(*sys->_threadSharedInfo.info, sys->_threadSharedInfo.systems, job.userPtr);
+			--sys->_jobsUnfinished;
 		}
 	}
 
@@ -54,24 +54,24 @@ namespace vke
 
 	void ThreadPoolSystem::OnUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestedVector<ThreadPoolJob>& tasks)
+		const jlb::NestedVector<ThreadPoolJob>& jobs)
 	{
-		JobSystem<ThreadPoolJob>::OnUpdate(info, systems, tasks);
+		JobSystem<ThreadPoolJob>::OnUpdate(info, systems, jobs);
 
 		// Continue the threads.
 		_threadSharedInfo.info = &info;
 		_threadSharedInfo.systems = systems;
-		_tasksRemaining = _tasksUnfinished = tasks.GetCount();
+		_jobssRemaining = _jobsUnfinished = jobs.GetCount();
 	}
 
 	void ThreadPoolSystem::OnPostUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestedVector<ThreadPoolJob>& tasks)
+		const jlb::NestedVector<ThreadPoolJob>& jobs)
 	{
-		JobSystem<ThreadPoolJob>::OnPostUpdate(info, systems, tasks);
+		JobSystem<ThreadPoolJob>::OnPostUpdate(info, systems, jobs);
 		
 		// Wait for the threads to finish.
-		while (_tasksUnfinished > 0)
+		while (_jobsUnfinished > 0)
 			Sleep(0);
 	}
 
@@ -100,6 +100,6 @@ namespace vke
 
 	size_t ThreadPoolSystem::GetFreeThreadSlots() const
 	{
-		return _threadCount < _tasksUnfinished ? 0 : _threadCount - _tasksUnfinished;
+		return _threadCount < _jobsUnfinished ? 0 : _threadCount - _jobsUnfinished;
 	}
 }

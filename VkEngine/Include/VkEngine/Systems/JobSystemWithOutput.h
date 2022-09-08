@@ -14,9 +14,9 @@ namespace vke
 		void Free(const EngineData& info) override;
 
 		void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestedVector<Job>& tasks) override;
+			const jlb::NestedVector<Job>& jobs) override;
 		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestedVector<Job>&, jlb::NestedVector<Output>& taskOutputs){}
+			const jlb::NestedVector<Job>&, jlb::NestedVector<Output>& jobs){}
 
 		[[nodiscard]] jlb::NestedVector<Output>& GetOutputEditable();
 		
@@ -24,53 +24,53 @@ namespace vke
 		jlb::NestedVector<Output> _outputs{};
 
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestedVector<Job>& tasks) override;
+			const jlb::NestedVector<Job>& jobs) override;
 	};
 
-	template <typename Task, typename Output>
-	const jlb::NestedVector<Output>& JobSystemWithOutput<Task, Output>::GetOutput() const
+	template <typename Job, typename Output>
+	const jlb::NestedVector<Output>& JobSystemWithOutput<Job, Output>::GetOutput() const
 	{
 		return _outputs;
 	}
 
-	template <typename Task, typename Output>
-	void JobSystemWithOutput<Task, Output>::Allocate(const EngineData& info)
+	template <typename Job, typename Output>
+	void JobSystemWithOutput<Job, Output>::Allocate(const EngineData& info)
 	{
-		JobSystem<Task>::Allocate(info);
-		_outputs.Allocate(*info.allocator, JobSystem<Task>::GetLength(), 
-			JobSystem<Task>::DefineNestedCapacity(info));
+		JobSystem<Job>::Allocate(info);
+		_outputs.Allocate(*info.allocator, JobSystem<Job>::GetLength(),
+			JobSystem<Job>::DefineNestedCapacity(info));
 	}
 
-	template <typename Task, typename Output>
-	void JobSystemWithOutput<Task, Output>::Free(const EngineData& info)
+	template <typename Job, typename Output>
+	void JobSystemWithOutput<Job, Output>::Free(const EngineData& info)
 	{
 		_outputs.Free(*info.allocator);
-		JobSystem<Task>::Free(info);
+		JobSystem<Job>::Free(info);
 	}
 
-	template <typename Task, typename Output>
-	void JobSystemWithOutput<Task, Output>::OnPreUpdate(const EngineData& info, 
+	template <typename Job, typename Output>
+	void JobSystemWithOutput<Job, Output>::OnPreUpdate(const EngineData& info,
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestedVector<Task>& tasks)
+		const jlb::NestedVector<Job>& jobs)
 	{
 		_outputs.DetachNested();
 		_outputs.Clear();
 
-		JobSystem<Task>::OnPreUpdate(info, systems, tasks);
+		JobSystem<Job>::OnPreUpdate(info, systems, jobs);
 	}
 
-	template <typename Task, typename Output>
-	jlb::NestedVector<Output>& JobSystemWithOutput<Task, Output>::GetOutputEditable()
+	template <typename Job, typename Output>
+	jlb::NestedVector<Output>& JobSystemWithOutput<Job, Output>::GetOutputEditable()
 	{
 		return _outputs;
 	}
 
-	template <typename Task, typename Output>
-	void JobSystemWithOutput<Task, Output>::OnUpdate(const EngineData& info, 
+	template <typename Job, typename Output>
+	void JobSystemWithOutput<Job, Output>::OnUpdate(const EngineData& info,
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestedVector<Task>& tasks)
+		const jlb::NestedVector<Job>& jobs)
 	{
-		JobSystem<Task>::OnUpdate(info, systems, tasks);
-		OnUpdate(info, systems, tasks, _outputs);
+		JobSystem<Job>::OnUpdate(info, systems, jobs);
+		OnUpdate(info, systems, jobs, _outputs);
 	}
 }

@@ -8,8 +8,8 @@ namespace vke
 	class JobSystem : public GameSystem
 	{
 	public:
-		// Returns MAX value if it couldn't add the task.
-		[[nodiscard]] size_t TryAdd(const EngineData& info, const T& task);
+		// Returns MAX value if it couldn't add the job.
+		[[nodiscard]] size_t TryAdd(const EngineData& info, const T& job);
 		[[nodiscard]] const jlb::NestedVector<T>& GetJobs() const;
 
 	protected:
@@ -19,20 +19,20 @@ namespace vke
 		[[nodiscard]] virtual size_t DefineCapacity(const EngineData& info);
 		[[nodiscard]] virtual size_t DefineNestedCapacity(const EngineData& info);
 		
-		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
-		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
-		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& tasks){}
+		virtual void OnPreUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& jobs){}
+		virtual void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& jobs){}
+		virtual void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems, const jlb::NestedVector<T>& jobs){}
 
-		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& task);
+		[[nodiscard]] virtual bool ValidateOnTryAdd(const T& job);
 
 		[[nodiscard]] virtual bool AutoClearOnFrameEnd();
-		void ClearTasks();
+		void ClearJobs();
 
 		[[nodiscard]] size_t GetLength() const;
 		[[nodiscard]] size_t GetCount() const;
 
 	private:
-		jlb::NestedVector<T> _tasks{};
+		jlb::NestedVector<T> _jobs{};
 
 		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
@@ -40,26 +40,26 @@ namespace vke
 	};
 
 	template <typename T>
-	size_t JobSystem<T>::TryAdd(const EngineData& info, const T& task)
+	size_t JobSystem<T>::TryAdd(const EngineData& info, const T& job)
 	{
-		if (!ValidateOnTryAdd(task))
+		if (!ValidateOnTryAdd(job))
 			return SIZE_MAX;
-		_tasks.Add(*info.dumpAllocator, task);
-		return _tasks.GetCount() - 1;
+		_jobs.Add(*info.dumpAllocator, job);
+		return _jobs.GetCount() - 1;
 	}
 
 	template <typename T>
 	void JobSystem<T>::Allocate(const EngineData& info)
 	{
 		System<EngineData>::Allocate(info);
-		_tasks.Allocate(*info.allocator, DefineCapacity(info), DefineNestedCapacity(info));
+		_jobs.Allocate(*info.allocator, DefineCapacity(info), DefineNestedCapacity(info));
 	}
 
 	template <typename T>
 	void JobSystem<T>::Free(const EngineData& info)
 	{
-		_tasks.DetachNested();
-		_tasks.Free(*info.allocator);
+		_jobs.DetachNested();
+		_jobs.Free(*info.allocator);
 		System<EngineData>::Free(info);
 	}
 
@@ -76,7 +76,7 @@ namespace vke
 	}
 
 	template <typename T>
-	bool JobSystem<T>::ValidateOnTryAdd(const T& task)
+	bool JobSystem<T>::ValidateOnTryAdd(const T& job)
 	{
 		return true;
 	}
@@ -88,50 +88,50 @@ namespace vke
 	}
 
 	template <typename T>
-	void JobSystem<T>::ClearTasks()
+	void JobSystem<T>::ClearJobs()
 	{
-		_tasks.DetachNested();
-		_tasks.Clear();
+		_jobs.DetachNested();
+		_jobs.Clear();
 	}
 
 	template <typename T>
 	size_t JobSystem<T>::GetLength() const
 	{
-		return _tasks.GetLength();
+		return _jobs.GetLength();
 	}
 
 	template <typename T>
 	size_t JobSystem<T>::GetCount() const
 	{
-		return _tasks.GetCount();
+		return _jobs.GetCount();
 	}
 
 	template <typename T>
 	const jlb::NestedVector<T>& JobSystem<T>::GetJobs() const
 	{
-		return _tasks;
+		return _jobs;
 	}
 
 	template <typename T>
 	void JobSystem<T>::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PreUpdate(info, systems);
-		OnPreUpdate(info, systems, _tasks);
+		OnPreUpdate(info, systems, _jobs);
 	}
 
 	template <typename T>
 	void JobSystem<T>::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		GameSystem::Update(info, systems);
-		OnUpdate(info, systems, _tasks);
+		OnUpdate(info, systems, _jobs);
 	}
 
 	template <typename T>
 	void JobSystem<T>::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PostUpdate(info, systems);
-		OnPostUpdate(info, systems, _tasks);
+		OnPostUpdate(info, systems, _jobs);
 		if(AutoClearOnFrameEnd())
-			ClearTasks();
+			ClearJobs();
 	}
 }

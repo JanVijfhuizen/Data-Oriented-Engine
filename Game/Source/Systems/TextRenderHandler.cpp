@@ -18,9 +18,9 @@ namespace game
 
 	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<TextRenderJob>& tasks)
+		const jlb::NestedVector<TextRenderJob>& jobs)
 	{
-		JobSystem<TextRenderJob>::OnPreUpdate(info, systems, tasks);
+		JobSystem<TextRenderJob>::OnPreUpdate(info, systems, jobs);
 
 		const auto uiSys = systems.Get<vke::UIRenderSystem>();
 		const auto resourceSys = systems.Get<game::ResourceSystem>();
@@ -36,37 +36,37 @@ namespace game
 		const auto symbolsTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::symbols);
 		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 4);
 
-		for (auto& task : tasks)
+		for (auto& job : jobs)
 		{
-			const float fontSize = pixelSize * task.scale;
+			const float fontSize = pixelSize * job.scale;
 
-			const size_t length = task.lengthOverride == SIZE_MAX ? task.text.GetLength() : task.lengthOverride;
-			assert(task.lengthOverride == SIZE_MAX ? true : task.lengthOverride <= task.text.GetLength());
+			const size_t length = job.lengthOverride == SIZE_MAX ? job.text.GetLength() : job.lengthOverride;
+			assert(job.lengthOverride == SIZE_MAX ? true : job.lengthOverride <= job.text.GetLength());
 
-			const float paddedFontSize = fontSize + pixelSize * static_cast<float>(task.padding);
-			glm::vec2 origin = task.origin;
-			origin.x -= task.center ? paddedFontSize * .5f * jlb::math::Min<float>(task.maxWidth, length) - .5f * paddedFontSize : 0;
+			const float paddedFontSize = fontSize + pixelSize * static_cast<float>(job.padding);
+			glm::vec2 origin = job.origin;
+			origin.x -= job.center ? paddedFontSize * .5f * jlb::math::Min<float>(job.maxWidth, length) - .5f * paddedFontSize : 0;
 
-			// If the task is appending on another task.
-			if (task.appendIndex != SIZE_MAX)
+			// If the job is appending on another job.
+			if (job.appendIndex != SIZE_MAX)
 			{
-				const auto& otherTask = tasks[task.appendIndex];
-				const size_t otherLength = otherTask.lengthOverride == SIZE_MAX ? otherTask.text.GetLength() : otherTask.lengthOverride;
-				const float additionalOffset = (fontSize + pixelSize * static_cast<float>(otherTask.padding)) * otherLength;
-				origin = otherTask.origin;
+				const auto& otherJob = jobs[job.appendIndex];
+				const size_t otherLength = otherJob.lengthOverride == SIZE_MAX ? otherJob.text.GetLength() : otherJob.lengthOverride;
+				const float additionalOffset = (fontSize + pixelSize * static_cast<float>(otherJob.padding)) * otherLength;
+				origin = otherJob.origin;
 				origin.x += additionalOffset;
-				task.origin = origin;
+				job.origin = origin;
 			}
 			origin.x -= paddedFontSize;
 
 			glm::vec2 current = origin;
-			size_t xRemaining = task.maxWidth;
+			size_t xRemaining = job.maxWidth;
 
 			for (size_t i = 0; i < length; ++i)
 			{
 				current.x += paddedFontSize;
 
-				const auto& c = task.text[i];
+				const auto& c = job.text[i];
 
 				--xRemaining;
 				xRemaining = xRemaining == SIZE_MAX ? 0 : xRemaining;
@@ -83,7 +83,7 @@ namespace game
 						while (j < length)
 						{
 							++j;
-							const bool end = task.text[j] == ' ';
+							const bool end = job.text[j] == ' ';
 							j = end ? length : j;
 							wordLength += !end;
 						}
@@ -95,7 +95,7 @@ namespace game
 					{
 						current.y += fontSize;
 						current.x = origin.x;
-						xRemaining = task.maxWidth;
+						xRemaining = job.maxWidth;
 					}
 					
 					continue;
@@ -113,13 +113,13 @@ namespace game
 				charSubTexture.lTop.x += chunkSize * position;
 				charSubTexture.rBot.x = charSubTexture.lTop.x + chunkSize;
 
-				vke::UIRenderJob uiRenderTask{};
-				uiRenderTask.position = current;
-				uiRenderTask.scale = glm::vec2(fontSize);
-				uiRenderTask.subTexture = charSubTexture;
-				uiRenderTask.color = task.color;
+				vke::UIRenderJob uiRenderJob{};
+				uiRenderJob.position = current;
+				uiRenderJob.scale = glm::vec2(fontSize);
+				uiRenderJob.subTexture = charSubTexture;
+				uiRenderJob.color = job.color;
 
-				const auto result = uiSys->TryAdd(info, uiRenderTask);
+				const auto result = uiSys->TryAdd(info, uiRenderJob);
 				assert(result != SIZE_MAX);
 			}
 		}

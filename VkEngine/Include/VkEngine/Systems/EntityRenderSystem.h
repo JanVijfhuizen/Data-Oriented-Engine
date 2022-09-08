@@ -34,6 +34,6 @@ namespace vke
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
-		[[nodiscard]] bool ValidateOnTryAdd(const EntityRenderJob& task) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const EntityRenderJob& jobs) override;
 	};
 }

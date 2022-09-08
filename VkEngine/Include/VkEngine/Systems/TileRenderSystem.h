@@ -17,19 +17,19 @@ namespace vke
 		int32_t _tileSize = PIXEL_SIZE_ENTITY;
 	};
 
-	struct TileRenderTask final
+	struct TileRenderJob final
 	{
 		glm::vec2 position;
 		glm::vec2 shape{ 1 };
 		SubTexture subTexture{};
 	};
 
-	class TileRenderSystem final : public RenderSystem<TileRenderTask, TileCamera>
+	class TileRenderSystem final : public RenderSystem<TileRenderJob, TileCamera>
 	{
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
-		bool ValidateOnTryAdd(const TileRenderTask& task) override;
+		bool ValidateOnTryAdd(const TileRenderJob& job) override;
 	};
 }

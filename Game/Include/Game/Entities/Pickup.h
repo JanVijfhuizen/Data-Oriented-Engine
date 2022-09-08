@@ -6,8 +6,8 @@ namespace game
 	struct Pickup final : Entity
 	{
 		size_t cardId = SIZE_MAX;
-		size_t collisionTaskId = SIZE_MAX;
-		size_t mouseTaskId = SIZE_MAX;
+		size_t collisionJobId = SIZE_MAX;
+		size_t mouseJobId = SIZE_MAX;
 		bool interacted = false;
 	};
 }

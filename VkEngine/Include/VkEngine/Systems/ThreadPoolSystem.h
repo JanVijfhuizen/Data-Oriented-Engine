@@ -35,9 +35,9 @@ namespace vke
 
 		jlb::Allocation<std::thread> _threads{};
 		std::atomic<bool> _stopThreads = false;
-		std::atomic<size_t> _tasksRemaining = 0;
-		std::atomic<size_t> _tasksUnfinished = 0;
-		std::mutex _getNextTaskMutex{};
+		std::atomic<size_t> _jobssRemaining = 0;
+		std::atomic<size_t> _jobsUnfinished = 0;
+		std::mutex _getNextJobsMutex{};
 		size_t _threadCount = 0;
 
 		struct ThreadSharedInfo final
@@ -49,9 +49,9 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, 
-			const jlb::NestedVector<ThreadPoolJob>& tasks) override;
+			const jlb::NestedVector<ThreadPoolJob>& jobs) override;
 		void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestedVector<ThreadPoolJob>& tasks) override;
+			const jlb::NestedVector<ThreadPoolJob>& jobs) override;
 		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;

@@ -27,8 +27,8 @@ namespace game
 		size_t interactedIndex = SIZE_MAX;
 
 		// Excluding title.
-		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuJob& task) const;
-		[[nodiscard]] size_t GetContentIndex(const MenuJob& task, size_t columnIndex) const;
+		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuJob& job) const;
+		[[nodiscard]] size_t GetContentIndex(const MenuJob& job, size_t columnIndex) const;
 	};
 
 	struct MenuJob final
@@ -72,8 +72,8 @@ namespace game
 		float scrollAnimDuration = 1;
 		float scrollAnimScaleMultiplier = .4f;
 
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuJob>& tasks) override;
-		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuJob>& tasks) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuJob>& jobs) override;
+		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuJob>& jobs) override;
 
 	private:
 		float _scrollDir = 0;
