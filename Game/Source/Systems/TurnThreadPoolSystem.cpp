@@ -6,7 +6,7 @@ namespace game
 {
 	void TurnThreadPoolSystem::ThreadObj::operator()(TurnThreadPoolSystem* sys) const
 	{
-		auto& tasks = sys->GetTasks();
+		auto& tasks = sys->GetJobs();
 
 		while (!sys->_stopThreads)
 		{
@@ -25,21 +25,21 @@ namespace game
 
 	void TurnThreadPoolSystem::Allocate(const vke::EngineData& info)
 	{
-		TaskSystem<TurnThreadPoolTask>::Allocate(info);
+		JobSystem<TurnThreadPoolJob>::Allocate(info);
 		_thread = info.allocator->New<std::thread>(1, ThreadObj(), this);
 	}
 
 	void TurnThreadPoolSystem::Free(const vke::EngineData& info)
 	{
 		info.allocator->MFree(_thread.id);
-		TaskSystem<TurnThreadPoolTask>::Free(info);
+		JobSystem<TurnThreadPoolJob>::Free(info);
 	}
 
 	void TurnThreadPoolSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<TurnThreadPoolTask>& tasks)
+		const jlb::NestedVector<TurnThreadPoolJob>& tasks)
 	{
-		TaskSystem<TurnThreadPoolTask>::OnPreUpdate(info, systems, tasks);
+		JobSystem<TurnThreadPoolJob>::OnPreUpdate(info, systems, tasks);
 
 		const auto turnSys = systems.Get<TurnSystem>();
 		_takesTasks = turnSys->GetIfBeginTickEvent();
@@ -55,9 +55,9 @@ namespace game
 
 	void TurnThreadPoolSystem::OnPostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<TurnThreadPoolTask>& tasks)
+		const jlb::NestedVector<TurnThreadPoolJob>& tasks)
 	{
-		TaskSystem<TurnThreadPoolTask>::OnPostUpdate(info, systems, tasks);
+		JobSystem<TurnThreadPoolJob>::OnPostUpdate(info, systems, tasks);
 
 		if (_takesTasks) 
 		{
@@ -74,7 +74,7 @@ namespace game
 	{
 		_stopThreads = true;
 		_thread.ptr->join();
-		TaskSystem<TurnThreadPoolTask>::Exit(info, systems);
+		JobSystem<TurnThreadPoolJob>::Exit(info, systems);
 	}
 
 	bool TurnThreadPoolSystem::AutoClearOnFrameEnd()
@@ -82,9 +82,9 @@ namespace game
 		return false;
 	}
 
-	bool TurnThreadPoolSystem::ValidateOnTryAdd(const TurnThreadPoolTask& task)
+	bool TurnThreadPoolSystem::ValidateOnTryAdd(const TurnThreadPoolJob& task)
 	{
-		return _takesTasks ? TaskSystem<TurnThreadPoolTask>::ValidateOnTryAdd(task) : false;
+		return _takesTasks ? JobSystem<TurnThreadPoolJob>::ValidateOnTryAdd(task) : false;
 	}
 
 	size_t TurnThreadPoolSystem::DefineCapacity(const vke::EngineData& info)

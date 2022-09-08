@@ -3,7 +3,7 @@
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -66,7 +66,7 @@ namespace game
 	{
 		vke::GameSystem::PreUpdate(info, systems);
 		
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto uiSys = systems.Get<vke::UIRenderSystem>();
 
 		const auto& cameraPixelSize = uiSys->camera.pixelSize;
@@ -74,7 +74,7 @@ namespace game
 
 		// Divide timeline texture.
 		{
-			const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
+			const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::timeline);
 			jlb::StackArray<vke::SubTexture, 4> textureDivided{};
 			vke::texture::Subdivide(timelineSubTexture, 4, textureDivided);
 
@@ -112,33 +112,33 @@ namespace game
 				const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[4], curveOvershoot, curveDecelerate);
 				const float offset = -eval * visuals.onPressedTimeVerticalOffsetMultiplier;
 
-				TextRenderTask textRenderTask{};
-				textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
-				textRenderTask.origin.y += offset;
-				textRenderTask.text = "x";
-				textRenderTask.padding = -8;
-				auto result = textRenderSys->TryAdd(info, textRenderTask);
+				TextRenderJob textRenderJob{};
+				textRenderJob.origin = vke::texture::GetCenter(coordinatesDivided[4]);
+				textRenderJob.origin.y += offset;
+				textRenderJob.text = "x";
+				textRenderJob.padding = -8;
+				auto result = textRenderSys->TryAdd(info, textRenderJob);
 				assert(result != SIZE_MAX);
 
 				jlb::String string{};
 				string.AllocateFromNumber(*info.dumpAllocator, _ticksPerSecond);
 
-				textRenderTask.text = string.GetStringView();
-				textRenderTask.appendIndex = result;
-				result = textRenderSys->TryAdd(info, textRenderTask);
+				textRenderJob.text = string.GetStringView();
+				textRenderJob.appendIndex = result;
+				result = textRenderSys->TryAdd(info, textRenderJob);
 				assert(result != SIZE_MAX);
 			}
 
 			// Draw the UI for the textures.
 			for (size_t i = 0; i < 4; ++i)
 			{
-				vke::UIRenderTask renderTask{};
-				renderTask.subTexture = targetTextures[i];
-				renderTask.position = vke::texture::GetCenter(coordinatesDivided[i]);
-				renderTask.scale = glm::vec2(scale);
+				vke::UIRenderJob renderJob{};
+				renderJob.subTexture = targetTextures[i];
+				renderJob.position = vke::texture::GetCenter(coordinatesDivided[i]);
+				renderJob.scale = glm::vec2(scale);
 				const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[i], curveOvershoot, curveDecelerate);
-				renderTask.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
-				const auto result = uiSys->TryAdd(info, renderTask);
+				renderJob.scale *= 1.f + eval * (visuals.onPressedSizeMultiplier - 1);
+				const auto result = uiSys->TryAdd(info, renderJob);
 				assert(result != SIZE_MAX);
 			}
 		}
@@ -150,23 +150,23 @@ namespace game
 
 		// Draw the timer itself.
 		{
-			const auto timerSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timer);
-			const auto timerArrowSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timerArrow);
+			const auto timerSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::timer);
+			const auto timerArrowSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::timerArrow);
 
-			vke::UIRenderTask renderTask{};
-			renderTask.subTexture = timerArrowSubTexture;
-			renderTask.position.y = visuals.screenYCoordinates + scale;
+			vke::UIRenderJob renderJob{};
+			renderJob.subTexture = timerArrowSubTexture;
+			renderJob.position.y = visuals.screenYCoordinates + scale;
 			const float lerp = 1.f - jlb::math::Clamp<float>(_lerp, 0, 1);
 			const float maxWidth = (scale - cameraPixelSize) * 3;
-			renderTask.position.x = lerp * maxWidth * 2 - maxWidth;
-			renderTask.scale = glm::vec2(scale);
-			auto result = uiSys->TryAdd(info, renderTask);
+			renderJob.position.x = lerp * maxWidth * 2 - maxWidth;
+			renderJob.scale = glm::vec2(scale);
+			auto result = uiSys->TryAdd(info, renderJob);
 			assert(result != SIZE_MAX);
 
-			renderTask.subTexture = timerSubTexture;
-			renderTask.scale = glm::vec2(scale * 8, scale);
-			renderTask.position.x = 0;
-			result = uiSys->TryAdd(info, renderTask);
+			renderJob.subTexture = timerSubTexture;
+			renderJob.scale = glm::vec2(scale * 8, scale);
+			renderJob.position.x = 0;
+			result = uiSys->TryAdd(info, renderJob);
 			assert(result != SIZE_MAX);
 		}
 

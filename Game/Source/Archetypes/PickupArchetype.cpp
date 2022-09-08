@@ -7,7 +7,7 @@
 #include "Systems/CollisionSystem.h"
 #include "Systems/MouseSystem.h"
 #include "Systems/PlayerSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Graphics/CameraUtils.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
@@ -28,7 +28,7 @@ namespace game
 		const auto menuSys = systems.Get<MenuSystem>();
 		const auto mouseSys = systems.Get<MouseSystem>();
 		const auto playerSys = systems.Get<PlayerSystem>();
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto turnSys = systems.Get<TurnSystem>();
 		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
 		const auto& camera = entityRenderSys->camera;
@@ -37,8 +37,8 @@ namespace game
 
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
-		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::pickup);
-		vke::EntityRenderTask task{};
+		const auto subTexture = resourceSys->GetSubTexture(ResourceSystem::EntitySubTextures::pickup);
+		vke::EntityRenderJob task{};
 		task.subTexture = subTexture;
 
 		const auto hoveredObj = mouseSys->GetHoveredObject();
@@ -132,7 +132,7 @@ namespace game
 			}
 		}
 
-		_menuUpdateInfo = resetMenu ? MenuTaskUpdateInfo() : _menuUpdateInfo;
-		_cardPreviewUpdateInfo = resetMenu ? CardPreviewTaskUpdateInfo() : _cardPreviewUpdateInfo;
+		_menuUpdateInfo = resetMenu ? MenuJobUpdateInfo() : _menuUpdateInfo;
+		_cardPreviewUpdateInfo = resetMenu ? CardPreviewJobUpdateInfo() : _cardPreviewUpdateInfo;
 	}
 }

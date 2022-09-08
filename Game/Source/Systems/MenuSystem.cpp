@@ -3,7 +3,7 @@
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Graphics/RenderConventions.h"
@@ -12,28 +12,28 @@
 
 namespace game
 {
-	size_t MenuTaskUpdateInfo::GetInteractedColumnIndex(const MenuTask& task) const
+	size_t MenuJobUpdateInfo::GetInteractedColumnIndex(const MenuJob& job) const
 	{
-		return interactedIndex == SIZE_MAX ? SIZE_MAX : GetContentIndex(task, interactedIndex);
+		return interactedIndex == SIZE_MAX ? SIZE_MAX : GetContentIndex(job, interactedIndex);
 	}
 
-	size_t MenuTaskUpdateInfo::GetContentIndex(const MenuTask& task, const size_t columnIndex) const
+	size_t MenuJobUpdateInfo::GetContentIndex(const MenuJob& job, const size_t columnIndex) const
 	{
-		return (scrollIdx + columnIndex) % (task.content.length - 1);
+		return (scrollIdx + columnIndex) % (job.content.length - 1);
 	}
 
-	size_t MenuTask::GetColumnCount() const
+	size_t MenuJob::GetColumnCount() const
 	{
 		return jlb::math::Min<size_t>(maxLength, content.length) - 1;
 	}
 
 	void MenuSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<MenuTask>& tasks)
+		const jlb::NestedVector<MenuJob>& jobs)
 	{
-		TaskSystemWithOutput<MenuTask, MenuTaskUpdateInfo>::OnPreUpdate(info, systems, tasks);
+		JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>::OnPreUpdate(info, systems, jobs);
 
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
 		const auto textRenderSys = systems.Get<TextRenderHandler>();
 		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
@@ -47,14 +47,14 @@ namespace game
 
 		auto& outputs = GetOutputEditable();
 
-		for (auto& task : tasks)
+		for (auto& job : jobs)
 		{
-			const size_t contentLength = task.content.length;
-			const size_t length = jlb::math::Min(contentLength, task.maxLength);
+			const size_t contentLength = job.content.length;
+			const size_t length = jlb::math::Min(contentLength, job.maxLength);
 			assert(length > 0);
-			assert(task.interactIds.length >= length - 1);
+			assert(job.interactIds.length >= length - 1);
 
-			auto& updateInfo = task.updateInfo;
+			auto& updateInfo = job.updateInfo;
 
 			// Update interactions.
 			if (updateInfo.opened)
@@ -62,19 +62,19 @@ namespace game
 				const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
 				auto& idx = updateInfo.interactedIndex;
 				idx = SIZE_MAX;
-				const auto length = task.GetColumnCount();
+				const auto length = job.GetColumnCount();
 				for (size_t i = 0; i < length; ++i)
-					idx = uiHoveredObj == task.interactIds[i] ? i : idx;
+					idx = uiHoveredObj == job.interactIds[i] ? i : idx;
 			}
 
 			// Update open duration.
 			updateInfo.duration += info.deltaTime * 1e-2f;
 
-			// Calculate screen position for the render task.
+			// Calculate screen position for the render job.
 			const auto& uiCamera = uiRenderSys->camera;
-			auto xOffset = (.5f + static_cast<float>(task.width) * .5f + task.xOffset) * ((camera.position.x > task.origin.x) * 2 - 1);
-			xOffset *= -2 * task.reverseXAxis + 1;
-			const auto worldPos = task.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
+			auto xOffset = (.5f + static_cast<float>(job.width) * .5f + job.xOffset) * ((camera.position.x > job.origin.x) * 2 - 1);
+			xOffset *= -2 * job.reverseXAxis + 1;
+			const auto worldPos = job.origin + glm::vec2(xOffset, 0) - entityRenderSys->camera.position;
 			const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, uiCamera, info.swapChainData->resolution);
 
 			if (updateInfo.right && xOffset < 0 || !updateInfo.right && xOffset > 0)
@@ -83,12 +83,12 @@ namespace game
 				updateInfo.duration = 0;
 			}
 
-			const auto renderTaskScale = glm::vec2(scale * task.width, scale * length);
+			const auto renderJobScale = glm::vec2(scale * job.width, scale * length);
 
-			vke::UIRenderTask renderTask{};
-			renderTask.position = screenPos;
-			renderTask.scale = renderTaskScale;
-			renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+			vke::UIRenderJob renderJob{};
+			renderJob.position = screenPos;
+			renderJob.scale = renderJobScale;
+			renderJob.subTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::blank);
 
 			auto overshooting = jlb::CreateCurveOvershooting();
 			const float openLerp = updateInfo.duration / openDuration;
@@ -99,16 +99,16 @@ namespace game
 			// Draw the text and box.
 			{
 				const float rAspectFix = vke::UIRenderSystem::GetReversedAspectFix(info.swapChainData->resolution);
-				const glm::vec2 tabSize{ renderTask.scale.x, renderTask.scale.y / length };
-				const float xOffset = scale * (task.width - 1) / 2 * rAspectFix;
-				const float yOffset = (renderTask.scale.y - tabSize.y) * .5f;
+				const glm::vec2 tabSize{ renderJob.scale.x, renderJob.scale.y / length };
+				const float xOffset = scale * (job.width - 1) / 2 * rAspectFix;
+				const float yOffset = (renderJob.scale.y - tabSize.y) * .5f;
 
 				// Update scroll position.
 				auto& scrollPos = updateInfo.scrollPos;
 				{
 					const auto& mousePos = info.mousePos;
-					const auto& rPos = renderTask.position;
-					const auto rScale = renderTask.scale * glm::vec2(rAspectFix, 1);
+					const auto& rPos = renderJob.position;
+					const auto rScale = renderJob.scale * glm::vec2(rAspectFix, 1);
 
 					jlb::FBounds bounds{ rPos, rScale };
 
@@ -122,7 +122,7 @@ namespace game
 						scrollPos = fmodf(scrollPos, contentLength);
 					}
 
-					const auto worldCenterPos = task.origin + entityRenderSys->camera.position;
+					const auto worldCenterPos = job.origin + entityRenderSys->camera.position;
 					const auto screenCenterPos = vke::UIRenderSystem::WorldToScreenPos(worldCenterPos, uiCamera, info.swapChainData->resolution);
 					bounds = { screenCenterPos, rScale };
 					updateInfo.centerHovered = bounds.Intersects(mousePos);
@@ -130,41 +130,41 @@ namespace game
 
 				auto& scrollIdx = updateInfo.scrollIdx = static_cast<size_t>(roundf(scrollPos));
 
-				renderTask.scale.y /= static_cast<float>(length + 1);
+				renderJob.scale.y /= static_cast<float>(length + 1);
 
 				const auto origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
-				TextRenderTask textTask{};
-				textTask.origin = origin;
+				TextRenderJob textJob{};
+				textJob.origin = origin;
 
 				for (size_t i = 0; i < length; ++i)
 				{
 					const size_t idx = i == 0 ? 0 : (scrollIdx + i - 1) % (contentLength - 1) + 1;
 
-					textTask.scale = i == 0 ? task.titleScale : task.textScale;
-					textTask.padding = static_cast<int32_t>(textTask.scale) / -2;
+					textJob.scale = i == 0 ? job.titleScale : job.textScale;
+					textJob.padding = static_cast<int32_t>(textJob.scale) / -2;
 
-					const auto& content = task.content[idx];
+					const auto& content = job.content[idx];
 					const float tabDelay = openTabDelay * i;
 
-					textTask.text = content.string;
-					textTask.origin.y += tabSize.y;
+					textJob.text = content.string;
+					textJob.origin.y += tabSize.y;
 
-					renderTask.position.y = textTask.origin.y;
-					renderTask.scale = tabSize;
-					renderTask.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
-					renderTask.color = glm::vec4(0, 0, 0, 1);
+					renderJob.position.y = textJob.origin.y;
+					renderJob.scale = tabSize;
+					renderJob.scale.x *= overshooting.Evaluate(openLerp - tabDelay);
+					renderJob.color = glm::vec4(0, 0, 0, 1);
 
-					// Add interaction task.
+					// Add interaction job.
 					if (i > 0)
 					{
-						UIInteractionTask interactionTask{};
-						interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, textTask.origin.y), tabSize * glm::vec2(rAspectFix, 1));
-						auto result = uiInteractSys->TryAdd(info, interactionTask);
+						UIInteractionJob interactionJob{};
+						interactionJob.bounds = jlb::FBounds(glm::vec2(screenPos.x, textJob.origin.y), tabSize * glm::vec2(rAspectFix, 1));
+						auto result = uiInteractSys->TryAdd(info, interactionJob);
 						assert(result != SIZE_MAX);
-						task.interactIds[i - 1] = result;
+						job.interactIds[i - 1] = result;
 					}
 
-					auto result = uiRenderSys->TryAdd(info, renderTask);
+					auto result = uiRenderSys->TryAdd(info, renderJob);
 					assert(result != SIZE_MAX);
 
 					if (i > 0)
@@ -172,24 +172,24 @@ namespace game
 						const bool interacted = i - 1 == updateInfo.interactedIndex && updateInfo.opened;
 						if (interacted)
 						{
-							vke::UIRenderTask enabledRenderTask = renderTask;
-							enabledRenderTask.color = glm::vec4(0, 0, 0, 1);
-							enabledRenderTask.position.x -= camera.pixelSize * 2;
-							result = uiRenderSys->TryAdd(info, enabledRenderTask);
+							vke::UIRenderJob enabledRenderJob = renderJob;
+							enabledRenderJob.color = glm::vec4(0, 0, 0, 1);
+							enabledRenderJob.position.x -= camera.pixelSize * 2;
+							result = uiRenderSys->TryAdd(info, enabledRenderJob);
 							assert(result != SIZE_MAX);
 						}
 
 						if (content.interactable)
 						{
-							renderTask.scale -= glm::vec2(4, 2) * camera.pixelSize;
-							renderTask.color = glm::vec4(glm::vec3(1 - interacted), 1);
-							result = uiRenderSys->TryAdd(info, renderTask);
+							renderJob.scale -= glm::vec2(4, 2) * camera.pixelSize;
+							renderJob.color = glm::vec4(glm::vec3(1 - interacted), 1);
+							result = uiRenderSys->TryAdd(info, renderJob);
 							assert(result != SIZE_MAX);
 						}
 					}
 
-					textTask.lengthOverride = textTask.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
-					result = textRenderSys->TryAdd(info, textTask);
+					textJob.lengthOverride = textJob.text.GetLength() * jlb::math::Clamp<float>(openTextLerp, 0, 1);
+					result = textRenderSys->TryAdd(info, textJob);
 					assert(result != SIZE_MAX);
 
 					// Draw amount if applicable.
@@ -199,21 +199,21 @@ namespace game
 						str.Allocate(dumpAllocator, "x_");
 						str[1] = static_cast<char>(48 + content.amount);
 
-						TextRenderTask textTaskAmount = textTask;
-						textTaskAmount.text = str;
-						textTaskAmount.lengthOverride = SIZE_MAX;
-						textTaskAmount.appendIndex = result;
-						result = textRenderSys->TryAdd(info, textTaskAmount);
+						TextRenderJob textJobAmount = textJob;
+						textJobAmount.text = str;
+						textJobAmount.lengthOverride = SIZE_MAX;
+						textJobAmount.appendIndex = result;
+						result = textRenderSys->TryAdd(info, textJobAmount);
 						assert(result != SIZE_MAX);
 					}
 				}
 
-				if (task.usedSpace != SIZE_MAX && task.capacity != SIZE_MAX)
+				if (job.usedSpace != SIZE_MAX && job.capacity != SIZE_MAX)
 				{
 					jlb::String usedSpaceStr{};
-					usedSpaceStr.AllocateFromNumber(tempAllocator, task.usedSpace);
+					usedSpaceStr.AllocateFromNumber(tempAllocator, job.usedSpace);
 					jlb::String capacityStr{};
-					capacityStr.AllocateFromNumber(tempAllocator, task.capacity);
+					capacityStr.AllocateFromNumber(tempAllocator, job.capacity);
 
 					jlb::String str{};
 					str.Allocate(dumpAllocator, usedSpaceStr.GetLength() + capacityStr.GetLength());
@@ -225,13 +225,13 @@ namespace game
 					capacityStr.Free(tempAllocator);
 					usedSpaceStr.Free(tempAllocator);
 
-					TextRenderTask textTaskAmount{};
-					textTaskAmount.text = str;
-					textTaskAmount.scale = task.textScale;
-					textTaskAmount.padding = static_cast<int32_t>(textTaskAmount.scale) / -2;
+					TextRenderJob textJobAmount{};
+					textJobAmount.text = str;
+					textJobAmount.scale = job.textScale;
+					textJobAmount.padding = static_cast<int32_t>(textJobAmount.scale) / -2;
 					const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
-					textTaskAmount.origin = origin;
-					auto result = textRenderSys->TryAdd(info, textTaskAmount);
+					textJobAmount.origin = origin;
+					auto result = textRenderSys->TryAdd(info, textJobAmount);
 					assert(result != SIZE_MAX);
 				}
 			}
@@ -251,40 +251,40 @@ namespace game
 					lerp = jlb::math::Min<float>(lerp, 1);
 				}
 
-				auto arrowSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::scrollArrow);
+				auto arrowSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::scrollArrow);
 				jlb::StackArray<vke::SubTexture, 2> arrows{};
 				vke::texture::Subdivide(arrowSubTexture, 2, arrows);
 
-				const glm::vec2 arrowOffset{ 0, renderTaskScale.y / 2 };
+				const glm::vec2 arrowOffset{ 0, renderJobScale.y / 2 };
 				const auto arrowScale = glm::vec2(scale);
-				vke::UIRenderTask arrowRenderTask{};
+				vke::UIRenderJob arrowRenderJob{};
 
-				arrowRenderTask.position = screenPos - arrowOffset;
-				arrowRenderTask.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[0],
+				arrowRenderJob.position = screenPos - arrowOffset;
+				arrowRenderJob.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[0],
 					overshootingCurve, decelerateCurve) * scrollAnimScaleMultiplier);
-				arrowRenderTask.subTexture = arrows[0];
-				auto result = uiRenderSys->TryAdd(info, arrowRenderTask);
+				arrowRenderJob.subTexture = arrows[0];
+				auto result = uiRenderSys->TryAdd(info, arrowRenderJob);
 				assert(result != SIZE_MAX);
 
-				arrowRenderTask.position = screenPos + arrowOffset;
-				arrowRenderTask.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[1],
+				arrowRenderJob.position = screenPos + arrowOffset;
+				arrowRenderJob.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[1],
 					overshootingCurve, decelerateCurve) * scrollAnimScaleMultiplier);
-				arrowRenderTask.subTexture = arrows[1];
-				result = uiRenderSys->TryAdd(info, arrowRenderTask);
+				arrowRenderJob.subTexture = arrows[1];
+				result = uiRenderSys->TryAdd(info, arrowRenderJob);
 				assert(result != SIZE_MAX);
 			}
 
 			updateInfo.opened = true;
 
-			outputs.Add(dumpAllocator, task.updateInfo);
+			outputs.Add(dumpAllocator, job.updateInfo);
 		}
 	}
 
 	void MenuSystem::OnPostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<MenuTask>& tasks)
+		const jlb::NestedVector<MenuJob>& tasks)
 	{
-		TaskSystemWithOutput<MenuTask, MenuTaskUpdateInfo>::OnPostUpdate(info, systems, tasks);
+		JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>::OnPostUpdate(info, systems, tasks);
 		_scrollDir = 0;
 	}
 

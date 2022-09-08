@@ -5,7 +5,7 @@
 namespace game
 {
 	// Simple, straightforward and non scalable resource manager.
-	class ResourceManager final : public vke::GameSystem
+	class ResourceSystem final : public vke::GameSystem
 	{
 	public:
 		// Subtextures available for the entity renderer.

@@ -157,7 +157,7 @@ namespace game
 						jlb::FBounds bounds{ position, glm::vec2(transform.scale) };
 						base->mouseTaskId = mouseSys->TryAdd(vkeInfo, bounds);
 
-						vke::EntityRenderTask renderTask{};
+						vke::EntityRenderJob renderTask{};
 						renderTask.transform = transform;
 						renderTask.transform.scale *= movementComponent.outScaleMultiplier;
 						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;

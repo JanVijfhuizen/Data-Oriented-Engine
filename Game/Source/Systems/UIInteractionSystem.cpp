@@ -11,16 +11,16 @@ namespace game
 
 	void UIInteractionSystem::Allocate(const vke::EngineData& info)
 	{
-		TaskSystem<UIInteractionTask>::Allocate(info);
+		JobSystem<UIInteractionJob>::Allocate(info);
 		for (auto& hovered : _hovered)
 			hovered = SIZE_MAX;
 	}
 
 	void UIInteractionSystem::OnPreUpdate(const vke::EngineData& info,
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<UIInteractionTask>& uiInteractionTasks)
+		const jlb::NestedVector<UIInteractionJob>& uiInteractionTasks)
 	{
-		TaskSystem<UIInteractionTask>::OnUpdate(info, systems, uiInteractionTasks);
+		JobSystem<UIInteractionJob>::OnUpdate(info, systems, uiInteractionTasks);
 
 		_hovered.Swap();
 		_hovered.GetPrevious() = SIZE_MAX;
@@ -28,14 +28,14 @@ namespace game
 		if (!info.mouseAvailable)
 			return;
 
-		vke::ThreadPoolTask task{};
+		vke::ThreadPoolJob task{};
 		task.userPtr = this;
 		task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto self = reinterpret_cast<UIInteractionSystem*>(userPtr);
 			const auto& mousePos = info.mousePos;
 
-			const auto& tasks = self->GetTasks();
+			const auto& tasks = self->GetJobs();
 
 			const size_t count = tasks.GetCount();
 			for (size_t i = 0; i < count; ++i)

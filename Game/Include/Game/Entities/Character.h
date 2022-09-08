@@ -27,10 +27,10 @@ namespace game
 
 		Input input{};
 
-		size_t collisionTaskId = SIZE_MAX;
-		size_t mouseTaskId = SIZE_MAX;
-		size_t movementTaskId = SIZE_MAX;
+		size_t collisionJobId = SIZE_MAX;
+		size_t mouseJobId = SIZE_MAX;
+		size_t movementJobId = SIZE_MAX;
 		size_t movementTileReservation = SIZE_MAX;
-		size_t pickupTaskId = SIZE_MAX;
+		size_t pickupJobId = SIZE_MAX;
 	};
 }

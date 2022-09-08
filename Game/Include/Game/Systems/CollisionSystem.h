@@ -6,7 +6,7 @@
 
 namespace game
 {
-	typedef jlb::BoundingVolumeHierarchy::Instance CollisionTask;
+	typedef jlb::BoundingVolumeHierarchy::Instance CollisionJob;
 
 	enum CollisionLayers
 	{
@@ -17,7 +17,7 @@ namespace game
 	class CollisionSystem final : public vke::GameSystem
 	{
 	public:
-		[[nodiscard]] size_t TryAdd(const CollisionTask& task);
+		[[nodiscard]] size_t TryAdd(const CollisionJob& job);
 
 		[[nodiscard]] size_t GetIntersections(const jlb::Bounds& bounds,
 			jlb::ArrayView<uint32_t> outArray);
@@ -31,7 +31,7 @@ namespace game
 		{
 			jlb::BoundingVolumeHierarchy bvh{};
 			jlb::DistanceTree distanceTree{};
-			jlb::Vector<CollisionTask> tasks{};
+			jlb::Vector<CollisionJob> jobs{};
 		};
 
 		jlb::SwapChain<CollisionFrame, 2> _collisionFrames{};

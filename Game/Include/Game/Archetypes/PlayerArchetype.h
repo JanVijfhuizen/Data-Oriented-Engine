@@ -26,17 +26,17 @@ namespace game
 		Input _movementInput[4]{};
 		const float _scalingOnSelected = 0.5f;
 
-		CardPreviewTaskUpdateInfo _cardPreviewUpdateInfo{};
-		MenuTaskUpdateInfo _menuUpdateInfo{};
+		CardPreviewJobUpdateInfo _cardPreviewUpdateInfo{};
+		MenuJobUpdateInfo _menuUpdateInfo{};
 		jlb::StackArray<size_t, 6> _menuInteractIds{};
-		MenuTaskUpdateInfo _secondMenuUpdateInfo{};
+		MenuJobUpdateInfo _secondMenuUpdateInfo{};
 		jlb::StackArray<size_t, 6> _secondMenuInteractIds{};
 		MenuIndex _menuIndex = MenuIndex::main;
 		size_t _cardHovered = SIZE_MAX;
 		size_t _cardActivated = SIZE_MAX;
-		size_t _menuTaskId = SIZE_MAX;
-		size_t _secondMenuTaskId = SIZE_MAX;
-		size_t _cardPreviewTaskId = SIZE_MAX;
+		size_t _menuJobId = SIZE_MAX;
+		size_t _secondMenuJobId = SIZE_MAX;
+		size_t _cardPreviewJobId = SIZE_MAX;
 
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
 			jlb::NestedVector<Player>& entities) override;

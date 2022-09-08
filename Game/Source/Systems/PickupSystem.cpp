@@ -14,11 +14,11 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<PickupComponent>& tasks)
 	{
-		TaskSystemWithOutput<PickupComponent, PickupComponent>::OnPreUpdate(info, systems, tasks);
+		JobSystemWithOutput<PickupComponent, PickupComponent>::OnPreUpdate(info, systems, tasks);
 
 		const auto turnSys = systems.Get<TurnSystem>();
 
-		vke::ThreadPoolTask threadTask{};
+		vke::ThreadPoolJob threadTask{};
 		threadTask.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto self = static_cast<PickupSystem*>(userPtr);
@@ -26,7 +26,7 @@ namespace game
 
 			const bool isEndTickEvent = turnSys->GetIfEndTickEvent();
 
-			const auto& tasks = self->GetTasks();
+			const auto& tasks = self->GetJobs();
 			auto curveOvershoot = jlb::CreateCurveOvershooting();
 			auto& tasksOutput = self->GetOutputEditable();
 			auto& dumpAllocator = *info.dumpAllocator;

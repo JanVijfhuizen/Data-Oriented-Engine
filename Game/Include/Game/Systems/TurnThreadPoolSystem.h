@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <atomic>
-#include <mutex>
 #include <thread>
-#include "VkEngine/Systems/TaskSystem.h"
+#include "VkEngine/Systems/JobSystem.h"
 
 namespace vke
 {
@@ -11,13 +10,13 @@ namespace vke
 
 namespace game
 {
-	struct TurnThreadPoolTask final
+	struct TurnThreadPoolJob final
 	{
 		void (*func)(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, void* userPtr);
 		void* userPtr = nullptr;
 	};
 
-	class TurnThreadPoolSystem final : public vke::TaskSystem<TurnThreadPoolTask>
+	class TurnThreadPoolSystem final : public vke::JobSystem<TurnThreadPoolJob>
 	{
 		// Pauses and continues managed threads based on how busy the ThreadPoolSystem is.
 		struct ThreadObj final
@@ -39,11 +38,11 @@ namespace game
 
 		void Allocate(const vke::EngineData& info) override;
 		void Free(const vke::EngineData& info) override;
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TurnThreadPoolTask>& tasks) override;
-		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TurnThreadPoolTask>& tasks) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TurnThreadPoolJob>& tasks) override;
+		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TurnThreadPoolJob>& tasks) override;
 		void Exit(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems) override;
 		[[nodiscard]] bool AutoClearOnFrameEnd() override;
-		[[nodiscard]] bool ValidateOnTryAdd(const TurnThreadPoolTask& task) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const TurnThreadPoolJob& task) override;
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 		size_t DefineNestedCapacity(const vke::EngineData& info) override;
 	};

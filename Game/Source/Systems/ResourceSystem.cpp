@@ -1,31 +1,31 @@
 ﻿#include "pch.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "StackArray.h"
 #include "VkEngine/Graphics/TextureUtils.h"
 
 namespace game
 {
-	vke::SubTexture ResourceManager::GetSubTexture(const EntitySubTextures type) const
+	vke::SubTexture ResourceSystem::GetSubTexture(const EntitySubTextures type) const
 	{
 		return _entitySubTextures[static_cast<int32_t>(type)];
 	}
 
-	vke::SubTexture ResourceManager::GetSubTexture(const TileSubTextures type) const
+	vke::SubTexture ResourceSystem::GetSubTexture(const TileSubTextures type) const
 	{
 		return _tileSubTextures[static_cast<int32_t>(type)];
 	}
 
-	vke::SubTexture ResourceManager::GetSubTexture(const UISubTextures type) const
+	vke::SubTexture ResourceSystem::GetSubTexture(const UISubTextures type) const
 	{
 		return _uiSubTextures[static_cast<int32_t>(type)];
 	}
 
-	vke::SubTexture ResourceManager::GetSubTexture(const CardSubTextures type) const
+	vke::SubTexture ResourceSystem::GetSubTexture(const CardSubTextures type) const
 	{
 		return _cardSubTextures[static_cast<int32_t>(type)];
 	}
 
-	void ResourceManager::Allocate(const vke::EngineData& info)
+	void ResourceSystem::Allocate(const vke::EngineData& info)
 	{
 		vke::GameSystem::Allocate(info);
 
@@ -111,7 +111,7 @@ namespace game
 		vke::texture::LoadAtlasSubTextures(SUB_TEXTURE_PATH_CARD, _cardSubTextures);
 	}
 
-	void ResourceManager::Free(const vke::EngineData& info)
+	void ResourceSystem::Free(const vke::EngineData& info)
 	{
 		auto& allocator = *info.allocator;
 		_cardSubTextures.Free(allocator);

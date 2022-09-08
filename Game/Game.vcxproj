@@ -189,8 +189,8 @@
     <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
     <ClInclude Include="Include\Game\Systems\PickupSystem.h" />
     <ClInclude Include="Include\Game\Systems\PlayerSystem.h" />
-    <ClInclude Include="Include\Game\Systems\ResourceManager.h" />
-    <ClInclude Include="Include\Game\Systems\ThreadedTaskSystemWithOutput.h" />
+    <ClInclude Include="Include\Game\Systems\ResourceSystem.h" />
+    <ClInclude Include="Include\Game\Systems\ParallelJobSystemWithOutput.h" />
     <ClInclude Include="Include\Game\Systems\TextBoxSystem.h" />
     <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
     <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
@@ -216,7 +216,7 @@
     <ClCompile Include="Source\Systems\CollisionSystem.cpp" />
     <ClCompile Include="Source\Systems\MovementSystem.cpp" />
     <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
-    <ClCompile Include="Source\Systems\ResourceManager.cpp" />
+    <ClCompile Include="Source\Systems\ResourceSystem.cpp" />
     <ClCompile Include="Source\Systems\MouseSystem.cpp" />
     <ClCompile Include="Source\Scenes\DemoScene.cpp" />
     <ClCompile Include="Source\Systems\TurnSystem.cpp" />

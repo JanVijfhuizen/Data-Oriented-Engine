@@ -12,9 +12,9 @@ namespace game
 		return ENTITY_CAPACITY;
 	}
 
-	bool MovementSystem::ValidateOnTryAdd(const MovementTask& task)
+	bool MovementSystem::ValidateOnTryAdd(const MovementJob& task)
 	{
-		return !task.active ? false : TaskSystemWithOutput<MovementTask, MovementTask>::ValidateOnTryAdd(task);
+		return !task.active ? false : JobSystemWithOutput<MovementJob, MovementJob>::ValidateOnTryAdd(task);
 	}
 
 	void MovementThreadableTask(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems,
@@ -61,7 +61,7 @@ namespace game
 		}
 	}
 
-	ThreadedTaskSystemWithOutput<MovementSystem, MovementComponent, MovementComponent>::threadableFunc
+	ParallelJobSystemWithOutput<MovementSystem, MovementComponent, MovementComponent>::threadableFunc
 		MovementSystem::DefineThreadable()
 	{
 		return MovementThreadableTask;

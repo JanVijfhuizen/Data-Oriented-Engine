@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Systems/MouseSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
@@ -32,7 +32,7 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<jlb::TBounds<float>>& tasks)
 	{
-		TaskSystem<jlb::TBounds<float>>::OnPreUpdate(info, systems, tasks);
+		JobSystem<jlb::TBounds<float>>::OnPreUpdate(info, systems, tasks);
 
 		for (auto& key : _keys)
 			key.pressedThisTurn = false;
@@ -41,14 +41,14 @@ namespace game
 
 		const auto& mousePos = info.mousePos;
 		const auto entitySys = systems.Get<vke::EntityRenderSystem>();
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto uiSys = systems.Get<vke::UIRenderSystem>();
 
-		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::mouse);
+		const auto subTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::mouse);
 		jlb::StackArray<vke::SubTexture, 2> subTextures{};
 		vke::texture::Subdivide(subTexture, 2, subTextures);
 
-		vke::UIRenderTask uiRenderTask{};
+		vke::UIRenderJob uiRenderTask{};
 		uiRenderTask.position = mousePos;
 		uiRenderTask.scale = glm::vec2(uiSys->camera.pixelSize * vke::PIXEL_SIZE_ENTITY);
 		uiRenderTask.subTexture = subTextures[_keys[0].pressed];
@@ -75,7 +75,7 @@ namespace game
 		const jlb::Systems<vke::EngineData> systems,
 		const jlb::NestedVector<jlb::TBounds<float>>& tasks)
 	{
-		TaskSystem<jlb::TBounds<float>>::OnPostUpdate(info, systems, tasks);
+		JobSystem<jlb::TBounds<float>>::OnPostUpdate(info, systems, tasks);
 
 		const auto uiInteractSys = systems.Get<UIInteractionSystem>();
 		const size_t uiHoveredObj = uiInteractSys->GetHoveredObject();
