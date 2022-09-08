@@ -3,7 +3,7 @@
 #include "Archetypes/DummyArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/CollisionSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/TileRenderSystem.h"
 
@@ -76,11 +76,11 @@ namespace game::demo
 		GameScene::PreUpdate(info, systems);
 
 		const auto collisionSys = systems.Get<CollisionSystem>();
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto tileSys = systems.Get<vke::TileRenderSystem>();
 		const auto turnSys = systems.Get<TurnSystem>();
 
-		const auto tileSubTexture = resourceSys->GetSubTexture(ResourceManager::TileSubTextures::tile);
+		const auto tileSubTexture = resourceSys->GetSubTexture(ResourceSystem::TileSubTextures::tile);
 
 		// Background.
 		vke::TileRenderTask tileTask{};

@@ -15,8 +15,8 @@ namespace game
 		void OnPreUpdate(const EntityArchetypeInfo& info, jlb::Systems<EntityArchetypeInfo> archetypes,
 			jlb::NestedVector<Pickup>& entities) override;
 	private:
-		MenuTaskUpdateInfo _menuUpdateInfo{};
-		CardPreviewTaskUpdateInfo _cardPreviewUpdateInfo{};
+		MenuJobUpdateInfo _menuUpdateInfo{};
+		CardPreviewJobUpdateInfo _cardPreviewUpdateInfo{};
 		jlb::StackArray<size_t, 1> _menuInteractIds{};
 	};
 }

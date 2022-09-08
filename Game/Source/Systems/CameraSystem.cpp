@@ -13,7 +13,7 @@ namespace game
 
 		const auto threadSys = systems.Get<vke::ThreadPoolSystem>();
 
-		vke::ThreadPoolTask task{};
+		vke::ThreadPoolJob task{};
 		task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto sys = reinterpret_cast<CameraSystem*>(userPtr);

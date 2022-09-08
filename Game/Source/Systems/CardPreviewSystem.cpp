@@ -3,7 +3,7 @@
 #include "JlbString.h"
 #include "Systems/CardRenderSystem.h"
 #include "Systems/CardSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TextBoxSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "VkEngine/Graphics/Animation.h"
@@ -13,14 +13,14 @@ namespace game
 {
 	void CardPreviewSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<CardPreviewTask>& tasks)
+		const jlb::NestedVector<CardPreviewJob>& tasks)
 	{
-		TaskSystemWithOutput<CardPreviewTask, CardPreviewTaskUpdateInfo>::OnPreUpdate(info, systems, tasks);
+		JobSystemWithOutput<CardPreviewJob, CardPreviewJobUpdateInfo>::OnPreUpdate(info, systems, tasks);
 
 		const auto cardSys = systems.Get<CardSystem>();
 		const auto cardRenderSys = systems.Get<CardRenderSystem>();
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto textBoxSys = systems.Get<TextBoxSystem>();
 		const auto textRenderSys = systems.Get<TextRenderHandler>();
 
@@ -30,19 +30,19 @@ namespace game
 		{
 			auto& dumpAllocator = *info.dumpAllocator;
 
-			const auto cardBorder = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::border);
+			const auto cardBorder = resourceSys->GetSubTexture(ResourceSystem::CardSubTextures::border);
 			const auto& pixelSize = cardRenderSys->camera.pixelSize;
 
 			const auto worldPos = task.origin - entityRenderSys->camera.position;
 			const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
-			vke::UIRenderTask cardRenderTask{};
+			vke::UIRenderJob cardRenderTask{};
 			cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
 			cardRenderTask.subTexture = cardBorder;
 			cardRenderTask.position = screenPos;
 			auto result = cardRenderSys->TryAdd(info, cardRenderTask);
 
-			vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceManager::CardSubTextures::idle);
+			vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceSystem::CardSubTextures::idle);
 
 			if (task.cardIndex != SIZE_MAX)
 			{
@@ -52,7 +52,7 @@ namespace game
 				jlb::String str{};
 				str.AllocateFromNumber(dumpAllocator, card.cost);
 
-				TextRenderTask textCostTask{};
+				TextRenderJob textCostTask{};
 				textCostTask.center = true;
 				textCostTask.origin = screenPos;
 				textCostTask.origin.y += cardRenderTask.scale.y * .5f;
@@ -61,7 +61,7 @@ namespace game
 				textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
 				result = textRenderSys->TryAdd(info, textCostTask);
 
-				TextBoxTask cardTextBox{};
+				TextBoxJob cardTextBox{};
 				cardTextBox.text = card.text;
 				result = textBoxSys->TryAdd(info, cardTextBox);
 			}

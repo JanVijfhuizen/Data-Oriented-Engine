@@ -75,7 +75,7 @@ namespace game
 			previous.tasks.SetCount(0);
 			previous.distanceTree.Clear();
 			
-			TurnThreadPoolTask task{};
+			TurnThreadPoolJob task{};
 			task.userPtr = this;
 			task.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
 			{

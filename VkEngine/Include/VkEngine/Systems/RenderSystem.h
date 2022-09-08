@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "TaskSystem.h"
+#include "JobSystem.h"
 #include "VkEngine/Graphics/Shader.h"
 #include "VkEngine/Graphics/Mesh.h"
 #include "VkEngine/Graphics/Texture.h"
@@ -18,8 +18,8 @@
 
 namespace vke
 {
-	template <typename Task, typename Camera>
-	class RenderSystem : public TaskSystem<Task>
+	template <typename Job, typename Camera>
+	class RenderSystem : public JobSystem<Job>
 	{
 	public:
 		Camera camera{};
@@ -59,7 +59,7 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestedVector<Task>& tasks) override;
+			const jlb::NestedVector<Job>& tasks) override;
 		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
 		
 		void CreateShaderAssets(const EngineData& info);
@@ -102,7 +102,7 @@ namespace vke
 	template <typename Task, typename Camera>
 	void RenderSystem<Task, Camera>::Allocate(const EngineData& info)
 	{
-		TaskSystem<Task>::Allocate(info);
+		JobSystem<Task>::Allocate(info);
 
 		const auto& app = *info.app;
 		const auto& logicalDevice = app.logicalDevice;
@@ -139,7 +139,7 @@ namespace vke
 		result = vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &_textureAtlas.sampler);
 		assert(!result);
 
-		if (TaskSystem<Task>::GetLength() == 0)
+		if (JobSystem<Task>::GetLength() == 0)
 			return;
 
 		CreateShaderAssets(info);
@@ -149,7 +149,7 @@ namespace vke
 	template <typename Task, typename Camera>
 	void RenderSystem<Task, Camera>::Free(const EngineData& info)
 	{
-		if (TaskSystem<Task>::GetLength() > 0)
+		if (JobSystem<Task>::GetLength() > 0)
 		{
 			DestroySwapChainAssets(info);
 			DestroyShaderAssets(info);
@@ -163,13 +163,13 @@ namespace vke
 		mesh::Destroy(info, _mesh);
 		shader::Unload(info, _shader);
 
-		TaskSystem<Task>::Free(info);
+		JobSystem<Task>::Free(info);
 	}
 
 	template <typename Task, typename Camera>
 	void RenderSystem<Task, Camera>::OnRecreateSwapChainAssets(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
-		TaskSystem<Task>::OnRecreateSwapChainAssets(info, systems);
+		JobSystem<Task>::OnRecreateSwapChainAssets(info, systems);
 		DestroySwapChainAssets(info);
 		CreateSwapChainAssets(info);
 	}
@@ -183,12 +183,12 @@ namespace vke
 		const auto& logicalDevice = app.logicalDevice;
 		const size_t swapChainImageCount = info.swapChainData->imageCount;
 
-		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, TaskSystem<Task>::GetLength());
+		_instanceBuffers = instancing::CreateStorageBuffers<Task>(info, JobSystem<Task>::GetLength());
 
 		// Create descriptor layout.
 		jlb::StackArray<layout::Info::Binding, 2> bindings{};
 		bindings[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		bindings[0].size = sizeof(Task) * TaskSystem<Task>::GetLength();
+		bindings[0].size = sizeof(Task) * JobSystem<Task>::GetLength();
 		bindings[0].flag = VK_SHADER_STAGE_VERTEX_BIT;
 		bindings[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		bindings[1].flag = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -237,7 +237,7 @@ namespace vke
 			VkDescriptorBufferInfo instanceInfo{};
 			instanceInfo.buffer = _instanceBuffers[i].buffer;
 			instanceInfo.offset = 0;
-			instanceInfo.range = sizeof(Task) * TaskSystem<Task>::GetLength();
+			instanceInfo.range = sizeof(Task) * JobSystem<Task>::GetLength();
 
 			auto& instanceWrite = writes[0];
 			instanceWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

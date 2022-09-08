@@ -12,7 +12,7 @@ namespace vke
 {
 	void ThreadPoolSystem::ThreadObj::operator()(ThreadPoolSystem* sys) const
 	{
-		auto& tasks = sys->GetTasks();
+		auto& tasks = sys->GetJobs();
 
 		while(!sys->_stopThreads)
 		{
@@ -40,7 +40,7 @@ namespace vke
 
 	void ThreadPoolSystem::Allocate(const EngineData& info)
 	{
-		TaskSystem<ThreadPoolTask>::Allocate(info);
+		JobSystem<ThreadPoolJob>::Allocate(info);
 
 		_threadCount = GetThreadCount();
 		_threads = info.allocator->New<std::thread>(_threadCount, ThreadObj(), this);
@@ -49,14 +49,14 @@ namespace vke
 	void ThreadPoolSystem::Free(const EngineData& info)
 	{
 		info.allocator->MFree(_threads.id);
-		TaskSystem<ThreadPoolTask>::Free(info);
+		JobSystem<ThreadPoolJob>::Free(info);
 	}
 
 	void ThreadPoolSystem::OnUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestedVector<ThreadPoolTask>& tasks)
+		const jlb::NestedVector<ThreadPoolJob>& tasks)
 	{
-		TaskSystem<ThreadPoolTask>::OnUpdate(info, systems, tasks);
+		JobSystem<ThreadPoolJob>::OnUpdate(info, systems, tasks);
 
 		// Continue the threads.
 		_threadSharedInfo.info = &info;
@@ -66,9 +66,9 @@ namespace vke
 
 	void ThreadPoolSystem::OnPostUpdate(const EngineData& info, 
 		const jlb::Systems<EngineData> systems,
-		const jlb::NestedVector<ThreadPoolTask>& tasks)
+		const jlb::NestedVector<ThreadPoolJob>& tasks)
 	{
-		TaskSystem<ThreadPoolTask>::OnPostUpdate(info, systems, tasks);
+		JobSystem<ThreadPoolJob>::OnPostUpdate(info, systems, tasks);
 		
 		// Wait for the threads to finish.
 		while (_tasksUnfinished > 0)
@@ -80,7 +80,7 @@ namespace vke
 		_stopThreads = true;
 		for (int i = 0; i < _threadCount; ++i)
 			_threads.ptr[i].join();
-		TaskSystem<ThreadPoolTask>::Exit(info, systems);
+		JobSystem<ThreadPoolJob>::Exit(info, systems);
 	}
 
 	size_t ThreadPoolSystem::DefineCapacity(const EngineData& info)

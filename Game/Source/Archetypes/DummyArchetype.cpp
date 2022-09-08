@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Archetypes/DummyArchetype.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 
 namespace game::demo
 {
@@ -19,8 +19,8 @@ namespace game::demo
 
 	vke::SubTexture DummyArchetype::DefineSubTextureSet(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems)
 	{
-		const auto resourceSys = systems.Get<ResourceManager>();
-		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
+		const auto resourceSys = systems.Get<ResourceSystem>();
+		const auto subTexture = resourceSys->GetSubTexture(ResourceSystem::EntitySubTextures::humanoid);
 		return subTexture;
 	}
 }

@@ -1,39 +1,39 @@
 ﻿#include "pch.h"
 #include "Systems/TextRenderHandler.h"
 #include "JlbMath.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
 
 namespace game
 {
-	size_t TextRenderTask::GetLineCount() const
+	size_t TextRenderJob::GetLineCount() const
 	{
 		return ceil(static_cast<float>(text.GetLength()) / maxWidth);
 	}
 
-	size_t TextRenderTask::GetWidth() const
+	size_t TextRenderJob::GetWidth() const
 	{
 		return (maxWidth == SIZE_MAX ? text.GetLength() : jlb::math::Min(maxWidth, text.GetLength())) / 2;
 	}
 
 	void TextRenderHandler::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<TextRenderTask>& tasks)
+		const jlb::NestedVector<TextRenderJob>& tasks)
 	{
-		TaskSystem<TextRenderTask>::OnPreUpdate(info, systems, tasks);
+		JobSystem<TextRenderJob>::OnPreUpdate(info, systems, tasks);
 
 		const auto uiSys = systems.Get<vke::UIRenderSystem>();
-		const auto resourceSys = systems.Get<game::ResourceManager>();
+		const auto resourceSys = systems.Get<game::ResourceSystem>();
 
 		const float pixelSize = uiSys->camera.pixelSize;
 
-		const auto alphabetTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::alphabet);
+		const auto alphabetTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::alphabet);
 		const float alphabetChunkSize = vke::texture::GetChunkSize(alphabetTexture, 26);
 
-		const auto numbersTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::numbers);
+		const auto numbersTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::numbers);
 		const float numbersChunkSize = vke::texture::GetChunkSize(numbersTexture, 10);
 
-		const auto symbolsTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::symbols);
+		const auto symbolsTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::symbols);
 		const float symbolsChunkSize = vke::texture::GetChunkSize(symbolsTexture, 4);
 
 		for (auto& task : tasks)
@@ -113,7 +113,7 @@ namespace game
 				charSubTexture.lTop.x += chunkSize * position;
 				charSubTexture.rBot.x = charSubTexture.lTop.x + chunkSize;
 
-				vke::UIRenderTask uiRenderTask{};
+				vke::UIRenderJob uiRenderTask{};
 				uiRenderTask.position = current;
 				uiRenderTask.scale = glm::vec2(fontSize);
 				uiRenderTask.subTexture = charSubTexture;

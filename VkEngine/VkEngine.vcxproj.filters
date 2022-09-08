@@ -30,7 +30,7 @@
     <ClInclude Include="Include\VkEngine\Systems\GameSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\Systems\TaskSystem.h">
+    <ClInclude Include="Include\VkEngine\Systems\JobSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h">
@@ -90,7 +90,7 @@
     <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\Systems\TaskSystemWithOutput.h">
+    <ClInclude Include="Include\VkEngine\Systems\JobSystemWithOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\VkEngine\Systems\ThreadPoolSystem.h">

@@ -3,7 +3,7 @@
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Graphics/RenderConventions.h"
@@ -12,28 +12,28 @@
 
 namespace game
 {
-	size_t MenuTaskUpdateInfo::GetInteractedColumnIndex(const MenuTask& task) const
+	size_t MenuJobUpdateInfo::GetInteractedColumnIndex(const MenuJob& task) const
 	{
 		return interactedIndex == SIZE_MAX ? SIZE_MAX : GetContentIndex(task, interactedIndex);
 	}
 
-	size_t MenuTaskUpdateInfo::GetContentIndex(const MenuTask& task, const size_t columnIndex) const
+	size_t MenuJobUpdateInfo::GetContentIndex(const MenuJob& task, const size_t columnIndex) const
 	{
 		return (scrollIdx + columnIndex) % (task.content.length - 1);
 	}
 
-	size_t MenuTask::GetColumnCount() const
+	size_t MenuJob::GetColumnCount() const
 	{
 		return jlb::math::Min<size_t>(maxLength, content.length) - 1;
 	}
 
 	void MenuSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<MenuTask>& tasks)
+		const jlb::NestedVector<MenuJob>& tasks)
 	{
-		TaskSystemWithOutput<MenuTask, MenuTaskUpdateInfo>::OnPreUpdate(info, systems, tasks);
+		JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>::OnPreUpdate(info, systems, tasks);
 
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
 		const auto textRenderSys = systems.Get<TextRenderHandler>();
 		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
@@ -85,10 +85,10 @@ namespace game
 
 			const auto renderTaskScale = glm::vec2(scale * task.width, scale * length);
 
-			vke::UIRenderTask renderTask{};
+			vke::UIRenderJob renderTask{};
 			renderTask.position = screenPos;
 			renderTask.scale = renderTaskScale;
-			renderTask.subTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::blank);
+			renderTask.subTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::blank);
 
 			auto overshooting = jlb::CreateCurveOvershooting();
 			const float openLerp = updateInfo.duration / openDuration;
@@ -133,7 +133,7 @@ namespace game
 				renderTask.scale.y /= static_cast<float>(length + 1);
 
 				const auto origin = screenPos - glm::vec2(xOffset, yOffset + tabSize.y);
-				TextRenderTask textTask{};
+				TextRenderJob textTask{};
 				textTask.origin = origin;
 
 				for (size_t i = 0; i < length; ++i)
@@ -157,7 +157,7 @@ namespace game
 					// Add interaction task.
 					if (i > 0)
 					{
-						UIInteractionTask interactionTask{};
+						UIInteractionJob interactionTask{};
 						interactionTask.bounds = jlb::FBounds(glm::vec2(screenPos.x, textTask.origin.y), tabSize * glm::vec2(rAspectFix, 1));
 						auto result = uiInteractSys->TryAdd(info, interactionTask);
 						assert(result != SIZE_MAX);
@@ -172,7 +172,7 @@ namespace game
 						const bool interacted = i - 1 == updateInfo.interactedIndex && updateInfo.opened;
 						if (interacted)
 						{
-							vke::UIRenderTask enabledRenderTask = renderTask;
+							vke::UIRenderJob enabledRenderTask = renderTask;
 							enabledRenderTask.color = glm::vec4(0, 0, 0, 1);
 							enabledRenderTask.position.x -= camera.pixelSize * 2;
 							result = uiRenderSys->TryAdd(info, enabledRenderTask);
@@ -199,7 +199,7 @@ namespace game
 						str.Allocate(dumpAllocator, "x_");
 						str[1] = static_cast<char>(48 + content.amount);
 
-						TextRenderTask textTaskAmount = textTask;
+						TextRenderJob textTaskAmount = textTask;
 						textTaskAmount.text = str;
 						textTaskAmount.lengthOverride = SIZE_MAX;
 						textTaskAmount.appendIndex = result;
@@ -225,7 +225,7 @@ namespace game
 					capacityStr.Free(tempAllocator);
 					usedSpaceStr.Free(tempAllocator);
 
-					TextRenderTask textTaskAmount{};
+					TextRenderJob textTaskAmount{};
 					textTaskAmount.text = str;
 					textTaskAmount.scale = task.textScale;
 					textTaskAmount.padding = static_cast<int32_t>(textTaskAmount.scale) / -2;
@@ -251,13 +251,13 @@ namespace game
 					lerp = jlb::math::Min<float>(lerp, 1);
 				}
 
-				auto arrowSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::scrollArrow);
+				auto arrowSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::scrollArrow);
 				jlb::StackArray<vke::SubTexture, 2> arrows{};
 				vke::texture::Subdivide(arrowSubTexture, 2, arrows);
 
 				const glm::vec2 arrowOffset{ 0, renderTaskScale.y / 2 };
 				const auto arrowScale = glm::vec2(scale);
-				vke::UIRenderTask arrowRenderTask{};
+				vke::UIRenderJob arrowRenderTask{};
 
 				arrowRenderTask.position = screenPos - arrowOffset;
 				arrowRenderTask.scale = arrowScale * (1.f + jlb::DoubleCurveEvaluate(updateInfo.scrollArrowsLerp[0],
@@ -282,9 +282,9 @@ namespace game
 
 	void MenuSystem::OnPostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<MenuTask>& tasks)
+		const jlb::NestedVector<MenuJob>& tasks)
 	{
-		TaskSystemWithOutput<MenuTask, MenuTaskUpdateInfo>::OnPostUpdate(info, systems, tasks);
+		JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>::OnPostUpdate(info, systems, tasks);
 		_scrollDir = 0;
 	}
 

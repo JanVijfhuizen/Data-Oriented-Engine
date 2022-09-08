@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <mutex>
 #include <thread>
-#include "TaskSystemWithOutput.h"
+#include "JobSystemWithOutput.h"
 
 namespace vke
 {
@@ -13,13 +13,13 @@ namespace vke
 #define THREAD_POOL_SYSTEM_NESTED_CAPACITY 8
 #endif
 
-	struct ThreadPoolTask final
+	struct ThreadPoolJob final
 	{
 		void (*func)(const EngineData& info, jlb::Systems<EngineData> systems, void* userPtr);
 		void* userPtr = nullptr;
 	};
 
-	class ThreadPoolSystem final : public TaskSystem<ThreadPoolTask>
+	class ThreadPoolSystem final : public JobSystem<ThreadPoolJob>
 	{
 		friend struct ThreadObj;
 
@@ -49,9 +49,9 @@ namespace vke
 		void Allocate(const EngineData& info) override;
 		void Free(const EngineData& info) override;
 		void OnUpdate(const EngineData& info, jlb::Systems<EngineData> systems, 
-			const jlb::NestedVector<ThreadPoolTask>& tasks) override;
+			const jlb::NestedVector<ThreadPoolJob>& tasks) override;
 		void OnPostUpdate(const EngineData& info, jlb::Systems<EngineData> systems,
-			const jlb::NestedVector<ThreadPoolTask>& tasks) override;
+			const jlb::NestedVector<ThreadPoolJob>& tasks) override;
 		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
 
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;

@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "StringView.h"
-#include "VkEngine/Systems/TaskSystem.h"
+#include "VkEngine/Systems/JobSystem.h"
 
 namespace game
 {
-	struct TextBoxTask final
+	struct TextBoxJob final
 	{
 		glm::vec2 screenOrigin{ 0, .6f };
 		jlb::StringView text{};
@@ -14,9 +14,9 @@ namespace game
 		bool center = true;
 	};
 
-	class TextBoxSystem final : public vke::TaskSystem<TextBoxTask>
+	class TextBoxSystem final : public vke::JobSystem<TextBoxJob>
 	{
 	public:
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TextBoxTask>& tasks) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<TextBoxJob>& jobs) override;
 	};
 }

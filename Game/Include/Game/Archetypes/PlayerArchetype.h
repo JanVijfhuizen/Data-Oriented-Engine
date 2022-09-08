@@ -26,10 +26,10 @@ namespace game
 		Input _movementInput[4]{};
 		const float _scalingOnSelected = 0.5f;
 
-		CardPreviewTaskUpdateInfo _cardPreviewUpdateInfo{};
-		MenuTaskUpdateInfo _menuUpdateInfo{};
+		CardPreviewJobUpdateInfo _cardPreviewUpdateInfo{};
+		MenuJobUpdateInfo _menuUpdateInfo{};
 		jlb::StackArray<size_t, 6> _menuInteractIds{};
-		MenuTaskUpdateInfo _secondMenuUpdateInfo{};
+		MenuJobUpdateInfo _secondMenuUpdateInfo{};
 		jlb::StackArray<size_t, 6> _secondMenuInteractIds{};
 		MenuIndex _menuIndex = MenuIndex::main;
 		size_t _cardHovered = SIZE_MAX;

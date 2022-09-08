@@ -1,16 +1,16 @@
 ﻿#pragma once
 #include "Bounds.h"
 #include "SwapChain.h"
-#include "VkEngine/Systems/TaskSystem.h"
+#include "VkEngine/Systems/JobSystem.h"
 
 namespace game
 {
-	struct UIInteractionTask final
+	struct UIInteractionJob final
 	{
 		jlb::FBounds bounds{};
 	};
 
-	class UIInteractionSystem final : public vke::TaskSystem<UIInteractionTask>
+	class UIInteractionSystem final : public vke::JobSystem<UIInteractionJob>
 	{
 	public:
 		[[nodiscard]] size_t GetHoveredObject();
@@ -20,6 +20,6 @@ namespace game
 
 		void Allocate(const vke::EngineData& info) override;
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::NestedVector<UIInteractionTask>&) override;
+			const jlb::NestedVector<UIInteractionJob>&) override;
 	};
 }

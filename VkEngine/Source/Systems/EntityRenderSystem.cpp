@@ -25,9 +25,9 @@ namespace vke
 		return ENTITY_RENDER_SYSTEM_CAPACITY;
 	}
 
-	bool EntityRenderSystem::ValidateOnTryAdd(const EntityRenderTask& task)
+	bool EntityRenderSystem::ValidateOnTryAdd(const EntityRenderJob& task)
 	{
 		const bool culls = Culls(camera.position, camera.pixelSize, task.transform.position, glm::vec2(task.transform.scale));
-		return culls ? false : RenderSystem<EntityRenderTask, EntityCamera>::ValidateOnTryAdd(task);
+		return culls ? false : RenderSystem<EntityRenderJob, EntityCamera>::ValidateOnTryAdd(task);
 	}
 }

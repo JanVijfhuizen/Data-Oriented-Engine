@@ -5,12 +5,12 @@
 namespace vke
 {
 	template <typename T>
-	class TaskSystem : public GameSystem
+	class JobSystem : public GameSystem
 	{
 	public:
 		// Returns MAX value if it couldn't add the task.
 		[[nodiscard]] size_t TryAdd(const EngineData& info, const T& task);
-		[[nodiscard]] const jlb::NestedVector<T>& GetTasks() const;
+		[[nodiscard]] const jlb::NestedVector<T>& GetJobs() const;
 
 	protected:
 		void Allocate(const EngineData& info) override;
@@ -40,7 +40,7 @@ namespace vke
 	};
 
 	template <typename T>
-	size_t TaskSystem<T>::TryAdd(const EngineData& info, const T& task)
+	size_t JobSystem<T>::TryAdd(const EngineData& info, const T& task)
 	{
 		if (!ValidateOnTryAdd(task))
 			return SIZE_MAX;
@@ -49,14 +49,14 @@ namespace vke
 	}
 
 	template <typename T>
-	void TaskSystem<T>::Allocate(const EngineData& info)
+	void JobSystem<T>::Allocate(const EngineData& info)
 	{
 		System<EngineData>::Allocate(info);
 		_tasks.Allocate(*info.allocator, DefineCapacity(info), DefineNestedCapacity(info));
 	}
 
 	template <typename T>
-	void TaskSystem<T>::Free(const EngineData& info)
+	void JobSystem<T>::Free(const EngineData& info)
 	{
 		_tasks.DetachNested();
 		_tasks.Free(*info.allocator);
@@ -64,70 +64,70 @@ namespace vke
 	}
 
 	template <typename T>
-	size_t TaskSystem<T>::DefineCapacity(const EngineData& info)
+	size_t JobSystem<T>::DefineCapacity(const EngineData& info)
 	{
 		return 8;
 	}
 
 	template <typename T>
-	size_t TaskSystem<T>::DefineNestedCapacity(const EngineData& info)
+	size_t JobSystem<T>::DefineNestedCapacity(const EngineData& info)
 	{
 		return 8;
 	}
 
 	template <typename T>
-	bool TaskSystem<T>::ValidateOnTryAdd(const T& task)
+	bool JobSystem<T>::ValidateOnTryAdd(const T& task)
 	{
 		return true;
 	}
 
 	template <typename T>
-	bool TaskSystem<T>::AutoClearOnFrameEnd()
+	bool JobSystem<T>::AutoClearOnFrameEnd()
 	{
 		return true;
 	}
 
 	template <typename T>
-	void TaskSystem<T>::ClearTasks()
+	void JobSystem<T>::ClearTasks()
 	{
 		_tasks.DetachNested();
 		_tasks.Clear();
 	}
 
 	template <typename T>
-	size_t TaskSystem<T>::GetLength() const
+	size_t JobSystem<T>::GetLength() const
 	{
 		return _tasks.GetLength();
 	}
 
 	template <typename T>
-	size_t TaskSystem<T>::GetCount() const
+	size_t JobSystem<T>::GetCount() const
 	{
 		return _tasks.GetCount();
 	}
 
 	template <typename T>
-	const jlb::NestedVector<T>& TaskSystem<T>::GetTasks() const
+	const jlb::NestedVector<T>& JobSystem<T>::GetJobs() const
 	{
 		return _tasks;
 	}
 
 	template <typename T>
-	void TaskSystem<T>::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void JobSystem<T>::PreUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PreUpdate(info, systems);
 		OnPreUpdate(info, systems, _tasks);
 	}
 
 	template <typename T>
-	void TaskSystem<T>::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void JobSystem<T>::Update(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		GameSystem::Update(info, systems);
 		OnUpdate(info, systems, _tasks);
 	}
 
 	template <typename T>
-	void TaskSystem<T>::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
+	void JobSystem<T>::PostUpdate(const EngineData& info, const jlb::Systems<EngineData> systems)
 	{
 		System<EngineData>::PostUpdate(info, systems);
 		OnPostUpdate(info, systems, _tasks);

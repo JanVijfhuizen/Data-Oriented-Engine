@@ -16,7 +16,7 @@
 #include "Systems/MovementSystem.h"
 #include "Systems/PickupSystem.h"
 #include "Systems/PlayerSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TextBoxSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "Systems/TurnThreadPoolSystem.h"
@@ -29,7 +29,7 @@ namespace game
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
 		// Core engine pre update.
-		initializer.DefineSystem<ResourceManager>();
+		initializer.DefineSystem<ResourceSystem>();
 
 		// Core game systems.
 		initializer.DefineSystem<TurnSystem>();

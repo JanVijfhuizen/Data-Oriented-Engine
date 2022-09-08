@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "Systems/PlayerSystem.h"
 #include "JlbMath.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TurnSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -18,11 +18,11 @@ namespace game
 		System<vke::EngineData>::PreUpdate(info, systems);
 
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto turnSys = systems.Get<TurnSystem>();
 		const auto uiRenderSys = systems.Get<vke::UIRenderSystem>();
 		
-		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceManager::UISubTextures::moveArrow);
+		const auto subTextureDirArrow = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::moveArrow);
 		constexpr glm::ivec2 inputDirs[4]
 		{
 			glm::ivec2(0, -1),
@@ -32,7 +32,7 @@ namespace game
 		};
 
 		// Draw the directional arrows based on where the player wants to go.
-		vke::UIRenderTask renderTask{};
+		vke::UIRenderJob renderTask{};
 
 		// Calculate screen position for the render task.
 		const auto& uiCamera = uiRenderSys->camera;

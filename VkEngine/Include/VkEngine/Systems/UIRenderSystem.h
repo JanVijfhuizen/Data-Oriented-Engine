@@ -16,7 +16,7 @@ namespace vke
 		float pixelSize = 0.008f;
 	};
 
-	struct UIRenderTask final
+	struct UIRenderJob final
 	{
 		glm::vec2 position;
 		glm::vec2 scale{ 1 };
@@ -24,7 +24,7 @@ namespace vke
 		glm::vec4 color{ 1 };
 	};
 
-	class UIRenderSystem : public RenderSystem<UIRenderTask, UICamera>
+	class UIRenderSystem : public RenderSystem<UIRenderJob, UICamera>
 	{
 	public:
 		[[nodiscard]] static float GetAspectFix(const glm::vec2& resolution);

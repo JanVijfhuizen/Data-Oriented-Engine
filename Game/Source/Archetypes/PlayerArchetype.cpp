@@ -8,7 +8,7 @@
 #include "Systems/MouseSystem.h"
 #include "Systems/PickupSystem.h"
 #include "Systems/PlayerSystem.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TurnSystem.h"
 #include "Systems/UIInteractionSystem.h"
 #include "VkEngine/Systems/EntityRenderSystem.h"
@@ -99,7 +99,7 @@ namespace game
 		_menuIndex = menuOpen ? _menuIndex : MenuIndex::main;
 		if (!occupied && menuOpen)
 		{
-			MenuTask menuTask{};
+			MenuJob menuTask{};
 			menuTask.interactable = true;
 			menuTask.origin = transform.position;
 			menuTask.entityCamera = &entityRenderSys->camera;
@@ -115,7 +115,7 @@ namespace game
 			secondMenuTask.usedSpace = SIZE_MAX;
 			bool drawSecondWindow = false;
 
-			jlb::Array<MenuTask::Content> content{};
+			jlb::Array<MenuJob::Content> content{};
 			const auto& inventory = entity.inventory;
 			const size_t inventoryCount = inventory.GetCount();
 
@@ -178,7 +178,7 @@ namespace game
 				{
 					const auto hoveredCard = cardSys->GetCard(_cardActivated);
 
-					jlb::Array<MenuTask::Content> deckContent{};
+					jlb::Array<MenuJob::Content> deckContent{};
 					deckContent.Allocate(dumpAllocator, 3);
 					deckContent[0].string = hoveredCard.name;
 					deckContent[1].string = "use";
@@ -228,7 +228,7 @@ namespace game
 
 				// Create deck menu.
 				{
-					jlb::Array<MenuTask::Content> deckContent{};
+					jlb::Array<MenuJob::Content> deckContent{};
 					deckContent.Allocate(dumpAllocator, deckSize + 1);
 					deckContent[0].string = "deck";
 
@@ -310,9 +310,9 @@ namespace game
 				{
 					const bool newCardHovered = oldCardHovered != cardIndex;
 					_cardHovered = cardIndex;
-					_cardPreviewUpdateInfo = newCardHovered ? CardPreviewTaskUpdateInfo() : _cardPreviewUpdateInfo;
+					_cardPreviewUpdateInfo = newCardHovered ? CardPreviewJobUpdateInfo() : _cardPreviewUpdateInfo;
 
-					CardPreviewTask cardTask{};
+					CardPreviewJob cardTask{};
 					cardTask.origin = transform.position;
 					cardTask.cardIndex = cardIndex;
 					cardTask.updateInfo = _cardPreviewUpdateInfo;
@@ -378,8 +378,8 @@ namespace game
 
 	vke::SubTexture PlayerArchetype::DefineSubTextureSet(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		const auto resourceSys = systems.Get<ResourceManager>();
-		const auto subTexture = resourceSys->GetSubTexture(ResourceManager::EntitySubTextures::humanoid);
+		const auto resourceSys = systems.Get<ResourceSystem>();
+		const auto subTexture = resourceSys->GetSubTexture(ResourceSystem::EntitySubTextures::humanoid);
 		return subTexture;
 	}
 

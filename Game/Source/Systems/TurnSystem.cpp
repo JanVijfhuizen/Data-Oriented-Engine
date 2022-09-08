@@ -3,7 +3,7 @@
 #include "Curve.h"
 #include "JlbMath.h"
 #include "JlbString.h"
-#include "Systems/ResourceManager.h"
+#include "Systems/ResourceSystem.h"
 #include "Systems/TextRenderHandler.h"
 #include "VkEngine/Graphics/RenderConventions.h"
 #include "VkEngine/Systems/UIRenderSystem.h"
@@ -66,7 +66,7 @@ namespace game
 	{
 		vke::GameSystem::PreUpdate(info, systems);
 		
-		const auto resourceSys = systems.Get<ResourceManager>();
+		const auto resourceSys = systems.Get<ResourceSystem>();
 		const auto uiSys = systems.Get<vke::UIRenderSystem>();
 
 		const auto& cameraPixelSize = uiSys->camera.pixelSize;
@@ -74,7 +74,7 @@ namespace game
 
 		// Divide timeline texture.
 		{
-			const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timeline);
+			const auto timelineSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::timeline);
 			jlb::StackArray<vke::SubTexture, 4> textureDivided{};
 			vke::texture::Subdivide(timelineSubTexture, 4, textureDivided);
 
@@ -112,7 +112,7 @@ namespace game
 				const float eval = jlb::DoubleCurveEvaluate(_keyVerticalLerps[4], curveOvershoot, curveDecelerate);
 				const float offset = -eval * visuals.onPressedTimeVerticalOffsetMultiplier;
 
-				TextRenderTask textRenderTask{};
+				TextRenderJob textRenderTask{};
 				textRenderTask.origin = vke::texture::GetCenter(coordinatesDivided[4]);
 				textRenderTask.origin.y += offset;
 				textRenderTask.text = "x";
@@ -132,7 +132,7 @@ namespace game
 			// Draw the UI for the textures.
 			for (size_t i = 0; i < 4; ++i)
 			{
-				vke::UIRenderTask renderTask{};
+				vke::UIRenderJob renderTask{};
 				renderTask.subTexture = targetTextures[i];
 				renderTask.position = vke::texture::GetCenter(coordinatesDivided[i]);
 				renderTask.scale = glm::vec2(scale);
@@ -150,10 +150,10 @@ namespace game
 
 		// Draw the timer itself.
 		{
-			const auto timerSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timer);
-			const auto timerArrowSubTexture = resourceSys->GetSubTexture(ResourceManager::UISubTextures::timerArrow);
+			const auto timerSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::timer);
+			const auto timerArrowSubTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::timerArrow);
 
-			vke::UIRenderTask renderTask{};
+			vke::UIRenderJob renderTask{};
 			renderTask.subTexture = timerArrowSubTexture;
 			renderTask.position.y = visuals.screenYCoordinates + scale;
 			const float lerp = 1.f - jlb::math::Clamp<float>(_lerp, 0, 1);

@@ -22,18 +22,18 @@ namespace vke
 		int32_t _tileSize = PIXEL_SIZE_ENTITY;
 	};
 
-	struct EntityRenderTask final
+	struct EntityRenderJob final
 	{
 		Transform transform{};
 		SubTexture subTexture{};
 	};
 
-	class EntityRenderSystem final : public RenderSystem<EntityRenderTask, EntityCamera>
+	class EntityRenderSystem final : public RenderSystem<EntityRenderJob, EntityCamera>
 	{
 		[[nodiscard]] jlb::StringView GetTextureAtlasFilePath() const override;
 		[[nodiscard]] jlb::StringView GetFragmentShaderPath() const override;
 		[[nodiscard]] jlb::StringView GetVertexShaderPath() const override;
 		[[nodiscard]] size_t DefineCapacity(const EngineData& info) override;
-		[[nodiscard]] bool ValidateOnTryAdd(const EntityRenderTask& task) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const EntityRenderJob& task) override;
 	};
 }

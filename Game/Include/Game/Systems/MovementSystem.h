@@ -1,13 +1,13 @@
 ﻿#pragma once
-#include "ThreadedTaskSystemWithOutput.h"
+#include "ParallelJobSystemWithOutput.h"
 #include "Components/MovementComponent.h"
 
 namespace game
 {
-	typedef MovementComponent MovementTask;
+	typedef MovementComponent MovementJob;
 
 	// Handles the movement of characters. Also handles the corresponding animation (by scaling) and rotations.
-	class MovementSystem final : public ThreadedTaskSystemWithOutput<MovementSystem, MovementTask, MovementTask>
+	class MovementSystem final : public ParallelJobSystemWithOutput<MovementSystem, MovementJob, MovementJob>
 	{
 	public:
 		// How many times bobbing happens during a tick.
@@ -21,7 +21,7 @@ namespace game
 		
 	private:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
-		[[nodiscard]] bool ValidateOnTryAdd(const MovementTask& task) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const MovementJob& task) override;
 		[[nodiscard]] threadableFunc DefineThreadable() override;
 	};
 }

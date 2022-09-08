@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include "StringView.h"
 #include "VkEngine/Graphics/RenderConventions.h"
-#include "VkEngine/Systems/TaskSystem.h"
+#include "VkEngine/Systems/JobSystem.h"
 
 namespace game
 {
-	struct TextRenderTask final
+	struct TextRenderJob final
 	{
 		// Text to render. Can include lowercase characters, spaces and numbers.
 		jlb::StringView text{};
@@ -15,7 +15,7 @@ namespace game
 		size_t scale = vke::PIXEL_SIZE_ENTITY;
 		// Overrides the length of the string.
 		size_t lengthOverride = SIZE_MAX;
-		// Ignores origin value to place it after the text of target task.
+		// Ignores origin value to place it after the text of target job.
 		size_t appendIndex = SIZE_MAX;
 		// Space between characters. Can be negative.
 		int32_t padding = -8;
@@ -32,12 +32,12 @@ namespace game
 	};
 
 	/*
-	Forwards created tasks to the UIRenderSystem as UIRenderTasks.
+	Forwards created jobs to the UIRenderSystem as UIRenderjobs.
 	*/
-	class TextRenderHandler final : public vke::TaskSystem<TextRenderTask>
+	class TextRenderHandler final : public vke::JobSystem<TextRenderJob>
 	{
 		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::NestedVector<TextRenderTask>& tasks) override;
+			const jlb::NestedVector<TextRenderJob>& jobs) override;
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
 	};
 }

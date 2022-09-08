@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include "Bounds.h"
-#include "VkEngine/Systems/TaskSystem.h"
+#include "VkEngine/Systems/JobSystem.h"
 
 namespace game
 {
 	typedef jlb::FBounds MouseInteractTask;
 
 	// Handles the mouse visualization and behaviour.
-	class MouseSystem final : public vke::TaskSystem<MouseInteractTask>
+	class MouseSystem final : public vke::JobSystem<MouseInteractTask>
 	{
 	public:
 		enum class Key

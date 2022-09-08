@@ -2,7 +2,7 @@
 #include "Bounds.h"
 #include "StringView.h"
 #include "VkEngine/Systems/GameSystem.h"
-#include "VkEngine/Systems/TaskSystemWithOutput.h"
+#include "VkEngine/Systems/JobSystemWithOutput.h"
 
 namespace vke
 {
@@ -12,9 +12,9 @@ namespace vke
 
 namespace game
 {
-	struct MenuTask;
+	struct MenuJob;
 
-	struct MenuTaskUpdateInfo final
+	struct MenuJobUpdateInfo final
 	{
 		bool opened = false;
 		bool hovered = false;
@@ -27,11 +27,11 @@ namespace game
 		size_t interactedIndex = SIZE_MAX;
 
 		// Excluding title.
-		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuTask& task) const;
-		[[nodiscard]] size_t GetContentIndex(const MenuTask& task, size_t columnIndex) const;
+		[[nodiscard]] size_t GetInteractedColumnIndex(const MenuJob& task) const;
+		[[nodiscard]] size_t GetContentIndex(const MenuJob& task, size_t columnIndex) const;
 	};
 
-	struct MenuTask final
+	struct MenuJob final
 	{
 		struct Content final
 		{
@@ -60,10 +60,10 @@ namespace game
 		// Returns the amount of columns rendered.
 		[[nodiscard]] size_t GetColumnCount() const;
 
-		MenuTaskUpdateInfo updateInfo{};
+		MenuJobUpdateInfo updateInfo{};
 	};
 
-	class MenuSystem final : public vke::TaskSystemWithOutput<MenuTask, MenuTaskUpdateInfo>
+	class MenuSystem final : public vke::JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>
 	{
 	public:
 		float openDuration = 1.f;
@@ -72,8 +72,8 @@ namespace game
 		float scrollAnimDuration = 1;
 		float scrollAnimScaleMultiplier = .4f;
 
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuTask>& tasks) override;
-		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuTask>& tasks) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuJob>& tasks) override;
+		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<MenuJob>& tasks) override;
 
 	private:
 		float _scrollDir = 0;
