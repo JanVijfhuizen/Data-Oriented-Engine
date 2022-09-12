@@ -131,5 +131,8 @@
     <ClInclude Include="Include\Tuple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Archetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
