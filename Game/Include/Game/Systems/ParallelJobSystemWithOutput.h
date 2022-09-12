@@ -48,9 +48,9 @@ namespace game
 		};
 		threadjob.userPtr = this;
 
-		auto& tasksOutput = vke::JobSystemWithOutput<Input, Output>::GetOutputEditable();
+		auto& jobsOutput = vke::JobSystemWithOutput<Input, Output>::GetOutputEditable();
 		auto& dumpAllocator = *info.dumpAllocator;
-		tasksOutput.PreAllocateNested(dumpAllocator, vke::JobSystemWithOutput<Input, Output>::GetCount());
+		jobsOutput.PreAllocateNested(dumpAllocator, vke::JobSystemWithOutput<Input, Output>::GetCount());
 
 		const auto threadSys = systems.Get<vke::ThreadPoolSystem>();
 		const auto result = threadSys->TryAdd(info, threadjob);

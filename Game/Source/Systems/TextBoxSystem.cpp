@@ -31,15 +31,15 @@ namespace game
 			const auto lineCount = renderJob.GetLineCount();
 			const auto aspectFix = vke::UIRenderSystem::GetAspectFix(info.swapChainData->resolution);
 
-			vke::UIRenderJob backgroundRenderTask{};
-			backgroundRenderTask.position = renderJob.origin;
-			backgroundRenderTask.scale.x = aspectFix * (scale * static_cast<float>(renderJob.GetWidth()));
-			backgroundRenderTask.scale.y = scale * static_cast<float>(lineCount);
-			backgroundRenderTask.scale += job.borderSize * pixelSize;
-			backgroundRenderTask.color = glm::vec4(0, 0, 0, 1);
-			backgroundRenderTask.subTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::blank);
-			backgroundRenderTask.position.y += scale * .5f * static_cast<float>(lineCount) - scale * .5f;
-			auto result = uiRenderSys->TryAdd(info, backgroundRenderTask);
+			vke::UIRenderJob backgroundRenderJob{};
+			backgroundRenderJob.position = renderJob.origin;
+			backgroundRenderJob.scale.x = aspectFix * (scale * static_cast<float>(renderJob.GetWidth()));
+			backgroundRenderJob.scale.y = scale * static_cast<float>(lineCount);
+			backgroundRenderJob.scale += job.borderSize * pixelSize;
+			backgroundRenderJob.color = glm::vec4(0, 0, 0, 1);
+			backgroundRenderJob.subTexture = resourceSys->GetSubTexture(ResourceSystem::UISubTextures::blank);
+			backgroundRenderJob.position.y += scale * .5f * static_cast<float>(lineCount) - scale * .5f;
+			auto result = uiRenderSys->TryAdd(info, backgroundRenderJob);
 			result = textRenderSys->TryAdd(info, renderJob);
 		}
 	}

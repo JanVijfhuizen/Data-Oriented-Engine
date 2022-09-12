@@ -32,20 +32,20 @@ namespace game
 		};
 
 		// Draw the directional arrows based on where the player wants to go.
-		vke::UIRenderJob renderTask{};
+		vke::UIRenderJob renderJob{};
 
-		// Calculate screen position for the render task.
+		// Calculate screen position for the render job.
 		const auto& uiCamera = uiRenderSys->camera;
 		const auto worldPos = -entityRenderSys->camera.position;
 
 		for (size_t i = 0; i < 4; ++i)
 		{
 			const auto& input = _updateInfo.keyArrowInput[i];
-			renderTask.position = worldPos + _updateInfo.position + glm::vec2(inputDirs[i]);
-			renderTask.position = vke::UIRenderSystem::WorldToScreenPos(renderTask.position, uiCamera, info.swapChainData->resolution);
-			renderTask.scale = glm::vec2(1.f / vke::PIXEL_SIZE_UI);
-			renderTask.subTexture = vke::texture::GetSubTexture(subTextureDirArrow, 4, i);
-			const auto result = input ? uiRenderSys->TryAdd(info, renderTask) : SIZE_MAX;
+			renderJob.position = worldPos + _updateInfo.position + glm::vec2(inputDirs[i]);
+			renderJob.position = vke::UIRenderSystem::WorldToScreenPos(renderJob.position, uiCamera, info.swapChainData->resolution);
+			renderJob.scale = glm::vec2(1.f / vke::PIXEL_SIZE_UI);
+			renderJob.subTexture = vke::texture::GetSubTexture(subTextureDirArrow, 4, i);
+			const auto result = input ? uiRenderSys->TryAdd(info, renderJob) : SIZE_MAX;
 		}
 
 		if(turnSys->GetIfBeginTickEvent())

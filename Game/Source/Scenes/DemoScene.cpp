@@ -83,7 +83,7 @@ namespace game::demo
 		const auto tileSubTexture = resourceSys->GetSubTexture(ResourceSystem::TileSubTextures::tile);
 
 		// Background.
-		vke::TileRenderTask tileTask{};
+		vke::TileRenderJob tileTask{};
 		tileTask.shape = glm::ivec2(25, 25);
 		tileTask.position = glm::ivec2(0, 0);
 		tileTask.subTexture = vke::texture::GetSubTexture(tileSubTexture, 7, 0);
@@ -119,7 +119,7 @@ namespace game::demo
 
 		if(turnSys->GetIfBeginTickEvent())
 		{
-			CollisionTask collisionTask{};
+			CollisionJob collisionTask{};
 			auto& bounds = collisionTask.bounds;
 			bounds.lBot = glm::ivec2(2, 3);
 			bounds.rTop = bounds.lBot + glm::ivec2(2, 4);

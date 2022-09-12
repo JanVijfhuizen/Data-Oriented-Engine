@@ -21,7 +21,7 @@ namespace game
 		
 	private:
 		[[nodiscard]] size_t DefineCapacity(const vke::EngineData& info) override;
-		[[nodiscard]] bool ValidateOnTryAdd(const MovementJob& task) override;
+		[[nodiscard]] bool ValidateOnTryAdd(const MovementJob& job) override;
 		[[nodiscard]] threadableFunc DefineThreadable() override;
 	};
 }

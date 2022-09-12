@@ -24,9 +24,9 @@ namespace vke
 		return TILE_RENDER_SYSTEM_CAPACITY;
 	}
 
-	bool TileRenderSystem::ValidateOnTryAdd(const TileRenderTask& task)
+	bool TileRenderSystem::ValidateOnTryAdd(const TileRenderJob& job)
 	{
-		const bool culls = Culls(camera.position, camera.pixelSize, task.position, task.shape);
-		return culls ? false : RenderSystem<TileRenderTask, TileCamera>::ValidateOnTryAdd(task);
+		const bool culls = Culls(camera.position, camera.pixelSize, job.position, job.shape);
+		return culls ? false : RenderSystem<TileRenderJob, TileCamera>::ValidateOnTryAdd(job);
 	}
 }

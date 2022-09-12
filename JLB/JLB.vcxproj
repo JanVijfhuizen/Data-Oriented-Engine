@@ -181,6 +181,7 @@
     <ClInclude Include="Include\SwapChain.h" />
     <ClInclude Include="Include\System.h" />
     <ClInclude Include="Include\SystemManager.h" />
+    <ClInclude Include="Include\Tuple.h" />
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

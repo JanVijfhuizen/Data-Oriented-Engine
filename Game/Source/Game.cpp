@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Game.h"
+
+#include "Tuple.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CardPreviewSystem.h"
 #include "Systems/CardRenderSystem.h"
