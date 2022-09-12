@@ -49,7 +49,7 @@ namespace game
 			// Wait for the threads to finish.
 			while (_tasksUnfinished > 0)
 				Sleep(0);
-			ClearTasks();
+			ClearJobs();
 		}
 	}
 

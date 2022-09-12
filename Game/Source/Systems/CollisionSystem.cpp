@@ -5,17 +5,17 @@
 
 namespace game
 {
-	size_t CollisionSystem::TryAdd(const CollisionTask& task)
+	size_t CollisionSystem::TryAdd(const CollisionJob& job)
 	{
 		auto& previous = _collisionFrames.GetPrevious();
-		previous.tasks.Add(task);
-		return previous.tasks.GetCount() - 1;
+		previous.jobs.Add(job);
+		return previous.jobs.GetCount() - 1;
 	}
 
 	size_t CollisionSystem::GetIntersections(const jlb::Bounds& bounds, const jlb::ArrayView<uint32_t> outArray)
 	{
 		auto& current = _collisionFrames.GetCurrent();
-		return current.bvh.GetIntersections(bounds, current.tasks, outArray);
+		return current.bvh.GetIntersections(bounds, current.jobs, outArray);
 	}
 
 	size_t CollisionSystem::ReserveTilesThisTurn(const jlb::Bounds& bounds)
@@ -43,7 +43,7 @@ namespace game
 		vke::GameSystem::Allocate(info);
 		for (auto& collisionFrame : _collisionFrames)
 		{
-			collisionFrame.tasks.Allocate(*info.allocator, ENTITY_CAPACITY);
+			collisionFrame.jobs.Allocate(*info.allocator, ENTITY_CAPACITY);
 			collisionFrame.bvh.Allocate(*info.allocator, ENTITY_CAPACITY);
 			collisionFrame.distanceTree.Allocate(*info.allocator, ENTITY_CAPACITY);
 		}
@@ -56,7 +56,7 @@ namespace game
 			auto& collisionFrame = _collisionFrames[i];
 			collisionFrame.distanceTree.Free(*info.allocator);
 			collisionFrame.bvh.Free(*info.allocator);
-			collisionFrame.tasks.Free(*info.allocator);
+			collisionFrame.jobs.Free(*info.allocator);
 		}
 
 		vke::GameSystem::Free(info);
@@ -72,7 +72,7 @@ namespace game
 		{
 			_collisionFrames.Swap();
 			auto& previous = _collisionFrames.GetPrevious();
-			previous.tasks.SetCount(0);
+			previous.jobs.SetCount(0);
 			previous.distanceTree.Clear();
 			
 			TurnThreadPoolJob task{};
@@ -83,7 +83,7 @@ namespace game
 				auto& previous = sys->_collisionFrames.GetPrevious();
 
 				// Compile into collision distance tree.
-				const auto& tasks = previous.tasks;
+				const auto& tasks = previous.jobs;
 				if (tasks.GetCount() > 0)
 					previous.bvh.Build(tasks);
 			};

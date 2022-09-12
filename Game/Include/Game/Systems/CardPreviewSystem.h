@@ -20,7 +20,7 @@ namespace game
 	public:
 		float cardAnimSpeed = 5;
 
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<CardPreviewJob>& tasks) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<CardPreviewJob>& jobs) override;
 	};
 }
 

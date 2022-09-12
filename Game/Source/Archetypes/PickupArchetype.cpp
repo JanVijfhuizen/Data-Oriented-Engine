@@ -38,8 +38,8 @@ namespace game
 		const bool leftPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::left);
 		const bool rightPressedThisTurn = mouseSys->GetIsPressedThisTurn(MouseSystem::Key::right);
 		const auto subTexture = resourceSys->GetSubTexture(ResourceSystem::EntitySubTextures::pickup);
-		vke::EntityRenderJob task{};
-		task.subTexture = subTexture;
+		vke::EntityRenderJob job{};
+		job.subTexture = subTexture;
 
 		const auto hoveredObj = mouseSys->GetHoveredObject();
 		bool resetMenu = true;
@@ -54,12 +54,12 @@ namespace game
 			{
 				const auto& transform = entity.transform;
 
-				// Collision task.
-				CollisionTask collisionTask{};
-				collisionTask.bounds = jlb::math::RoundNearest(transform.position);
-				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
-				entity.collisionTaskId = collisionSys->TryAdd(collisionTask);
-				assert(entity.collisionTaskId != SIZE_MAX);
+				// Collision job.
+				CollisionJob collisionJob{};
+				collisionJob.bounds = jlb::math::RoundNearest(transform.position);
+				collisionJob.bounds.layers = collisionLayerMain | collisionLayerInteractable;
+				entity.collisionJobId = collisionSys->TryAdd(collisionJob);
+				assert(entity.collisionJobId != SIZE_MAX);
 			}
 		}
 
@@ -76,18 +76,18 @@ namespace game
 
 			const auto& transform = entity.transform;
 			const bool culls = vke::Culls(camera.position, camera.pixelSize, transform.position, glm::vec2(transform.scale));
-			entity.mouseTaskId = SIZE_MAX;
+			entity.mouseJobId = SIZE_MAX;
 			if (!culls)
 			{
 				jlb::FBounds bounds{ transform.position, glm::vec2(transform.scale) };
-				entity.mouseTaskId = mouseSys->TryAdd(vkeInfo, bounds);
+				entity.mouseJobId = mouseSys->TryAdd(vkeInfo, bounds);
 			}
 
 			// Render.
-			task.transform = transform;
-			const bool hovered = hoveredObj == entity.mouseTaskId && hoveredObj != SIZE_MAX;
-			task.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
-			auto result = entityRenderSys->TryAdd(vkeInfo, task);
+			job.transform = transform;
+			const bool hovered = hoveredObj == entity.mouseJobId && hoveredObj != SIZE_MAX;
+			job.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
+			auto result = entityRenderSys->TryAdd(vkeInfo, job);
 
 			// Update menu if available.
 			const bool menuOpen = leftPressedThisTurn && !mouseSys->GetIsUIBlocking() ?

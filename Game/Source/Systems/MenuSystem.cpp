@@ -282,9 +282,9 @@ namespace game
 
 	void MenuSystem::OnPostUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<MenuJob>& tasks)
+		const jlb::NestedVector<MenuJob>& jobs)
 	{
-		JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>::OnPostUpdate(info, systems, tasks);
+		JobSystemWithOutput<MenuJob, MenuJobUpdateInfo>::OnPostUpdate(info, systems, jobs);
 		_scrollDir = 0;
 	}
 

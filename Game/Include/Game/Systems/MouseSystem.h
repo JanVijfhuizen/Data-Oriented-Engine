@@ -4,10 +4,10 @@
 
 namespace game
 {
-	typedef jlb::FBounds MouseInteractTask;
+	typedef jlb::FBounds MouseInteractJob;
 
 	// Handles the mouse visualization and behaviour.
-	class MouseSystem final : public vke::JobSystem<MouseInteractTask>
+	class MouseSystem final : public vke::JobSystem<MouseInteractJob>
 	{
 	public:
 		enum class Key
@@ -32,8 +32,8 @@ namespace game
 		KeyData _keys[2];
 		bool _isUIBlocking = false;
 
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<jlb::TBounds<float>>& tasks) override;
-		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<jlb::TBounds<float>>& tasks) override;
+		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<jlb::TBounds<float>>& jobs) override;
+		void OnPostUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<jlb::TBounds<float>>& jobs) override;
 		void OnMouseInput(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, int key, int action) override;
 	};
 }

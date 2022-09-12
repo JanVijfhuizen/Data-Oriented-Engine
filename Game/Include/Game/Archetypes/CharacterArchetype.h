@@ -107,11 +107,11 @@ namespace game
 				}
 
 				// Collision task.
-				CollisionTask collisionTask{};
+				CollisionJob collisionTask{};
 				collisionTask.bounds = jlb::math::RoundNearest(collisionPos);
 				collisionTask.bounds.layers = collisionLayerMain | collisionLayerInteractable;
-				base->collisionTaskId = collisionSys->TryAdd(collisionTask);
-				assert(base->collisionTaskId != SIZE_MAX);
+				base->collisionJobId = collisionSys->TryAdd(collisionTask);
+				assert(base->collisionJobId != SIZE_MAX);
 			}
 
 		{
@@ -140,27 +140,27 @@ namespace game
 
 				const auto& transform = base->transform;
 				const auto& position = transform.position;
-				base->movementTaskId = movementSys->TryAdd(vkeInfo, movementComponent);
+				base->movementJobId = movementSys->TryAdd(vkeInfo, movementComponent);
 
 				if (base->pickupComponent.active)
 				{
-					base->pickupTaskId = pickupSystem->TryAdd(vkeInfo, base->pickupComponent);
-					assert(base->pickupTaskId != SIZE_MAX);
+					base->pickupJobId = pickupSystem->TryAdd(vkeInfo, base->pickupComponent);
+					assert(base->pickupJobId != SIZE_MAX);
 				}
 
 				{
 					const auto& camera = entityRenderSys->camera;
 					const bool culls = vke::Culls(camera.position, camera.pixelSize, position, glm::vec2(transform.scale));
-					base->mouseTaskId = SIZE_MAX;
+					base->mouseJobId = SIZE_MAX;
 					if (!culls)
 					{
 						jlb::FBounds bounds{ position, glm::vec2(transform.scale) };
-						base->mouseTaskId = mouseSys->TryAdd(vkeInfo, bounds);
+						base->mouseJobId = mouseSys->TryAdd(vkeInfo, bounds);
 
 						vke::EntityRenderJob renderTask{};
 						renderTask.transform = transform;
 						renderTask.transform.scale *= movementComponent.outScaleMultiplier;
-						const bool hovered = hoveredObj == base->mouseTaskId && hoveredObj != SIZE_MAX;
+						const bool hovered = hoveredObj == base->mouseJobId && hoveredObj != SIZE_MAX;
 						renderTask.transform.scale *= 1.f + scalingOnSelected * static_cast<float>(hovered);
 
 						auto& lHandPos = base->lHandPosPile;
@@ -202,7 +202,7 @@ namespace game
 						result = entityRenderSys->TryAdd(vkeInfo, renderTask);
 
 						float headDelta = 0;
-						headDelta += (base->movementComponent.outScaleMultiplier - 1.f) * (base->movementTaskId != SIZE_MAX);
+						headDelta += (base->movementComponent.outScaleMultiplier - 1.f) * (base->movementJobId != SIZE_MAX);
 
 						const auto headOffset = jlb::math::GetDir(transform.rotation + jlb::math::PI * .5f) * headDelta;
 						base->headRotation = jlb::math::SmoothAngle(base->headRotation, transform.rotation, headRotationSpeed);
@@ -234,19 +234,19 @@ namespace game
 		for (auto& entity : entities)
 		{
 			const auto base = reinterpret_cast<Character*>(&entity);
-			if (base->movementTaskId != SIZE_MAX)
+			if (base->movementJobId != SIZE_MAX)
 			{
 				auto& outputs = movementSys->GetOutput();
-				const auto& output = outputs[base->movementTaskId];
+				const auto& output = outputs[base->movementJobId];
 				base->movementComponent = output;
 				auto& transform = base->transform;
 				transform.position = output.outPosition;
 				transform.rotation = output.outRotation;
 			}
-			if (base->pickupTaskId != SIZE_MAX)
+			if (base->pickupJobId != SIZE_MAX)
 			{
 				auto& outputs = pickupSys->GetOutput();
-				const auto& output = outputs[base->pickupTaskId];
+				const auto& output = outputs[base->pickupJobId];
 				base->pickupComponent = output;
 			}
 		}

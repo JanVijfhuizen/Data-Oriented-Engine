@@ -13,9 +13,9 @@ namespace game
 {
 	void CardPreviewSystem::OnPreUpdate(const vke::EngineData& info, 
 		const jlb::Systems<vke::EngineData> systems,
-		const jlb::NestedVector<CardPreviewJob>& tasks)
+		const jlb::NestedVector<CardPreviewJob>& jobs)
 	{
-		JobSystemWithOutput<CardPreviewJob, CardPreviewJobUpdateInfo>::OnPreUpdate(info, systems, tasks);
+		JobSystemWithOutput<CardPreviewJob, CardPreviewJobUpdateInfo>::OnPreUpdate(info, systems, jobs);
 
 		const auto cardSys = systems.Get<CardSystem>();
 		const auto cardRenderSys = systems.Get<CardRenderSystem>();
@@ -26,47 +26,47 @@ namespace game
 
 		auto& outputs = GetOutputEditable();
 
-		for (auto& task : tasks)
+		for (auto& job : jobs)
 		{
 			auto& dumpAllocator = *info.dumpAllocator;
 
 			const auto cardBorder = resourceSys->GetSubTexture(ResourceSystem::CardSubTextures::border);
 			const auto& pixelSize = cardRenderSys->camera.pixelSize;
 
-			const auto worldPos = task.origin - entityRenderSys->camera.position;
+			const auto worldPos = job.origin - entityRenderSys->camera.position;
 			const auto screenPos = vke::UIRenderSystem::WorldToScreenPos(worldPos, cardRenderSys->camera, info.swapChainData->resolution);
 
-			vke::UIRenderJob cardRenderTask{};
-			cardRenderTask.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
-			cardRenderTask.subTexture = cardBorder;
-			cardRenderTask.position = screenPos;
-			auto result = cardRenderSys->TryAdd(info, cardRenderTask);
+			vke::UIRenderJob cardRenderJob{};
+			cardRenderJob.scale = pixelSize * glm::vec2(static_cast<float>(vke::PIXEL_SIZE_ENTITY * 4));
+			cardRenderJob.subTexture = cardBorder;
+			cardRenderJob.position = screenPos;
+			auto result = cardRenderSys->TryAdd(info, cardRenderJob);
 
 			vke::SubTexture cardSubTexture = resourceSys->GetSubTexture(ResourceSystem::CardSubTextures::idle);
 
-			if (task.cardIndex != SIZE_MAX)
+			if (job.cardIndex != SIZE_MAX)
 			{
-				const auto card = cardSys->GetCard(task.cardIndex);
+				const auto card = cardSys->GetCard(job.cardIndex);
 				cardSubTexture = card.art;
 
 				jlb::String str{};
 				str.AllocateFromNumber(dumpAllocator, card.cost);
 
-				TextRenderJob textCostTask{};
-				textCostTask.center = true;
-				textCostTask.origin = screenPos;
-				textCostTask.origin.y += cardRenderTask.scale.y * .5f;
-				textCostTask.text = str;
-				textCostTask.scale = vke::PIXEL_SIZE_ENTITY;
-				textCostTask.padding = static_cast<int32_t>(textCostTask.scale) / -2;
-				result = textRenderSys->TryAdd(info, textCostTask);
+				TextRenderJob textCostJob{};
+				textCostJob.center = true;
+				textCostJob.origin = screenPos;
+				textCostJob.origin.y += cardRenderJob.scale.y * .5f;
+				textCostJob.text = str;
+				textCostJob.scale = vke::PIXEL_SIZE_ENTITY;
+				textCostJob.padding = static_cast<int32_t>(textCostJob.scale) / -2;
+				result = textRenderSys->TryAdd(info, textCostJob);
 
 				TextBoxJob cardTextBox{};
 				cardTextBox.text = card.text;
 				result = textBoxSys->TryAdd(info, cardTextBox);
 			}
 
-			auto& animLerp = task.updateInfo.animLerp;
+			auto& animLerp = job.updateInfo.animLerp;
 			animLerp += info.deltaTime * 0.001f * cardAnimSpeed / CARD_ANIM_LENGTH;
 			animLerp = fmodf(animLerp, 1);
 			vke::Animation cardAnim{};
@@ -74,10 +74,10 @@ namespace game
 			cardAnim.width = CARD_ANIM_LENGTH;
 			auto sub = cardAnim.Evaluate(cardSubTexture, 0);
 
-			cardRenderTask.subTexture = sub;
-			result = cardRenderSys->TryAdd(info, cardRenderTask);
+			cardRenderJob.subTexture = sub;
+			result = cardRenderSys->TryAdd(info, cardRenderJob);
 
-			outputs.Add(dumpAllocator, task.updateInfo);
+			outputs.Add(dumpAllocator, job.updateInfo);
 		}
 	}
 }
