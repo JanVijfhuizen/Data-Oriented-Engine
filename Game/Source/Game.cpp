@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Game.h"
+
+#include "Archetype.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CardPreviewSystem.h"
 #include "Systems/CardRenderSystem.h"
@@ -28,6 +30,15 @@ namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
+		jlb::StackAllocator alloc{};
+		alloc.Allocate({});
+		jlb::Archetype archetype{};
+		archetype.Allocate<int, float, bool>(alloc, 12);
+
+		int* i;
+		bool* b;
+		archetype.GetView(i, b);
+
 		// Core engine pre update.
 		initializer.DefineSystem<ResourceSystem>();
 
