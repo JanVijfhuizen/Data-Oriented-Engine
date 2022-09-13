@@ -1,5 +1,6 @@
 #pragma once
 #include "ArrayView.h"
+#include <cstring>
 
 namespace jlb
 {

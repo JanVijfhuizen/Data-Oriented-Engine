@@ -1,6 +1,7 @@
 #pragma once
 #include <vcruntime_typeinfo.h>
 #include "Allocation.h"
+#include "Heap.h"
 #include "Map.h"
 
 namespace jlb

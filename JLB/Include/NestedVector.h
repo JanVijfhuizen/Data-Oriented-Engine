@@ -40,7 +40,7 @@ namespace jlb
 
 		[[nodiscard]] T& operator [](size_t index) const;
 		
-		void Allocate(StackAllocator& allocator, size_t size, size_t nestableCapacity, const T& fillValue = {});
+		void Allocate(StackAllocator& allocator, size_t capacity, size_t nestableCapacity, const T& fillValue = {});
 		void Free(StackAllocator& allocator);
 
 		// Detach nested without deallocating them.
@@ -130,12 +130,12 @@ namespace jlb
 
 	template <typename T>
 	void NestedVector<T>::Allocate(StackAllocator& allocator, 
-		const size_t size, const size_t nestableCapacity,
+		const size_t capacity, const size_t nestableCapacity,
 		const T& fillValue)
 	{
 		assert(!_root);
 		_root = allocator.New<Node>();
-		_root.ptr->Allocate(allocator, size, fillValue);
+		_root.ptr->Allocate(allocator, capacity, fillValue);
 		_nestableCapacity = nestableCapacity;
 	}
 

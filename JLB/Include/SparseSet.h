@@ -9,8 +9,8 @@ namespace jlb
 	public:
 		struct Node final
 		{
-			T instance;
-			size_t sparseIndex;
+			T instance{};
+			size_t sparseIndex = SIZE_MAX;
 		};
 
 		[[nodiscard]] Node& operator[](size_t index) const;
@@ -22,7 +22,7 @@ namespace jlb
 		void RemoveAt(size_t index);
 		void Clear();
 
-		[[nodiscard]] bool Contains(size_t index);
+		[[nodiscard]] bool Contains(size_t index) const;
 		[[nodiscard]] size_t GetCount() const;
 		[[nodiscard]] size_t GetLength() const;
 		[[nodiscard]] ArrayView<Node> GetView() const;
@@ -81,7 +81,7 @@ namespace jlb
 	}
 
 	template <typename T>
-	bool SparseSet<T>::Contains(const size_t index)
+	bool SparseSet<T>::Contains(const size_t index) const
 	{
 		return _sparse[index] != SIZE_MAX;
 	}
