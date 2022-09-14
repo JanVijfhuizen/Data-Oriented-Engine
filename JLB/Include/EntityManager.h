@@ -17,7 +17,7 @@ namespace jlb
 
 	struct Entity final
 	{
-		EntityId id{};
+		size_t id = SIZE_MAX;
 		Archetype* archetype = nullptr;
 		size_t archetypeIndex = SIZE_MAX;
 	};
@@ -60,11 +60,13 @@ namespace jlb
 		Entity entity{};
 		entity.archetype = &archetype;
 		// TODO add archetype index.
-		auto& id = entity.id;
-		id.id = _entityGlobalId++;
-		id.index = index;
+		entity.id = _entityGlobalId++;
 
 		_entities.Insert(index, entity);
+
+		EntityId id{};
+		id.id = _entityGlobalId - 1;
+		id.index = index;
 		return id;
 	}
 
@@ -79,6 +81,6 @@ namespace jlb
 
 	inline bool EntityManager::Validate(const EntityId& id) const
 	{
-		return id && _entities[id.index].instance.id == id;
+		return id && _entities[id.index].instance.id == id.id;
 	}
 }

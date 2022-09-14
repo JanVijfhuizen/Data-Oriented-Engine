@@ -15,12 +15,15 @@ namespace jlb
 		template <typename ...Components>
 		void GetView(Components*&... outViews);
 
+		void Copy(StackAllocator& levelAllocator, const Archetype& archetype);
+
 		[[nodiscard]] size_t GetCapacity() const;
 
 	private:
 		struct Column final
 		{
 			void* data = nullptr;
+			size_t size = 0;
 		};
 
 		Map<Column> _columns{};
@@ -36,6 +39,21 @@ namespace jlb
 		template <typename T>
 		void GetViewColumn(T*& outView);
 	};
+
+	inline void Archetype::Copy(StackAllocator& levelAllocator, const Archetype& archetype)
+	{
+		_capacity = archetype._capacity;
+		_columns.Allocate(levelAllocator, archetype._columns.GetCount());
+
+		const auto& arr = archetype._columns.GetData();
+		for (auto& keyPair : arr)
+		{
+			Column column{};
+			column.size = keyPair.value.size;
+			column.data = levelAllocator.Malloc(column.size).ptr;
+			_columns.Insert(column, keyPair.key);
+		}
+	}
 
 	inline size_t Archetype::GetCapacity() const
 	{
@@ -67,7 +85,8 @@ namespace jlb
 	void Archetype::AllocateColumn(StackAllocator& levelAllocator, const size_t capacity)
 	{
 		Column column{};
-		column.data = levelAllocator.Malloc(sizeof(T) * capacity).ptr;
+		column.size = sizeof(T) * capacity;
+		column.data = levelAllocator.Malloc(column.size).ptr;
 		_columns.Insert(column, typeid(T).hash_code());
 	}
 

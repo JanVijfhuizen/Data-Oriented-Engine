@@ -21,6 +21,8 @@ namespace jlb
 		void Erase(T& value);
 		[[nodiscard]] size_t GetCount() const;
 
+		const Array<KeyPair<T>>& GetData() const;
+
 	protected:
 		[[nodiscard]] size_t GetHash(size_t key) const;
 		void _Insert(T& value, size_t key);
@@ -111,6 +113,12 @@ namespace jlb
 	size_t Map<T>::GetCount() const
 	{
 		return _count;
+	}
+
+	template <typename T>
+	const Array<KeyPair<T>>& Map<T>::GetData() const
+	{
+		return _array;
 	}
 
 	template <typename T>
