@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include <iostream>
+
 #include "Archetype.h"
 #include "Systems/CameraSystem.h"
 #include "Systems/CardPreviewSystem.h"
@@ -30,14 +32,37 @@ namespace game
 {
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
+		// Testing stuff.
 		jlb::StackAllocator alloc{};
 		alloc.Allocate({});
-		jlb::Archetype archetype{};
-		archetype.Allocate<int, float, bool>(alloc, 12);
 
-		jlb::NestedVector<int> i;
-		jlb::NestedVector<bool> b;
-		archetype.GetView(i, b);
+		// Set up entity archetype with initial size (resizes automatically when needed).
+		jlb::Archetype<int, float, bool> archetype{};
+		archetype.Allocate(alloc, 12);
+
+		// Get a view on the components you want to use.
+		const jlb::NestedVector<int>* intComponents = nullptr;
+		const jlb::NestedVector<bool>* boolComponents = nullptr;
+		archetype.GetView(intComponents, boolComponents);
+
+		// Add a new defaulted entity.
+		archetype.Add(alloc);
+		archetype.Add(alloc);
+
+		// Create a prototype from which to create specific entities.
+		jlb::Tuple<int, float, bool> prototype{};
+		jlb::Get<0>(prototype) = 5;
+		jlb::Get<2>(prototype) = true;
+
+		// Create entity based on prototype.
+		archetype.Add(alloc, prototype);
+		archetype.RemoveAt(0);
+
+		// Iterate over entities.
+		for (int i = static_cast<int>(archetype.GetCount()) - 1; i >= 0; --i)
+		{
+			std::cout << intComponents->operator[](i) << " - " << boolComponents->operator[](i) << std::endl;
+		}
 
 		// Core engine pre update.
 		initializer.DefineSystem<ResourceSystem>();

@@ -11,8 +11,14 @@ namespace jlb
 	template <size_t I, typename ...Args>
 	struct TupleImpl;
 
+	template <size_t I>
+	struct TupleImpl<I>
+	{
+		
+	};
+
 	template <size_t I, typename Head, typename ...Tail>
-	struct TupleImpl<I, Head, Tail...> : TupleLeaf<0, Head>, TupleImpl<I + 1, Tail...>
+	struct TupleImpl<I, Head, Tail...> : TupleLeaf<I, Head>, TupleImpl<I + 1, Tail...>
 	{
 		
 	};
@@ -21,7 +27,7 @@ namespace jlb
 	using Tuple = TupleImpl<0, Args...>;
 
 	template <size_t I, typename Head, typename ...Tail>
-	[[nodiscard]] auto& Get(const TupleImpl<I, Head, Tail...>& tuple)
+	[[nodiscard]] auto& Get(TupleImpl<I, Head, Tail...>& tuple)
 	{
 		return tuple.template TupleLeaf<I, Head>::value;
 	}

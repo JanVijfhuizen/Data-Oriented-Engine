@@ -117,11 +117,10 @@ namespace jlb
 		while (node)
 		{
 			const size_t length = node->GetLength();
-
 			if (index < length)
 				return node->operator[](index);
+
 			index -= length;
-			
 			node = node->_next;
 		}
 
