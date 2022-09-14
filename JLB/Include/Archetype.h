@@ -3,6 +3,7 @@
 #include "EntityManager.h"
 #include "Heap.h"
 #include "Map.h"
+#include "NestedVector.h"
 
 namespace jlb
 {
@@ -13,17 +14,14 @@ namespace jlb
 		void Allocate(StackAllocator& levelAllocator, size_t capacity);
 
 		template <typename ...Components>
-		void GetView(Components*&... outViews);
-
-		void Copy(StackAllocator& levelAllocator, const Archetype& archetype);
-
+		void GetView(NestedVector<Components>&... outViews);
+		
 		[[nodiscard]] size_t GetCapacity() const;
 
 	private:
 		struct Column final
 		{
-			void* data = nullptr;
-			size_t size = 0;
+			void* ptr = nullptr;
 		};
 
 		Map<Column> _columns{};
@@ -35,25 +33,10 @@ namespace jlb
 		void AllocateColumn(StackAllocator& levelAllocator, size_t capacity);
 
 		template <typename Head, typename Second, typename ...Tail>
-		void GetViewColumn(Head*& outHead, Second*& outSecond, Tail*&... outTail);
+		void GetViewColumn(NestedVector<Head>& outHead, NestedVector<Second>& outSecond, NestedVector<Tail>&... outTail);
 		template <typename T>
-		void GetViewColumn(T*& outView);
+		void GetViewColumn(NestedVector<T>& outView);
 	};
-
-	inline void Archetype::Copy(StackAllocator& levelAllocator, const Archetype& archetype)
-	{
-		_capacity = archetype._capacity;
-		_columns.Allocate(levelAllocator, archetype._columns.GetCount());
-
-		const auto& arr = archetype._columns.GetData();
-		for (auto& keyPair : arr)
-		{
-			Column column{};
-			column.size = keyPair.value.size;
-			column.data = levelAllocator.Malloc(column.size).ptr;
-			_columns.Insert(column, keyPair.key);
-		}
-	}
 
 	inline size_t Archetype::GetCapacity() const
 	{
@@ -69,7 +52,7 @@ namespace jlb
 	}
 
 	template <typename ... Components>
-	void Archetype::GetView(Components*&... outViews)
+	void Archetype::GetView(NestedVector<Components>&... outViews)
 	{
 		GetViewColumn(outViews...);
 	}
@@ -85,23 +68,24 @@ namespace jlb
 	void Archetype::AllocateColumn(StackAllocator& levelAllocator, const size_t capacity)
 	{
 		Column column{};
-		column.size = sizeof(T) * capacity;
-		column.data = levelAllocator.Malloc(column.size).ptr;
+		auto ptr = levelAllocator.New<NestedVector<T>>().ptr;
+		column.ptr = ptr;
+		ptr->Allocate(levelAllocator, capacity, capacity);
 		_columns.Insert(column, typeid(T).hash_code());
 	}
 
 	template <typename Head, typename Second, typename ...Tail>
-	void Archetype::GetViewColumn(Head*& outHead, Second*& outSecond, Tail*&... outTail)
+	void Archetype::GetViewColumn(NestedVector<Head>& outHead, NestedVector<Second>& outSecond, NestedVector<Tail>&... outTail)
 	{
 		GetViewColumn(outHead);
 		GetViewColumn(outSecond, outTail...);
 	}
 
 	template <typename T>
-	void Archetype::GetViewColumn(T*& outView)
+	void Archetype::GetViewColumn(NestedVector<T>& outView)
 	{
 		Column* column = _columns.Contains(typeid(T).hash_code());
 		assert(column);
-		outView = static_cast<T*>(column->data);
+		outView = *static_cast<NestedVector<T>*>(column->ptr);
 	}
 }
