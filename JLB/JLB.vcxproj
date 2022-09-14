@@ -164,6 +164,7 @@
     <ClInclude Include="Include\EntityManager.h" />
     <ClInclude Include="Include\Map.h" />
     <ClInclude Include="Include\NestedVector.h" />
+    <ClInclude Include="Include\Node.h" />
     <ClInclude Include="Include\Pile.h" />
     <ClInclude Include="Include\SparseSet.h" />
     <ClInclude Include="Include\StackQueue.h" />

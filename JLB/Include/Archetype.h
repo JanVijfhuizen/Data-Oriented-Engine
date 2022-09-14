@@ -1,11 +1,22 @@
 #pragma once
 #include <vcruntime_typeinfo.h>
-#include "Allocation.h"
+#include "EntityManager.h"
 #include "Heap.h"
 #include "Map.h"
+#include "Node.h"
 
 namespace jlb
 {
+	template <typename T>
+	struct View final
+	{
+		friend Archetype;
+
+	private:
+		Node* node = nullptr;
+		size_t capacity = 0;
+	};
+
 	class Archetype final
 	{
 	public:
@@ -13,15 +24,17 @@ namespace jlb
 		void Allocate(StackAllocator& levelAllocator, size_t capacity);
 
 		template <typename ...Components>
-		void GetView(Components*&... outArrays);
+		void GetView(View<Components>&... outViews);
 
 	private:
 		struct Column final
 		{
-			Allocation<void> alloc{};
+			Node* root = nullptr;
+			size_t nodeSize = 0;
 		};
 
 		Map<Column> _columns{};
+		size_t _capacity = 0;
 
 		template <typename Head, typename Second, typename ...Tail>
 		void AllocateColumn(StackAllocator& levelAllocator, size_t capacity);
@@ -29,9 +42,9 @@ namespace jlb
 		void AllocateColumn(StackAllocator& levelAllocator, size_t capacity);
 
 		template <typename Head, typename Second, typename ...Tail>
-		void GetViewColumn(Head*& outHead, Second*& outSecond, Tail*&... outTail);
+		void GetViewColumn(View<Head>& outHead, View<Second>& outSecond, View<Tail>&... outTail);
 		template <typename T>
-		void GetViewColumn(T*& outArray);
+		void GetViewColumn(View<T>& outView);
 	};
 
 	template <typename ...Components>
@@ -39,12 +52,13 @@ namespace jlb
 	{
 		_columns.Allocate(levelAllocator, sizeof...(Components));
 		AllocateColumn<Components...>(levelAllocator, capacity);
+		_capacity = capacity;
 	}
 
 	template <typename ... Components>
-	void Archetype::GetView(Components*&... outArrays)
+	void Archetype::GetView(View<Components>&... outViews)
 	{
-		GetViewColumn(outArrays...);
+		GetViewColumn(outViews...);
 	}
 
 	template <typename Head, typename Second, typename ... Tail>
@@ -58,25 +72,23 @@ namespace jlb
 	void Archetype::AllocateColumn(StackAllocator& levelAllocator, const size_t capacity)
 	{
 		Column column{};
-		column.alloc = levelAllocator.Malloc(sizeof(T) * capacity);
-		T* ptr = static_cast<T*>(column.alloc.ptr);
-		for (size_t i = 0; i < capacity; ++i)
-			ptr[i] = {};
+		column.nodeSize = sizeof(T) * capacity;
 		_columns.Insert(column, typeid(T).hash_code());
 	}
 
 	template <typename Head, typename Second, typename ...Tail>
-	void Archetype::GetViewColumn(Head*& outHead, Second*& outSecond, Tail*&... outTail)
+	void Archetype::GetViewColumn(View<Head>& outHead, View<Second>& outSecond, View<Tail>&... outTail)
 	{
 		GetViewColumn(outHead);
 		GetViewColumn(outSecond, outTail...);
 	}
 
 	template <typename T>
-	void Archetype::GetViewColumn(T*& outArray)
+	void Archetype::GetViewColumn(View<T>& outView)
 	{
 		Column* column = _columns.Contains(typeid(T).hash_code());
 		assert(column);
-		outArray = static_cast<T*>(column->alloc.ptr);
+		outView.node = column->root;
+		outView.capacity = _capacity;
 	}
 }
