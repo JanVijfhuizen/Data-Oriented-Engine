@@ -35,8 +35,8 @@ namespace game
 		jlb::Archetype archetype{};
 		archetype.Allocate<int, float, bool>(alloc, 12);
 
-		jlb::View<int> i;
-		jlb::View<bool> b;
+		int* i;
+		bool* b;
 		archetype.GetView(i, b);
 
 		// Core engine pre update.
