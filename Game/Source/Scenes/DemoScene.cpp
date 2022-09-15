@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Scenes/DemoScene.h"
 #include "Archetypes/DummyArchetype.h"
+#include "Archetypes/PickupArchetype.h"
 #include "Archetypes/PlayerArchetype.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/ResourceSystem.h"
@@ -89,7 +90,7 @@ namespace game::demo
 		tileTask.subTexture = vke::texture::GetSubTexture(tileSubTexture, 7, 0);
 		auto result = tileSys->TryAdd(info, tileTask);
 
-		srand(0);
+		srand(0);  // NOLINT(cert-msc51-cpp)
 		for (int i = -20; i < 20; ++i)
 			for (int j = -20; j < 20; ++j)
 			{
@@ -101,7 +102,7 @@ namespace game::demo
 				tileTask.subTexture = vke::texture::GetSubTexture(tileSubTexture, 7, idx);
 				result = tileSys->TryAdd(info, tileTask);
 			}
-		srand(info.time);
+		srand(static_cast<int>(info.time));
 
 		const auto entityRenderSys = systems.Get<vke::EntityRenderSystem>();
 		auto& lightDir = entityRenderSys->camera.lightDir;
@@ -129,10 +130,10 @@ namespace game::demo
 		}
 	}
 
-	void DemoScene::DefineSystems(jlb::SystemsInitializer<EntityArchetypeInfo> initializer)
+	void DemoScene::DefineArchetypes(ArchetypeInitializer& initializer)
 	{
-		initializer.DefineSystem<PlayerArchetype>();
-		initializer.DefineSystem<PickupArchetype>();
-		initializer.DefineSystem<DummyArchetype>();
+		initializer.Add<PlayerArchetype>(1);
+		initializer.Add<PickupArchetype>(1);
+		initializer.Add<DummyArchetype>(64);
 	}
 }

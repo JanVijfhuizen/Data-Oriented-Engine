@@ -21,11 +21,38 @@ namespace jlb
 		NestedVector<T>* _nestedVector = nullptr;
 	};
 
-	template <typename ...Args>
-	class Archetype final
+	class IArchetype
 	{
 	public:
-		void Allocate(StackAllocator& levelAllocator, size_t capacity);
+		virtual void Allocate(StackAllocator& levelAllocator, size_t capacity) = 0;
+		virtual void PreUpdate();
+		virtual void PostUpdate();
+
+		virtual void OnKeyInput(int key, int action);
+		virtual void OnMouseInput(int key, int action);
+	};
+
+	inline void IArchetype::PreUpdate()
+	{
+	}
+
+	inline void IArchetype::PostUpdate()
+	{
+	}
+
+	inline void IArchetype::OnKeyInput(const int key, const int action)
+	{
+	}
+
+	inline void IArchetype::OnMouseInput(const int key, const int action)
+	{
+	}
+
+	template <typename ...Args>
+	class Archetype : public IArchetype
+	{
+	public:
+		void Allocate(StackAllocator& levelAllocator, size_t capacity) override;
 
 		template <typename ...Components>
 		void GetViews(ArchetypeView<Components>&... outViews);
