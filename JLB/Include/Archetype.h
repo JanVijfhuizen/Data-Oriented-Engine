@@ -7,6 +7,20 @@
 
 namespace jlb
 {
+	template <typename T>
+	struct ArchetypeView final 
+	{
+		template <typename ...Args>
+		friend class Archetype;
+		
+		[[nodiscard]] T& operator[](size_t index) const;
+		[[nodiscard]] typename NestedVector<T>::Iterator begin() const;
+		[[nodiscard]] typename NestedVector<T>::Iterator end() const;
+
+	private:
+		NestedVector<T>* _nestedVector = nullptr;
+	};
+
 	template <typename ...Args>
 	class Archetype final
 	{
@@ -14,7 +28,7 @@ namespace jlb
 		void Allocate(StackAllocator& levelAllocator, size_t capacity);
 
 		template <typename ...Components>
-		void GetView(const NestedVector<Components>*&... outViews);
+		void GetViews(ArchetypeView<Components>&... outViews);
 
 		size_t Add(StackAllocator& levelAllocator, Tuple<Args...> components = {});
 		void RemoveAt(size_t index);
@@ -32,9 +46,9 @@ namespace jlb
 		void AllocateColumn(StackAllocator& levelAllocator, size_t nestedCapacity);
 
 		template <typename Head, typename Second, typename ...Tail>
-		void GetViewColumn(const NestedVector<Head>*& outHead, const NestedVector<Second>*& outSecond, const NestedVector<Tail>*&... outTail);
+		void GetViewColumn(ArchetypeView<Head>& outHead, ArchetypeView<Second>& outSecond, ArchetypeView<Tail>&... outTail);
 		template <typename T>
-		void GetViewColumn(const NestedVector<T>*& outView);
+		void GetViewColumn(ArchetypeView<T>& outView);
 
 		template <size_t I, typename Head, typename ...Tail>
 		size_t AddInstance(StackAllocator& levelAllocator, Tuple<Args...>& components);
@@ -44,6 +58,24 @@ namespace jlb
 		template <typename T>
 		void RemoveInstance(size_t index);
 	};
+
+	template <typename T>
+	T& ArchetypeView<T>::operator[](const size_t index) const
+	{
+		return _nestedVector->operator[](index);
+	}
+
+	template <typename T>
+	typename NestedVector<T>::Iterator ArchetypeView<T>::begin() const
+	{
+		return _nestedVector->begin();
+	}
+
+	template <typename T>
+	typename NestedVector<T>::Iterator ArchetypeView<T>::end() const
+	{
+		return _nestedVector->end();
+	}
 
 	template <typename ... Args>
 	void Archetype<Args...>::Allocate(StackAllocator& levelAllocator, size_t capacity)
@@ -55,7 +87,7 @@ namespace jlb
 
 	template <typename ... Args>
 	template <typename ... Components>
-	void Archetype<Args...>::GetView(const NestedVector<Components>*&... outViews)
+	void Archetype<Args...>::GetViews(ArchetypeView<Components>&... outViews)
 	{
 		GetViewColumn(outViews...);
 	}
@@ -99,8 +131,8 @@ namespace jlb
 
 	template <typename ... Args>
 	template <typename Head, typename Second, typename ... Tail>
-	void Archetype<Args...>::GetViewColumn(const NestedVector<Head>*& outHead, const NestedVector<Second>*& outSecond,
-		const NestedVector<Tail>*&... outTail)
+	void Archetype<Args...>::GetViewColumn(ArchetypeView<Head>& outHead, ArchetypeView<Second>& outSecond,
+		ArchetypeView<Tail>&... outTail)
 	{
 		GetViewColumn(outHead);
 		GetViewColumn(outSecond, outTail...);
@@ -108,11 +140,12 @@ namespace jlb
 
 	template <typename ... Args>
 	template <typename T>
-	void Archetype<Args...>::GetViewColumn(const NestedVector<T>*& outView)
+	void Archetype<Args...>::GetViewColumn(ArchetypeView<T>& outView)
 	{
 		void** column = _columns.Contains(typeid(T).hash_code());
 		assert(column);
-		outView = static_cast<NestedVector<T>*>(*column);
+
+		outView._nestedVector = static_cast<NestedVector<T>*>(*column);
 	}
 
 	template <typename ... Args>
