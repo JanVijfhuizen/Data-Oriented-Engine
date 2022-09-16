@@ -24,14 +24,14 @@ namespace game
 	{
 		Scene::PostUpdate(info, systems);
 		for (const auto& archetype : _archetypes)
-			archetype->PostUpdate();
+			archetype->OnPostUpdate();
 	}
 
 	void GameScene::PreUpdate(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
 		Scene::PreUpdate(info, systems);
 		for (const auto& archetype : _archetypes)
-			archetype->PreUpdate();
+			archetype->OnPreUpdate();
 	}
 
 	jlb::StackAllocator& GameScene::GetAllocator()

@@ -4,43 +4,17 @@
 
 namespace game
 {
-	Entity* EntitySystem::operator[](const size_t index) const
+	void EntitySystem::EndFrame(const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems)
 	{
-		return _entities[index].instance;
+		JobSystem<Entity*>::EndFrame(info, systems);
+
+		const auto turnSys = systems.Get<TurnSystem>();
+		if (turnSys->GetIfEndTickEvent())
+			ClearJobs();
 	}
 
-	bool EntitySystem::Contains(const EntityId& id)
+	bool EntitySystem::AutoClearOnFrameEnd()
 	{
-		return id ? _entities.Contains(id.index) && _entities[id.index].sparseIndex == id.id : false;
-	}
-
-	void EntitySystem::CreateEntity(Entity& entity)
-	{
-		auto& id = entity.id;
-		id.index = _open.GetCount() > 0 ? _open.Pop() : _entities.GetCount();
-		id.id = _globalId++;
-		_entities.Insert(id.index, &entity);
-	}
-
-	void EntitySystem::DestroyEntity(Entity& entity)
-	{
-		auto& id = entity.id;
-		_open.Insert(id.index, id.index);
-		_entities.RemoveAt(id.index);
-		entity = {};
-	}
-
-	void EntitySystem::Allocate(const vke::EngineData& info)
-	{
-		System<vke::EngineData>::Allocate(info);
-		_entities.Allocate(*info.allocator, ENTITY_CAPACITY);
-		_open.Allocate(*info.allocator, ENTITY_CAPACITY);
-	}
-
-	void EntitySystem::Free(const vke::EngineData& info)
-	{
-		_open.Free(*info.allocator);
-		_entities.Free(*info.allocator);
-		System<vke::EngineData>::Free(info);
+		return false;
 	}
 }
