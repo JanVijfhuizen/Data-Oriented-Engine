@@ -160,67 +160,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\Game\Archetypes\EntityArchetype.h" />
-    <ClInclude Include="Include\Game\Archetypes\CharacterArchetype.h" />
-    <ClInclude Include="Include\Game\Archetypes\DummyArchetype.h" />
-    <ClInclude Include="Include\Game\Archetypes\PickupArchetype.h" />
-    <ClInclude Include="Include\Game\Archetypes\PlayerArchetype.h" />
-    <ClInclude Include="Include\Game\Components\Inventory.h" />
-    <ClInclude Include="Include\Game\Components\MovementComponent.h" />
-    <ClInclude Include="Include\Game\Components\PickupComponent.h" />
-    <ClInclude Include="Include\Game\Entities\Character.h" />
-    <ClInclude Include="Include\Game\Entities\DummyEntity.h" />
     <ClInclude Include="Include\Game\Entities\Entity.h" />
-    <ClInclude Include="Include\Game\Entities\Pickup.h" />
-    <ClInclude Include="Include\Game\Entities\Player.h" />
-    <ClInclude Include="Include\Game\Scenes\DemoScene.h" />
-    <ClInclude Include="Include\Game\Scenes\GameScene.h" />
-    <ClInclude Include="Include\Game\Systems\CameraSystem.h" />
-    <ClInclude Include="Include\Game\Systems\CardPreviewSystem.h" />
-    <ClInclude Include="Include\Game\Systems\CardRenderSystem.h" />
-    <ClInclude Include="Include\Game\Systems\CardSystem.h" />
-    <ClInclude Include="Include\Game\Systems\CollisionSystem.h" />
-    <ClInclude Include="Include\Game\Systems\EntitySystem.h" />
-    <ClInclude Include="Include\Game\Systems\GameManager.h" />
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />
-    <ClInclude Include="Include\Game\Systems\MenuSystem.h" />
-    <ClInclude Include="Include\Game\Systems\MouseSystem.h" />
-    <ClInclude Include="Include\Game\Systems\MovementSystem.h" />
-    <ClInclude Include="Include\Game\Systems\PickupSystem.h" />
-    <ClInclude Include="Include\Game\Systems\PlayerSystem.h" />
-    <ClInclude Include="Include\Game\Systems\ResourceSystem.h" />
-    <ClInclude Include="Include\Game\Systems\ParallelJobSystemWithOutput.h" />
-    <ClInclude Include="Include\Game\Systems\TextBoxSystem.h" />
-    <ClInclude Include="Include\Game\Systems\TurnSystem.h" />
-    <ClInclude Include="Include\Game\Systems\TextRenderHandler.h" />
-    <ClInclude Include="Include\Game\Systems\TurnThreadPoolSystem.h" />
-    <ClInclude Include="Include\Game\Systems\UIInteractionSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Systems\CardPreviewSystem.cpp" />
-    <ClCompile Include="Source\Systems\TextBoxSystem.cpp" />
-    <ClCompile Include="Source\Scenes\GameScene.cpp" />
-    <ClCompile Include="Source\Entities\Entity.cpp" />
-    <ClCompile Include="Source\Systems\PickupSystem.cpp" />
-    <ClCompile Include="Source\Systems\PlayerSystem.cpp" />
-    <ClCompile Include="Source\Archetypes\PickupArchetype.cpp" />
-    <ClCompile Include="Source\Systems\CardRenderSystem.cpp" />
-    <ClCompile Include="Source\Systems\CardSystem.cpp" />
-    <ClCompile Include="Source\Systems\EntitySystem.cpp" />
-    <ClCompile Include="Source\Archetypes\DummyArchetype.cpp" />
-    <ClCompile Include="Source\Systems\MenuSystem.cpp" />
-    <ClCompile Include="Source\Systems\UIInteractionSystem.cpp" />
-    <ClCompile Include="Source\Systems\TurnThreadPoolSystem.cpp" />
-    <ClCompile Include="Source\Systems\CameraSystem.cpp" />
-    <ClCompile Include="Source\Systems\CollisionSystem.cpp" />
-    <ClCompile Include="Source\Systems\MovementSystem.cpp" />
-    <ClCompile Include="Source\Archetypes\PlayerArchetype.cpp" />
-    <ClCompile Include="Source\Systems\ResourceSystem.cpp" />
-    <ClCompile Include="Source\Systems\MouseSystem.cpp" />
-    <ClCompile Include="Source\Scenes\DemoScene.cpp" />
-    <ClCompile Include="Source\Systems\TurnSystem.cpp" />
-    <ClCompile Include="Source\Systems\GameManager.cpp" />
     <ClCompile Include="Source\dllmain.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\pch.cpp">
@@ -229,7 +174,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Systems\TextRenderHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JLB\JLB.vcxproj">

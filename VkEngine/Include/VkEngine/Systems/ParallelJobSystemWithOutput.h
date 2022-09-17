@@ -1,19 +1,19 @@
 ﻿#pragma once
-#include "VkEngine/Systems/JobSystemWithOutput.h"
-#include "VkEngine/Systems/ThreadPoolSystem.h"
+#include "JobSystemWithOutput.h"
+#include "ThreadPoolSystem.h"
 
-namespace game
+namespace jlb
 {
 	template <typename Self, typename Job, typename Output>
 	class ParallelJobSystemWithOutput : public vke::JobSystemWithOutput<Job, Output>
 	{
 	protected:
-		typedef void (*threadableFunc)(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems, 
-			const jlb::NestedVector<Job>& jobs, jlb::NestedVector<Output>& output, jlb::StackAllocator& dumpAllocator, Self* selfPtr);
+		typedef void (*threadableFunc)(const vke::EngineData& info, Systems<vke::EngineData> systems, 
+			const NestedVector<Job>& jobs, NestedVector<Output>& output, StackAllocator& dumpAllocator, Self* selfPtr);
 
-		void Awake(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems) override;
-		void OnPreUpdate(const vke::EngineData& info, jlb::Systems<vke::EngineData> systems,
-			const jlb::NestedVector<Job>& jobs) override;
+		void Awake(const vke::EngineData& info, Systems<vke::EngineData> systems) override;
+		void OnPreUpdate(const vke::EngineData& info, Systems<vke::EngineData> systems,
+			const NestedVector<Job>& jobs) override;
 
 		[[nodiscard]] virtual threadableFunc DefineThreadable() = 0;
 
@@ -23,7 +23,7 @@ namespace game
 
 	template <typename Self, typename Input, typename Output>
 	void ParallelJobSystemWithOutput<Self, Input, Output>::Awake(const vke::EngineData& info,
-		const jlb::Systems<vke::EngineData> systems)
+		const Systems<vke::EngineData> systems)
 	{
 		vke::JobSystemWithOutput<Input, Output>::Awake(info, systems);
 		_func = DefineThreadable();
@@ -31,12 +31,12 @@ namespace game
 
 	template <typename Self, typename Input, typename Output>
 	void ParallelJobSystemWithOutput<Self, Input, Output>::OnPreUpdate(const vke::EngineData& info,
-		const jlb::Systems<vke::EngineData> systems, const jlb::NestedVector<Input>& jobs)
+		const Systems<vke::EngineData> systems, const NestedVector<Input>& jobs)
 	{
 		vke::JobSystemWithOutput<Input, Output>::OnPreUpdate(info, systems, jobs);
 
 		vke::ThreadPoolJob threadjob{};
-		threadjob.func = [](const vke::EngineData& info, const jlb::Systems<vke::EngineData> systems, void* userPtr)
+		threadjob.func = [](const vke::EngineData& info, const Systems<vke::EngineData> systems, void* userPtr)
 		{
 			const auto self = static_cast<ParallelJobSystemWithOutput<Self, Input, Output>*>(userPtr);
 			

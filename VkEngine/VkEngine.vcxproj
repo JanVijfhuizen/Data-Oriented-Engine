@@ -186,6 +186,7 @@
     <ClInclude Include="Include\VkEngine\Systems\JobSystemWithOutput.h" />
     <ClInclude Include="Include\VkEngine\Systems\TileRenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h" />
+    <ClInclude Include="Include\VkEngine\Systems\ParallelJobSystemWithOutput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\VkEngine\Systems\PostEffectHandler.cpp" />
