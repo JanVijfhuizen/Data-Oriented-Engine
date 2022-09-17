@@ -159,8 +159,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Game\Archetypes\EntityArchetype.h" />
-    <ClInclude Include="Include\Game\Entities\Entity.h" />
     <ClInclude Include="Include\Game\framework.h" />
     <ClInclude Include="Include\Game\Game.h" />
     <ClInclude Include="Include\Game\pch.h" />

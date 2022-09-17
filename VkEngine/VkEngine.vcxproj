@@ -155,9 +155,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\VkEngine\Entity.h" />
+    <ClInclude Include="Include\VkEngine\Archetypes\EntityArchetype.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Animation.h" />
     <ClInclude Include="Include\VkEngine\Graphics\CameraUtils.h" />
-    <ClInclude Include="Include\VkEngine\Graphics\PostEffectHandler.h" />
     <ClInclude Include="Include\VkEngine\Systems\ThreadPoolSystem.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
     <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h" />
@@ -189,7 +190,6 @@
     <ClInclude Include="Include\VkEngine\Systems\ParallelJobSystemWithOutput.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Include\VkEngine\Systems\PostEffectHandler.cpp" />
     <ClCompile Include="Source\Graphics\Animation.cpp" />
     <ClCompile Include="Source\Graphics\CameraUtils.cpp" />
     <ClCompile Include="Source\Systems\TileRenderSystem.cpp" />

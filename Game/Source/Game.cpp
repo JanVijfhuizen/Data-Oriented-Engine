@@ -11,9 +11,9 @@ namespace game
 	void DefineSystems(const jlb::SystemsInitializer<vke::EngineData>& initializer)
 	{
 		initializer.DefineSystem<vke::ThreadPoolSystem>();
-		initializer.DefineSystem<vke::SceneSystem>();
 		initializer.DefineSystem<vke::TileRenderSystem>();
 		initializer.DefineSystem<vke::EntityRenderSystem>();
 		initializer.DefineSystem<vke::UIRenderSystem>();
+		initializer.DefineSystem<vke::SceneSystem>();
 	}
 }
