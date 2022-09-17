@@ -177,7 +177,6 @@
     <ClInclude Include="Include\VkEngine\Graphics\Texture.h" />
     <ClInclude Include="Include\VkEngine\Graphics\TextureUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Vertex.h" />
-    <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\GameSystem.h" />
     <ClInclude Include="Include\VkEngine\pch.h" />
     <ClInclude Include="Include\VkEngine\Systems\RenderSystem.h" />
@@ -194,7 +193,6 @@
     <ClCompile Include="Source\Graphics\BufferUtils.cpp" />
     <ClCompile Include="Source\Graphics\ShaderLoader.cpp" />
     <ClCompile Include="Source\Graphics\Vertex.cpp" />
-    <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

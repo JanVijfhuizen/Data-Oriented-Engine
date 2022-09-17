@@ -15,5 +15,5 @@ namespace vke::layout
 		jlb::ArrayView<Binding> bindings{};
 	};
 
-	[[nodiscard]] VkDescriptorSetLayout Create(const EngineData& engineInfo, Info& info);
+	[[nodiscard]] VkDescriptorSetLayout Create(const EngineData& engineInfo, const Info& info);
 }

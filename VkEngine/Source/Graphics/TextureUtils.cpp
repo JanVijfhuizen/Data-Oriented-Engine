@@ -23,7 +23,7 @@ namespace vke::texture
 		auto& logicalDevice = app.logicalDevice;
 		auto& vkAllocator = *info.vkAllocator;
 
-		const size_t imageSize = resolution.x * resolution.y * 4;
+		const size_t imageSize = static_cast<size_t>(resolution.x) * static_cast<size_t>(resolution.y) * 4;
 
 		// Create staging buffer.
 		VkBuffer stagingBuffer;
@@ -194,7 +194,7 @@ namespace vke::texture
 						filledNodes.Add(filledNode);
 
 						// Add the new smaller node if it still exists.
-						node.coordinates.x += partition.width;
+						node.coordinates.x += static_cast<int>(partition.width);
 						node.width -= partition.width;
 						if(node.width > 0)
 							open.Insert(node, node.width);
@@ -209,13 +209,13 @@ namespace vke::texture
 				if(!found)
 				{
 					Node newLayerStart{};
-					newLayerStart.coordinates.x = partition.width;
-					newLayerStart.coordinates.y = ++layersUsed;
+					newLayerStart.coordinates.x = static_cast<int>(partition.width);
+					newLayerStart.coordinates.y = static_cast<int>(++layersUsed);
 					newLayerStart.width = atlasWidth - partition.width;
 					open.Insert(newLayerStart, newLayerStart.width);
 
 					FilledNode filledNode{};
-					filledNode.coordinates.y = layersUsed;
+					filledNode.coordinates.y = static_cast<int>(layersUsed);
 					filledNode.partition = partition;
 					filledNode.index = content.index;
 					filledNodes.Add(filledNode);
@@ -235,7 +235,7 @@ namespace vke::texture
 		}
 
 		jlb::Array<stbi_uc> atlasPixels{};
-		atlasPixels.Allocate(*info.tempAllocator, powf(atlasWidth * nodeResolution, 2) * 4);
+		atlasPixels.Allocate(*info.tempAllocator, static_cast<size_t>(powf(static_cast<float>(atlasWidth) * nodeResolution, 2)) * 4);
 
 		const size_t yStepSize = atlasWidth * nodeResolution * 4;
 
@@ -249,7 +249,7 @@ namespace vke::texture
 
 			const auto& coordinates = node.coordinates;
 			const size_t width = node.partition.width * nodeResolution * 4;
-			const size_t startIndex = (coordinates.x * 4 + coordinates.y * yStepSize) * nodeResolution;
+			const size_t startIndex = (static_cast<size_t>(coordinates.x) * 4 + coordinates.y * yStepSize) * nodeResolution;
 
 			for (size_t y = 0; y < nodeResolution; ++y)
 			{
@@ -316,7 +316,7 @@ namespace vke::texture
 
 	void Subdivide(const SubTexture subTexture, const size_t amount, const jlb::ArrayView<SubTexture> outSubTextures)
 	{
-		const float partitionSize = (subTexture.rBot.x - subTexture.lTop.x) / amount;
+		const float partitionSize = (subTexture.rBot.x - subTexture.lTop.x) / static_cast<float>(amount);
 		for (size_t i = 0; i < amount; ++i)
 		{
 			auto& newSubTexture = outSubTextures[i];

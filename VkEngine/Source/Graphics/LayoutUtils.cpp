@@ -6,7 +6,7 @@
 
 namespace vke::layout
 {
-	VkDescriptorSetLayout Create(const EngineData& engineInfo, Info& info)
+	VkDescriptorSetLayout Create(const EngineData& engineInfo, const Info& info)
 	{
 		jlb::Array<VkDescriptorSetLayoutBinding> bindings{};
 		bindings.Allocate(*engineInfo.tempAllocator, info.bindings.length);

@@ -13,9 +13,9 @@ namespace vke
 		while (lerp < 0)
 			lerp += 1;
 		const float chunkSize = vke::texture::GetChunkSize(subTexture, width);
-		const size_t index = floorf(lerp * width);
+		const float index = floorf(lerp * static_cast<float>(width));
 		subTexture.lTop.x += chunkSize * index;
-		subTexture.rBot.x -= chunkSize * (width - index - 1);
+		subTexture.rBot.x -= chunkSize * (static_cast<float>(width) - index - 1);
 		return subTexture;
 	}
 }

@@ -33,9 +33,6 @@
     <ClInclude Include="Include\VkEngine\Systems\JobSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VkEngine\Systems\EntityRenderSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\VkEngine\Components\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,9 +99,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Systems\EntityRenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\ShaderLoader.cpp">
