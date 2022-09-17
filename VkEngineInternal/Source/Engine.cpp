@@ -15,7 +15,7 @@ namespace vke
 	{
 		// Create them here so that other objects can reference them.
 		EngineData outData{};
-		jlb::SystemManager<EngineData> systemManager;
+		jlb::SystemManager<EngineData> systemManager{};
 
 		// Set up the allocators.
 		jlb::StackAllocator allocator{};

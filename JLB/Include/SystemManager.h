@@ -77,9 +77,9 @@ namespace jlb
 	private:
 		struct TempSystemData final
 		{
-			System<T>* ptr;
-			AllocationID allocation;
-			size_t hashCode;
+			System<T>* ptr = nullptr;
+			AllocationID allocation{};
+			size_t hashCode = SIZE_MAX;
 		};
 
 		Map<System<T>*> _map{};
@@ -137,7 +137,8 @@ namespace jlb
 
 		Array<System<T>*> systemsCpy{};
 		systemsCpy.Allocate(tempAllocator, _vector.GetCount());
-		Copy(systemsCpy.GetView(), 0, systemsCpy.GetLength(), _vector.GetData());
+		if(systemsCpy.GetLength() > 0)
+			Copy(systemsCpy.GetView(), 0, systemsCpy.GetLength(), _vector.GetData());
 
 		_vector.Free(allocator);
 		_map.Free(allocator);

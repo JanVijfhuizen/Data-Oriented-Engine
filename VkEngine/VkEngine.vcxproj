@@ -159,6 +159,8 @@
     <ClInclude Include="Include\VkEngine\Archetypes\EntityArchetype.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Animation.h" />
     <ClInclude Include="Include\VkEngine\Graphics\CameraUtils.h" />
+    <ClInclude Include="Include\VkEngine\Scenes\Scene.h" />
+    <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\ThreadPoolSystem.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Buffer.h" />
     <ClInclude Include="Include\VkEngine\Graphics\BufferUtils.h" />
@@ -184,6 +186,7 @@
     <ClInclude Include="Include\VkEngine\Systems\ParallelJobSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Systems\SceneSystem.cpp" />
     <ClCompile Include="Source\Graphics\Animation.cpp" />
     <ClCompile Include="Source\Graphics\CameraUtils.cpp" />
     <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />

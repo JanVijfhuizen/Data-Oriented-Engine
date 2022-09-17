@@ -55,7 +55,7 @@ namespace jlb
 	{
 		const auto alloc = Malloc(sizeof(T) * count);
 		Allocation<T> allocation{};
-		allocation.ptr = reinterpret_cast<T*>(alloc.ptr);
+		allocation.ptr = static_cast<T*>(alloc.ptr);
 		allocation.id = alloc.id;
 
 		for (size_t i = 0; i < count; ++i)
