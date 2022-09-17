@@ -155,7 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Include\VkEngine\Entity.h" />
+    <ClInclude Include="Include\VkEngine\Components\Entity.h" />
     <ClInclude Include="Include\VkEngine\Archetypes\EntityArchetype.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Animation.h" />
     <ClInclude Include="Include\VkEngine\Graphics\CameraUtils.h" />
@@ -167,7 +167,6 @@
     <ClInclude Include="Include\VkEngine\Graphics\Mesh.h" />
     <ClInclude Include="Include\VkEngine\Graphics\MeshUtils.h" />
     <ClInclude Include="Include\VkEngine\Graphics\PipelineUtils.h" />
-    <ClInclude Include="Include\VkEngine\Graphics\RenderConventions.h" />
     <ClInclude Include="Include\VkEngine\Graphics\Shader.h" />
     <ClInclude Include="Include\VkEngine\Graphics\ShaderLoader.h" />
     <ClInclude Include="Include\VkEngineIntermediate\framework.h" />
@@ -182,18 +181,12 @@
     <ClInclude Include="Include\VkEngine\Systems\GameSystem.h" />
     <ClInclude Include="Include\VkEngine\pch.h" />
     <ClInclude Include="Include\VkEngine\Systems\RenderSystem.h" />
-    <ClInclude Include="Include\VkEngine\Systems\SceneSystem.h" />
     <ClInclude Include="Include\VkEngine\Systems\JobSystem.h" />
-    <ClInclude Include="Include\VkEngine\Systems\JobSystemWithOutput.h" />
-    <ClInclude Include="Include\VkEngine\Systems\TileRenderSystem.h" />
-    <ClInclude Include="Include\VkEngine\Systems\UIRenderSystem.h" />
-    <ClInclude Include="Include\VkEngine\Systems\ParallelJobSystemWithOutput.h" />
+    <ClInclude Include="Include\VkEngine\Systems\ParallelJobSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Graphics\Animation.cpp" />
     <ClCompile Include="Source\Graphics\CameraUtils.cpp" />
-    <ClCompile Include="Source\Systems\TileRenderSystem.cpp" />
-    <ClCompile Include="Source\Systems\UIRenderSystem.cpp" />
     <ClCompile Include="Source\Graphics\LayoutUtils.cpp" />
     <ClCompile Include="Source\Graphics\PipelineUtils.cpp" />
     <ClCompile Include="Source\Graphics\TextureUtils.cpp" />
@@ -202,7 +195,6 @@
     <ClCompile Include="Source\Graphics\ShaderLoader.cpp" />
     <ClCompile Include="Source\Graphics\Vertex.cpp" />
     <ClCompile Include="Source\Systems\EntityRenderSystem.cpp" />
-    <ClCompile Include="Source\Systems\SceneSystem.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

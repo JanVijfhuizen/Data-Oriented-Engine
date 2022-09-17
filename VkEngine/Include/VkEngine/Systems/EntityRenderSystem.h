@@ -4,7 +4,6 @@
 #include "VkEngine/Components/Transform.h"
 #include "VkEngine/Graphics/SubTexture.h"
 #include "RenderSystem.h"
-#include "VkEngine/Graphics/RenderConventions.h"
 
 namespace vke
 {
@@ -19,7 +18,7 @@ namespace vke
 		// Size of a pixel, where the window width equals 1.
 		float pixelSize = 0.008f;
 	private:
-		int32_t _tileSize = PIXEL_SIZE_ENTITY;
+		int32_t _tileSize = 32;
 	};
 
 	struct EntityRenderJob final

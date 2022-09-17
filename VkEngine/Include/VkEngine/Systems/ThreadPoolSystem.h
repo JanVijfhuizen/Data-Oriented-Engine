@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <mutex>
 #include <thread>
-#include "JobSystemWithOutput.h"
+#include "JobSystem.h"
 
 namespace vke
 {

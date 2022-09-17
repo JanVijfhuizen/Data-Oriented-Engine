@@ -26,8 +26,7 @@ namespace jlb
 	{
 	public:
 		virtual void Allocate(StackAllocator& levelAllocator, size_t capacity);
-		virtual void OnPreUpdate(const Info& info);
-		virtual void OnPostUpdate(const Info& info);
+		virtual void OnUpdate(const Info& info);
 
 		virtual void OnKeyInput(int key, int action);
 		virtual void OnMouseInput(int key, int action);
@@ -52,7 +51,7 @@ namespace jlb
 			GetViewColumn(outViews...);
 		}
 
-		size_t Add(StackAllocator& levelAllocator, Tuple<Args...> components = {})
+		virtual size_t Add(StackAllocator& levelAllocator, Tuple<Args...> components = {})
 		{
 			_count++;
 			return AddInstance<0, Args...>(levelAllocator, components);
@@ -157,12 +156,7 @@ namespace jlb
 	}
 
 	template <typename Info>
-	void IArchetype<Info>::OnPreUpdate(const Info& info)
-	{
-	}
-
-	template <typename Info>
-	void IArchetype<Info>::OnPostUpdate(const Info& info)
+	void IArchetype<Info>::OnUpdate(const Info& info)
 	{
 	}
 
