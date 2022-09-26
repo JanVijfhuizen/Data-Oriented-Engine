@@ -1,10 +1,14 @@
 #pragma once
-#include "VkEngine/Systems/GameSystem.h"
 
 namespace vke
 {
-	class Scene : public GameSystem
+	class Scene
 	{
-		
+	public:
+		void Allocate();
+		void Free();
+
+	private:
+		jlb::StackAllocator _allocator{};
 	};
 }

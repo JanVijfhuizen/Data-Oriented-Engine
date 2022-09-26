@@ -9,8 +9,8 @@ namespace vke
 	class EntityArchetype : public jlb::Archetype<EngineData, Entity, Args...>
 	{
 	public:
-		void OnPreUpdate(const EngineData& info) override;
-		size_t Add(jlb::StackAllocator& levelAllocator, jlb::Tuple<Args...> components) override;
+		void OnUpdate(const EngineData& info) override;
+		size_t Add(jlb::StackAllocator& levelAllocator, jlb::Tuple<Entity, Args...> components) override;
 
 	private:
 		typedef jlb::Archetype<EngineData, Entity, Args...> Base;
@@ -20,9 +20,9 @@ namespace vke
 	};
 
 	template <typename ... Args>
-	void EntityArchetype<Args...>::OnPreUpdate(const EngineData& info)
+	void EntityArchetype<Args...>::OnUpdate(const EngineData& info)
 	{
-		Base::OnPreUpdate();
+		Base::OnUpdate(info);
 
 		jlb::ArchetypeView<Entity> entities;
 		Base::template GetViews(entities);
@@ -31,8 +31,8 @@ namespace vke
 				Base::RemoveAt(i);
 	}
 
-	template <typename ... Args>
-	size_t EntityArchetype<Args...>::Add(jlb::StackAllocator& levelAllocator, jlb::Tuple<Args...> components)
+	template <typename ...Args>
+	size_t EntityArchetype<Args...>::Add(jlb::StackAllocator& levelAllocator, jlb::Tuple<Entity, Args...> components)
 	{
 		jlb::Get<0>(components).id = _entityGlobalId++;
 		return Base::Add(levelAllocator, components);

@@ -1,30 +1,50 @@
 ﻿#pragma once
 #include "GameSystem.h"
+#include "NestedVector.h"
+#include "VkEngine/Scenes/Scene.h"
 
 namespace vke
 {
 	class SceneSystem : public GameSystem
 	{
 	protected:
-		void Allocate(const EngineData& info) override;
-		void Free(const EngineData& info) override;
-		void Awake(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void Start(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void BeginFrame(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void PreUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void Update(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void PostUpdate(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void EndFrame(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void OnRecreateSwapChainAssets(const EngineData& info, jlb::Systems<EngineData> systems) override;
-		void OnKeyInput(const EngineData& info, jlb::Systems<EngineData> systems, int key, int action) override;
-		void OnMouseInput(const EngineData& info, jlb::Systems<EngineData> systems, int key, int action) override;
-		void OnScrollInput(const EngineData& info, jlb::Systems<EngineData> systems, float xOffset,
-			float yOffset) override;
-		void Exit(const EngineData& info, jlb::Systems<EngineData> systems) override;
+		struct Initializer final
+		{
+			friend SceneSystem;
 
-		virtual void DefineScenes(const jlb::SystemsInitializer<EngineData>& initializer) = 0;
+			template <typename T>
+			void Add() const;
+
+		private:
+			SceneSystem* _sys = nullptr;
+			jlb::StackAllocator* _allocator = nullptr;
+			jlb::StackAllocator* _tempAllocator = nullptr;
+		};
+
+		void Allocate(const EngineData& info) override;
+		virtual void DefineScenes(const Initializer& initializer) = 0;
+
+		void Load(size_t id);
+		void Unload(size_t id);
 
 	private:
-		jlb::SystemManager<EngineData> _sceneManager{};
+		struct SceneData final
+		{
+			bool loaded = false;
+			jlb::Allocation<Scene> allocation{};
+		};
+
+		jlb::Vector<SceneData> _scenes{};
 	};
+
+	template <typename T>
+	void SceneSystem::Initializer::Add() const
+	{
+		auto allocation = _allocator->New<T>();
+		assert(static_cast<Scene*>(allocation.ptr));
+
+		SceneData data{};
+		data.allocation = allocation;
+		_sys->_scenes.Add(data, _allocator, _tempAllocator);
+	}
 }
